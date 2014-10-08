@@ -1,0 +1,133 @@
+<html>
+	<head>
+		<script src="/js/jquery-2.1.0.min.js" ></script>
+		<script type="text/javascript">
+		var lastSiteId = null;
+		var lastMeetingId = null;
+
+			$("document").ready (function (){
+				$("#sitepost").click (function (){
+					var text = $('#sitedata').val();
+					var value = eval ('(' + text + ')');
+					$.ajax ({
+						'type':'POST',
+						 'url' : '/meetingssite/create',
+						 'data' : value,
+						 'success' : function (data){
+						 	$("#resulttest").append ("<p>"+ JSON.stringify(data) +"</p>");
+						 	lastSiteId = data.siteId;
+						 },
+						 'error': function (error){
+						 	alert ('error' + error);
+						 },
+						 'dataType': 'json'
+					});
+				});
+
+				$("#meetingpost").click (function (){
+					var text = $('#meetingdata').val();
+					var value = eval ('(' + text + ')');
+					$.ajax ({
+						'type':'POST',
+						 'url' : '/meetingssite/'+lastSiteId+'/meeting/create',
+						 'data' : value,
+						 'success' : function (data){
+						 	$("#resulttest").append ("<p>"+ JSON.stringify(data) +"</p>");
+						 	lastMeetingId = data.meetingId;
+						 },
+						 'error': function (error){
+						 	alert ('error' + error);
+						 },
+						 'dataType': 'json'
+					});
+				});
+
+				$("#paylastmeeting").click (function (){
+					$.ajax ({
+						'type':'POST',
+						 'url' : '/meetingssite/'+lastSiteId+'/meeting/' + lastMeetingId+'/pay',
+						 'data' : undefined,
+						 'success' : function (data){
+						 	$("#resulttest").append ("<p>"+ JSON.stringify(data) +"</p>");
+						 },
+						 'error': function (error){
+						 	alert ('error' + error);
+						 },
+						 'dataType': 'json'
+					});
+				});
+
+				$("#cancellastmeeting").click (function (){
+					$.ajax ({
+						'type':'POST',
+						 'url' : '/meetingssite/'+lastSiteId+'/meeting/' + lastMeetingId+'/cancel',
+						 'data' : undefined,
+						 'success' : function (data){
+						 	$("#resulttest").append ("<p>"+ JSON.stringify(data) +"</p>");
+						 },
+						 'error': function (error){
+						 	alert ('error' + error);
+						 },
+						 'dataType': 'json'
+					});
+				});
+
+
+				$("#adduserkey").click (function (){
+					var text = $('#userkey').val();
+					var value = eval ('({"userkey" : "' + text + '"})');
+					$.ajax ({
+						'type':'POST',
+						 'url' : '/meetingssite/'+lastSiteId+'/meeting/' + lastMeetingId+'/addAllowedUser',
+						 'data' : value,
+						 'success' : function (data){
+						 	$("#resulttest").append ("<p>"+ JSON.stringify(data) +"</p>");
+						 },
+						 'error': function (error){
+						 	alert ('error' + error);
+						 },
+						 'dataType': 'json'
+					});
+				});
+
+				$("#dropuserkey").click (function (){
+					var text = $('#userkey').val();
+				
+					$.ajax ({
+						'type':'DELETE',
+						 'url' : '/meetingssite/'+lastSiteId+'/meeting/' + lastMeetingId+'/dropAllowedUser/'+text,
+						 'data' : undefined,
+						 'success' : function (data){
+						 	$("#resulttest").append ("<p>"+ JSON.stringify(data) +"</p>");
+						 },
+						 'error': function (error){
+						 	alert ('error' + error);
+						 },
+						 'dataType': 'json'
+					});
+				});
+
+
+			});
+		</script>
+	</head>
+	
+	<body>
+		Create a site:<input type="text" id="sitedata" value="{}" >
+		<a href="#" id="sitepost">add a session</a><br/>
+		Create a meetgin:<input type="text" id="meetingdata" value="{'startdate':1397592000000, 'enddate':1397595000000}">
+		<a href="#" id="meetingpost">add a session</a><br/>
+		<a href="#" id="paylastmeeting">pay last</a><br/>
+		<a href="#" id="cancellastmeeting">cancel last</a><br />
+		User key <input type="text" id="userkey" value="" > 
+		<a href="#" id="adduserkey">add</a>
+		<a href="#" id="dropuserkey">delete</a>
+		
+
+
+		<div id="resulttest">
+
+		</div>
+
+	</body>
+</html>

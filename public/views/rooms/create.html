@@ -1,0 +1,64 @@
+<div id="home" data-ng-controller="RoomsController" data-ng-init="init()">
+	<header class="home_nav">
+		<!--div class="inner">
+			<a id="logo" href="" ng-click="ui.question='none'">
+				<h2>L<span id="eyeslogo"></span>WID</h2>
+			</a>
+			<span class="version">&alpha;</span>
+		</div-->
+	</header>
+	<section id="starred">
+		<div class="inner">
+			<aside id="sharingroom">
+				<h1 class="slogan">Look what I'm doing</h1>
+				<p>{{resourceBundle.starredText}}</p>
+			</aside>
+			<article id="formroom">
+				<h2>{{resourceBundle.startsharing}}:</h2>
+				<form name="createForm" class="navbar-left navbar-form" data-ng-submit="create()" novalidate>
+					<!-- div id="cf" ng-click="resetName()" >
+						<img class="bottom" src="img/hero.png" title="{{resourceBundle.shhh}}" >
+						<img class="top" src="img/person.png" title="{{resourceBundle.shhh}}" >
+					</div -->
+					<input id="mname" type="text" data-ng-model="ui.name" ng-pattern="global.namePattern" required class="input-lg form-control" placeholder="{{resourceBundle.heroPlaceholder}}" data-ng-show="isValidBrowser() && !isRoomAvailable()" autofocus> 
+					<button id="main_button" type="submit" data-ng-show="isValidBrowser() && !isRoomAvailable()">{{resourceBundle.loowidnow}}</button>
+	  				<label for="terms" ng-bind-html="resourceBundle.acceptterms" ></label>
+					<input ng-model="termsaccepted" data-ng-show="isValidBrowser() && !isRoomAvailable()" type="checkbox" id="terms" ng-click="clickterms($event)" /> <p ng-show="termsnotaccepted" class="alert">{{resourceBundle.youmustacceptterms}}</p>
+					
+					<img src="img/ajax-loader-bar.gif" ng-show="creating"/>
+					<button id="goroom_button" type="submit" data-ng-show="isValidBrowser() && isRoomAvailable()">{{resourceBundle.gototheroom}}</button>
+					<div data-ng-show="!isValidBrowser()">
+						<h2>{{resourceBundle.yourbrowsernot}}</h2>
+					</div>
+					<p class="mission" data-ng-hide="isValidBrowser()">{{resourceBundle.selectsecretinvalid}}</p>
+				</form>			
+		        <!-- a class="twitterLink" href="http://twitter.com/LoowidCOM" target="_blank"><img src="img/twitter.png" ></a -->
+			</article>
+		</div>
+	</section>
+	<section id="texts">
+		<article class="inner">
+			<div class="esquema">
+				<h2>{{resourceBundle.qwhatcanido}}</h2>
+				<ul class="mainschema">
+					<li>{{resourceBundle.createroom}}</li>
+					<li><h3 id="logo">L<span id="eyesLogo"></span>WID</h3></li>
+					<li>{{resourceBundle.sharelink}}</li>
+				</ul>
+				<p class="register">{{resourceBundle.startconversation}}<em class="hoverinfo">{{resourceBundle.conversationdevices}}</em></p>
+			</div>
+			<div class="homeinfo">
+				<p>{{resourceBundle.textsheader}}</p>
+				<ul>
+					<li>{{resourceBundle.textsitemshare}}</li>
+					<li>{{resourceBundle.textsitemcreate}}</li>
+					<li>{{resourceBundle.textsitemsharefile}}</li>
+				</ul>
+				<p>{{resourceBundle.textslink}}</p>
+			</div>
+		</article>
+	</section>
+	<footer class="inner">
+		&copy; {{resourceBundle.footerText}}
+	</footer>
+</div>

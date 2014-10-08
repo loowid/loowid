@@ -1,0 +1,38 @@
+{
+  "name": "loowid",
+  "description": "Loowid - Share your screen easy.",
+  "version": "0.1.0",
+  "private": false,
+  "author": "juanjo alex edu",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/---"
+  },
+  "engines": {
+    "node": "0.10.x",
+    "npm": "1.2.x"
+  },
+  "scripts": {
+    "start": "node node_modules/grunt-cli/bin/grunt",
+    "test": "node node_modules/grunt-cli/bin/grunt test"
+  },
+  "dependencies": {
+    "express": "3.4.4",
+    "jade": "0.35.0",
+    "mongoose": "3.8.0",
+    "mongoose-currency": "0.0.4",
+    "connect-mongo": "0.4.0",
+    "crypto": "0.0.3",
+    "underscore": "1.5.2",
+    "async": "0.2.9",
+    "grunt": "0.4.1",
+    "grunt-cli": "0.1.11",
+    "grunt-env": "0.4.0",
+    "socket.io": "0.9.6",
+    "ws": "0.4.31",
+    "i18next": "1.7.1",
+    "cookie-signature": "1.0.3",
+    "request": "2.34.0",
+    "node-rest-client": "~1.0.0"
+  }
+}

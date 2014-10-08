@@ -1,0 +1,30 @@
+/**
+* Module dependencies.
+*/
+
+var mongoose = require('mongoose'),
+models = require ('../models/events'),
+WSEvent = mongoose.model('WSEvent');
+
+exports.addEvent = function (srv,e,d,s){
+	var newsocket = s;
+	if (s.id) newsocket = {id:s.id};
+	var wsevt = new WSEvent({eventName:e,eventServer:srv,eventDate:new Date(),data:d,socket:newsocket});
+	wsevt.save(function(err){ if (err) console.log('SAVED-EV: '+err); });
+}
+
+exports.initListener = function(srv,cb) {
+	// Add initial data to start tail
+	var startDate = this.sendAck(srv);
+	// Query with tail
+	var stream = WSEvent.find({eventDate:{'$gte':startDate}}).tailable().stream();
+	stream.on('data', cb);
+}
+
+exports.sendAck = function(srv) {
+	// Add initial data to start tail
+	var ackDate = new Date();
+	var ackEvent = new WSEvent({eventName:'startup',eventServer:srv,eventDate:ackDate,data:'none',socket:'none'});
+	ackEvent.save(function(err){ if (err) console.log('SAVED-ACK: '+err); });
+	return ackDate;
+}
