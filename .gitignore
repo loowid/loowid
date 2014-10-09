@@ -27,3 +27,6 @@ node_modules
 # Users Environment Variables
 .lock-wscript
 /data/
+/.project
+/private.pem
+/public.pem
