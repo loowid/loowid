@@ -115,46 +115,6 @@ if (navigator.webkitGetUserMedia) {
   };
 
 
- rtc.SERVER = function() {
-/*    if (navigator.mozGetUserMedia) {
-      return {
-        "iceServers": [{
-          "url": "stun:23.21.150.121"
-        },
-
-        ]
-      };
-    }*/
-    return {
-      "iceServers": [{
-        "url": "stun:stun.l.google.com:19302"
-      },
-    	{url:'stun:stun.l.google.com:19302'},
-		{url:'stun:stun1.l.google.com:19302'},
-		{url:'stun:stun2.l.google.com:19302'},
-		{url:'stun:stun3.l.google.com:19302'},
-		{url:'stun:stun4.l.google.com:19302'},
-		{
-			"credential": "numbloowid",
-			"host": "numb.viagenie.ca",
-			"protocol": "turn",
-			"url": "turn:numb.viagenie.ca",
-			"username": "loowid@gmail.com"
-		}    
-      ]
-    };
-  };
-
-  /* Our turn server
-   {
-        "credential": "numbloowid",
-        "host": "numb.viagenie.ca",
-        "protocol": "turn",
-        "url": "turn:numb.viagenie.ca",
-        "username": " loowid@gmail.com"
-      }
-  */
-
   // Reference to the lone PeerConnection instance.
   rtc.producedPeerConnections = {};
   rtc.receivedPeerConnections = {};
@@ -221,8 +181,8 @@ if (navigator.webkitGetUserMedia) {
 	 };	
 		
 	rtc.on ('get_updated_servers', function (data){
-		 rtc.iceServers = data.iceServers;
-		 console.log ('serverList updated' + JSON.stringify (rtc.iceServers));
+		rtc.iceServers = data.iceServers;
+		console.log ('serverList updated' + JSON.stringify (rtc.iceServers));
 	 });	
 	
 	rtc.askForUpdateServers(); 	

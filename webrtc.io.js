@@ -41,6 +41,29 @@ rtc.on = function(eventName, callback) {
   rtc._events[eventName].push(callback);
 };
 
+ rtc.iceSERVERS = function() {
+    return {
+      "iceServers": [{
+        "url": "stun:stun.l.google.com:19302"
+      },
+    	{url:'stun:stun.l.google.com:19302'},
+		{url:'stun:stun1.l.google.com:19302'},
+		{url:'stun:stun2.l.google.com:19302'},
+		{url:'stun:stun3.l.google.com:19302'},
+		{url:'stun:stun4.l.google.com:19302'},
+		{
+			"credential": "numbloowid",
+			"host": "numb.viagenie.ca",
+			"protocol": "turn",
+			"url": "turn:numb.viagenie.ca",
+			"username": "loowid@gmail.com"
+		}    
+      ]
+    };
+  };
+
+
+
 rtc.fire = function(eventName, _) {
   var events = rtc._events[eventName];
   var args = Array.prototype.slice.call(arguments, 1);
@@ -258,28 +281,36 @@ function attachEvents(manager) {
         },
 
         function (error, response, body) {
-            if (!error && response.statusCode == 200) {
+            var iceServers;
+			
+			if (!error && response.statusCode == 200) {
                 console.log(body);
 				var pdata = JSON.parse(body);
 				if (pdata.d){
-					var iceServers = pdata.d.iceServers;
-					socket.send (JSON.stringify ({
-							"eventName":"get_updated_servers",
-							"data":{
-								"iceServers": iceServers
-							}
-					}), function(error) {
-							if (error) {
-							  console.log(error);
-							}
-					});
+					iceServers = pdata.d.iceServers;
+			
 				}else{
-				  console.log("Empty list");
+					serverList = rtc.iceSERVERS();
+				  	iceServers = serverList.iceServers; 
 				}
                
             }else{
+				serverList = rtc.iceSERVERS();
+				iceServers = serverList.iceServers;
 				console.log ("Error connecting to server to get servers" + body  + "\n " + response);
 			}
+			
+			//Send the correct list
+			socket.send (JSON.stringify ({
+					"eventName":"get_updated_servers",
+					"data":{
+						"iceServers": iceServers
+					}
+			}), function(error) {
+					if (error) {
+					  console.log(error);
+					}
+			});
         });
 	 
 	 
