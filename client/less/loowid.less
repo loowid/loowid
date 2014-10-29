@@ -143,18 +143,18 @@ h1, h2, h3, h4, h5, h6{
 	}
 }
 
-/*.mission{
+.mission{
 	clear: both;
 	img{
 		vertical-align: bottom;
 		cursor: pointer;
 	}
-}*/
+}
 
-/*#cf{
-	clear: both;
+#cf{
 	position:relative;
-	float:left;
+ 	display: inline-block;	
+	vertical-align: middle;
 	width: 100px;
 	height:120px;
 	margin: -1.2em 1.2em 0 0;
@@ -169,7 +169,7 @@ h1, h2, h3, h4, h5, h6{
 			opacity: 0;
 		}
 	}
-}*/
+}
 
 #landing{
 	background: @maincolor;
@@ -222,14 +222,14 @@ h1, h2, h3, h4, h5, h6{
 			font-size: 1em;
 			letter-spacing: 0.1em;
 			font-family: "komika_display_tightregular", sans-serif;
-			width: 50%;
+			width: 36%;
 			text-rendering: optimizeLegibility;
 			&.ng-invalid {
 				border: 2px solid #b52715;
 			}
 		}
 		button{
-			width: 35%;
+			width: 29%;
 			margin: 0 0 0.5em 2.4%;
 			font-family: "Open Sans", sans-serif;
 			background-color: @linkcolor;
@@ -436,7 +436,7 @@ h1, h2, h3, h4, h5, h6{
 		}
 		#formroom{
 			background: @maincolor;
-			margin: 0.6em 0 0 55%;
+			margin: 0.6em 0 0 47%;
 			padding: 0.8em;
 			color: @bgcolor;
 			form{
@@ -444,6 +444,10 @@ h1, h2, h3, h4, h5, h6{
 				.mission{
 					font-size: 1em;
 					margin: 0.35em 0 0 0;
+				}
+				.termscontainer{
+					width: 100%;
+					text-align: right;
 				}
 			}
 		}

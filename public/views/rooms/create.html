@@ -17,15 +17,18 @@
 			<article id="formroom">
 				<h2>{{resourceBundle.startsharing}}:</h2>
 				<form name="createForm" class="navbar-left navbar-form" data-ng-submit="create()" novalidate>
-					<!-- div id="cf" ng-click="resetName()" >
+					 <div id="cf" ng-click="resetName()" >
 						<img class="bottom" src="img/hero.png" title="{{resourceBundle.shhh}}" >
 						<img class="top" src="img/person.png" title="{{resourceBundle.shhh}}" >
-					</div -->
+					</div>
 					<input id="mname" type="text" data-ng-model="ui.name" ng-pattern="global.namePattern" required class="input-lg form-control" placeholder="{{resourceBundle.heroPlaceholder}}" data-ng-show="isValidBrowser() && !isRoomAvailable()" autofocus> 
 					<button id="main_button" type="submit" data-ng-show="isValidBrowser() && !isRoomAvailable()">{{resourceBundle.loowidnow}}</button>
-	  				<label for="terms" ng-bind-html="resourceBundle.acceptterms" ></label>
-					<input ng-model="termsaccepted" data-ng-show="isValidBrowser() && !isRoomAvailable()" type="checkbox" id="terms" ng-click="clickterms($event)" /> <p ng-show="termsnotaccepted" class="alert">{{resourceBundle.youmustacceptterms}}</p>
-					
+	  				<div class="termscontainer">
+						 <p ng-show="termsnotaccepted" class="alert">{{resourceBundle.youmustacceptterms}}</p>
+						<input ng-model="termsaccepted" data-ng-show="isValidBrowser() && !isRoomAvailable()" type="checkbox" id="terms" ng-click="clickterms($event)" />
+						<label for="terms" ng-bind-html="resourceBundle.acceptterms" ></label>
+						
+					</div>
 					<img src="img/ajax-loader-bar.gif" ng-show="creating"/>
 					<button id="goroom_button" type="submit" data-ng-show="isValidBrowser() && isRoomAvailable()">{{resourceBundle.gototheroom}}</button>
 					<div data-ng-show="!isValidBrowser()">
