@@ -563,23 +563,41 @@ if (navigator.webkitGetUserMedia) {
     onFail = onFail || function() {};
 
     if (getUserMedia) {
-      rtc.numStreams++;
-      getUserMedia.call(navigator, options, function(stream) {
-        var streamObj = {};
-        streamObj.mediastream = stream;
-        streamObj.mediatype = mediatype;
+		var startStream = function (){
+			rtc.numStreams++;
+			getUserMedia.call(navigator, options, function(stream) {
+				var streamObj = {};
+				streamObj.mediastream = stream;
+				streamObj.mediatype = mediatype;
 
-        rtc.streams.push(streamObj);
-        rtc.initializedStreams++;
-        onSuccess(stream);
-        if (rtc.initializedStreams === rtc.numStreams) {
-          rtc.fire('ready', mediatype,maxBitrate);
-        }
-      }, function(error) {
-        //alert("Could not connect stream.");
-        onFail(error);
-      });
-    } else {
+				rtc.streams.push(streamObj);
+				rtc.initializedStreams++;
+				onSuccess(stream);
+				if (rtc.initializedStreams === rtc.numStreams) {
+					rtc.fire('ready', mediatype,maxBitrate);
+				}
+			}, function(error) {
+				//alert("Could not connect stream.");
+				onFail(error);
+			});
+		};
+		
+		if (mediatype === 'screen'){
+			getScreenId(function (error, sourceId, screen_constraints) {
+				if (error === 'permission-denied') //return alert('Permission is denied.');
+				if (error === 'not-chrome') return alert('Please use chrome.');
+				if (!error && sourceId) {
+					 options.video.mandatory.chromeMediaSource = 'desktop';
+					 options.video.mandatory.chromeMediaSourceId = sourceId;
+				 }
+				startStream();
+			});	
+		}else{
+			startStream();	
+		}
+	
+	
+	    } else {
       alert('webRTC is not yet supported in this browser.');
     }
   };

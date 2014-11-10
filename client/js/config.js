@@ -16,8 +16,9 @@ window.app.config(['$routeProvider',
             templateUrl: 'views/rooms/tos_es.html' 
         }).when ('/tos_ca',{
             templateUrl: 'views/rooms/tos_ca.html' 
-        })
-		.when('/', {
+        }).when ('/desktop_cap',{
+            templateUrl: 'views/rooms/desktop_cap.html' 
+		}).when('/', {
                 templateUrl: 'views/rooms/create.html'
         }).otherwise({
                 redirectTo: '/'
