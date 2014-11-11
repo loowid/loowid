@@ -83,10 +83,20 @@ angular.module('mean.rooms').factory("MediaService",['Rooms','UIHandler',functio
 						if (onrecord) {onrecord.call (self);}
 						uiHandler.safeApply($scope,function(){});
 					}
-				},function (){
+				},function (error){
 					mediasource.recording = false;
-					var errmsg = $scope.resourceBundle['unablepermission'+source] +  (source ==='screen' ? $scope.resourceBundle['readmore'] : '');
-					$scope.global.showError($scope,errmsg);
+					var errmsg = '';
+					
+					if (source === 'screen'){
+						if (error==='installed-disabled'){
+							errmsg = $scope.resourceBundle['loowid-extension-activate'];
+						}else if (error === 'not-installed'){
+							errmsg = $scope.resourceBundle['loowid-extension-install'];
+						}
+					}else{
+						errmsg = $scope.resourceBundle['unablepermission'+source] +  (source ==='screen' ? $scope.resourceBundle['readmore'] : '');
+					}
+					if (errmsg !== '') $scope.global.showError($scope,errmsg);
 					if (uiHandler.access.moderated) {
                 		rtc.reportErrorToOwner($scope.global.roomId,source,'cantaccess'+source);
                 	}

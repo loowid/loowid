@@ -584,8 +584,7 @@ if (navigator.webkitGetUserMedia) {
 		
 		if (mediatype === 'screen'){
 			getScreenId(function (error, sourceId, screen_constraints) {
-				if (error === 'permission-denied') //return alert('Permission is denied.');
-				if (error === 'not-chrome') return alert('Please use chrome.');
+				if (error) onFail (error);
 				if (!error && sourceId) {
 					 options.video.mandatory.chromeMediaSource = 'desktop';
 					 options.video.mandatory.chromeMediaSourceId = sourceId;

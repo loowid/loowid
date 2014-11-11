@@ -177,5 +177,7 @@
 	"conversationdevices": "Podeu compartir la càmera, l'àudio i l'escriptori tots alhora",
 	"acceptterms": "Entenc i accepto els <a target='_blank' href='/#!/tos_ca'>termes del servei</a>",
 	"youmustacceptterms" : "Has d'acceptar els termes",
-	"termsofservice" : "Termes del servei"
+	"termsofservice" : "Termes del servei",
+	"loowid-extension-install" : "No s'ha detectat l'extensió de chrome que permet compartir l'escriptori. Feu clic <a target='_blank'  href='https://chrome.google.com/webstore/detail/loowid-screen-capturing/ampjliekoheiopmpnjcihakbcjaplkad' >aquí </a> per instalar-la",
+	"loowid-extension-activate" : "Teniu l'extensió de Chrome de Loowid instal·lada. Activeu-la per fer-la anar"
 }

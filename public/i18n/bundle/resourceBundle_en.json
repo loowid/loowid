@@ -177,5 +177,7 @@
 	"conversationdevices": "You can share your cam, audio and your desktop at the same time",
 	"acceptterms": "I understood and accept the <a target='_blank' href='/#!/tos_en'>terms of service</a>",
 	"youmustacceptterms" : "You must accept terms",
-	"termsofservice" : "Terms of service"
+	"termsofservice" : "Terms of service",
+	"loowid-extension-install" : "LooWID Chrome extension was not detected. Click <a target='_blank'  href='https://chrome.google.com/webstore/detail/loowid-screen-capturing/ampjliekoheiopmpnjcihakbcjaplkad' >here</a> to install it",
+	"loowid-extension-activate" : "you've installed the Loowid extension but it's not active. Please activate it to record the desktop"
 }
