@@ -4,6 +4,7 @@
  * node server [prod] [nport] -> Run below proxy port [nport], using minimized js with prod
  * 
  */
+var crypto = require('crypto') ;
 var i18n = require('i18next');
 var express = require('express'), jade = require('jade');
 var defaultPort = true;
@@ -145,7 +146,7 @@ app.configure(function() {
 		store:new MongoStore({mongoose_connection:mongoose.connection},function(){console.log('Session store connected !!')}),
 		cookie: { maxAge : 3600000 }, // 1 hour
 		key:'jsessionid', 
-		secret:'your-secret'}));
+		secret:crypto.randomBytes(16).toString('hex')}));
 	app.use(express.bodyParser());
 	var csrf = express.csrf();
 	app.use(function(req,res,next){
@@ -285,7 +286,7 @@ app.post('/rooms/keep', function(req, res, next){
 });
 
 // Rest Services Protected
-var auth = express.basicAuth('your-api-login', 'your-api-password');
+var auth = express.basicAuth(process.env.REST_API_USERNAME || 'username', process.env.REST_API_PASSWORD || 'password');
 
 //Define the routes for payservice REST service
 app.post('/meetingssite/create',auth,function (req,res,next){

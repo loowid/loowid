@@ -271,11 +271,11 @@ function attachEvents(manager) {
 	 request.post(
             'https://api.xirsys.com/getIceServers', {
             form: {
-                domain: "domain",
+                domain: process.env.XIRSYS_DOMAIN || "domain",
                 room: "default",
                 application: "default",
-                ident: "username",
-                secret: "password",
+                ident: process.env.XIRSYS_USER || "username",
+                secret: process.env.XIRSYS_SECRET || "password",
                 secure: 1
             }
         },
