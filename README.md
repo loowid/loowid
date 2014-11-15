@@ -20,5 +20,11 @@ Install
   6. Run >sudo node server.js
   7. Connect to https://localhost/
   
+Modify
+=======
 
+  1. Add your changes to the source.
+  2. If you change client side javascript files you have to generate public minified files.
+  
+      grunt mini
   
