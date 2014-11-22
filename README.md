@@ -19,6 +19,12 @@ Install
   5. Run >npm install
   6. Run >sudo node server.js
   7. Connect to https://localhost/
+
+Docker
+=======
+
+	Too much steps to install? Don't worry loowid is also dockerized !!
+	https://github.com/loowid/loowid-dockers
   
 Modify
 =======
