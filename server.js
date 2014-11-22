@@ -47,7 +47,7 @@ if (!process.env.PORT && !process.env.OPENSHIFT_NODEJS_PORT && defaultPort) {
 	};
 	sserver = require('https').createServer(credentials, app);
 }
-var ipaddr = process.env.OPENSHIFT_NODEJS_IP ||"127.0.0.1";
+var ipaddr = process.env.OPENSHIFT_NODEJS_IP ||"0.0.0.0";
 
 // load webrtc module
 var webRTC = require('./webrtc.io.js').listen(
