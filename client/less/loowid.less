@@ -229,7 +229,7 @@ h1, h2, h3, h4, h5, h6{
 			}
 		}
 		button{
-			width: 29%;
+			width: 165px;
 			margin: 0 0 0.5em 2.4%;
 			font-family: "Open Sans", sans-serif;
 			background-color: @linkcolor;
@@ -488,7 +488,10 @@ h1, h2, h3, h4, h5, h6{
 				margin: 0 auto;
 				.border-radius(100%);
 				.box-shadow( inset 0 0 10px rgba(0,0,0,0.25) );
+				
+				
 				li{
+					
 					.border-radius(100%);
 					background: @maincolor;
 					float: left;
@@ -499,17 +502,44 @@ h1, h2, h3, h4, h5, h6{
 					text-align: center;
 					color: @bgcolor;
 					position: relative;
-					&:first-child{
+					
+					&.firstball{
 						margin: 0 3em 0 -4em;
 					}
-					&:last-child{
+					
+					&.lastball{
 						background: @linkcolor;
 						margin: 0 1em 0 18em;
 						float: right;
 						position: absolute;
 					}
+					
+					@media all and (max-width:800px){ 
+						&.middleball{
+							display: none;	
+						}&.firstball{
+							margin: -10em 0 0 5em;	
+						}&.lastball{
+							float: left;
+							position: relative;
+							margin: 0 1em 0 5em;
+						}
+						
+					}		
 				}
+				@media all and (max-width:800px){ 
+					width: 18em;
+					height: 7em;
+					margin: 6em auto 0 auto;
+					.border-radius(100%);
+					.box-shadow( none );
+				}
+				
+				
+				
 			}
+
+			
 			.register{
 				width: 7em;
 				height: 2.8em;
