@@ -425,7 +425,7 @@ if (navigator.webkitGetUserMedia) {
 						console.log ('not completed yet. Try : ' + tries);
 						tries ++;
 						if (tries < 10) tryStream();
-					},400);
+					},1500);
 				}
 			}
 		};
