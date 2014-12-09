@@ -14448,7 +14448,7 @@ if (navigator.webkitGetUserMedia) {
 						console.log ('not completed yet. Try : ' + tries);
 						tries ++;
 						if (tries < 10) tryStream();
-					},400);
+					},1500);
 				}
 			}
 		};
@@ -15874,7 +15874,8 @@ angular.module('mean.rooms').factory("MediaService",['Rooms','UIHandler',functio
 	    	uiHandler.isMuted = false;	
 	    	uiHandler.modals = [];
 	    	uiHandler.tutorials = [];
-		  	uiHandler.canShareDesktop = (navigator.webkitGetUserMedia!==undefined);
+		  	//uiHandler.canShareDesktop = (navigator.webkitGetUserMedia!==undefined);
+			uiHandler.canShareDesktop = true;
     
 			//Initialize resolutions
 
