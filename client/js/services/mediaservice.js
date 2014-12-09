@@ -166,9 +166,8 @@ angular.module('mean.rooms').factory("MediaService",['Rooms','UIHandler',functio
 	    	uiHandler.isMuted = false;	
 	    	uiHandler.modals = [];
 	    	uiHandler.tutorials = [];
-		  	//uiHandler.canShareDesktop = (navigator.webkitGetUserMedia!==undefined);
-			uiHandler.canShareDesktop = true;
-    
+		  	uiHandler.canShareDesktop = (navigator.webkitGetUserMedia!==undefined);
+			
 			//Initialize resolutions
 
 			var addedResolution = {x:0,y:0};
