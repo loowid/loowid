@@ -282,20 +282,22 @@ if (navigator.webkitGetUserMedia) {
       rtc.on('new_peer_connected', function(data) {
         var id = data.socketId;
         rtc.connections.push(id);
-      
+      	
+		 //This is a bit of delay to keep the other client load all the needed before sending him offers
+		 var sendDelayedOffer =  function (id, mediatype){
+			  setTimeout (function (){
+				  rtc.sendOffer (id,mediatype);
+				  if (rtc.debug) console.log ("Sending to " + id + " a " + mediatype + "offer");
+			  },2000);
+		 };  
+		  
         for (var i = 0; i < rtc.streams.length; i++){
           var stream = rtc.streams[i].mediastream;
           var mediatype = rtc.streams[i].mediatype;
           var pc = rtc.createPeerConnection(id,mediatype,true);
           pc.addStream(stream);
-          
-
-          //Wait for a second before you start sending offers
-          setTimeout (function (){
-              rtc.sendOffer (id,mediatype);  
-          },1000);
-          
-        }
+          sendDelayedOffer (id,mediatype);
+	    }
     
 
       });
