@@ -30,3 +30,4 @@ node_modules
 /.project
 /private.pem
 /public.pem
+/.DS_Store
