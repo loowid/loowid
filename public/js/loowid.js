@@ -14205,7 +14205,7 @@ if (navigator.webkitGetUserMedia) {
 		
 	rtc.on ('get_updated_servers', function (data){
 		rtc.iceServers = data.iceServers;
-		console.log ('serverList updated' + JSON.stringify (rtc.iceServers));
+		if (rtc.debug) console.log ('serverList updated' + JSON.stringify (rtc.iceServers));
 	 });	
 	
 	rtc.askForUpdateServers(); 	
@@ -14443,11 +14443,11 @@ if (navigator.webkitGetUserMedia) {
 		var tryStream = function (){
 			if (pc != null){
 				if ( pc.iceConnectionState === 'completed' || pc.iceConnectionState == 'connected'){
-					console.log ("the connection was completed send the data");
+					if (rtc.debug) console.log ("the connection was completed send the data");
 					rtc.fire('add remote stream', event.stream, id,mediatype);
 				}else{
 					setTimeout (function (){
-						console.log ('not completed yet. Try : ' + tries);
+						if (rtc.debug) console.log ('Remote stream not added yet. Try : ' + tries);
 						tries ++;
 						if (tries < 10) tryStream();
 					},1500);
@@ -14459,7 +14459,6 @@ if (navigator.webkitGetUserMedia) {
 	};
 
     pc.oniceconnectionstatechange = function (event){
-
 		if (rtc.debug) console.log ('User id: ' + id + ' changed : ' + pc.iceConnectionState +  ' mediatype' + mediatype);
     }
 
@@ -14529,15 +14528,15 @@ if (navigator.webkitGetUserMedia) {
   
       //if it's a new peer but it alrready exist must be destroyed first
 	  if (pc != undefined){
-		 console.log ("Destroyed previous connection");
+		 if (rtc.debug) console.log ("Destroyed previous connection");
 		  rtc.dropPeerConnection(socketId,mediatype,false);
 	  }
 	
-	  console.log ("Create a new one");
+	 if (rtc.debug) console.log ("Create a new one connection");
 		 
 	 pc = rtc.createPeerConnection(socketId,mediatype,false,requestId);
 	
-	 console.log ("send a new annser");
+	 if (rtc.debug) console.log ("Send a new annser");
     rtc.sendAnswer(socketId, sdp,mediatype);
   };
 
@@ -14566,9 +14565,9 @@ if (navigator.webkitGetUserMedia) {
     pc.setRemoteDescription(new nativeRTCSessionDescription(sdp));
 	  
 	setTimeout(function(){
-		console.log("PCICE::::"+pc.iceConnectionState);
+		if (rtc.debug) console.log("PCICE::::"+pc.iceConnectionState);
 		if (pc.iceConnectionState == "checking") {
-			console.log("Estancado lanza offer !!");
+			if (rtc.debug) console.log("Seems that the state is stalled !!");
 
 			//Borramos la posible peer
 			rtc.dropPeerConnection(socketId,mediatype,true);

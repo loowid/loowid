@@ -1,3 +1,4 @@
+'use strict';
 module.exports = function(grunt) {
     // Project Configuration
     grunt.initConfig({
@@ -10,7 +11,7 @@ module.exports = function(grunt) {
                 },
             },
             js: {
-                files: ['public/js/**', 'app/**/*.js'],
+                files: ['client/js/**/*js', 'public/js/**', 'app/**/*.js'],
                 tasks: ['jshint'],
                 options: {
                     livereload: true,
@@ -32,46 +33,109 @@ module.exports = function(grunt) {
         jshint: {
             all: { 
             	files: { 
-            		src: ['gruntfile.js', 'public/js/**/*.js', 'test/**/*.js', 'app/**/*.js'] 
+            		src: ['*.js',
+            		      'app/**/*.js',
+            		      'client/js/**/*.js',
+            		      '!client/js/**/*min.js',
+            		      '!client/js/ventus.js',
+            		      '!client/js/modernizr.js',
+            		      '!client/js/jquery.js'
+            		      ] 
             	},
             	options: { 
             		jshintrc: '.jshintrc' 
             	}
             }
         },
+        shell: {
+        	mongo: {
+        		command: 'mongod --dbpath ./data',
+        		options: {
+        			async: true
+        		}
+        	}
+        },
         nodemon: {
             dev: {
+            	script: 'server.js',
                 options: {
-                    file: 'server.js',
                     args: [],
                     ignoredFiles: ['README.md', 'node_modules/**', '.DS_Store'],
                     watchedExtensions: ['js'],
-                    watchedFolders: ['app', 'config'],
+                    watchedFolders: ['app', 'client', 'public'],
                     debug: true,
                     delayTime: 1,
-                    env: {
-                        PORT: 3000
-                    },
                     cwd: __dirname
                 }
-            }
+            },
+            prod: {
+            	script: 'server.js',
+                options: {
+                    args: ['prod'],
+                    ignoredFiles: ['README.md', 'node_modules/**', '.DS_Store'],
+                    watchedExtensions: ['js'],
+                    watchedFolders: ['app', 'client', 'public'],
+                    debug: true,
+                    delayTime: 1,
+                    cwd: __dirname
+                }
+            },
+        	dev1: {
+	        	script: 'server.js',
+	            options: {
+	                args: [8001],
+	                ignoredFiles: ['README.md', 'node_modules/**', '.DS_Store'],
+	                watchedExtensions: ['js'],
+	                watchedFolders: ['app', 'client', 'public'],
+	                debug: true,
+	                delayTime: 1,
+	                cwd: __dirname
+	            }
+	        },
+        	dev2: {
+	        	script: 'server.js',
+	            options: {
+	                args: [8002],
+	                ignoredFiles: ['README.md', 'node_modules/**', '.DS_Store'],
+	                watchedExtensions: ['js'],
+	                watchedFolders: ['app', 'client', 'public'],
+	                debug: true,
+	                delayTime: 1,
+	                cwd: __dirname
+	            }
+	        },
+        	proxy: {
+	        	script: 'proxy.js',
+	            options: {
+	                args: [],
+	                ignoredFiles: ['README.md', 'node_modules/**', '.DS_Store'],
+	                watchedExtensions: ['js'],
+	                watchedFolders: ['app', 'client', 'public'],
+	                debug: true,
+	                delayTime: 1,
+	                cwd: __dirname
+	            }
+	        }
         },
         concurrent: {
-            tasks: ['nodemon', 'watch'], 
-            options: {
-                logConcurrentOutput: true
-            }
-        },
-        mochaTest: {
-            options: {
-                reporter: 'spec'
-            },
-            src: ['test/**/*.js']
-        },
-        env: {
-            test: {
-                NODE_ENV: 'test'
-            }
+        	default: {
+	            tasks: ['shell','nodemon:dev', 'watch'], 
+	            options: {
+	                logConcurrentOutput: true
+	            }
+        	},
+        	prod: {
+	            tasks: ['shell','nodemon:prod', 'watch'], 
+	            options: {
+	                logConcurrentOutput: true
+	            }
+        	},
+        	cluster: {
+	            tasks: ['shell','nodemon:dev1','nodemon:dev2', 'nodemon:proxy', 'watch'], 
+	            options: {
+	                logConcurrentOutput: true
+	            }
+        	}
         },
         concat: {
         	dist: {
@@ -85,24 +149,6 @@ module.exports = function(grunt) {
         		dest: 'public/js/loowid.js'
         	}
         },
-        'closure-compiler': {
-            frontend: {
-              closurePath: 'node_modules/grunt-closure-compiler',
-              js: 'public/js/loowid.js',
-              jsOutputFile: 'public/js/loowid.min.js',
-              maxBuffer: 500,
-              options: {
-                compilation_level: 'ADVANCED_OPTIMIZATIONS',
-                language_in: 'ECMASCRIPT5_STRICT'
-              }
-            }
-        },
-        ngmin: {
-        	angular: {
-        		src: ['public/js/loowid.js'],
-        		dest: 'public/js/loowid.min.js'
-        	}
-        },
         uglify: {
         	options: {
         	   mangle: false
@@ -113,58 +159,42 @@ module.exports = function(grunt) {
         		}
         	}
         },
-        min: {
-            dist: {
-                src: ['public/js/loowid.js'],
-                dest: 'public/js/loowid.min.js'
-            }        	
-        },
-        cssmin: {
-        	  minify: {
-        	    expand: true,
-        	    cwd: 'public/css/',
-        	    src: ['*.css', '!*.min.css'],
-        	    dest: 'public/css/',
-        	    ext: '.min.css'
-        	  }
-        }        
+        less: {
+        	prod: {
+        		options: {
+        			paths:['client/less'],
+        			cleancss:true
+        		},
+            	files: {
+            		'public/css/loowid.min.css':'client/less/loowid.less'
+            	}
+        	}
+        }
     });
 
     //Load NPM tasks 
-    //grunt.loadNpmTasks('grunt-ngmin');
-    //grunt.loadNpmTasks('grunt-contrib-watch');
+    grunt.loadNpmTasks('grunt-shell');
+    grunt.loadNpmTasks('grunt-contrib-watch');
     grunt.loadNpmTasks('grunt-contrib-jshint');
-    //grunt.loadNpmTasks('grunt-mocha-test');
-    //grunt.loadNpmTasks('grunt-nodemon');
-    //grunt.loadNpmTasks('grunt-concurrent');
-    //grunt.loadNpmTasks('grunt-env');
-    //grunt.loadNpmTasks('grunt-yui-compressor');
+    grunt.loadNpmTasks('grunt-nodemon');
+    grunt.loadNpmTasks('grunt-concurrent');
     grunt.loadNpmTasks('grunt-contrib-concat');
     grunt.loadNpmTasks('grunt-contrib-uglify');
-    //grunt.loadNpmTasks('grunt-contrib-cssmin');
-    //grunt.loadNpmTasks('grunt-closure-compiler');
+    grunt.loadNpmTasks('grunt-contrib-less');
 
     //Making grunt default to force in order not to break the project.
     grunt.option('force', true);
 
     //Default task(s).
-    grunt.registerTask('default', ['jshint', 'concurrent']);
-    
-    // Minify tasks
-    grunt.registerTask('mini', ['concat','uglify']);
+    grunt.registerTask('default', ['mini','concurrent:default']);
 
-    // Minify tasks
-    //grunt.registerTask('minic', ['concat','closure-compiler']);
+    //Cluster local configuration 2 nodes 8001,8002
+    grunt.registerTask('cluster', ['mini','concurrent:cluster']);
 
-    // Minify tasks
-    //grunt.registerTask('miniu', ['concat','uglify']);
+    // Same as development but using min.js (to test if its working)
+    grunt.registerTask('prod', ['mini','concurrent:prod']);
 
-    // Minify tasks
-    //grunt.registerTask('minin', ['concat','ngmin']);
+    // Minify tasks (generate min files)
+    grunt.registerTask('mini', ['concat','uglify','less']);
 
-    // Minify tasks
-    //grunt.registerTask('miniy', ['concat','min']);
-
-    //Test task.
-    //grunt.registerTask('test', ['env:test', 'mochaTest']);
 };
