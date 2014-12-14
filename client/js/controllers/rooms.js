@@ -15,7 +15,6 @@ angular.module('mean.rooms').controller('RoomsController', ['$scope', '$routePar
     uiHandler.cache = ngI18nConfig.cache;
     uiHandler.step = 1;
 
-
     ngI18nResourceBundle.get().success(function (resourceBundle) {
             $scope.resourceBundle = resourceBundle;
     });

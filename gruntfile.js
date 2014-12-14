@@ -12,7 +12,7 @@ module.exports = function(grunt) {
             },
             js: {
                 files: ['client/js/**/*js', 'public/js/**', 'app/**/*.js'],
-                tasks: ['jshint'],
+                //tasks: ['jshint'],
                 options: {
                     livereload: true,
                 },
