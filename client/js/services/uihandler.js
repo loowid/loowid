@@ -175,7 +175,7 @@ angular.module('mean.rooms').factory("UIHandler",['$window','$timeout',function(
 
 	keyboardManagerService.bind('ctrl+shift+d', function(){
     	rtc.debug = !rtc.debug;
-    	if (rtc.debug) console.log('Debug Enabled!!');
+    	console.log('Debug is now '+(rtc.debug?'enabled':'disabled')+' !!');
     });
 		
     return _this._data;

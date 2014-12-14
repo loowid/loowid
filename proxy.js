@@ -60,13 +60,13 @@ var validateBackend = function(h,p) {
 		removeBackend('http://'+h+':'+p);
 	});
 }
-var backends = isNaN(process.argv[2])?3:(process.argv[2]-0);
+var backends = isNaN(process.argv[2])?2:(process.argv[2]-0);
 var checkServers = function() {
 	for (var j=1; j<=backends; j++) {
 		validateBackend('localhost',8000+j);
 	}
 	// Check new servers every 5 seconds !!
-	setTimeout(checkServers,15000);
+	setTimeout(checkServers,5000);
 }
 // Look for backends !!
 setTimeout(checkServers,100);
@@ -98,7 +98,7 @@ var httpServer = https.createServer({
 		removeBackend(tg);
 	});
 	targets.push(tg);
-}).listen(443, "127.0.0.1");
+}).listen(443, "0.0.0.0");
 
 httpServer.on('upgrade', function (req, socket, head) {
 	var tg = targets.shift();

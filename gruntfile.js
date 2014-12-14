@@ -1,5 +1,27 @@
 'use strict';
 module.exports = function(grunt) {
+	
+	/*
+	 * grunt 								: Run default development server
+	 * grunt --prod=true 					: Run default development server using minified js file
+	 * grunt cluster 						: Run default development cluster server with 2 nodes
+	 * grunt cluster --nodes=N 				: Run default development cluster server with N nodes
+	 * grunt cluster --nodes=N --prod=true 	: Run default development cluster server with N nodes using minified js file
+	 * 
+	 *  The server reloads if you change something from server side.
+	 *  The minified and css are compiled when client side is changed.
+	 * 
+	*/
+	var generateOptions = function(arg) {
+		return {
+            args: arg,
+            watch: ['proxy.js','server.js','webrtc.io.js','app'],
+            debug: true,
+            delayTime: 1,
+            cwd: __dirname
+        };		
+	}
+	
     // Project Configuration
     grunt.initConfig({
         pkg: grunt.file.readJSON('package.json'),
@@ -11,8 +33,8 @@ module.exports = function(grunt) {
                 },
             },
             js: {
-                files: ['client/js/**/*js', 'public/js/**', 'app/**/*.js'],
-                tasks: ['mini'],
+                files: ['client/js/**/*js'],
+                tasks: ['minijs'],
                 options: {
                     livereload: true,
                 },
@@ -24,8 +46,8 @@ module.exports = function(grunt) {
                 },
             },
             css: {
-                files: ['public/css/**'],
-                tasks: ['mini'],
+                files: ['client/less/**'],
+                tasks: ['less'],
                 options: {
                     livereload: true
                 }
@@ -58,64 +80,10 @@ module.exports = function(grunt) {
         },
         nodemon: {
             dev: {
-            	script: 'server.js',
-                options: {
-                    args: [],
-                    ignoredFiles: ['README.md', 'node_modules/**', '.DS_Store'],
-                    watchedExtensions: ['js'],
-                    watchedFolders: ['app', 'client', 'public'],
-                    debug: true,
-                    delayTime: 1,
-                    cwd: __dirname
-                }
+            	script: 'server.js'
             },
-            prod: {
-            	script: 'server.js',
-                options: {
-                    args: ['prod'],
-                    ignoredFiles: ['README.md', 'node_modules/**', '.DS_Store'],
-                    watchedExtensions: ['js'],
-                    watchedFolders: ['app', 'client', 'public'],
-                    debug: true,
-                    delayTime: 1,
-                    cwd: __dirname
-                }
-            },
-        	dev1: {
-	        	script: 'server.js',
-	            options: {
-	                args: [8001],
-	                ignoredFiles: ['README.md', 'node_modules/**', '.DS_Store'],
-	                watchedExtensions: ['js'],
-	                watchedFolders: ['app', 'client', 'public'],
-	                debug: true,
-	                delayTime: 1,
-	                cwd: __dirname
-	            }
-	        },
-        	dev2: {
-	        	script: 'server.js',
-	            options: {
-	                args: [8002],
-	                ignoredFiles: ['README.md', 'node_modules/**', '.DS_Store'],
-	                watchedExtensions: ['js'],
-	                watchedFolders: ['app', 'client', 'public'],
-	                debug: true,
-	                delayTime: 1,
-	                cwd: __dirname
-	            }
-	        },
         	proxy: {
-	        	script: 'proxy.js',
-	            options: {
-	                args: [],
-	                ignoredFiles: ['README.md', 'node_modules/**', '.DS_Store'],
-	                watchedExtensions: ['js'],
-	                watchedFolders: ['app', 'client', 'public'],
-	                debug: true,
-	                delayTime: 1,
-	                cwd: __dirname
-	            }
+	        	script: 'proxy.js'
 	        }
         },
         concurrent: {
@@ -125,14 +93,8 @@ module.exports = function(grunt) {
 	                logConcurrentOutput: true
 	            }
         	},
-        	prod: {
-	            tasks: ['shell','nodemon:prod', 'watch'], 
-	            options: {
-	                logConcurrentOutput: true
-	            }
-        	},
         	cluster: {
-	            tasks: ['shell','nodemon:dev1','nodemon:dev2', 'nodemon:proxy', 'watch'], 
+	            tasks: ['shell', 'nodemon:proxy', 'watch'], 
 	            options: {
 	                logConcurrentOutput: true
 	            }
@@ -188,14 +150,29 @@ module.exports = function(grunt) {
 
     //Default task(s).
     grunt.registerTask('default', ['mini','concurrent:default']);
+    // Production mode
+    var prod = grunt.option('prod') || false;
 
-    //Cluster local configuration 2 nodes 8001,8002
+    //Cluster local configuration N nodes 8001,8002,...
+    // grunt cluster --nodes=N
+    var nodes = grunt.option('nodes') || 2;
+    // Create nodemon tasks for cluster
+    for (var k=0; k<nodes; k++) {
+    	grunt.config.data.nodemon['dev'+k] = { script: 'server.js', options: generateOptions(prod?['prod',8000+k+1]:[8000+k+1]) }
+    	grunt.config.data.concurrent.cluster.tasks.push('nodemon:dev'+k);
+    }
+    // Setting number of cluster nodes
+    grunt.config.data.nodemon.proxy.options = generateOptions([nodes]);
+    grunt.config.data.nodemon.dev.options = generateOptions(prod?['prod']:[]);
     grunt.registerTask('cluster', ['mini','concurrent:cluster']);
 
     // Same as development but using min.js (to test if its working)
     grunt.registerTask('prod', ['mini','concurrent:prod']);
 
     // Minify tasks (generate min files)
-    grunt.registerTask('mini', ['concat','uglify','less']);
+    grunt.registerTask('minijs', ['concat','uglify']);
+    
+    // Minify tasks (generate min files)
+    grunt.registerTask('mini', ['minijs','less']);
 
 };
