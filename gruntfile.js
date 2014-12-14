@@ -7,7 +7,11 @@ module.exports = function(grunt) {
 	 * grunt cluster 						: Run default development cluster server with 2 nodes
 	 * grunt cluster --nodes=N 				: Run default development cluster server with N nodes
 	 * grunt cluster --nodes=N --prod=true 	: Run default development cluster server with N nodes using minified js file
-	 * 
+	 * grunt minijs							: Minify client js files
+	 * grunt less							: Compile less sources to css
+	 * grunt mini							: Minify js files and compile less
+	 * grunt jshint							: Analyze js files to check style and best practices
+	 * 						
 	 *  The server reloads if you change something from server side.
 	 *  The minified and css are compiled when client side is changed.
 	 * 
