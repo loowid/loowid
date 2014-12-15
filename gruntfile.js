@@ -114,7 +114,7 @@ module.exports = function(grunt) {
 						'client/js/angular/angular.min.js',
 						'client/js/angular/angular-*.js',
 						'client/js/angular/ui-*.js',
-						'client/js/angular/ng-tags-input.min.js',
+						'client/js/angular/ng-*.js',
 						'client/js/*.js',
 						'client/js/services/*.js',
 						'client/js/controllers/*.js'        			
