@@ -17,7 +17,7 @@ Install
   
       mongod --dbpath data
   5. Run >npm install
-  6. Run >sudo node server.js
+  6. Run >sudo grunt
   7. Connect to https://localhost/
 
 Docker
@@ -26,12 +26,4 @@ Docker
   Too many steps to install? Don't worry loowid is also dockerized !!
   
   https://github.com/loowid/loowid-docker
-  
-Modify
-=======
-
-  1. Add your changes to the source.
-  2. If you change client side javascript files you have to generate public minified files.
-  
-      grunt mini
   
