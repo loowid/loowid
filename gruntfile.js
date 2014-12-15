@@ -3,10 +3,8 @@ module.exports = function(grunt) {
 	
 	/*
 	 * grunt 								: Run default development server
-	 * grunt --prod=true 					: Run default development server using minified js file
 	 * grunt cluster 						: Run default development cluster server with 2 nodes
 	 * grunt cluster --nodes=N 				: Run default development cluster server with N nodes
-	 * grunt cluster --nodes=N --prod=true 	: Run default development cluster server with N nodes using minified js file
 	 * grunt minijs							: Minify client js files
 	 * grunt less							: Compile less sources to css
 	 * grunt mini							: Minify js files and compile less
@@ -104,25 +102,23 @@ module.exports = function(grunt) {
 	            }
         	}
         },
-        concat: {
-        	dist: {
-        		src:['client/js/angular/angular.min.js',
-        		     'client/js/angular/angular-*.js',
-        		     'client/js/angular/ui-*.js',
-        		     'client/js/angular/ng-tags-input.min.js',
-        		     'client/js/*.js',
-        		     'client/js/services/*.js',
-        		     'client/js/controllers/*.js'],
-        		dest: 'public/js/loowid.js'
-        	}
-        },
         uglify: {
         	options: {
-        	   mangle: false
+        	   mangle: false,
+        	   sourceMap: true,
+        	   compress: false
         	},
         	build: {
         		files: {
-        			'public/js/loowid.min.js':['public/js/loowid.js']
+        			'public/js/loowid.min.js':[
+						'client/js/angular/angular.min.js',
+						'client/js/angular/angular-*.js',
+						'client/js/angular/ui-*.js',
+						'client/js/angular/ng-tags-input.min.js',
+						'client/js/*.js',
+						'client/js/services/*.js',
+						'client/js/controllers/*.js'        			
+					]
         		}
         	}
         },
@@ -145,7 +141,6 @@ module.exports = function(grunt) {
     grunt.loadNpmTasks('grunt-contrib-jshint');
     grunt.loadNpmTasks('grunt-nodemon');
     grunt.loadNpmTasks('grunt-concurrent');
-    grunt.loadNpmTasks('grunt-contrib-concat');
     grunt.loadNpmTasks('grunt-contrib-uglify');
     grunt.loadNpmTasks('grunt-contrib-less');
 
@@ -154,27 +149,25 @@ module.exports = function(grunt) {
 
     //Default task(s).
     grunt.registerTask('default', ['mini','concurrent:default']);
-    // Production mode
-    var prod = grunt.option('prod') || false;
 
     //Cluster local configuration N nodes 8001,8002,...
     // grunt cluster --nodes=N
     var nodes = grunt.option('nodes') || 2;
     // Create nodemon tasks for cluster
     for (var k=0; k<nodes; k++) {
-    	grunt.config.data.nodemon['dev'+k] = { script: 'server.js', options: generateOptions(prod?['prod',8000+k+1]:[8000+k+1]) }
+    	grunt.config.data.nodemon['dev'+k] = { script: 'server.js', options: generateOptions([8000+k+1]) }
     	grunt.config.data.concurrent.cluster.tasks.push('nodemon:dev'+k);
     }
     // Setting number of cluster nodes
     grunt.config.data.nodemon.proxy.options = generateOptions([nodes]);
-    grunt.config.data.nodemon.dev.options = generateOptions(prod?['prod']:[]);
+    grunt.config.data.nodemon.dev.options = generateOptions([]);
     grunt.registerTask('cluster', ['mini','concurrent:cluster']);
 
     // Same as development but using min.js (to test if its working)
     grunt.registerTask('prod', ['mini','concurrent:prod']);
 
     // Minify tasks (generate min files)
-    grunt.registerTask('minijs', ['concat','uglify']);
+    grunt.registerTask('minijs', ['uglify']);
     
     // Minify tasks (generate min files)
     grunt.registerTask('mini', ['minijs','less']);

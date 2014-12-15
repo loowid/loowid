@@ -31,3 +31,4 @@ node_modules
 /private.pem
 /public.pem
 /.DS_Store
+/bower_components/

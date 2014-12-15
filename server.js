@@ -1,7 +1,7 @@
 /**
  * Module dependencies.
- * node server [prod] -> Run standalone port 80 and 443 (or cloud port), using minimized js with prod.
- * node server [prod] [nport] -> Run below proxy port [nport], using minimized js with prod
+ * node server -> Run standalone port 80 and 443 (or cloud port)
+ * node server [nport] -> Run below proxy port [nport]
  * 
  */
 var crypto = require('crypto') ;
@@ -183,9 +183,7 @@ app.configure(function() {
 		logs.addLog(serverId,str.substring(0,str.length-1).split('@'));
 	}},format:':date@:sessionid@:ip@:method@:url@:status@:res[content-length]@:response-time'}));
 	app.use(express.static(__dirname + '/public'));
-	// Local access to public
-	//if (!process.env.PORT && !process.env.OPENSHIFT_NODEJS_PORT)
-		app.use(express.static(__dirname + '/client'));
+	app.use('/client',express.static(__dirname + '/client'));
 });
 
 i18n.registerAppHelper(app);
@@ -247,8 +245,7 @@ if (process.env.PORT || process.env.OPENSHIFT_NODEJS_PORT) {
 				res.sendfile(__dirname + '/public/landing.html');
 			} else {
 				res.setHeader("X-FRAME-OPTIONS","DENY");
-				res.render('index' + (process.argv[2] == 'prod' ? '' : '_dev')
-						+ '.jade', {
+				res.render('index.jade', {
 					title : "Look what I'm doing!",
 					appName : "Loowid"
 				});
