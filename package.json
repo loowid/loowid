@@ -1,20 +1,26 @@
 {
   "name": "loowid",
-  "description": "Loowid - Share your screen easy.",
+  "description": "Loowid - Share your webcam, audio and screen easy.",
   "version": "0.1.0",
   "private": false,
   "author": "juanjo alex edu",
   "repository": {
     "type": "git",
-    "url": "https://github.com/---"
+    "url": "https://github.com/loowid/loowid"
   },
   "engines": {
     "node": "0.10.x",
     "npm": "1.2.x"
   },
   "scripts": {
-    "start": "node node_modules/grunt-cli/bin/grunt",
+    "start": "node node_modules/grunt-cli/bin/grunt prod",
     "test": "node node_modules/grunt-cli/bin/grunt test"
+  },
+  "devDependencies": {
+  	"grunt-contrib-watch": "0.6.1",
+  	"grunt-contrib-uglify": "0.6.0",
+  	"grunt-contrib-jshint": "0.10.0",
+  	"grunt-contrib-less": "0.12.0"
   },
   "dependencies": {
     "express": "3.4.4",
@@ -27,6 +33,9 @@
     "grunt": "0.4.1",
     "grunt-cli": "0.1.11",
     "grunt-env": "0.4.0",
+    "grunt-shell": "1.1.1",
+    "grunt-nodemon": "0.3.0",
+    "grunt-concurrent": "1.0.0",
     "socket.io": "0.9.6",
     "ws": "0.4.31",
     "i18next": "1.7.1",

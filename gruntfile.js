@@ -81,6 +81,9 @@ module.exports = function(grunt) {
         	}
         },
         nodemon: {
+            prod: {
+            	script: 'server.js'
+            },
             dev: {
             	script: 'server.js'
             },
@@ -91,6 +94,12 @@ module.exports = function(grunt) {
         concurrent: {
         	default: {
 	            tasks: ['shell','nodemon:dev', 'watch'], 
+	            options: {
+	                logConcurrentOutput: true
+	            }
+        	},
+        	prod: {
+	            tasks: ['shell','nodemon:prod'], 
 	            options: {
 	                logConcurrentOutput: true
 	            }
@@ -137,10 +146,11 @@ module.exports = function(grunt) {
 
     //Load NPM tasks 
     grunt.loadNpmTasks('grunt-shell');
-    grunt.loadNpmTasks('grunt-contrib-watch');
-    grunt.loadNpmTasks('grunt-contrib-jshint');
     grunt.loadNpmTasks('grunt-nodemon');
     grunt.loadNpmTasks('grunt-concurrent');
+    
+    grunt.loadNpmTasks('grunt-contrib-watch');
+    grunt.loadNpmTasks('grunt-contrib-jshint');
     grunt.loadNpmTasks('grunt-contrib-uglify');
     grunt.loadNpmTasks('grunt-contrib-less');
 
@@ -164,7 +174,7 @@ module.exports = function(grunt) {
     grunt.registerTask('cluster', ['mini','concurrent:cluster']);
 
     // Same as development but using min.js (to test if its working)
-    grunt.registerTask('prod', ['mini','concurrent:prod']);
+    grunt.registerTask('prod', ['concurrent:prod']);
 
     // Minify tasks (generate min files)
     grunt.registerTask('minijs', ['uglify']);
