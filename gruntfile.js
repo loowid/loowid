@@ -9,6 +9,7 @@ module.exports = function(grunt) {
 	 * grunt less							: Compile less sources to css
 	 * grunt mini							: Minify js files and compile less
 	 * grunt jshint							: Analyze js files to check style and best practices
+	 * grunt prod							: Run server in production mode
 	 * 						
 	 *  The server reloads if you change something from server side.
 	 *  The minified and css are compiled when client side is changed.
