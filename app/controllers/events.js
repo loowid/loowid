@@ -2,6 +2,7 @@
 * Module dependencies.
 */
 
+var logger = require('../../log.js').getLog('events');
 var mongoose = require('mongoose'),
 models = require ('../models/events'),
 WSEvent = mongoose.model('WSEvent');
@@ -10,7 +11,7 @@ exports.addEvent = function (srv,e,d,s){
 	var newsocket = s;
 	if (s.id) newsocket = {id:s.id};
 	var wsevt = new WSEvent({eventName:e,eventServer:srv,eventDate:new Date(),data:d,socket:newsocket});
-	wsevt.save(function(err){ if (err) console.log('SAVED-EV: '+err); });
+	wsevt.save(function(err){ if (err) logger.error('SAVED-EV: '+err); });
 }
 
 exports.initListener = function(srv,cb) {
@@ -25,6 +26,6 @@ exports.sendAck = function(srv) {
 	// Add initial data to start tail
 	var ackDate = new Date();
 	var ackEvent = new WSEvent({eventName:'startup',eventServer:srv,eventDate:ackDate,data:'none',socket:'none'});
-	ackEvent.save(function(err){ if (err) console.log('SAVED-ACK: '+err); });
+	ackEvent.save(function(err){ if (err) logger.error('SAVED-ACK: '+err); });
 	return ackDate;
 }

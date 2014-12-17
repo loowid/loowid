@@ -1,3 +1,4 @@
+var logger = require('../../log.js').getLog('meetingssite');
 var mongoose = require('mongoose'),
 models = require ('../models/meetingssite'),
 rooms = require('./rooms');
@@ -18,7 +19,7 @@ var makeId = function(){
 
 
 exports.site = function(req, res, next, id) {
-		console.log ("demano site" + id);
+		logger.debug ("demano site" + id);
 		MeetingsSite.loadSite(id, function(err, site) {
 		if (!site) {
 			var error = new Error('Failed to load the site: ' + id); 
@@ -34,7 +35,7 @@ exports.site = function(req, res, next, id) {
 
 exports.meeting = function (req,res,next,meetingId){
 	if (req.site){
-		console.log ('got it');
+		logger.debug ('got it');
 		
 		var site = req.site;
 		var meetings = site.meetings;
@@ -152,7 +153,7 @@ exports.meetingsite = function (req, res, next) {
 
 
 exports.createmeeting = function (req, res, next) {
-	console.log (JSON.stringify (req.body));
+	logger.debug (JSON.stringify (req.body));
 
 	if (req.site){
 			var meeting = new Meeting ({
@@ -253,7 +254,7 @@ exports.prepare = function (req, res, next){
 };
 
 exports.cancel = function (req, res, next){
-	console.log ('cancel');
+	logger.debug ('cancel');
 
 	var meeting =  req.meeting;
 	var site = req.site;
