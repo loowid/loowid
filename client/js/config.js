@@ -17,7 +17,7 @@ window.app.config(['$routeProvider',
         }).when ('/tos_ca',{
             templateUrl: 'views/rooms/tos_ca.html' 
         }).when ('/desktop_cap',{
-            templateUrl: 'views/rooms/desktop_cap.html' 
+            templateUrl: 'views/desktop_cap.html' 
 		}).when('/', {
                 templateUrl: 'views/rooms/create.html'
         }).otherwise({

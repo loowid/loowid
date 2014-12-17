@@ -6,13 +6,14 @@ var screenCallback;
 
 DetectRTC.screen = {
     chromeMediaSource: 'screen',
-    getSourceId: function (callback) {
+    getSourceId: function (extensionId,callback) {
         screenCallback = callback;
-        window.postMessage('get-sourceId', '*');
+		var extMsg = 'get-sourceId-from-ext-' + extensionId;
+        window.postMessage(extMsg, '*');
     },
     onMessageCallback: function (data) {
         // "cancel" button is clicked
-        if (data == 'PermissionDeniedError') {
+        if (data == 'PermissionDeniedError') {	
             DetectRTC.screen.chromeMediaSource = 'PermissionDeniedError';
             if (screenCallback) return screenCallback('PermissionDeniedError');
             else throw new Error('PermissionDeniedError');
@@ -29,15 +30,14 @@ DetectRTC.screen = {
             if (screenCallback) screenCallback(DetectRTC.screen.sourceId);
         }
     },
-    getChromeExtensionStatus: function (callback) {
-        // https://chrome.google.com/webstore/detail/screen-capturing/ampjliekoheiopmpnjcihakbcjaplkad
-        var extensionid = 'ampjliekoheiopmpnjcihakbcjaplkad';
-
+    getChromeExtensionStatus: function (extensionId,callback) {
+     
         var image = document.createElement('img');
-        image.src = 'chrome-extension://' + extensionid + '/hero.png';
+        image.src = 'chrome-extension://' + extensionId + '/hero.png';
         image.onload = function () {
             DetectRTC.screen.chromeMediaSource = 'screen';
-            window.postMessage('is-installed', '*');
+			var instMsg = 'is-installed-' + extensionId;
+            window.postMessage(instMsg, '*');
             setTimeout(function () {
                 if (DetectRTC.screen.chromeMediaSource == 'screen') {
                     callback('installed-disabled');
@@ -52,14 +52,14 @@ DetectRTC.screen = {
 
 window.addEventListener('message', function (event) {
     if (!event.data || !(typeof event.data == 'string' || event.data.sourceId || event.data.captureSourceId)) return;
-    if (event.data.captureSourceId) captureSourceId();
+    if (event.data.captureSourceId) captureSourceId(event.data.captureSourceId);
 
     DetectRTC.screen.onMessageCallback(event.data);
 });
 
-function captureSourceId() {
+function captureSourceId(extensionId) {
     // check if desktop-capture extension installed.
-    DetectRTC.screen.getChromeExtensionStatus(function (status) {
+    DetectRTC.screen.getChromeExtensionStatus(extensionId, function (status) {
         if (status != 'installed-enabled') {
             window.parent.postMessage({
                 chromeExtensionStatus: status
@@ -67,7 +67,7 @@ function captureSourceId() {
             return;
         }
 
-        DetectRTC.screen.getSourceId(function (sourceId) {
+        DetectRTC.screen.getSourceId(extensionId,function (sourceId) {
             window.parent.postMessage({
                 chromeMediaSourceId: sourceId
             }, '*');

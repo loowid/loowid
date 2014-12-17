@@ -22,11 +22,13 @@ getScreenId(function (error, sourceId, screen_constraints) {
 */
 
 (function() {
-    window.getScreenId = function(callback) {
+    window.getScreenId = function(extensionid,callback) {
         // for Firefox:
         // sourceId == 'firefox'
         // screen_constraints = {...}
-        if (!!navigator.mozGetUserMedia) {
+		this.extensionId = extensionid;
+        
+		if (!!navigator.mozGetUserMedia) {
             callback(null, 'firefox', {
                 video: {
                     mozMediaSource: 'window',
@@ -85,7 +87,7 @@ getScreenId(function (error, sourceId, screen_constraints) {
         }
 
         iframe.contentWindow.postMessage({
-            captureSourceId: true
+            captureSourceId: this.extensionId
         }, '*');
     }
 

@@ -238,36 +238,8 @@ function attachEvents(manager) {
   });
 	
  //We receives a request to get a STUN/TURN server list updated	
- rtc.on ('update_server_list', function (data,socket){
-	 /*
-	 //Define the args
-	 var args = {
-		 data: {ident: "username",secret: "password",domain: "loowid.com",application: "default",room: "default",secure: 1 },
-		 headers:{"Content-Type": "application/json",} 
-	 };
-	 
-	 lclient.methods.getXirSysServers (args,function (data,response){
-		if (response.statusCode === 200){
-			var pdata = JSON.parse(data);
-			if (pdata.d){
-				var iceServers = pdata.d.iceServers;
-				socket.send (JSON.stringify ({
-						"eventName":"get_updated_servers",
-						"data":{
-							"iceServers": iceServers
-						}
-				}), function(error) {
-						if (error) {
-						  console.log(error);
-						}
-				});
-			}
-			console.log ("Servers not updated");
-		}else{
-			console.log ("Error connecting to server to get servers" + data  + "\n " + response);
-		}
-	 });
-	 */
+ rtc.on ('update_server_config', function (data,socket){
+	
 	 request.post(
             'https://api.xirsys.com/getIceServers', {
             form: {
@@ -300,11 +272,16 @@ function attachEvents(manager) {
 				console.log ("Error connecting to server to get servers" + body  + "\n " + response);
 			}
 			
+
 			//Send the correct list
+			var cextid = process.env.CEXTID || 'ocegbggnlgopmchofgnbjhgpljlchlpl';
+
+			console.log ("wer" + cextid);
 			socket.send (JSON.stringify ({
-					"eventName":"get_updated_servers",
+					"eventName":"get_updated_config",
 					"data":{
-						"iceServers": iceServers
+						"iceServers": iceServers,
+						"chromeDesktopExtensionId" : cextid
 					}
 			}), function(error) {
 					if (error) {

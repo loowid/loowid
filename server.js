@@ -224,7 +224,7 @@ if (process.env.PORT || process.env.OPENSHIFT_NODEJS_PORT) {
 				res.setHeader("X-FRAME-OPTIONS","DENY");
 				res.sendfile(__dirname + '/public/landing.html');
 			} else {
-				res.setHeader("X-FRAME-OPTIONS","DENY");
+				res.setHeader("X-FRAME-OPTIONS","SAMEORIGIN");
 				res.render('index.jade', {
 					title : "Look what I'm doing!",
 					appName : "Loowid"
@@ -244,7 +244,7 @@ if (process.env.PORT || process.env.OPENSHIFT_NODEJS_PORT) {
 				res.setHeader("X-FRAME-OPTIONS","DENY");
 				res.sendfile(__dirname + '/public/landing.html');
 			} else {
-				res.setHeader("X-FRAME-OPTIONS","DENY");
+				res.setHeader("X-FRAME-OPTIONS","SAMEORIGIN");
 				res.render('index.jade', {
 					title : "Look what I'm doing!",
 					appName : "Loowid"

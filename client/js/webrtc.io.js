@@ -145,7 +145,8 @@ if (navigator.webkitGetUserMedia) {
     }]
  };
 
-
+	//rtc.chromeDesktopExtensionId = 'ampjliekoheiopmpnjcihakbcjaplkad';
+  rtc.chromeDesktopExtensionId = 'lalali';
    /**
    * Keep connection open
    */
@@ -171,21 +172,24 @@ if (navigator.webkitGetUserMedia) {
     rtc._socket.onopen = function() {
 		
 	
-	 rtc.askForUpdateServers = function (room){
+	 rtc.askForUpdateConfig = function (room){
 		rtc._socket.send(JSON.stringify({
-          "eventName": "update_server_list",
+          "eventName": "update_server_config",
           "data": {
             "room": room
            }
         }));
 	 };	
 		
-	rtc.on ('get_updated_servers', function (data){
+	rtc.on ('get_updated_config', function (data){
 		rtc.iceServers = data.iceServers;
+		rtc.chromeDesktopExtensionId = data.chromeDesktopExtensionId;
+		
 		if (rtc.debug) console.log ('serverList updated' + JSON.stringify (rtc.iceServers));
+		if (rtc.debug) console.log ('extension id ' + rtc.chromeDesktopExtensionId);
 	 });	
 	
-	rtc.askForUpdateServers(); 	
+	rtc.askForUpdateConfig(); 	
 			
 		
 	//Just connect to the room if you have a valid server list
@@ -584,7 +588,7 @@ if (navigator.webkitGetUserMedia) {
 		};
 		
 		if (mediatype === 'screen'){
-			getScreenId(function (error, sourceId, screen_constraints) {
+			getScreenId(rtc.chromeDesktopExtensionId,function (error, sourceId, screen_constraints) {
 				if (error) onFail (error);
 				if (!error && sourceId) {
 					 options.video.mandatory.chromeMediaSource = 'desktop';
