@@ -178,6 +178,7 @@
 	"acceptterms": "Entenc i accepto els <a target='_blank' href='/#!/tos_ca'>termes del servei</a>",
 	"youmustacceptterms" : "Has d'acceptar els termes",
 	"termsofservice" : "Termes del servei",
-	"loowid-extension-install" : "No s'ha detectat l'extensió de chrome que permet compartir l'escriptori. Feu clic <a target='_blank'  href='https://chrome.google.com/webstore/detail/loowid-screen-capturing/ampjliekoheiopmpnjcihakbcjaplkad' >aquí </a> per instalar-la",
+	"loowid-extension-message" : "No s'ha detectat l'extensió de chrome que permet compartir l'escriptori. Per instal·lar-la feu clic ",
+	"loowid-extension-install" : "aquí",
 	"loowid-extension-activate" : "Teniu l'extensió de Chrome de Loowid instal·lada. Activeu-la per fer-la anar"
 }

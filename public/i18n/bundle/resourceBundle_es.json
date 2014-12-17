@@ -178,7 +178,8 @@
 	"acceptterms": "He entendido y acepto los  <a target='_blank' href='/#!/tos_es'>términos del servicio</a>",
 	"youmustacceptterms" : "Debes aceptar los términos",
 	"termsofservice" : "Términos del servicio",
-		"loowid-extension-install" : "No se ha detectado la extensión de Loowid para Chrome que permite compartir el escritorio. Haz click <a target='_blank'  href='https://chrome.google.com/webstore/detail/loowid-screen-capturing/ampjliekoheiopmpnjcihakbcjaplkad' >aquí </a> para instalarla",
+	"loowid-extension-message":  "No se ha detectado la extensión de Loowid para Chrome que permite compartir el escritorio. Para instalarla haz click ",
+	"loowid-extension-install" : "aquí",
 	"loowid-extension-activate" : "Tienes la extensión de Chrome instalada, pero no está activada. Activala para poder grabar el escritorio."
 
 }

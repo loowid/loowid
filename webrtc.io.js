@@ -262,7 +262,6 @@ function attachEvents(manager) {
 			//Send the correct list
 			var cextid = process.env.CEXTID || 'ocegbggnlgopmchofgnbjhgpljlchlpl';
 
-			console.log ("wer" + cextid);
 			socket.send (JSON.stringify ({
 					"eventName":"get_updated_config",
 					"data":{
