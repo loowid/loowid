@@ -35,7 +35,6 @@ var server = http.createServer(app);
 var rooms = require('./app/controllers/rooms');
 var wsevents = require('./app/controllers/events');
 var logs = require('./app/controllers/log');
-var meetingsSiteHandler = require('./app/controllers/meetingssite');
 
 if (!process.env.PORT && !process.env.OPENSHIFT_NODEJS_PORT && defaultPort) {
 	var fs = require('fs');
@@ -152,8 +151,7 @@ app.configure(function() {
 	app.use(express.bodyParser());
 	var csrf = express.csrf();
 	app.use(function(req,res,next){
-		// Skip CSRF control in rest services
-		return (req.url.indexOf('/meetingssite/')!=0)?csrf(req,res,next):next();
+		return csrf(req,res,next);
 	});
 	app.use(i18n.handle);
 	app.use(express.methodOverride());
@@ -294,32 +292,9 @@ app.post('/rooms/keep', function(req, res, next){
 // Rest Services Protected
 var auth = express.basicAuth(process.env.REST_API_USERNAME || 'username', process.env.REST_API_PASSWORD || 'password');
 
-//Define the routes for payservice REST service
-app.post('/meetingssite/create',auth,function (req,res,next){
-	console.log ("It's loaded");
-	meetingsSiteHandler.createsite (req,res,next);
-});
-
-app.get  ('/meetingssite/user/:userKey/next/:days', auth, meetingsSiteHandler.futureusermeetings);
-app.get  ('/meetingssite/:siteId/info',auth,meetingsSiteHandler.meetingsite);
-app.post ('/meetingssite/:siteId/meeting/create',auth,meetingsSiteHandler.createmeeting);
-app.get  ('/meetingssite/:siteId/meeting/next/:days',auth,meetingsSiteHandler.futuremeetings);
-app.get  ('/meetingssite/:siteId/meeting/:meetingId',auth,meetingsSiteHandler.meetingdata);
-app.post ('/meetingssite/:siteId/meeting/:meetingId/pay',auth,meetingsSiteHandler.pay);
-app.post ('/meetingssite/:siteId/meeting/:meetingId/prepare',auth,meetingsSiteHandler.prepare);
-app.post ('/meetingssite/:siteId/meeting/:meetingId/cancel',auth,meetingsSiteHandler.cancel);
-app.post ('/meetingssite/:siteId/meeting/:meetingId/addAllowedUser',auth,meetingsSiteHandler.addalloweduser);
-app.delete ('/meetingssite/:siteId/meeting/:meetingId/dropAllowedUser/:userKey',auth,meetingsSiteHandler.dropalloweduser);
-//....
-
 app.param('roomId', rooms.room);
 app.param('connectionId', rooms.connection);
 
-app.param('siteId', meetingsSiteHandler.site);
-app.param('meetingId', meetingsSiteHandler.meeting);
-app.param('userKey', meetingsSiteHandler.userkey);
-app.param('days', meetingsSiteHandler.days);
-	
 app.use(function(err, req, res, next) {
 	console.error(err.message);
 	var code = err.http_code || 500;
