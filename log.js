@@ -12,10 +12,21 @@ module.exports.getLog = function(appender) {
 	return logger;
 }
 
-module.exports.setLogLevel = function(level) {
+module.exports.setLogLevel = function(level,appender) {
 	if (isValidLogLevel(level)) {
 		for (var i=0; i<loggers.length; i++) {
-			loggers[i].setLevel(level);
+			if (!appender || appender === loggers[i].category) {
+				loggers[i].setLevel(level);
+			}
 		}
 	}
+}
+
+module.exports.printLogLevels = function(res) {
+	var response = '';
+	for (var i=0; i<loggers.length; i++) {
+		response += '['+loggers[i].category+']::'+loggers[i].level.levelStr+'<br>';
+		loggers[i].info(loggers[i].level.levelStr);
+	}	
+	res.send(response);
 }

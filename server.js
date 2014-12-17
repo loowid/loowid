@@ -137,6 +137,9 @@ app.set("view options", {
 	layout : false
 });
 
+// Auth Basic, for admin paths
+var auth = express.basicAuth(process.env.ADMIN_USERNAME || 'admin', process.env.ADMIN_PASSWORD || 'admin');
+
 // Save sessions on Mongo
 var MongoStore = require('connect-mongo')(express);
 
@@ -184,12 +187,9 @@ app.configure(function() {
 	}},format:':date@:sessionid@:ip@:method@:url@:status@:res[content-length]@:response-time'}));
 	app.use(express.static(__dirname + '/public'));
 	app.use('/client',express.static(__dirname + '/client'));
-	app.use('/debug',function(req,res,next){
-		if (req.query.level) {
-			log4js.setLogLevel(req.query.level);
-		}
-		logger.info('Log Level: '+logger.level.levelStr);
-		res.send('Log Level: '+logger.level.levelStr);
+	app.get('/debug',auth,function(req,res,next){
+		log4js.setLogLevel(req.query.level,req.query.module);
+		log4js.printLogLevels(res);
 	});
 });
 
@@ -288,9 +288,6 @@ app.post('/rooms/:roomId/move', function(req, res, next) {
 app.post('/rooms/keep', function(req, res, next){
 	res.json({keep:true});
 });
-
-// Rest Services Protected
-var auth = express.basicAuth(process.env.REST_API_USERNAME || 'username', process.env.REST_API_PASSWORD || 'password');
 
 app.param('roomId', rooms.room);
 app.param('connectionId', rooms.connection);
