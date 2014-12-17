@@ -1,7 +1,7 @@
 /**
 * Module dependencies.
 */
-
+var logger = require('../../log.js').getLog('rooms');
 var mongoose = require('mongoose'),
 models = require ('../models/rooms'),
 async = require('async'),
@@ -395,7 +395,7 @@ exports.disconnectOwnerOrGuess = function (connectionId,success){
 			if (room){
 				room.status = 'DISCONNECTED';
 				room.save(function(err) {
-					if (err) console.log ("Error saving room status" + connectionId + err); 
+					if (err) logger.error ("Error saving room status" + connectionId + err); 
 					success(room,true);
 				});
 			} else {
@@ -412,7 +412,7 @@ exports.disconnectOwnerOrGuess = function (connectionId,success){
 							        // save the doc
 							        room.markModified('guests');
 							        room.save(function(err) {
-										if (err) console.log ("Error saving room status" + connectionId + err); 
+										if (err) logger.error ("Error saving room status" + connectionId + err); 
 										success(room,false);
 							        });
 							    }
@@ -428,7 +428,7 @@ exports.checkModerateOwnerOrAsked = function (id,room,type,success,failure){
 	Room.findOne(query,
 		function (err,room){
 			if (err) {
-				console.log ("Alert: Error executing query checkModerateOwnerOrAsked. ConnectionId: " + id + " roomId " + room + " type " + type + " error " + error);
+				logger.error ("Alert: Error executing query checkModerateOwnerOrAsked. ConnectionId: " + id + " roomId " + room + " type " + type + " error " + error);
 			}
 			if (room) {
 				success();
@@ -444,7 +444,7 @@ exports.checkModerateOwnerFiles = function (id,destinationId,room,success,failur
 	Room.findOne(query,
 		function (err,room){
 			if (err) {
-				console.log ("Alert: Error executing query checkModerateOwnerOrAsked. ConnectionId: " + id + " roomId " + room + " destinationId " + destinationId + " error " + error);
+				logger.error ("Alert: Error executing query checkModerateOwnerOrAsked. ConnectionId: " + id + " roomId " + room + " destinationId " + destinationId + " error " + error);
 			}
 			if (room) {
 				success();
@@ -460,7 +460,7 @@ exports.checkOwnerOrHandsUp = function (connectionId,destinationId,roomId,type,s
 	Room.findOne(query,
 		function (err,room){
 			if (err) {
-				console.log ("Alert: Error executing query checkOwner. ConnectionId: " + connectionId + " roomId " + roomId + " error " + error);
+				logger.error ("Alert: Error executing query checkOwner. ConnectionId: " + connectionId + " roomId " + roomId + " error " + error);
 			}
 			if (room) {
 				success();
@@ -476,7 +476,7 @@ exports.checkChatEnabled = function (connectionId,roomId,success,failure){
 	Room.findOne(query,
 		function (err,room){
 			if (err) {
-				console.log ("Alert: Error executing query checkChatEnabled. RoomId " + roomId + " error " + error);
+				logger.error ("Alert: Error executing query checkChatEnabled. RoomId " + roomId + " error " + error);
 			}
 			if (room) {
 				success();
@@ -492,7 +492,7 @@ exports.checkOwner = function (connectionId,roomId,success,failure){
 	Room.findOne(query,
 		function (err,room){
 			if (err) {
-				console.log ("Alert: Error executing query checkOwner. ConnectionId: " + connectionId + " roomId " + roomId + " error " + error);
+				logger.error ("Alert: Error executing query checkOwner. ConnectionId: " + connectionId + " roomId " + roomId + " error " + error);
 			}
 			if (room) {
 				success();

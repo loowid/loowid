@@ -6,21 +6,9 @@ request = require('request');
 
 //Create a service definition for externar servers list
 var lclient = new ServerList();
+var logger = require('./log.js').getLog('webrtc.io');
 
 lclient.registerMethod('getXirSysServers','https://api.xirsys.com:443/getIceServers','POST');
-
-var iolog = function() {};
-
-for (var i = 0; i < process.argv.length; i++) {
-  var arg = process.argv[i];
-  if (arg === "-debug") {
-    iolog = function(msg) {
-      console.log(msg);
-    };
-    console.log('Debug mode on!');
-  }
-}
-
 
 // Used for callback publish and subscribe
 if (typeof rtc === "undefined") {
@@ -88,7 +76,6 @@ module.exports.listen = function(server) {
       server: server
     });
   }
-
   manager.rtc = rtc;
   attachEvents(manager);
   return manager;
@@ -108,11 +95,11 @@ function getSessionId(headers) {
 function attachEvents(manager) {
 
   manager.on('connection', function(socket) {
-    iolog('connect');
+    logger.debug('connect');
 
 	socket.sessionid = getSessionId(socket.upgradeReq.headers);
     socket.id = id();
-    iolog('new socket got id: ' + socket.id);
+    logger.debug('new socket got id: ' + socket.id);
 
     rtc.sockets.push(socket);
 
@@ -125,7 +112,7 @@ function attachEvents(manager) {
     });
 
     socket.on('close', function() {
-      iolog('close');
+    	logger.debug('close');
 
       // find socket to remove
       var i = rtc.sockets.indexOf(socket);
@@ -139,7 +126,6 @@ function attachEvents(manager) {
         if (exist !== -1) {
           room.splice(room.indexOf(socket.id), 1);
           for (var j = 0; j < room.length; j++) {
-            //console.log(room[j]);
             var soc = rtc.getSocket(room[j]);
             if (soc) { // This check is missing (bug)
 	            soc.send(JSON.stringify({
@@ -149,7 +135,7 @@ function attachEvents(manager) {
 	              }
 	            }), function(error) {
 	              if (error) {
-	                console.log(error);
+	            	  logger.error(error);
 	              }
 	            });
             }
@@ -197,7 +183,7 @@ function attachEvents(manager) {
 		        }
 		      }), function(error) {
 		        if (error) {
-		          console.log(error);
+		          logger.error(error);
 		        }
 		      });
 		    }
@@ -213,7 +199,7 @@ function attachEvents(manager) {
 			  }
 			}), function(error) {
 			  if (error) {
-			    console.log(error);
+			    logger.error(error);
 			  }
 			});
 		} else {
@@ -231,7 +217,7 @@ function attachEvents(manager) {
 			}
 		}), function(error) {
 			if (error) {
-				console.log(error);
+				logger.error(error);
 			}
 		});
 	});
@@ -256,7 +242,7 @@ function attachEvents(manager) {
             var iceServers;
 			
 			if (!error && response.statusCode == 200) {
-                console.log(body);
+                logger.debug(body);
 				var pdata = JSON.parse(body);
 				if (pdata.d){
 					iceServers = pdata.d.iceServers;
@@ -269,7 +255,7 @@ function attachEvents(manager) {
             }else{
 				serverList = rtc.iceSERVERS();
 				iceServers = serverList.iceServers;
-				console.log ("Error connecting to server to get servers" + body  + "\n " + response);
+				logger.error ("Error connecting to server to get servers" + body  + "\n " + response);
 			}
 			
 
@@ -285,7 +271,7 @@ function attachEvents(manager) {
 					}
 			}), function(error) {
 					if (error) {
-					  console.log(error);
+					  logger.error(error);
 					}
 			});
         });
@@ -296,7 +282,7 @@ function attachEvents(manager) {
 	
   //Receive ICE candidates and send to the correct socket
   rtc.on('send_ice_candidate', function(data, socket) {
-    iolog('send_ice_candidate');
+	  logger.debug('send_ice_candidate');
     var soc = rtc.getSocket(data.socketId);
     if (soc) {
       soc.send(JSON.stringify({
@@ -310,7 +296,7 @@ function attachEvents(manager) {
         }
       }), function(error) {
         if (error) {
-          console.log(error);
+          logger.error(error);
         }
       });
       // call the 'recieve ICE candidate' callback
@@ -321,7 +307,7 @@ function attachEvents(manager) {
   //Receive offer and send to correct socket
   rtc.on('send_offer', function(data, socket) {
 		manager.rooms.checkModerateOwnerOrAsked(socket.id,data.room,data.mediatype,function(){
-		    iolog('send_offer');
+			logger.debug('send_offer');
 		    var soc = rtc.getSocket(data.socketId);
 		    if (soc) {
 		      soc.send(JSON.stringify({
@@ -348,7 +334,7 @@ function attachEvents(manager) {
 
   //Receive answer and send to correct socket
   rtc.on('send_answer', function(data, socket) {
-    iolog('send_answer');
+	logger.debug('send_answer');
     var soc = rtc.getSocket( data.socketId);
     if (soc) {
       soc.send(JSON.stringify({
@@ -360,7 +346,7 @@ function attachEvents(manager) {
         }
       }), function(error) {
         if (error) {
-          console.log(error);
+          logger.error(error);
         }
       });
       rtc.fire('send answer', rtc);
@@ -385,7 +371,7 @@ function attachEvents(manager) {
   					}
   				}), function(error) {
   					if (error) {
-  						console.log(error);
+  						logger.error(error);
   					}
   				});
   			}
@@ -409,7 +395,7 @@ function attachEvents(manager) {
 				        }
 				      }), function(error) {
 				        if (error) {
-				          console.log(error);
+				          logger.error(error);
 				        }
 				      });
 		    	}
@@ -440,14 +426,14 @@ function attachEvents(manager) {
 							}
 						}), function(error) {
 							if (error) {
-								console.log(error);
+								logger.error(error);
 							}
 						});
 					}
 				}
 			}
 		}, function() {
-			console.log("Alert: a non owner is asking for update owner data");
+			logger.warn("Alert: a non owner is asking for update owner data");
 		});
 	});
 
@@ -468,7 +454,7 @@ function attachEvents(manager) {
 						}
 					}), function(error) {
 						if (error) {
-							console.log(error);
+							logger.error(error);
 						}
 					});
 				}
@@ -495,7 +481,7 @@ function attachEvents(manager) {
 							}
 						}), function(error) {
 							if (error) {
-								console.log(error);
+								logger.error(error);
 							}
 						});
 					}
@@ -513,7 +499,7 @@ function attachEvents(manager) {
 					}
 				}), function(error) {
 					if (error) {
-						console.log(error);
+						logger.error(error);
 					}
 				});
 			}
@@ -533,12 +519,12 @@ function attachEvents(manager) {
 					}
 				}), function(error) {
 					if (error) {
-						console.log(error);
+						logger.error(error);
 					}
 				});
 			}
 		}, function() {
-			console.log("Alert: someone asking for sharing without permissions");
+			logger.warn("Alert: someone asking for sharing without permissions");
 		});
 	});
 
@@ -556,12 +542,12 @@ function attachEvents(manager) {
 	        }
 	      }), function(error) {
 	        if (error) {
-	          console.log(error);
+	          logger.error(error);
 	        }
 	      });
 	    }
 	  }, function() {
-	    console.log("Alert: someone asking for sharing files without permissions");
+	    logger.warn("Alert: someone asking for sharing files without permissions");
 	  });
 	});
 
@@ -579,12 +565,12 @@ function attachEvents(manager) {
 	        }
 	      }), function(error) {
 	        if (error) {
-	          console.log(error);
+	          logger.error(error);
 	        }
 	      });
 	    }
 	  }, function() {
-	    console.log("Alert: someone asking for sharing files without permissions");
+	    logger.warn("Alert: someone asking for sharing files without permissions");
 	  });
 	});
 
@@ -603,12 +589,12 @@ function attachEvents(manager) {
 	        }
 	      }), function(error) {
 	        if (error) {
-	          console.log(error);
+	          logger.error(error);
 	        }
 	      });
 	    }
 	  }, function() {
-	    console.log("Alert: someone is trying to announce that a file is completed");
+	    logger.warn("Alert: someone is trying to announce that a file is completed");
 	  });
 	});
 

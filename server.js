@@ -4,6 +4,8 @@
  * node server [nport] -> Run below proxy port [nport]
  * 
  */
+var log4js = require('./log.js');
+var logger = log4js.getLog('server');
 var crypto = require('crypto') ;
 var i18n = require('i18next');
 var express = require('express'), jade = require('jade');
@@ -33,7 +35,6 @@ var server = http.createServer(app);
 var rooms = require('./app/controllers/rooms');
 var wsevents = require('./app/controllers/events');
 var logs = require('./app/controllers/log');
-var meetingsSiteHandler = require('./app/controllers/meetingssite');
 
 if (!process.env.PORT && !process.env.OPENSHIFT_NODEJS_PORT && defaultPort) {
 	var fs = require('fs');
@@ -67,7 +68,7 @@ webRTC.rtc.fire = function(eventName,_) {
 	logs.addSocketLog(serverId,eventName,args);
 	fireOrig.apply(null,args);
 	if (args.length==3 && isClustered && eventName!='ping') {
-		//console.log('Distributing['+args[2].id+']: '+eventName);
+		logger.debug('Distributing['+args[2].id+']: '+eventName);
 		wsevents.addEvent(serverId,eventName,args[1],args[2]);  
 	}
 };
@@ -81,7 +82,7 @@ wsevents.initListener(serverId,function(event) {
 	} else {
 		// Fire if it is from another server 
 		if (event.eventServer!=serverId) {
-			//console.log('Catched['+event.socket.id+']: '+event.eventName);
+			logger.debug('Catched['+event.socket.id+']: '+event.eventName);
 			var args = [];
 			args.push(event.eventName);
 			args.push(event.data);
@@ -110,9 +111,9 @@ if (process.env.OPENSHIFT_MONGODB_DB_PASSWORD) {
 // Connect to the selected uri
 var db = mongoose.connect(uristring, function(err, res) {
 	if (err) {
-		console.log('ERROR connecting to: ' + uristring + '. ' + err);
+		logger.error('ERROR connecting to: ' + uristring + '. ' + err);
 	} else {
-		console.log('Succeeded connected to: ' + uristring);
+		logger.info('Succeeded connected to: ' + uristring);
 	}
 });
 
@@ -136,6 +137,9 @@ app.set("view options", {
 	layout : false
 });
 
+// Auth Basic, for admin paths
+var auth = express.basicAuth(process.env.ADMIN_USERNAME || 'admin', process.env.ADMIN_PASSWORD || 'admin');
+
 // Save sessions on Mongo
 var MongoStore = require('connect-mongo')(express);
 
@@ -143,15 +147,14 @@ app.configure(function() {
 	app.use(express.cookieParser());
 	//app.use(express.session({secret:'Secret'}));	
 	app.use(express.session({
-		store:new MongoStore({mongoose_connection:mongoose.connection},function(){console.log('Session store connected !!')}),
+		store:new MongoStore({mongoose_connection:mongoose.connection},function(){logger.info('Session store connected !!')}),
 		cookie: { maxAge : 3600000 }, // 1 hour
 		key:'jsessionid', 
 		secret:crypto.randomBytes(16).toString('hex')}));
 	app.use(express.bodyParser());
 	var csrf = express.csrf();
 	app.use(function(req,res,next){
-		// Skip CSRF control in rest services
-		return (req.url.indexOf('/meetingssite/')!=0)?csrf(req,res,next):next();
+		return csrf(req,res,next);
 	});
 	app.use(i18n.handle);
 	app.use(express.methodOverride());
@@ -184,6 +187,10 @@ app.configure(function() {
 	}},format:':date@:sessionid@:ip@:method@:url@:status@:res[content-length]@:response-time'}));
 	app.use(express.static(__dirname + '/public'));
 	app.use('/client',express.static(__dirname + '/client'));
+	app.get('/debug',auth,function(req,res,next){
+		log4js.setLogLevel(req.query.level,req.query.module);
+		log4js.printLogLevels(res);
+	});
 });
 
 i18n.registerAppHelper(app);
@@ -206,7 +213,7 @@ app.get('/chat/talk',function(req, res) {
 		response.pipe(res);
 	});
 	req.on('error', function(err) {
-	  console.log("Talk translate error: " + err.message);
+	  logger.error("Talk translate error: " + err.message);
 	});
 });
 
@@ -214,7 +221,7 @@ app.get('/chat/talk',function(req, res) {
 if (process.env.PORT || process.env.OPENSHIFT_NODEJS_PORT) {
 	// Heroku redirect
 	/* At the top, with other redirect methods before other routes */
-	console.log('Running production environment !!');
+	logger.info('Running production environment !!');
 	app.get('/', function(req, res, next) {
 		if (req.headers['x-forwarded-proto'] != 'https') {
 			res.setHeader("X-FRAME-OPTIONS","DENY");
@@ -233,7 +240,7 @@ if (process.env.PORT || process.env.OPENSHIFT_NODEJS_PORT) {
 		}
 	});
 } else {
-	console.log('Running development environment !!');
+	logger.info('Running development environment !!');
 	// Local redirect
 	app.get('/', function(req, res) {
 		if (req.protocol == 'http' && defaultPort) {
@@ -282,35 +289,9 @@ app.post('/rooms/keep', function(req, res, next){
 	res.json({keep:true});
 });
 
-// Rest Services Protected
-var auth = express.basicAuth(process.env.REST_API_USERNAME || 'username', process.env.REST_API_PASSWORD || 'password');
-
-//Define the routes for payservice REST service
-app.post('/meetingssite/create',auth,function (req,res,next){
-	console.log ("It's loaded");
-	meetingsSiteHandler.createsite (req,res,next);
-});
-
-app.get  ('/meetingssite/user/:userKey/next/:days', auth, meetingsSiteHandler.futureusermeetings);
-app.get  ('/meetingssite/:siteId/info',auth,meetingsSiteHandler.meetingsite);
-app.post ('/meetingssite/:siteId/meeting/create',auth,meetingsSiteHandler.createmeeting);
-app.get  ('/meetingssite/:siteId/meeting/next/:days',auth,meetingsSiteHandler.futuremeetings);
-app.get  ('/meetingssite/:siteId/meeting/:meetingId',auth,meetingsSiteHandler.meetingdata);
-app.post ('/meetingssite/:siteId/meeting/:meetingId/pay',auth,meetingsSiteHandler.pay);
-app.post ('/meetingssite/:siteId/meeting/:meetingId/prepare',auth,meetingsSiteHandler.prepare);
-app.post ('/meetingssite/:siteId/meeting/:meetingId/cancel',auth,meetingsSiteHandler.cancel);
-app.post ('/meetingssite/:siteId/meeting/:meetingId/addAllowedUser',auth,meetingsSiteHandler.addalloweduser);
-app.delete ('/meetingssite/:siteId/meeting/:meetingId/dropAllowedUser/:userKey',auth,meetingsSiteHandler.dropalloweduser);
-//....
-
 app.param('roomId', rooms.room);
 app.param('connectionId', rooms.connection);
 
-app.param('siteId', meetingsSiteHandler.site);
-app.param('meetingId', meetingsSiteHandler.meeting);
-app.param('userKey', meetingsSiteHandler.userkey);
-app.param('days', meetingsSiteHandler.days);
-	
 app.use(function(err, req, res, next) {
 	console.error(err.message);
 	var code = err.http_code || 500;
@@ -319,7 +300,7 @@ app.use(function(err, req, res, next) {
 
 server.listen(port, ipaddr);
 
-console.log('Express app started on port ' + (defaultPort?sport:port));
+logger.info('Express app started on port ' + (defaultPort?sport:port));
 
 // expose app
 exports = app;

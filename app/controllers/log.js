@@ -1,7 +1,7 @@
 /**
 * Module dependencies.
 */
-
+var logger = require('../../log.js').getLog('log');
 var mongoose = require('mongoose'),
 models = require ('../models/log'),
 Log = mongoose.model('Log');
@@ -19,7 +19,7 @@ exports.addLog = function (srvId,logData){
 		length:((logData[6]=='-')?-1:logData[6]), // -1 => Unknown response length
 		time:logData[7],
 		valid: (logData.length==8)}); // To detect fake log entries
-	log.save(function(err){ if (err) console.log('SAVED-LOG: '+err); });
+	log.save(function(err){ if (err) logger.error('SAVED-LOG: '+err); });
 }
 
 exports.addSocketLog = function (srvId,event,data) {
@@ -35,6 +35,6 @@ exports.addSocketLog = function (srvId,event,data) {
 			length:0,
 			time:0,
 			valid:true});
-		log.save(function(err){ if (err) console.log('SAVED-SLOG: '+err); });
+		log.save(function(err){ if (err) logger.error('SAVED-SLOG: '+err); });
 	}
 }
