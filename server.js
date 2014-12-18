@@ -191,6 +191,9 @@ app.configure(function() {
 		log4js.setLogLevel(req.query.level,req.query.module);
 		log4js.printLogLevels(res);
 	});
+	app.get('/stats/rooms',auth,function(req,res,next){
+		rooms.stats(res);
+	});
 });
 
 i18n.registerAppHelper(app);

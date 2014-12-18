@@ -4,10 +4,11 @@ var Schema = mongoose.Schema;
 /**
  * Room schema
  */
+var ttl = 3600 * 24 * 30; // Room expires after 30 days
 
 var RoomSchema = new Schema({
     roomId: String,
-    created: Date,
+    created: { type: Date, expires: ttl },
     status: String,
     access: {
     	shared:String,       	
@@ -81,6 +82,17 @@ RoomSchema.statics = {
     		delete guests[i].sessionid;
     	}
     	return guests;
+    },
+    all: function(cb) {
+    	this.aggregate([
+		      {
+		        $group : {
+		           _id : { day: { $dayOfMonth: "$created" }, month: { $month: "$created" }, year: { $year: "$created" } },
+		           avgMembers: { $avg: { $add:[ { $size: "$guests" }, 1 ] } },
+		           count: { $sum: 1 }
+		        }
+		      }, { $sort : { _id: 1 } }
+    	]).exec(cb);
     }
 };
 
