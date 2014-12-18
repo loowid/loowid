@@ -226,55 +226,56 @@ function attachEvents(manager) {
  //We receives a request to get a STUN/TURN server list updated	
  rtc.on ('update_server_config', function (data,socket){
 	
-	 request.post(
-            'https://api.xirsys.com/getIceServers', {
-            form: {
-                domain: process.env.XIRSYS_DOMAIN || "domain",
-                room: "default",
-                application: "default",
-                ident: process.env.XIRSYS_USER || "username",
-                secret: process.env.XIRSYS_SECRET || "password",
-                secure: 1
-            }
-        },
-
-        function (error, response, body) {
-            var iceServers;
-			
-			if (!error && response.statusCode == 200) {
-                logger.debug(body);
-				var pdata = JSON.parse(body);
-				if (pdata.d){
-					iceServers = pdata.d.iceServers;
-			
-				}else{
-					serverList = rtc.iceSERVERS();
-				  	iceServers = serverList.iceServers; 
-				}
-               
-            }else{
+	 var handlePost = function (error, response, body) {
+        var iceServers;
+		if (!error && response.statusCode == 200) {
+            logger.debug(body);
+			var pdata = JSON.parse(body);
+			if (pdata.d){
+				iceServers = pdata.d.iceServers;
+			}else{
 				serverList = rtc.iceSERVERS();
-				iceServers = serverList.iceServers;
-				logger.error ("Error connecting to server to get servers" + body  + "\n " + response);
+			  	iceServers = serverList.iceServers;
+			  	logger.error('Error parsing server list. Returning default ice servers.');
 			}
+        } else {
+			serverList = rtc.iceSERVERS();
+			iceServers = serverList.iceServers;
+			if (response || body) logger.error ('Error connecting to get servers ['+error+']: ' + response  + '\n' + body);
+			else logger.info('Returning default ice servers.');
+		}
 			
+		//Send the correct list
+		var cextid = process.env.CEXTID || 'ocegbggnlgopmchofgnbjhgpljlchlpl';
 
-			//Send the correct list
-			var cextid = process.env.CEXTID || 'ocegbggnlgopmchofgnbjhgpljlchlpl';
-
-			socket.send (JSON.stringify ({
-					"eventName":"get_updated_config",
-					"data":{
-						"iceServers": iceServers,
-						"chromeDesktopExtensionId" : cextid
-					}
+		socket.send (JSON.stringify ({
+				"eventName":"get_updated_config",
+				"data":{
+					"iceServers": iceServers,
+					"chromeDesktopExtensionId" : cextid
+				}
 			}), function(error) {
-					if (error) {
-					  logger.error(error);
-					}
+				if (error) {
+				  logger.error(error);
+				}
 			});
-        });
+     };
 	 
+     if (process.env.XIRSYS_USER) {
+		 request.post(
+	            'https://api.xirsys.com/getIceServers', {
+	            form: {
+	                domain: process.env.XIRSYS_DOMAIN,
+	                room: "default",
+	                application: "default",
+	                ident: process.env.XIRSYS_USER,
+	                secret: process.env.XIRSYS_SECRET,
+	                secure: 1
+	            }
+	        },handlePost);
+     } else {
+    	 handlePost('Default');
+     }
 	 
 	 
  });
