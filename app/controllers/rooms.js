@@ -608,15 +608,6 @@ Array.prototype.indexOfField = function (propertyName, value) {
 
 exports.stats = function(res) {
 	Room.all(function(err,list){
-		//res.json(list);
-		var page = '<html>';
-		page += '<table>';
-		page += '<tr><td>Date</td><td>Rooms</td><td>Members/Room</td></tr>';
-		for (var i=0; i<list.length; i++) {
-			page += '<tr><td>'+list[i]._id.day+'/'+list[i]._id.month+'/'+list[i]._id.year+'</td><td>'+list[i].count+'</td><td>'+list[i].avgMembers+'</td></tr>';
-		}
-		page += '</table>';
-		page += '</html>';
-		res.send(page);
+		res.json(list);
 	});
 }
