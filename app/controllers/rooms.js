@@ -51,21 +51,6 @@ exports.room = function(req, res, next, id) {
 	});
 };
 
-exports.roomByMeeting = function(req, res, next, m) {
-	Room.loadByMeeting(m._id, function(err, room) {
-		if (!room) {
-			var error = new Error('Failed to load the room: ' + m._id); 
-			error.http_code = 404;
-			next(error,m);
-		} else {
-			req.room = room;
-			next(null,m);
-		}
-	});
-
-};
-
-
 /*
 * Set the connectionId in the request
 */ 

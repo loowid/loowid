@@ -28,7 +28,6 @@ var RoomSchema = new Schema({
     guests: [UserSchema],
     valid: [String],
     chat: [ChatSchema],
-    meetingId: String,
     alias: [AliasSchema]
 });
 
@@ -72,10 +71,6 @@ RoomSchema.statics = {
     		}
     	}
     	return null;
-    },
-    loadByMeeting: function(id, cb) {
-        // Only show the last 150 chat messages
-        this.findOne({meetingId:id},{chat:{'$slice':-150}}).exec(cb);
     },
     safe: function(guests) {
     	for (i=0; i<guests.length; i++) {
