@@ -175,7 +175,6 @@ var createmeeting = function(req, res, next, meet) {
 				guests: [],
 				valid: [],
 				chat: [],
-				meetingId: meet ? meet._id : null,
 				alias: []
 		});
 		room.save(function(err) {
