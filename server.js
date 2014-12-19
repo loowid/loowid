@@ -208,8 +208,8 @@ app.get('/chat/talk',function(req, res) {
 	var req = http.get(
 			{
 			 host:'translate.google.com',
-			 path:'/translate_tts?tl='+req.locale+'&q='+t,
-			 headers:{'User-Agent':'Mozilla/5.0 (Windows NT 6.0; rv:26.0) Gecko/20100101 Firefox/26.0'}
+			 path:'/translate_tts?tl='+req.locale+'&q='+escape(t),
+			 headers:{'User-Agent':'Mozilla/5.0 (Windows NT 6.0; rv:26.0) Gecko/20100101 Firefox/33.0'}
 			}, function(response) {
 		//handle the response
 		res.setHeader('Content-Type','audio/mpeg');
