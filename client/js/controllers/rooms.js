@@ -25,7 +25,7 @@ angular.module('mean.rooms').controller('RoomsController', ['$scope', '$routePar
     }
     
     $scope.create = function() {
-		if ($scope.termsaccepted){
+		if ($scope.termsaccepted || $scope.isRoomAvailable()){
 
 		  document.getElementById('noscript').style.display = '';
 		  $scope.global.sessionclosed = false;

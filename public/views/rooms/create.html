@@ -23,14 +23,13 @@
 					</div>
 					<input id="mname" type="text" data-ng-model="ui.name" ng-pattern="global.namePattern" required class="input-lg form-control" placeholder="{{resourceBundle.heroPlaceholder}}" data-ng-show="isValidBrowser() && !isRoomAvailable()" autofocus> 
 					<button id="main_button" type="submit" data-ng-show="isValidBrowser() && !isRoomAvailable()">{{resourceBundle.loowidnow}}</button>
+					<button id="goroom_button" type="submit" data-ng-show="isValidBrowser() && isRoomAvailable()">{{resourceBundle.gototheroom}}</button>
 	  				<div class="termscontainer">
 						 <p ng-show="termsnotaccepted" class="alert">{{resourceBundle.youmustacceptterms}}</p>
 						<input ng-model="termsaccepted" data-ng-show="isValidBrowser() && !isRoomAvailable()" type="checkbox" id="terms" ng-click="clickterms($event)" />
-						<label for="terms" ng-bind-html="resourceBundle.acceptterms" ></label>
-						
+						<label for="terms" ng-bind-html="resourceBundle.acceptterms" data-ng-show="!isRoomAvailable()"></label>
 					</div>
 					<img src="img/ajax-loader-bar.gif" ng-show="creating"/>
-					<button id="goroom_button" type="submit" data-ng-show="isValidBrowser() && isRoomAvailable()">{{resourceBundle.gototheroom}}</button>
 					<div data-ng-show="!isValidBrowser()">
 						<h2>{{resourceBundle.yourbrowsernot}}</h2>
 					</div>
