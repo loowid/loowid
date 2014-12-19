@@ -157,18 +157,18 @@ exports.createid = function(req, res, next) {
 * Create a room
 */
 
-var createmeeting = function(req, res, next, meet) {
+exports.create = function(req, res, next) {
 	// Check the id is the same as previously created
-	if (req.session.roomId === req.body.roomId || meet){
+	if (req.session.roomId === req.body.roomId){
 		var acc = {shared:'LINK',title:'',keywords:[],passwd:makeId(),moderated:false,chat:true,locked:false};
 		var room = new Room (
-				{roomId: meet ? makeId() : req.session.roomId, 
+				{roomId: req.session.roomId, 
 				 created: new Date(),
-				 status: meet ?  'CREATED' : 'OPENED',
+				 status: 'OPENED',
 				 access: acc,
 				 owner:
 				 	{name: req.body.name, 
-					 sessionid: meet ? null : req.sessionID,
+					 sessionid: req.sessionID,
 					 status:'CONNECTED',
 					 connectionId: req.body.connectionId,
 					 avatar: req.body.avatar},
@@ -181,12 +181,7 @@ var createmeeting = function(req, res, next, meet) {
 			if (err) {
 				next(err);
 			} else {
-				if (meet){
-					req.room = room;
-					next();
-				}else{
-					res.json(room);
-				}
+				res.json(room);
 			}
 		});
 	} else {
@@ -194,14 +189,6 @@ var createmeeting = function(req, res, next, meet) {
 		error.http_code = 500;
 		next(error);
 	}
-};
-
-exports.create = function(req, res, next) {
-	createmeeting(req,res,next,null);
-}
-
-exports.createmeeting = function(req, res, next, meet) {
-	createmeeting(req,res,next,meet);
 }
 
 exports.users = function(req,res){
