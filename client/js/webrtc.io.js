@@ -263,8 +263,8 @@ if (navigator.webkitGetUserMedia) {
 			});
 
 			rtc.on('receive_ice_candidate', function(data) {
-				var candidate = new nativeRTCIceCandidate(data);
-
+				var candidate = new nativeRTCIceCandidate({'candidate': data.candidate, 'sdpMLineIndex': data.label});
+			
 				var peerConnections = data.produced ? rtc.receivedPeerConnections: rtc.producedPeerConnections;
 
 				if (!peerConnections[data.socketId]){
@@ -273,14 +273,21 @@ if (navigator.webkitGetUserMedia) {
 
 				//We store temporaly candidates
 				if (!peerConnections[data.socketId][data.mediatype]){
-					/* peerConnections[data.socketId]["temp_"+data.mediatype] = [];
-            peerConnections[data.socketId]["temp_"+data.mediatype].push(candidate);*/
+					if (rtc.debug) console.log ("Peer not ready, so storing ICE candidate for a while");
+					if (!peerConnections[data.socketId]["temp_"+data.mediatype]) 
+						peerConnections[data.socketId]["temp_"+data.mediatype] = [];
+            		peerConnections[data.socketId]["temp_"+data.mediatype].push(candidate);
+					return;
 				}else{
-					peerConnections[data.socketId][data.mediatype].addIceCandidate(candidate);
+					peerConnections[data.socketId][data.mediatype].addIceCandidate(candidate,
+							function (){ if (rtc.debug) console.log ('ICE candidate added')},
+							function (error) { if (rtc.debug) console.log ('Error adding an ICE candidate ' + JSON.stringify (error));} );
+				
 				}
 
 				//Take care should send mediatype??
 				rtc.fire('receive ice candidate', candidate);
+				
 			});
 
 			rtc.on('new_peer_connected', function(data) {
@@ -390,11 +397,13 @@ if (navigator.webkitGetUserMedia) {
 		//if (!peerConnections[id][mediatype]){
 		peerConnections[id][mediatype] = new PeerConnection({iceServers:rtc.iceServers}, config);
 		//}
-
+		
+		
 		var pc = peerConnections[id][mediatype];
 
 		pc.onicecandidate = function(event) {
-			if (event.candidate) {
+			if (event.candidate && event.candidate.candidate) {
+				if (rtc.debug) console.log ("Sending an ICE candidate");
 				rtc._socket.send(JSON.stringify({
 					"eventName": "send_ice_candidate",
 					"data": {
@@ -405,8 +414,9 @@ if (navigator.webkitGetUserMedia) {
 						"produced": produced
 					}
 				}));
-			}
 			rtc.fire('ice candidate', event.candidate);
+
+			}
 		};
 
 		pc.onopen = function() {
@@ -448,6 +458,11 @@ if (navigator.webkitGetUserMedia) {
 			rtc.addDataChannel(id, evt.channel,requestId,mediatype);
 		};
 
+		
+		
+		
+		
+		
 		return pc;
 	};
 
@@ -482,6 +497,7 @@ if (navigator.webkitGetUserMedia) {
 			//session_description.sdp = preferOpus(session_description.sdp);
 			if (maxBitrate){
 				session_description.sdp = changeBitrate(session_description.sdp,maxBitrate); 
+				pc.tempSession_description = session_description;
 			}
 			pc.setLocalDescription(session_description, function (){
 				rtc._socket.send(JSON.stringify({
@@ -535,6 +551,17 @@ if (navigator.webkitGetUserMedia) {
 
 		pc.setRemoteDescription(new nativeRTCSessionDescription(sdp),
 								function (){
+
+									//Finaly look for already stored messages and flush them
+									if (rtc.receivedPeerConnections[socketId]['temp_'+mediatype]){
+										for (var i=0; i< rtc.receivedPeerConnections[socketId]['temp_'+mediatype].length; i++){
+											var storedIceCandidate = rtc.receivedPeerConnections[socketId]['temp_'+mediatype][i];
+											pc.addIceCandidate(storedIceCandidate,
+												   function (){if (rtc.debug) console.log ('ICE candidate added')},
+															   function (error) {if (rtc.debug) console.log ('Error adding ICE candiate' + JSON.stringify (error));
+											});
+										}
+									}	
 
 									pc.createAnswer(function(session_description) {
 
