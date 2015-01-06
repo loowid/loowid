@@ -166,13 +166,17 @@ angular.module('mean.rooms').controller('ViewDesktopController', ['$scope', '$ro
 
         // Keep Session with auto request every 15 min
 		window.clearInterval($scope.global.keepInterval);
-		$scope.keepInterval = window.setInterval(function(){
+		$scope.global.keepInterval = window.setInterval(function(){
 			room.keepSession(function(){},function(){});
 		},900000);
 
-
-
-
+		// Reload if is a permanent room
+		window.clearInterval($scope.global.reloadInterval);
+		$scope.global.reloadInterval = window.setInterval(function(){
+			if (uiHandler.joinable==false && uiHandler.locked==false && uiHandler.permanent) {
+				window.location.reload();
+			}
+		},30000);
 
         if ($scope.isValidBrowser()) { 
             //When this method is triggered is possible that we didn't know anything about the room 
@@ -275,6 +279,7 @@ angular.module('mean.rooms').controller('ViewDesktopController', ['$scope', '$ro
         room.isRoomJoinable ($scope.global.roomId,function(result){
         	uiHandler.joinable = result.joinable;
         	uiHandler.locked = result.locked;
+        	uiHandler.permanent = result.permanent;
             if (result.joinable) {
             	uiHandler.passNeeded = result.private;
                 if (!result.private) {

@@ -9,6 +9,7 @@ var ttl = 3600 * 24 * 30; // Room expires after 30 days
 var RoomSchema = new Schema({
     roomId: String,
     created: { type: Date, expires: ttl },
+    dueDate: Date,
     status: String,
     access: {
     	shared:String,       	
@@ -17,7 +18,9 @@ var RoomSchema = new Schema({
        	passwd: String,
        	moderated: Boolean,
         chat: {type: Boolean, default: true},
-        locked: Boolean
+        locked: Boolean,
+        permanent: Boolean,
+        permanentkey: String
     },
     owner: {
 		name: String, 

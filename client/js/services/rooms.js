@@ -21,6 +21,7 @@ angular.module('mean.rooms').factory("Rooms", ['$resource','$http','$window', fu
 	            moveRoom: {method: "POST", params: {cmd: 'move'},headers:{'x-csrf-token':csrf}},
 	            keepSession: {method: "POST", params: {cmd: 'keep'},headers:{'x-csrf-token':csrf}},
                 claimforroom: {method: "POST", params:{cmd: 'claimforroom'},headers:{'x-csrf-token':csrf}},
+	            chat: {method: "POST", params: {cmd: 'chat'}, headers:{'x-csrf-token':csrf}},
 				
 	        });
 		
@@ -79,7 +80,7 @@ angular.module('mean.rooms').factory("Rooms", ['$resource','$http','$window', fu
 					
 					rtc.on('connections',function(){
 						room.create ({roomId: newId, name: name,connectionId: rtc._me, avatar: $window.getGravatarImg(gravatar)},function(newRoom){
-							success(newRoom.roomId,gravatar,$window.getGravatarImg(gravatar),newRoom.access);
+							success(newRoom.roomId,gravatar,$window.getGravatarImg(gravatar),newRoom.access,newRoom.dueDate);
 						}); 
 					});
 					rtc.connect(host, newId);
@@ -106,9 +107,12 @@ angular.module('mean.rooms').factory("Rooms", ['$resource','$http','$window', fu
 			}
 		};
 
-        this.claimforroom = function (roomId,success){
-            room.claimforroom ({id: roomId}, function (rdo){
+        this.claimforroom = function (roomId,success,failure){
+        	var connectionId = rtc._me ? rtc._me : 'not valid id';
+            room.claimforroom ({id: roomId, cid: connectionId}, function (rdo){
                 success(rdo);
+            },function(err){
+            	failure(err);
             });
         }
         
@@ -151,6 +155,12 @@ angular.module('mean.rooms').factory("Rooms", ['$resource','$http','$window', fu
             }
         };
 
+        this.chat = function (roomId,success){
+            if (roomId){ 
+                room.chat ({id: roomId},success);
+            }
+        };
+        
         this.editOwnerName = function (roomId, name, gravatar, success) {
         	this.saveName(name);
         	this.saveGravatar(gravatar);

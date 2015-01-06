@@ -152,6 +152,7 @@
 		<div id="remoteAudios" ></div>
 		<article class="creator_message" data-ng-show="ui.joinable==false && ui.locked==false">
 			<h1>{{resourceBundle.roomisinactive}}</h1>
+			<h6 data-ng-show="ui.permanent">{{resourceBundle.permanentReload}}</h6>
 		</article>
 		<article class="creator_message" data-ng-show="ui.joinable==false && ui.locked==true">
 			<h1>{{resourceBundle.roomislocked}}</h1>

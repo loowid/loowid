@@ -275,8 +275,9 @@ app.post('/rooms/:roomId/join', function(req, res, next) {
 	rooms.join(req, res, next);
 });
 app.post('/rooms/:roomId/users', rooms.users);
+app.post('/rooms/:roomId/chat', rooms.chat);
 app.post('/rooms/:roomId/isJoinable', rooms.isJoinable);
-app.post('/rooms/:roomId/claimforroom', rooms.claimForRoom);
+app.post('/rooms/:roomId/:connectionId/claimforroom', rooms.claimForRoom);
 app.post('/rooms/:roomId/:connectionId/isActive', rooms.isActive);
 app.post('/rooms/:roomId/:connectionId/askForSharing', rooms.askForSharing);
 app.post('/rooms/:roomId/:connectionId/askForStopSharing', rooms.askForStopSharing);

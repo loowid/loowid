@@ -173,7 +173,6 @@ angular.module('mean.rooms').controller('RecordController', ['$scope', '$routePa
     };
 
 
-    
     //control de media
 	$scope.lastCharsUrl = function (url){
 		return url.substring (url.length -10);
@@ -196,11 +195,24 @@ angular.module('mean.rooms').controller('RecordController', ['$scope', '$routePa
 		$scope.global.keepInterval = window.setInterval(function(){
 			room.keepSession(function(){},function(){});
 		},900000);
+		
+		// Show Timeout CountDown
+		window.clearInterval($scope.global.countDownInterval);
+		$scope.global.countDownInterval = window.setInterval(function(){
+			var now = new Date();
+			var dueDate = new Date($scope.global.roomDueDate);
+			var hours = Math.floor(Math.abs(dueDate - now) / 36e5);
+			var mins = Math.floor((Math.abs(dueDate - now) - (hours * 36e5)) / 6e4);
+			var secs = Math.floor((Math.abs(dueDate - now) - (hours * 36e5) - (mins * 6e4)) / 1e3);
+			uiHandler.countDown = (hours>9?hours:'0'+hours)+'h'+(mins>9?mins:'0'+mins)+'m'+(secs>9?secs:'0'+secs)+'s';
+			$scope.$apply();
+		},1000);
+		
 
 		//look if who is selecting the room is valid
 		room.isRoomAvailable(uiHandler.roomId, function(result){
 			uiHandler.roomStatus = result.status;
-		    
+    
             //Initialize userHandler options
             userHandler.init ($scope);
 
@@ -219,13 +231,13 @@ angular.module('mean.rooms').controller('RecordController', ['$scope', '$routePa
 						 	uiHandler.status = results.status;
 						 	uiHandler.access = results.access;
 						 	uiHandler.gravatar = results.owner.gravatar;
+						 	$scope.global.roomDueDate = results.dueDate;
 					    	$scope.global.access = uiHandler.access;
- 				    	    
+					    	uiHandler.permanenturl = $location.$$protocol+ "://"+ $location.$$host +  "/#!/r/" + uiHandler.access.permanentkey + "/claim";
                             $scope.global.name = uiHandler.name;
 					    	$scope.global.avatar = uiHandler.avatar;
 					    	$scope.global.gravatar = uiHandler.gravatar;
 						 	rtc.updateOwnerData (uiHandler.roomId,uiHandler.name,uiHandler.avatar,uiHandler.status,uiHandler.access);
-
 						 	chatService.init ($scope,results.chat);
 			            });
 			            
@@ -246,10 +258,12 @@ angular.module('mean.rooms').controller('RecordController', ['$scope', '$routePa
 				 	}
    			} else {
    				// Owner trying to open multiple tabs not allowed
-   				if (result.owner) {
+   				if (result.owner || !rtc._me) {
    					$location.path("/");
    				} else {
-   					chatService.init ($scope,null);
+   					room.chat($scope.global.roomId,function(results){
+   						chatService.init ($scope,results.chat);
+   					});
    				}
    			}
 

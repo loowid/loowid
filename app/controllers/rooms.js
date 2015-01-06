@@ -37,7 +37,9 @@ exports.room = function(req, res, next, id) {
 						room.alias.splice(i,1);
 					} else if (room.alias[i].id == id) {
 						owner = room.alias[i].owner; 
-						room.alias.splice(i,1);
+						if (room.alias[i].session) {
+							room.alias.splice(i,1);
+						}
 					}
 				}
 				var expireDate = new Date();
@@ -124,6 +126,7 @@ exports.join = function (req, res, next){
 						next(err);
 					} else {
 						room.access.passwd = '';
+						room.access.permanentkey = '';
 						room.owner.sessionid = '';
 						room.guests = Room.safe(room.guests);
 						res.json(room);
@@ -160,10 +163,14 @@ exports.createid = function(req, res, next) {
 exports.create = function(req, res, next) {
 	// Check the id is the same as previously created
 	if (req.session.roomId === req.body.roomId){
-		var acc = {shared:'LINK',title:'',keywords:[],passwd:makeId(),moderated:false,chat:true,locked:false};
+		var acc = {shared:'LINK',title:'',keywords:[],passwd:makeId(),moderated:false,chat:true,locked:false,permanent:false,permanentkey:makeId()};
+		var now = new Date();
+		var due = new Date();
+		due.setDate(new Date(now.getDate()+30));
 		var room = new Room (
 				{roomId: req.session.roomId, 
-				 created: new Date(),
+				 created: now,
+				 dueDate: due,
 				 status: 'OPENED',
 				 access: acc,
 				 owner:
@@ -208,11 +215,29 @@ exports.users = function(req,res){
 	}
 };
 
+exports.chat = function(req,res){
+	var room = req.room;
+	res.json({chat:room?room.chat:[]});
+};
+
 exports.editShared = function (req,res,next) {
 	var room = req.room;
 	// Only the owner can change his name
 	if (req.sessionID == room.owner.sessionid) {
 		room.access = req.body.access;
+		if (room.access.permanent) {
+			var expireDate = new Date();
+			expireDate.setTime(expireDate.getTime()+(12*60*60*1000)); // 12 Hours of session token
+			room.alias.push({id: room.access.permanentkey, session: '', owner: true, timestamp: expireDate});
+			room.markModified('alias');
+		} else {
+			var len = room.alias.length;
+			for (var i=len-1; i>=0; i--) {
+				if (room.alias[i].id === room.access.permanentkey) {
+					room.alias.splice(i,1);
+				}
+			}
+		}
 		room.save(function(err) {
 			if (err) {
 				next(err);
@@ -289,17 +314,17 @@ exports.editGuestName = function (req,res,next) {
 exports.claimForRoom = function (req,res,next){
 	var room = req.room;
 	var alias = Room.alias(room,req.sessionID);
-	if (alias.owner) {
+	if (alias.owner && room.status === 'DISCONNECTED') {
 		room.owner.sessionid = req.sessionID; 
-	    room.owner.connectionId = req.body.connectionId;
+    	room.owner.connectionId = req.connectionId;
 		room.owner.status = 'OPENED';
 	}
-    var roomUrl = 'r/' + alias.id + (alias.owner?'/join':'');
+    var roomUrl = 'r/' + room.roomId + (alias.owner?'/join':'');
     room.save(function(err) {
 		if (err) {
 			next(err);
 		} else {
-			res.json({url:roomUrl});
+			res.json({url:roomUrl,id:room.roomId});
 		}
 	});
 
@@ -309,7 +334,11 @@ exports.isActive = function(req,res,next){
 	var room = req.room;
 	if (req.connectionId && room.owner.connectionId === req.connectionId){
 		if (room.owner.sessionid === req.sessionID){
-			return res.json({status: 'active'});
+			if (room.status==='OPENED') {
+				return res.json({status:'active'});
+			} else {
+				return res.json({status:'inactive',owner:true});
+			}
 		}
 	}
 	var aliasRoom = Room.alias(room,req.sessionID);
@@ -350,12 +379,11 @@ exports.markValid = function (roomId,sessionId) {
 exports.isJoinable = function(req,res,next){
 	var room = req.room;
 	var locked = !room.access || room.access.locked;
-	
+	var permanent = room.access && room.access.permanent;
 	if (room.status != 'DISCONNECTED' && (!locked || isReloading(room,req.sessionID))){
-
 		return res.json({joinable:true,locked:false,private:(room.access && room.access.shared=='PRIVATE')});	
 	}else{
-		return res.json({joinable:false,locked:locked});
+		return res.json({joinable:false,locked:locked,permanent:permanent});
 	}
 };
 

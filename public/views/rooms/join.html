@@ -53,6 +53,7 @@
 			<p><input id="chgacctitle" type="text" data-ng-model="ui.access.title" class="input-lg" size="15" ng- ng-maxlength="100" placeholder="{{resourceBundle.accesstitle}}"></p>
 			
 			<p><label>{{resourceBundle.roomsettings}}</label></p>
+			<p class="user_title"><input type="checkbox" ng-model="ui.access.permanent" />{{resourceBundle.permanentroom}}</p>
 			<p class="user_title"><input type="checkbox" ng-model="ui.access.moderated" />{{resourceBundle.moderatedroom}}</p>
 			<p class="user_title"><input type="checkbox" ng-model="ui.access.chat" ng-false-value="true" ng-true-value="false"/>{{resourceBundle.disablechat}}</p>
 			<p class="user_title"><input type="checkbox" ng-model="ui.access.locked"/>{{resourceBundle.lockroom}}</p>
@@ -204,6 +205,11 @@
 		<article class="creator_message" data-ng-show="ui.roomStatus == 'active' && !areWindowsOpened()  && shareDesktopStatus != 'failed'">
 			<h1>{{resourceBundle.sharethisurl}}</h1>
 			<a href="{{ui.screenurl}}" target="_blank">{{ui.screenurl}}</a>
+			<div ng-show="global.access.permanent">
+				<h5>{{resourceBundle.permanentUrl}}</h5>
+				<a href="{{ui.permanenturl}}">{{ui.permanenturl}}</a>
+				<h6>{{ui.countDown}}</h6>
+			</div>
 		</article>
 	</div>	
 </section>

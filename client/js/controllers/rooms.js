@@ -33,12 +33,14 @@ angular.module('mean.rooms').controller('RoomsController', ['$scope', '$routePar
 			   $location.path("r/" + $scope.global.roomId + '/join');   
 		  }else {
 			   uiHandler.creating=true;
-			   room.create(uiHandler.name,function(id,gav,av,acc){
+			   room.create(uiHandler.name,function(id,gav,av,acc,dueDate){
 				   $scope.global.roomId = id;
 				   $scope.global.name = uiHandler.name;
 				   $scope.global.avatar = av;
 				   $scope.global.access = acc;
 				   $scope.global.gravatar = gav;
+				   $scope.global.roomDueDate = dueDate; 
+			       uiHandler.permanenturl = $location.$$protocol+ "://"+ $location.$$host +  "/#!/r/" + $scope.global.access.permanentkey + "/claim";
 				   $location.path("r/" + id + '/join');
 			   });
 		   }
@@ -60,10 +62,12 @@ angular.module('mean.rooms').controller('RoomsController', ['$scope', '$routePar
 	   room.claimforroom ($scope.global.roomId,function(rdo){
            uiHandler.creating=true;
            $scope.global.name = uiHandler.name;
-           //$scope.global.avatar = av;
-           //$scope.global.access = acc;
-           //$scope.global.gravatar = gav;
+       	   $scope.global.roomId = uiHandler.roomId = rdo.id;
 	       $location.path(rdo.url);
+	   },function() {
+		   // Error claiming room
+		   $scope.global.roomId = uiHandler.roomId =  '';
+		   $location.path('/');
 	   });
 
    };
@@ -77,7 +81,7 @@ angular.module('mean.rooms').controller('RoomsController', ['$scope', '$routePar
    
    $scope.join = function() {
        var roomId = $scope.global.roomId;
-       uiHandler.screenurl = $location.$$protocol+ "://"+ $location.$$host +  "/#!/r/" + roomId;   
+       uiHandler.screenurl = $location.$$protocol+ "://"+ $location.$$host +  "/#!/r/" + roomId;
        $location.path("r/" +roomId + '/join');
    };
 
