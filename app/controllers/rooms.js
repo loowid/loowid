@@ -143,17 +143,22 @@ exports.join = function (req, res, next){
 
 // Generate unique room id
 // Validate is unique in mongo
+// Session is regenerated for every room you create
 exports.createid = function(req, res, next) {
-	req.session.roomId = makeId();
-	var result = function(err,room){
-		if (!room) {
-			res.json({id:req.session.roomId});
-		} else {
-			req.session.roomId = makeId();
-			Room.load(req.session.roomId,0,result);
-		}
-	};
-	Room.load(req.session.roomId,0,result);
+	var _csrfSecret = req.session._csrfSecret;
+	req.session.regenerate(function(){
+		req.session._csrfSecret = _csrfSecret; 
+		req.session.roomId = makeId();
+		var result = function(err,room){
+			if (!room) {
+				res.json({id:req.session.roomId});
+			} else {
+				req.session.roomId = makeId();
+				Room.load(req.session.roomId,0,result);
+			}
+		};
+		Room.load(req.session.roomId,0,result);
+	});
 }
 
 /*
