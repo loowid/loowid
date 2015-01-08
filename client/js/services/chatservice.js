@@ -78,7 +78,7 @@ angular.module('mean.rooms').factory("ChatService",['$timeout','UIHandler',funct
 	        		audio.play();
 	       		}
 	        	self.addNewMessage($scope,data);
-	        	$scope.$apply();
+	        	uiHandler.safeApply($scope,function(){});
 	    	});
 
 			if (chatmessages && uiHandler.messages.length==0) {

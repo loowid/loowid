@@ -386,7 +386,7 @@ angular.module('mean.rooms').factory("MediaService",['Rooms','UIHandler',functio
 					//Press play again for firefox
 					mediaElement.get(0).play();
 			  	}
-	    		$scope.$apply();
+	            uiHandler.safeApply($scope,function(){});
 			});
 
 			
@@ -499,7 +499,7 @@ angular.module('mean.rooms').factory("MediaService",['Rooms','UIHandler',functio
 					$scope.global.showError($scope,errMessage);
 			    }
             
-        		$scope.$apply();
+	            uiHandler.safeApply($scope,function(){});
 
         	});	
 

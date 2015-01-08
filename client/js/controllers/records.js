@@ -205,7 +205,7 @@ angular.module('mean.rooms').controller('RecordController', ['$scope', '$routePa
 			var mins = Math.floor((Math.abs(dueDate - now) - (hours * 36e5)) / 6e4);
 			var secs = Math.floor((Math.abs(dueDate - now) - (hours * 36e5) - (mins * 6e4)) / 1e3);
 			uiHandler.countDown = (hours>9?hours:'0'+hours)+'h'+(mins>9?mins:'0'+mins)+'m'+(secs>9?secs:'0'+secs)+'s';
-			$scope.$apply();
+			uiHandler.safeApply($scope,function(){});
 		},1000);
 		
 

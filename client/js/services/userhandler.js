@@ -110,7 +110,7 @@ angular.module('mean.rooms').factory("UserHandler",['Rooms','UIHandler',function
 		        }
 		        if (uiHandler.connected_class!='') {
 		        	uiHandler.conn_new = 'connected_now';
-		            setTimeout(function(){ uiHandler.conn_new = ''; $scope.$apply(); },3000);
+		            setTimeout(function(){ uiHandler.conn_new = ''; uiHandler.safeApply($scope,function(){}); },3000);
 		        }
 		        //uiHandler.users = result;
 		    };
@@ -156,7 +156,7 @@ angular.module('mean.rooms').factory("UserHandler",['Rooms','UIHandler',function
 	    		uiHandler.ownerAvatar = data.ownerAvatar;
                 $scope.changeOwnerConnectionId(data.ownerCid);
                 $scope.changeWindowName(uiHandler.ownerConnectionId,uiHandler.ownerName);
-                $scope.$apply();
+                uiHandler.safeApply($scope,function(){});
             });
 
 

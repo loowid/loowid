@@ -30,8 +30,8 @@ angular.module('mean.system').factory("Global", [function() {
         showError: function(scope,err) {
             scope.error_class = 'error_now';
             scope.error_message = err;
-            scope.$apply();
-            setTimeout(function(){scope.error_class='';scope.error_message='';scope.$apply();},10000);
+            uiHandler.safeApply(scope,function(){});
+            setTimeout(function(){scope.error_class='';scope.error_message='';uiHandler.safeApply(scope,function(){});},10000);
         },
         hideError: function(scope) {
             scope.error_class = '';

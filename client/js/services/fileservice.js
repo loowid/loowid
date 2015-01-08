@@ -260,7 +260,7 @@ angular.module('mean.rooms').factory("FileService",['$sce','UIHandler',function(
 	                fileToCancel.canceled = true;
 	            };
 
-	            $scope.$apply();  
+	            uiHandler.safeApply($scope,function(){});  
 	            
 	        });
 
@@ -340,7 +340,7 @@ angular.module('mean.rooms').factory("FileService",['$sce','UIHandler',function(
 	                 //Now we can release the connection sending transfer completed
 	                //Check if all files are completed
 	                files[renderedIndex].completed = 100;
-	                $scope.$apply ();
+	                uiHandler.safeApply($scope,function(){});
 
 	                rtc.fileDownloaded( $scope.global.roomId,connectionId,requestId,data.fileid);
 
