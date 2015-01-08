@@ -4,6 +4,8 @@ window.app.config(['$routeProvider',
         $routeProvider.
         when ('/r/:roomId/join',{reloadOnSearch: false,
     		templateUrl: 'views/rooms/join.html'
+    	}).when ('/r/:roomId/owner',{
+            templateUrl: 'views/rooms/owner.html'
     	}).when ('/r/:roomId/claim',{
             templateUrl: 'views/rooms/claim.html'
         }).when ('/r/:roomId',{reloadOnSearch: false,

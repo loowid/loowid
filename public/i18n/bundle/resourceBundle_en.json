@@ -183,5 +183,6 @@
 	"loowid-extension-activate" : "you've installed the Loowid extension but it's not active. Please activate it to record the desktop",
 	"permanentroom" : "Standing room",
 	"permanentUrl" : "Do not share this link with anyone, use it to return to this room as owner of it later.",
-	"permanentReload": "You can wait for the room's owner, or reload to check if the room is activated."
+	"permanentReload": "You can wait for the room's owner, or reload to check if the room is activated.",
+	"ownerMultiple": "You are already connected as the owner of this room, only one connection to the room as the owner is allowed."
 }

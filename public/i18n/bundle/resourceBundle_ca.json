@@ -183,5 +183,6 @@
 	"loowid-extension-activate" : "Teniu l'extensió de Chrome de Loowid instal·lada. Activeu-la per fer-la anar",
 	"permanentroom" : "Sala permanent",
 	"permanentUrl" : "No comparteixis aquest enllaç amb ningú, lo servir per tornar a aquesta sala com a propietari de la mateixa més tard.",
-	"permanentReload": "Pot romandre a l'espera que es connecti el propietari de la sala, o recarregar per comprovar si la sala s'activa."
+	"permanentReload": "Pot romandre a l'espera que es connecti el propietari de la sala, o recarregar per comprovar si la sala s'activa.",
+	"ownerMultiple": "Ja està connectat com a propietari a aquesta sala, només es permet una connexió a la sala com a propietari."
 }

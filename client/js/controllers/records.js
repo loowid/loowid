@@ -259,7 +259,7 @@ angular.module('mean.rooms').controller('RecordController', ['$scope', '$routePa
    			} else {
    				// Owner trying to open multiple tabs not allowed
    				if (result.owner || !rtc._me) {
-   					$location.path("/");
+   					$location.path("r/"+$scope.global.roomId+'/owner');
    				} else {
    					room.chat($scope.global.roomId,function(results){
    						chatService.init ($scope,results.chat);
