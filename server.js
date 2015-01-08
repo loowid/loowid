@@ -220,6 +220,7 @@ app.get('/chat/talk',function(req, res) {
 	});
 });
 
+var pck = require('./package.json');
 
 if (process.env.PORT || process.env.OPENSHIFT_NODEJS_PORT) {
 	// Heroku redirect
@@ -237,7 +238,8 @@ if (process.env.PORT || process.env.OPENSHIFT_NODEJS_PORT) {
 				res.setHeader("X-FRAME-OPTIONS","SAMEORIGIN");
 				res.render('index.jade', {
 					title : "Look what I'm doing!",
-					appName : "Loowid"
+					appName : "Loowid",
+					version: pck.version
 				});
 			}
 		}
@@ -257,7 +259,8 @@ if (process.env.PORT || process.env.OPENSHIFT_NODEJS_PORT) {
 				res.setHeader("X-FRAME-OPTIONS","SAMEORIGIN");
 				res.render('index.jade', {
 					title : "Look what I'm doing!",
-					appName : "Loowid"
+					appName : "Loowid",
+					version: pck.version
 				});
 			}
 		}
