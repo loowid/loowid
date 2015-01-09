@@ -47,23 +47,27 @@ Configuration
   Check your hosting provider documentation in order to know how to set this values, for example, with openshift you can type:
   	rhc env set VARIABLE=VALUE -a app
   
-  1. Credentials to access to some admin resources (debug level and stats).
+  1. Credentials to access to some admin resources (debug level and stats). By default admin/admin.
   
-  * ADMIN_USERNAME
-  * ADMIN_PASSWORD
+  * ADMIN_USERNAME=admin
+  * ADMIN_PASSWORD=admin
   
-  2. Chrome plugin extension id. Set the id of your own plugin extension for screen sharing. A generic plugin will be used by default.
+  2. Chrome plugin extension id. Set the id of your own plugin extension for screen sharing. A generic domain plugin will be used by default.
   
-  * CEXTID
+  * CEXTID=generic-domain-plugin-id
   
   3. Xyrsys configuration, to configure access to xyrsys (https://xirsys.com/).
   
-  * XIRSYS_DOMAIN
-  * XIRSYS_USER
-  * XIRSYS_SECRET
+  * XIRSYS_DOMAIN=
+  * XIRSYS_USER=
+  * XIRSYS_SECRET=
   
   4. Room timeout. The number of days that a room can be active on the server before expires (15 days by default).
   
-  * ROOM_TIMEOUT
+  * ROOM_TIMEOUT=15
   
+  5. Path to certificate files. By default 'public.pem' and 'private.pem' in the same folder, you could set the full path to your own certificate files.
+  
+  * PUBLIC_KEY=public.pem
+  * PRIVATE_KEY=private.pem
 

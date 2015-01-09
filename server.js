@@ -40,8 +40,8 @@ if (!process.env.PORT && !process.env.OPENSHIFT_NODEJS_PORT && defaultPort) {
 	var fs = require('fs');
 	// Certificado de pruebas para local
 	// Generado con http://www.cert-depot.com/
-	var privateKey = fs.readFileSync('private.pem');
-	var certificate = fs.readFileSync('public.pem');
+	var privateKey = fs.readFileSync(process.env.PRIVATE_KEY || 'private.pem');
+	var certificate = fs.readFileSync(process.env.PUBLIC_KEY || 'public.pem');
 	var credentials = {
 		key : privateKey,
 		cert : certificate
