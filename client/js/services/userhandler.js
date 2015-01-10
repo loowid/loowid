@@ -82,6 +82,9 @@ angular.module('mean.rooms').factory("UserHandler",['Rooms','UIHandler',function
 		                        exists = true;
 		                        uiHandler.users[j].name = result[i].name;
 		                        uiHandler.users[j].avatar = result[i].avatar;
+		                        if (uiHandler.users[j].status !== result[i].status) {
+		                        	uiHandler.newusers.unshift(result[i]);
+		                        }
 		                        uiHandler.users[j].status = result[i].status;
 		                        $scope.changeWindowName(result[i].connectionId,result[i].name);
 		                    }
