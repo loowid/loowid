@@ -45,6 +45,7 @@ https://www.loowid.com
   	rhc env set VARIABLE=VALUE -a app
   ```
   1. Credentials to access to some admin resources (debug level and stats). By default admin/admin.
+
   ```
   ADMIN_USERNAME=<your-admin-username>
   ADMIN_PASSWORD=<your-admin-password>
