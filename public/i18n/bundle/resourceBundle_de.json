@@ -184,5 +184,7 @@
 	"permanentroom" : "Beständiger Raum",
 	"permanentUrl" : "Teile diese Internetadresse nicht mit jedem. Nutze sie, um später jederzeit als Raumeigentümer zurückzukehren",
 	"permanentReload": "Du kannst auf den Raumeigentümer warten oder die Seite erneut laden, um zu sehen, ob der Raum aktiviert ist",
-	"ownerMultiple": "Du bist schon als Raumeigentümer mit diesem Raum verbunden, es ist nur eine Verbindung als Raumeigentümer erlaubt"
+	"ownerMultiple": "Du bist schon als Raumeigentümer mit diesem Raum verbunden, es ist nur eine Verbindung als Raumeigentümer erlaubt",
+	"loowid" : "Look what I'm doing"
+	
 }

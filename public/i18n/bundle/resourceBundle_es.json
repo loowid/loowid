@@ -184,6 +184,6 @@
 	"permanentroom" : "Sala permanente",
 	"permanentUrl" : "No compartas este enlace con nadie, utilizalo para regresar a esta sala como propietario de la misma.",
 	"permanentReload" : "Puede permanecer a la espera de que se conecte el propietario de la sala, o recargar para comprobar si la sala se activa.",
-	"ownerMultiple" : "Ya está conectado como propietario a esta sala, sólo se permite una conexión a la sala como propietario."
-
+	"ownerMultiple" : "Ya está conectado como propietario a esta sala, sólo se permite una conexión a la sala como propietario.",
+	"loowid" : "Look what I'm doing"
 }
