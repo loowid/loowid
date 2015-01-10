@@ -87,6 +87,14 @@
 		</li>
 	</ul>
 </div>
+<div id="connecting" ng-class="ui.conn_new">
+	<div class="connected" data-ng-repeat="user in ui.newusers"> 
+		<img ng-src="{{user.avatar}}"/>
+		<h3 ng-show="user.status=='CONNECTED'">{{user.name}} (+)</h3>
+		<h3 ng-show="user.status=='DISCONNECTED'">{{user.name}} (-)</h3>
+		<p class="user_title">{{resourceBundle.usertypeviewer}}</p>
+	</div>
+</div>
 <aside id="connected" ng-class="ui.connected_class">
 	<span class="toggler" ng-click="toogleConnected()"><i class="fa fa-angle-double-left"></i></span>
 	<h1>{{resourceBundle.peopleconnected}}</h1>
