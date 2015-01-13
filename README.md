@@ -35,6 +35,8 @@ https://www.loowid.com
 	 * `grunt less`		: Compile less sources to css
 	 * `grunt mini`		: Minify js files and compile less
 	 * `grunt jshint`		: Analyze js files to check style and best practices
+   
+  7. If you get some npm packages errors try `npm update` (We had that errors on Windows 7 64bits)
   
 ## Configuration
 
