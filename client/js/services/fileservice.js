@@ -374,7 +374,7 @@ angular.module('mean.rooms').factory("FileService",['$sce','UIHandler',function(
 
 	                var virtualURL = (window.URL || window.webkitURL).createObjectURL(blob);
 
-	                files[renderedIndex].name = $sce.trustAsHtml('<a target="_blank" download="'+filename+' " href="'+virtualURL+'" >' + filename +'</a>');
+	                files[renderedIndex].name = $sce.trustAsHtml('<a target="_blank" download="'+filename+'" href="'+virtualURL+'" >' + filename +'</a>');
 	                self.arrayToStoreChunks[connectionId][mediatype][data.fileid] = []; // resetting array
 	                self.hasToRefresh=true;
 	            }else{
