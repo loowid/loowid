@@ -1,6 +1,6 @@
 describe("Main Server Tests", function() {
 
-	process.env.MONGOLAB_URI = 'mongodb://localhost/loowid';
+	process.env.MONGOLAB_URI = 'mongodb://localhost/loowid-test';
 	
 	var server = require('../server.js');
 	var request = require('request');
@@ -32,7 +32,7 @@ describe("Main Server Tests", function() {
 	}
     
 	var total = 0;
-    
+    // Wrapper of it function to count number of tests
 	var test = function(name,fn) {
 		total++;
 		it(name,fn);
