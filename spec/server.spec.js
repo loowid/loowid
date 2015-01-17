@@ -2,7 +2,7 @@ describe("Main Server Tests", function() {
 
 	process.env.MONGOLAB_URI = 'mongodb://localhost/loowid';
 	
-	var server = require('./server.js');
+	var server = require('../server.js');
 	var request = require('request');
 	var request = request.defaults({
 		  strictSSL: false,

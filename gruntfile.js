@@ -164,7 +164,7 @@ module.exports = function(grunt) {
                 consolidate: true
               }
             },
-            all: ['./']
+            all: ['spec/']
         }
     });
 
