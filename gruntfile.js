@@ -77,7 +77,9 @@ module.exports = function(grunt) {
         	mongo: {
         		command: 'mongod --dbpath ./data',
         		options: {
-        			async: true
+        			async: true,
+        			stdout: false,
+        			stderr: true
         		}
         	}
         },
@@ -107,6 +109,12 @@ module.exports = function(grunt) {
         	},
         	cluster: {
 	            tasks: ['shell', 'nodemon:proxy', 'watch'], 
+	            options: {
+	                logConcurrentOutput: true
+	            }
+        	},
+        	test: {
+	            tasks: ['shell', 'jasmine_node'], 
 	            options: {
 	                logConcurrentOutput: true
 	            }
@@ -142,6 +150,21 @@ module.exports = function(grunt) {
             		'public/css/loowid.min.css':'client/less/loowid.less'
             	}
         	}
+        },
+        jasmine_node: {
+            options: {
+              forceExit: true,
+              matchall: false,
+              extensions: 'js',
+              specNameMatcher: 'spec',
+              jUnit: {
+                report: false,
+                savePath : "./build/reports/jasmine/",
+                useDotNotation: true,
+                consolidate: true
+              }
+            },
+            all: ['./']
         }
     });
 
@@ -154,7 +177,8 @@ module.exports = function(grunt) {
     grunt.loadNpmTasks('grunt-contrib-jshint');
     grunt.loadNpmTasks('grunt-contrib-uglify');
     grunt.loadNpmTasks('grunt-contrib-less');
-
+    grunt.loadNpmTasks('grunt-jasmine-node');
+    
     //Making grunt default to force in order not to break the project.
     grunt.option('force', true);
 
@@ -182,5 +206,8 @@ module.exports = function(grunt) {
     
     // Minify tasks (generate min files)
     grunt.registerTask('mini', ['minijs','less']);
+    
+    // Run tests
+    grunt.registerTask('test', ['concurrent:test']);
 
 };

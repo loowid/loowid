@@ -114,6 +114,7 @@ var db = mongoose.connect(uristring, function(err, res) {
 		logger.error('ERROR connecting to: ' + uristring + '. ' + err);
 	} else {
 		logger.info('Succeeded connected to: ' + uristring);
+		exports.dbReady = true;
 	}
 });
 
@@ -308,6 +309,3 @@ app.use(function(err, req, res, next) {
 server.listen(port, ipaddr);
 
 logger.info('Express app started on port ' + (defaultPort?sport:port));
-
-// expose app
-exports = app;
