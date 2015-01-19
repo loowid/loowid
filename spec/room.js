@@ -61,17 +61,38 @@ module.exports = function(request,test,utils) {
 	            	expect(n).toBe(1);
 		            utils.Room.count({'roomId':utils.roomID}).exec(function(e,n){
 		            	expect(n).toBe(1);
-		            	// WebSocket Connect !!
-		            	utils.connect(function(msg){
-		            		var resp = JSON.parse(msg);
-		            		expect(resp.eventName).toBe('get_updated_config');
-		            		done();
-		            	});
+		            	done();
 		            });
 	            });
 	            
 	    	});
 	    });
+	    
+	    test("WebSocket connection done.",function(done) {
+	    	utils.addListener('get_updated_config',function(ice){
+	    		expect(ice.iceServers.length).toBeGreaterThan(0);
+	    		done();
+	    	});
+        	// WebSocket Connect !!
+        	utils.connect();
+	    });
+	    
+	    test("Join the room.",function(done) {
+	    	utils.addListener('get_peers',function(join){
+	    		expect(join.you.length).toBeGreaterThan(0);
+	    		utils.owner = join.you;
+	    		done();
+	    	});
+	    	utils.ws.send(JSON.stringify({
+				"eventName": "join_room",
+				"data": {
+					"room": utils.roomID,
+					"pwd": '',
+					"reload": ''
+				}
+	    	}));
+	    });
+	    
 	    
 	});	
 	

@@ -16,12 +16,35 @@ describe("Main Server Tests", function() {
 	utils.WSEvent = mongoose.model('WSEvent');
 	utils.Room = mongoose.model('Room');
 
-	utils.connect = function(onmessage) {
+	utils._events = {};
+	utils.addListener = function(eventName, callback) {
+		utils._events[eventName] = utils._events[eventName] || [];
+		utils._events[eventName].push(callback);
+	};
+	utils.call = function(eventName, _) {
+		var events = utils._events[eventName];
+		var args = Array.prototype.slice.call(arguments, 1);
+		if (!events) {
+			return;
+		}
+		for (var i = 0, len = events.length; i < len; i++) {
+			events[i].apply(null, args);
+		}
+	};
+	utils.connect = function() {
 		utils.ws = new WebSocket('wss://localhost/',null,utils.options);
 		utils.ws.on('open', function(){
+			// Initial call in open
 			utils.ws.send(JSON.stringify({"eventName": "update_server_config","data": {	"room": utils.room	}}));
 		});
-		utils.ws.on('message', onmessage);
+		utils.ws.on('message', function(msg){
+			try {
+				var json = JSON.parse(msg);
+				utils.call(json.eventName,json.data);
+			} catch (err) {
+				console.log(err);
+			}
+		});
 		utils.ws.on('close', function(){
 			console.log('Close');
 		});
