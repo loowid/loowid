@@ -87,7 +87,7 @@ function getSessionId(headers) {
         var parts = cookie.split('=');
         list[parts.shift().trim()] = unescape(parts.join('='));
     });
-    var real_sid = list.jsessionid.replace( prefix, "" );
+    var real_sid = (list.jsessionid != null)?list.jsessionid.replace( prefix, "" ):"";
     real_sid = signature.unsign( real_sid, 'your-secret' );
     return real_sid;
 }
@@ -104,11 +104,15 @@ function attachEvents(manager) {
     rtc.sockets.push(socket);
 
     socket.on('message', function(msg) {
-      var json = JSON.parse(msg);
-      manager.rooms.realRoomId(json.data.room,socket.sessionid,function(realRoom){
-    	  json.data.room = realRoom;
-          rtc.fire(json.eventName, json.data, socket);
-      });
+      try {
+	      var json = JSON.parse(msg);
+	      manager.rooms.realRoomId(json.data.room,socket.sessionid,function(realRoom){
+	    	  json.data.room = realRoom;
+	          rtc.fire(json.eventName, json.data, socket);
+	      });
+      } catch (err) {
+    	  logger.error(err);
+      }
     });
 
     socket.on('close', function() {
