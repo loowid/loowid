@@ -2,21 +2,52 @@ describe("Main Server Tests", function() {
 
 	process.env.MONGOLAB_URI = 'mongodb://localhost/loowid-test';
 	
+	var mongoose = require('mongoose');
 	var server = require('../server.js');
 	var request = require('request');
-	var request = request.defaults({
-		  strictSSL: false,
-		  rejectUnauthorized: false,
-		  jar:true
-		});
-	var csrf = '';
+	var WebSocket = require('ws');
+	
+	var utils = {};
+	utils.options = { strictSSL: false, rejectUnauthorized: false, jar:true };
+	var request = request.defaults(utils.options);
 	var endTests = false;
+	
+	utils.Log = mongoose.model('Log');
+	utils.WSEvent = mongoose.model('WSEvent');
+	utils.Room = mongoose.model('Room');
+
+	utils.connect = function(onmessage) {
+		utils.ws = new WebSocket('wss://localhost/',null,utils.options);
+		utils.ws.on('open', function(){
+			utils.ws.send(JSON.stringify({"eventName": "update_server_config","data": {	"room": utils.room	}}));
+		});
+		utils.ws.on('message', onmessage);
+		utils.ws.on('close', function(){
+			console.log('Close');
+		});
+	};
+	
+	utils.disconnect = function() {
+		utils.ws.close();
+	}
 	
 	beforeEach(function(done){
 		// Wait for DB Connection
 		var fn = function(){
 			if (server.dbReady) {
-				done();
+				// Removing collections before start
+				if (count==0) {
+					// WSEvent can't be removed (is capped)
+					utils.Log.remove().exec(function(err){
+						if (err) console.log('Log: Error removing collection!!');
+						utils.Room.remove().exec(function(err){
+							if (err) console.log('Room: Error removing collection!!');
+							done();
+						});
+					});
+				} else {
+					done();
+				}
 			} else {
 				setTimeout(fn,500);
 			}
@@ -46,61 +77,8 @@ describe("Main Server Tests", function() {
 		done();
 	});
 	
-	describe("Server is working", function() {
-		
-	    test("Index loads loowid.min.js.", function(done) {
-	        request("https://localhost/", function(error, response, body){
-	            expect(error).toBeNull();
-	            expect(response.statusCode).toBe(200);
-	            expect(body.indexOf('loowid.min.js')>0).toBeTruthy();
-	            var text = body.substring(body.indexOf('window.csrf'),body.indexOf(';',body.indexOf('window.csrf'))+1).replace('window.','');
-	            eval(text);
-	            done();
-	        });
-	    });
-
-	    test("Hello call return 200.", function(done) {
-	        request("https://localhost/rooms/hello", function(error, response, body){
-	            expect(error).toBeNull();
-	            expect(response.statusCode).toBe(200);
-	            var hello = JSON.parse(body);
-	            expect(hello.status).toBe(200);
-	            done();
-	        });
-	    });
-
-	});
-
-	describe("Create room", function() {
-		
-	    test("Create room id first.", function(done) {
-	    	request.post({
-	    		  headers: {'content-type':'application/x-www-form-urlencoded','x-csrf-token':csrf},
-	    		  url:     'https://localhost/rooms/createid',
-	    		  body:    ''
-	    	}, function(error, response, body){
-	            expect(error).toBeNull();
-	            expect(response.statusCode).toBe(200);
-	            var room = JSON.parse(body);
-	            expect(room.id.length).toBe(7);
-	            done();
-	    	});
-	    });
-	    
-	    test("Keep call returns true.", function(done) {
-	    	request.post({
-	    		  headers: {'content-type':'application/x-www-form-urlencoded','x-csrf-token':csrf},
-	    		  url:     'https://localhost/rooms/keep',
-	    		  body:    ''
-	    	}, function(error, response, body){
-	            expect(error).toBeNull();
-	            expect(response.statusCode).toBe(200);
-	            var keep = JSON.parse(body);
-	            expect(keep.keep).toBeTruthy();
-	            done();
-	    	});
-	    });
-		
-	});
+	require('./init')(request,test,utils);
+	require('./room')(request,test,utils);
+	
 	
 });
