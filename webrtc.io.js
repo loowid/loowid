@@ -1,6 +1,8 @@
+'use strict';
 //SERVER
+/*global unescape: true */
 var WebSocketServer = require('ws').Server,
-signature = require( "cookie-signature" ),prefix = "s:",
+signature = require( 'cookie-signature' ),prefix = 's:',
 ServerList = require('node-rest-client').Client,
 request = require('request');
 
@@ -11,9 +13,9 @@ var logger = require('./log.js').getLog('webrtc.io');
 lclient.registerMethod('getXirSysServers','https://api.xirsys.com:443/getIceServers','POST');
 
 // Used for callback publish and subscribe
-if (typeof rtc === "undefined") {
+//if (typeof rtc === 'undefined') {
   var rtc = {};
-}
+//}
 //Array to store connections
 rtc.sockets = [];
 
@@ -31,8 +33,8 @@ rtc.on = function(eventName, callback) {
 
  rtc.iceSERVERS = function() {
     return {
-      "iceServers": [{
-        "url": "stun:stun.l.google.com:19302"
+      'iceServers': [{
+        'url': 'stun:stun.l.google.com:19302'
       },
     	{url:'stun:stun.l.google.com:19302'},
 		{url:'stun:stun1.l.google.com:19302'},
@@ -40,11 +42,11 @@ rtc.on = function(eventName, callback) {
 		{url:'stun:stun3.l.google.com:19302'},
 		{url:'stun:stun4.l.google.com:19302'},
 		{
-			"credential": "numbloowid",
-			"host": "numb.viagenie.ca",
-			"protocol": "turn",
-			"url": "turn:numb.viagenie.ca",
-			"username": "loowid@gmail.com"
+			'credential': 'numbloowid',
+			'host': 'numb.viagenie.ca',
+			'protocol': 'turn',
+			'url': 'turn:numb.viagenie.ca',
+			'username': 'loowid@gmail.com'
 		}    
       ]
     };
@@ -60,37 +62,35 @@ rtc.fire = function(eventName, _) {
     return;
   }
 
-  for (var i = 0, len = events.length; i < len; i++) {
+  for (var i = 0, len = events.length; i < len; i+=1) {
     events[i].apply(null, args);
   }
 };
 
-module.exports.listen = function(server) {
-  var manager;
-  if (typeof server === 'number') { 
-    manager = new WebSocketServer({
-        port: server
-      });
-  } else {
-    manager = new WebSocketServer({
-      server: server
-    });
-  }
-  manager.rtc = rtc;
-  attachEvents(manager);
-  return manager;
-};
-
 function getSessionId(headers) {
     var list = {}, rc = headers.cookie;
-    rc && rc.split(';').forEach(function( cookie ) {
-        var parts = cookie.split('=');
-        list[parts.shift().trim()] = unescape(parts.join('='));
-    });
-    var real_sid = (list.jsessionid != null)?list.jsessionid.replace( prefix, "" ):"";
+    if (rc) { 
+    	rc.split(';').forEach(function( cookie ) {
+    		var parts = cookie.split('=');
+    		list[parts.shift().trim()] = unescape(parts.join('='));
+    	});
+    }
+    var real_sid = (list.jsessionid)?list.jsessionid.replace( prefix, '' ):'';
     real_sid = signature.unsign( real_sid, 'your-secret' );
     return real_sid;
 }
+
+//generate a 4 digit hex code randomly
+function S4() {
+  return Math.floor((1 + Math.random()) * 0x10000).toString(16).substring(1);
+}
+
+// make a REALLY COMPLICATED AND RANDOM id, kudos to dennis
+function id() {
+  return (S4() + S4() + '-' + S4() + '-' + S4() + '-' + S4() + '-' + S4() + S4() + S4());
+}
+
+var errorFn = function(error) { if (error) { logger.error(error); } };
 
 function attachEvents(manager) {
 
@@ -124,24 +124,21 @@ function attachEvents(manager) {
 	  rtc.sockets.splice(i, 1);
       // remove from rooms and send remove_peer_connected to all sockets in room
       var room;
+      
       for (var key in rtc.rooms) {
         room = rtc.rooms[key];
         var exist = room.indexOf(socket.id);
         if (exist !== -1) {
           room.splice(room.indexOf(socket.id), 1);
-          for (var j = 0; j < room.length; j++) {
+          for (var j = 0; j < room.length; j+=1) {
             var soc = rtc.getSocket(room[j]);
             if (soc) { // This check is missing (bug)
 	            soc.send(JSON.stringify({
-	              "eventName": "remove_peer_connected",
-	              "data": {
-	                "socketId": socket.id
+	              'eventName': 'remove_peer_connected',
+	              'data': {
+	                'socketId': socket.id
 	              }
-	            }), function(error) {
-	              if (error) {
-	            	  logger.error(error);
-	              }
-	            });
+	            }), errorFn);
             }
           }
           room = key; // This line is missing (bug)
@@ -149,9 +146,9 @@ function attachEvents(manager) {
         }
       }
       // we are leaved the room so lets notify about that
-	  rtc.fire("room_leave", room, socket.id);
+	  rtc.fire('room_leave', room, socket.id);
       // call the disconnect callback
-	  rtc.fire("disconnect", rtc);
+	  rtc.fire('disconnect', rtc);
 
     });
     // call the connect callback
@@ -170,10 +167,10 @@ function attachEvents(manager) {
 			manager.rooms.markValid(data.room,socket.sessionid);
 		}
 		
-		for (var i = 0; i < roomList.length; i++) {
+		for (var i = 0; i < roomList.length; i+=1) {
 		  var id = roomList[i];
 
-		  if (id == socket.id) {
+		  if (id === socket.id) {
 		    continue;
 		  } else {
 		    connectionsId.push(id);
@@ -181,49 +178,36 @@ function attachEvents(manager) {
 		    // inform the peers that they have a new peer
 		    if (soc) {
 		      soc.send(JSON.stringify({
-		        "eventName": "new_peer_connected",
-		        "data":{
-		          "socketId": socket.id
+		        'eventName': 'new_peer_connected',
+		        'data':{
+		          'socketId': socket.id
 		        }
-		      }), function(error) {
-		        if (error) {
-		          logger.error(error);
-		        }
-		      });
+		      }), errorFn);
 		    }
 		  }
 		}
 		if (socket._events) {
 			// send new peer a list of all prior peers
 			socket.send(JSON.stringify({
-			  "eventName": "get_peers",
-			  "data": {
-			    "connections": connectionsId,
-			    "you": socket.id
+			  'eventName': 'get_peers',
+			  'data': {
+			    'connections': connectionsId,
+			    'you': socket.id
 			  }
-			}), function(error) {
-			  if (error) {
-			    logger.error(error);
-			  }
-			});
+			}), errorFn);
 		} else {
 			if (connectionsId.length>0) {
-				wsevents.addEvent(serverId,'add_peers',{'room':data.room,'connections':connectionsId},socket);
+				manager.wsevents.addEvent(manager.serverId,'add_peers',{'room':data.room,'connections':connectionsId},socket);
 			}
 		}
-	}
-	, function(lock) {
+	},function(lock) {
 		socketa.send(JSON.stringify({
-			"eventName" : (lock?"room_locked":"password_failed"),
-			"data" : {
-				"password" : dataa.pwd,
-				"room" : dataa.room
+			'eventName' : (lock?'room_locked':'password_failed'),
+			'data' : {
+				'password' : dataa.pwd,
+				'room' : dataa.room
 			}
-		}), function(error) {
-			if (error) {
-				logger.error(error);
-			}
-		});
+		}), errorFn);
 	});
   });
 	
@@ -232,19 +216,17 @@ function attachEvents(manager) {
 	
 	 var handlePost = function (error, response, body) {
         var iceServers;
-		if (!error && response.statusCode == 200) {
+		if (!error && response.statusCode === 200) {
             logger.debug(body);
 			var pdata = JSON.parse(body);
 			if (pdata.d){
 				iceServers = pdata.d.iceServers;
 			}else{
-				serverList = rtc.iceSERVERS();
-			  	iceServers = serverList.iceServers;
+			  	iceServers = rtc.iceSERVERS().iceServers;
 			  	logger.error('Error parsing server list. Returning default ice servers.');
 			}
         } else {
-			serverList = rtc.iceSERVERS();
-			iceServers = serverList.iceServers;
+			iceServers = rtc.iceSERVERS().iceServers;
 			if (response || body) logger.error ('Error connecting to get servers ['+error+']: ' + response  + '\n' + body);
 			else logger.info('Returning default ice servers.');
 		}
@@ -253,16 +235,12 @@ function attachEvents(manager) {
 		var cextid = process.env.CEXTID || 'ocegbggnlgopmchofgnbjhgpljlchlpl';
 
 		socket.send (JSON.stringify ({
-				"eventName":"get_updated_config",
-				"data":{
-					"iceServers": iceServers,
-					"chromeDesktopExtensionId" : cextid
+				'eventName':'get_updated_config',
+				'data':{
+					'iceServers': iceServers,
+					'chromeDesktopExtensionId' : cextid
 				}
-			}), function(error) {
-				if (error) {
-				  logger.error(error);
-				}
-			});
+			}), errorFn);
      };
 	 
      if (process.env.XIRSYS_USER) {
@@ -270,8 +248,8 @@ function attachEvents(manager) {
 	            'https://api.xirsys.com/getIceServers', {
 	            form: {
 	                domain: process.env.XIRSYS_DOMAIN,
-	                room: "default",
-	                application: "default",
+	                room: 'default',
+	                application: 'default',
 	                ident: process.env.XIRSYS_USER,
 	                secret: process.env.XIRSYS_SECRET,
 	                secure: 1
@@ -290,19 +268,15 @@ function attachEvents(manager) {
     var soc = rtc.getSocket(data.socketId);
     if (soc) {
       soc.send(JSON.stringify({
-        "eventName": "receive_ice_candidate",
-        "data": {
-          "label": data.label,
-          "candidate": data.candidate,
-          "socketId": socket.id,
-          "mediatype": data.mediatype,
-          "produced": data.produced
+        'eventName': 'receive_ice_candidate',
+        'data': {
+          'label': data.label,
+          'candidate': data.candidate,
+          'socketId': socket.id,
+          'mediatype': data.mediatype,
+          'produced': data.produced
         }
-      }), function(error) {
-        if (error) {
-          logger.error(error);
-        }
-      });
+      }), errorFn);
       // call the 'recieve ICE candidate' callback
       rtc.fire('receive ice candidate', rtc);
     }
@@ -315,24 +289,20 @@ function attachEvents(manager) {
 		    var soc = rtc.getSocket(data.socketId);
 		    if (soc) {
 		      soc.send(JSON.stringify({
-		        "eventName": "receive_offer",
-		        "data": {
-		          "sdp": data.sdp,
-		          "socketId": socket.id,
-		          "mediatype": data.mediatype,
-		          "requestId": data.requestId,
-		          "token": data.token
+		        'eventName': 'receive_offer',
+		        'data': {
+		          'sdp': data.sdp,
+		          'socketId': socket.id,
+		          'mediatype': data.mediatype,
+		          'requestId': data.requestId,
+		          'token': data.token
 		      }
-		      }), function(error) {
-		        if (error) {
-		          console.log(error);
-		        }
-		      });
+		      }), errorFn);
 		    }
 		    // call the 'send offer' callback
 		    rtc.fire('send offer', rtc);
 		},function(){
-			console.log("Alert: trying to sending offer without permissions");
+			logger.error('Alert: trying to sending offer without permissions');
 		});
   });
 
@@ -342,17 +312,13 @@ function attachEvents(manager) {
     var soc = rtc.getSocket( data.socketId);
     if (soc) {
       soc.send(JSON.stringify({
-        "eventName": "receive_answer",
-        "data" : {
-          "sdp": data.sdp,
-          "socketId": socket.id,
-          "mediatype": data.mediatype
+        'eventName': 'receive_answer',
+        'data' : {
+          'sdp': data.sdp,
+          'socketId': socket.id,
+          'mediatype': data.mediatype
         }
-      }), function(error) {
-        if (error) {
-          logger.error(error);
-        }
-      });
+      }), errorFn);
       rtc.fire('send answer', rtc);
     }
   });
@@ -360,24 +326,20 @@ function attachEvents(manager) {
   //Extend webrtc server with new event peer_list_updated
   rtc.on('peer_list_updated', function(data, socket) {
   	var roomList = rtc.rooms[data.room] || [];
-  	for ( var i = 0; i < roomList.length; i++) {
+  	for ( var i = 0; i < roomList.length; i+=1) {
   		var id = roomList[i];
-  		if (id == socket.id) {
+  		if (id === socket.id) {
   			continue;
   		} else {
   			var soc = rtc.getSocket(id);
   			// inform the peers that they have a chage on peer list
   			if (soc) {
   				soc.send(JSON.stringify({
-  					"eventName" : "peer_list_updated",
-  					"data" : {
-  						"socketId" : socket.id
+  					'eventName' : 'peer_list_updated',
+  					'data' : {
+  						'socketId' : socket.id
   					}
-  				}), function(error) {
-  					if (error) {
-  						logger.error(error);
-  					}
-  				});
+  				}), errorFn);
   			}
   		}
   	}
@@ -385,23 +347,19 @@ function attachEvents(manager) {
   
   rtc.on('add_peers', function(data, socket) {
 		var roomList = rtc.rooms[data.room] || [];
-		for (var i = 0; i < roomList.length; i++) {
+		for (var i = 0; i < roomList.length; i+=1) {
 		  var id = roomList[i];
-		  if (id == socket.id) {
+		  if (id === socket.id) {
 		    var soc = rtc.getSocket(id);
 		    // inform the peers that they have a new peer
 		    if (soc) {
-		    	for (var j=0; j<data.connections.length; j++) {
+		    	for (var j=0; j<data.connections.length; j+=1) {
 			      soc.send(JSON.stringify({
-				        "eventName": "new_peer_connected",
-				        "data":{
-				          "socketId": data.connections[j]
+				        'eventName': 'new_peer_connected',
+				        'data':{
+				          'socketId': data.connections[j]
 				        }
-				      }), function(error) {
-				        if (error) {
-				          logger.error(error);
-				        }
-				      });
+				      }), errorFn);
 		    	}
 		    }
 		  }
@@ -411,56 +369,48 @@ function attachEvents(manager) {
 	rtc.on('update_owner_data', function(data, socket) {
 		var roomList = rtc.rooms[data.room] || [];
 		manager.rooms.checkOwner(socket.id, data.room, function() {
-			for ( var i = 0; i < roomList.length; i++) {
+			for ( var i = 0; i < roomList.length; i+=1) {
 				var id = roomList[i];
-				if (id == socket.id) {
+				if (id === socket.id) {
 					continue;
 				} else {
 					var soc = rtc.getSocket(id);
 					// inform the peers that they have a new peer
 					if (soc) {
 						soc.send(JSON.stringify({
-							"eventName" : "owner_data_updated",
-							"data" : {
-								"ownerName" : data.owner_name,
-								"ownerAvatar" : data.owner_avatar,
-								"status" : data.status,
-								"ownerCid" : socket.id,
-								"access" : data.access
+							'eventName' : 'owner_data_updated',
+							'data' : {
+								'ownerName' : data.owner_name,
+								'ownerAvatar' : data.owner_avatar,
+								'status' : data.status,
+								'ownerCid' : socket.id,
+								'access' : data.access
 							}
-						}), function(error) {
-							if (error) {
-								logger.error(error);
-							}
-						});
+						}), errorFn);
 					}
 				}
 			}
 		}, function() {
-			logger.warn("Alert: a non owner is asking for update owner data");
+			logger.warn('Alert: a non owner is asking for update owner data');
 		});
 	});
 
 	rtc.on('stream_closed', function(data, socket) {
 		var roomList = rtc.rooms[data.room] || [];
-		for ( var i = 0; i < roomList.length; i++) {
+		for ( var i = 0; i < roomList.length; i+=1) {
 			var id = roomList[i];
-			if (id == socket.id) {
+			if (id === socket.id) {
 				continue;
 			} else {
 				var soc = rtc.getSocket(id);
 				if (soc) {
 					soc.send(JSON.stringify({
-						"eventName" : "stream_closed",
-						"data" : {
-							"connectionId" : socket.id,
-							"mediatype" : data.mediatype
+						'eventName' : 'stream_closed',
+						'data' : {
+							'connectionId' : socket.id,
+							'mediatype' : data.mediatype
 						}
-					}), function(error) {
-						if (error) {
-							logger.error(error);
-						}
-					});
+					}), errorFn);
 				}
 			}
 		}
@@ -471,23 +421,19 @@ function attachEvents(manager) {
 			var created = new Date();
 			manager.rooms.addChatMessage(socket.id,data.room,data.text,created,function(senderId){
 				var roomList = rtc.rooms[data.room] || [];
-				for ( var i = 0; i < roomList.length; i++) {
+				for ( var i = 0; i < roomList.length; i+=1) {
 					var id = roomList[i];
 					var soc = rtc.getSocket(id);
 					// inform the peers that they have a new peer
 					if (soc) {
 						soc.send(JSON.stringify({
-							"eventName" : "chat_message",
-							"data" : {
-								"text" : data.text,
-								"id" : senderId,
-								"time" : created
+							'eventName' : 'chat_message',
+							'data' : {
+								'text' : data.text,
+								'id' : senderId,
+								'time' : created
 							}
-						}), function(error) {
-							if (error) {
-								logger.error(error);
-							}
-						});
+						}), errorFn);
 					}
 				}
 			});
@@ -496,16 +442,12 @@ function attachEvents(manager) {
 			// inform the peers that they have a new peer
 			if (soc) {
 				soc.send(JSON.stringify({
-					"eventName" : "chat_message",
-					"data" : {
-						"text" : "The chat is closed.", // Input is disabled so only appears for hackers
-						"id" : "||@@||"
+					'eventName' : 'chat_message',
+					'data' : {
+						'text' : 'The chat is closed.', // Input is disabled so only appears for hackers
+						'id' : '||@@||'
 					}
-				}), function(error) {
-					if (error) {
-						logger.error(error);
-					}
-				});
+				}), errorFn);
 			}
 		});
 	});
@@ -516,19 +458,15 @@ function attachEvents(manager) {
 			// inform the user you ask to screen share
 			if (soc) {
 				soc.send(JSON.stringify({
-					"eventName" : "share_request",
-					"data" : {
-						"source" : data.source,
-						"id" : socket.id
+					'eventName' : 'share_request',
+					'data' : {
+						'source' : data.source,
+						'id' : socket.id
 					}
-				}), function(error) {
-					if (error) {
-						logger.error(error);
-					}
-				});
+				}), errorFn);
 			}
 		}, function() {
-			logger.warn("Alert: someone asking for sharing without permissions");
+			logger.warn('Alert: someone asking for sharing without permissions');
 		});
 	});
 
@@ -538,20 +476,16 @@ function attachEvents(manager) {
 	    // inform the user you ask to screen share
 	    if (soc) {
 	      soc.send(JSON.stringify({
-	        "eventName" : "request_for_accept_files",
-	        "data" : {
-	          "requestId": data.requestId,
-	          "files" : data.filesinfo,
-	          "id" : socket.id
+	        'eventName' : 'request_for_accept_files',
+	        'data' : {
+	          'requestId': data.requestId,
+	          'files' : data.filesinfo,
+	          'id' : socket.id
 	        }
-	      }), function(error) {
-	        if (error) {
-	          logger.error(error);
-	        }
-	      });
+	      }), errorFn);
 	    }
 	  }, function() {
-	    logger.warn("Alert: someone asking for sharing files without permissions");
+	    logger.warn('Alert: someone asking for sharing files without permissions');
 	  });
 	});
 
@@ -561,20 +495,16 @@ function attachEvents(manager) {
 	    // inform the user you ask to screen share
 	    if (soc) {
 	      soc.send(JSON.stringify({
-	        "eventName" : "files accepted",
-	        "data" : {
-	          "requestId": data.requestId,
-	          "token" : data.token,
-	          "id" : socket.id
+	        'eventName' : 'files accepted',
+	        'data' : {
+	          'requestId': data.requestId,
+	          'token' : data.token,
+	          'id' : socket.id
 	        }
-	      }), function(error) {
-	        if (error) {
-	          logger.error(error);
-	        }
-	      });
+	      }), errorFn);
 	    }
 	  }, function() {
-	    logger.warn("Alert: someone asking for sharing files without permissions");
+	    logger.warn('Alert: someone asking for sharing files without permissions');
 	  });
 	});
 
@@ -584,21 +514,17 @@ function attachEvents(manager) {
 	    // inform the user you ask to screen share
 	    if (soc) {
 	      soc.send(JSON.stringify({
-	        "eventName" : "file downloaded",
-	        "data" : {
-	          "requestId": data.requestId,
-	          "fileid": data.fileid,
-	          "token" : data.token,
-	          "id" : socket.id
+	        'eventName' : 'file downloaded',
+	        'data' : {
+	          'requestId': data.requestId,
+	          'fileid': data.fileid,
+	          'token' : data.token,
+	          'id' : socket.id
 	        }
-	      }), function(error) {
-	        if (error) {
-	          logger.error(error);
-	        }
-	      });
+	      }), errorFn);
 	    }
 	  }, function() {
-	    logger.warn("Alert: someone is trying to announce that a file is completed");
+	    logger.warn('Alert: someone is trying to announce that a file is completed');
 	  });
 	});
 
@@ -608,20 +534,16 @@ function attachEvents(manager) {
 	    // inform the user you ask to screen share
 	    if (soc) {
 	      soc.send(JSON.stringify({
-	        "eventName" : "files request completed", 
-	        "data" : {
-	          "requestId": data.requestId,
-	          "token" : data.token,
-	          "id" : socket.id
+	        'eventName' : 'files request completed', 
+	        'data' : {
+	          'requestId': data.requestId,
+	          'token' : data.token,
+	          'id' : socket.id
 	        }
-	      }), function(error) {
-	        if (error) {
-	          console.log(error);
-	        }
-	      });
+	      }), errorFn);
 	    }
 	  }, function() {
-	    console.log("Alert: someone is trying to announce request file completion");
+	    logger.error('Alert: someone is trying to announce request file completion');
 	  });
 	});
 
@@ -631,21 +553,17 @@ function attachEvents(manager) {
 	    // inform the user you ask to screen share
 	    if (soc) {
 	      soc.send(JSON.stringify({
-	        "eventName" : "files request completed", 
-	        "data" : {
-	          "requestId": data.requestId,
-	          "token" : data.token,
-	          "id" : socket.id,
-	          "error" : data.error
+	        'eventName' : 'files request completed', 
+	        'data' : {
+	          'requestId': data.requestId,
+	          'token' : data.token,
+	          'id' : socket.id,
+	          'error' : data.error
 	        }
-	      }), function(error) {
-	        if (error) {
-	          console.log(error);
-	        }
-	      });
+	      }), errorFn);
 	    }
 	  }, function() {
-	    console.log("Alert: someone is trying to announce request file error");
+	    logger.error('Alert: someone is trying to announce request file error');
 	  });
 	});
 
@@ -655,47 +573,39 @@ function attachEvents(manager) {
 	    // inform the user you ask to screen share
 	    if (soc) {
 	      soc.send(JSON.stringify({
-	        "eventName" : "file canceled",
-	        "data" : {
-	        	"requestId": data.requestId,
-	        	"fileid": data.fileid,
-	        	"token" : data.token,
-	        	"id" : socket.id,
-	        	"direction": data.direction
+	        'eventName' : 'file canceled',
+	        'data' : {
+	        	'requestId': data.requestId,
+	        	'fileid': data.fileid,
+	        	'token' : data.token,
+	        	'id' : socket.id,
+	        	'direction': data.direction
 	        }
-	      }), function(error) {
-	        if (error) {
-	          console.log(error);
-	        }
-	      });
+	      }), errorFn);
 	    }
 	  }, function() {
-	    console.log("Alert: someone is trying to cancel a file without permission");
+	    logger.error('Alert: someone is trying to cancel a file without permission');
 	  });
 	});
   
 	rtc.on('error_to_owner', function(data, socket) {
 		var roomList = rtc.rooms[data.room] || [];
-		for ( var i = 0; i < roomList.length; i++) {
+		for ( var i = 0; i < roomList.length; i+=1) {
 			var id = roomList[i];
 			var soc = rtc.getSocket(id);
 			// inform the peers that the stop request was sent to id
 			if (soc) {
-				if (id == socket.id) {
+				if (id === socket.id) {
 					continue;
 				} else {
 					soc.send(JSON.stringify({
-						"eventName" : "error_produced",
-						"data" : {
+						'eventName' : 'error_produced',
+						'data' : {
 							connectionId : socket.id,
 							origin : data.origin,
 							type : data.type
 						}
-					}), function(error) {
-						if (error) {
-							console.log(error);
-						}
-					});
+					}), errorFn);
 				}
 			}
 		}
@@ -704,29 +614,25 @@ function attachEvents(manager) {
 	rtc.on('error_to_user', function(data, socket) {
 		var roomList = rtc.rooms[data.room] || [];
 		manager.rooms.checkOwner(socket.id, data.room, function() {
-			for ( var i = 0; i < roomList.length; i++) {
+			for ( var i = 0; i < roomList.length; i+=1) {
 				var id = roomList[i];
-				if (id == data.origin) {
+				if (id === data.origin) {
 					var soc = rtc.getSocket(id);
 					// inform the peers that the stop request was sent to id
 					if (soc) {
 						soc.send(JSON.stringify({
-							"eventName" : "error_produced",
-							"data" : {
+							'eventName' : 'error_produced',
+							'data' : {
 								connectionId : socket.id,
 								origin : data.origin,
 								type : data.type
 							}
-						}), function(error) {
-							if (error) {
-								console.log(error);
-							}
-						});
+						}), errorFn);
 					}
 				}
 			}
 		},function (){
-			console.log ("Somebody is trying to send an error and it's not the owner");
+			logger.error ('Somebody is trying to send an error and it\'s not the owner');
 		});
 	});
 
@@ -765,9 +671,9 @@ function attachEvents(manager) {
 			delete rtc.rooms[data.fromRoom];
 			if (!roomList) roomList = [];
 			var toClose = [];
-			for ( var i = 0; i < roomList.length; i++) {
+			for ( var i = 0; i < roomList.length; i+=1) {
 				var id = roomList[i];
-				if (id == socket.id) {
+				if (id === socket.id) {
 					continue;
 				} else {
 					var soc = rtc.getSocket(id);
@@ -776,61 +682,49 @@ function attachEvents(manager) {
 						if (data.list.indexOf(id)!==-1) {
 							toClose.push(soc);
 							soc.send(JSON.stringify({
-								"eventName" : "room_out",
-								"data" : {
-									"room" : data.fromRoom
+								'eventName' : 'room_out',
+								'data' : {
+									'room' : data.fromRoom
 								}
-							}), function(error) {
-								if (error) {
-									console.log(error);
-								}
-							});
+							}), errorFn);
 
 
 						} else {
 							soc.send(JSON.stringify({
-								"eventName" : "room_moved",
-								"data" : {
-									"room" : data.toRoom
+								'eventName' : 'room_moved',
+								'data' : {
+									'room' : data.toRoom
 								}
-							}), function(error) {
-								if (error) {
-									console.log(error);
-								}
-							});
+							}), errorFn);
 						}
 					}
 				}
 			}
-			for (var j=0; j<toClose.length; j++) {
+			for (var j=0; j<toClose.length; j+=1) {
 				toClose[j].close();
 			}
 		}, function() {
-			console.log("Alert: a non owner is trying to move room");
+			logger.error('Alert: a non owner is trying to move room');
 		});
 	});
 
 	var sendStop = function(data, socket) {
 		var roomList = rtc.rooms[data.room] || [];
-		for ( var i = 0; i < roomList.length; i++) {
+		for ( var i = 0; i < roomList.length; i+=1) {
 			var id = roomList[i];
 			var soc = rtc.getSocket(id);
 			// inform the peers that the stop request was sent to id
 			if (soc) {
-				if (id == socket.id) {
+				if (id === socket.id) {
 					continue;
 				} else {
 					soc.send(JSON.stringify({
-						"eventName" : "stop_request",
-						"data" : {
+						'eventName' : 'stop_request',
+						'data' : {
 							connectionId : data.connectionId,
 							source : data.source
 						}
-					}), function(error) {
-						if (error) {
-							console.log(error);
-						}
-					});
+					}), errorFn);
 				}
 			}
 		}
@@ -845,7 +739,7 @@ function attachEvents(manager) {
 			if (socket.id === data.connectionId) {
 				sendStop(data, socket);
 			} else {
-				console.log("Alert: a non owner is asking for stop sharing");
+				logger.error('Alert: a non owner is asking for stop sharing');
 			}
 		});
 	});
@@ -854,15 +748,21 @@ function attachEvents(manager) {
 	
 }
 
-// generate a 4 digit hex code randomly
-function S4() {
-  return (((1 + Math.random()) * 0x10000) | 0).toString(16).substring(1);
-}
-
-// make a REALLY COMPLICATED AND RANDOM id, kudos to dennis
-function id() {
-  return (S4() + S4() + "-" + S4() + "-" + S4() + "-" + S4() + "-" + S4() + S4() + S4());
-}
+module.exports.listen = function(server) {
+  var manager;
+  if (typeof server === 'number') { 
+    manager = new WebSocketServer({
+        port: server
+      });
+  } else {
+    manager = new WebSocketServer({
+      server: server
+    });
+  }
+  manager.rtc = rtc;
+  attachEvents(manager);
+  return manager;
+};
 
 rtc.getSocket = function(id) {
   var connections = rtc.sockets;
@@ -871,7 +771,7 @@ rtc.getSocket = function(id) {
     return;
   }
 
-  for (var i = 0; i < connections.length; i++) {
+  for (var i = 0; i < connections.length; i+=1) {
     var socket = connections[i];
     if (id === socket.id) {
       return socket;

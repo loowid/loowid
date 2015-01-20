@@ -1,14 +1,16 @@
+'use strict';
 /**
  * Module dependencies.
  * node server -> Run standalone port 80 and 443 (or cloud port)
  * node server [nport] -> Run below proxy port [nport]
  * 
  */
+/*global escape: true */
 var log4js = require('./log.js');
 var logger = log4js.getLog('server');
 var crypto = require('crypto') ;
 var i18n = require('i18next');
-var express = require('express'), jade = require('jade');
+var express = require('express');//, jade = require('jade');
 var defaultPort = true;
 var portvalue = 80;
 if (!isNaN(process.argv[2]) || !isNaN(process.argv[3])) {
@@ -48,17 +50,20 @@ if (!process.env.PORT && !process.env.OPENSHIFT_NODEJS_PORT && defaultPort) {
 	};
 	sserver = require('https').createServer(credentials, app);
 }
-var ipaddr = process.env.OPENSHIFT_NODEJS_IP ||"0.0.0.0";
+var ipaddr = process.env.OPENSHIFT_NODEJS_IP ||'0.0.0.0';
 
 // load webrtc module
 var webRTC = require('./webrtc.io.js').listen(
 		(process.env.PORT || process.env.OPENSHIFT_NODEJS_PORT || !defaultPort) ? server
 				: sserver, ipaddr);
 
+var serverId = (Math.random()/+new Date()).toString(36).replace(/[^a-z]+/g,'').substring(0,9);
+
+webRTC.wsevents = wsevents;
 webRTC.rooms = rooms;
+webRTC.serverId = serverId;
  
 // Socket Messages on Mongo
-var serverId = (Math.random()/+new Date()).toString(36).replace(/[^a-z]+/g,'').substring(0,9);
 var serverCluster = serverId;
 var isClustered = false;
 var fireOrig = webRTC.rtc.fire;
@@ -67,21 +72,21 @@ webRTC.rtc.fire = function(eventName,_) {
 	args.unshift(eventName);
 	logs.addSocketLog(serverId,eventName,args);
 	fireOrig.apply(null,args);
-	if (args.length==3 && isClustered && eventName!='ping') {
+	if (args.length===3 && isClustered && eventName!=='ping') {
 		logger.debug('Distributing['+args[2].id+']: '+eventName);
 		wsevents.addEvent(serverId,eventName,args[1],args[2]);  
 	}
 };
 wsevents.initListener(serverId,function(event) {
-	if (event.eventName=='startup') {
-		isClustered = isClustered || event.eventServer!=serverId;
+	if (event.eventName==='startup') {
+		isClustered = isClustered || event.eventServer!==serverId;
 		if (isClustered && serverCluster.indexOf(event.eventServer)<0) {
 			serverCluster += ','+event.eventServer;
 			wsevents.sendAck(serverId);
 		}
 	} else {
 		// Fire if it is from another server 
-		if (event.eventServer!=serverId) {
+		if (event.eventServer!==serverId) {
 			logger.debug('Catched['+event.socket.id+']: '+event.eventName);
 			var args = [];
 			args.push(event.eventName);
@@ -97,19 +102,18 @@ wsevents.initListener(serverId,function(event) {
 // Load mongoose modules
 var mongoose = require('mongoose');
 
-var uristring = process.env.MONGOLAB_URI || process.env.MONGOHQ_URL
-		|| 'mongodb://localhost/loowid';
+var uristring = process.env.MONGOLAB_URI || process.env.MONGOHQ_URL	|| 'mongodb://localhost/loowid';
 // if OPENSHIFT env variables are present, use the available connection info:
 if (process.env.OPENSHIFT_MONGODB_DB_PASSWORD) {
-	uristring = process.env.OPENSHIFT_MONGODB_DB_USERNAME + ":"
-			+ process.env.OPENSHIFT_MONGODB_DB_PASSWORD + "@"
-			+ process.env.OPENSHIFT_MONGODB_DB_HOST + ':'
-			+ process.env.OPENSHIFT_MONGODB_DB_PORT + '/'
-			+ process.env.OPENSHIFT_APP_NAME;
+	uristring = process.env.OPENSHIFT_MONGODB_DB_USERNAME + ':' +
+			process.env.OPENSHIFT_MONGODB_DB_PASSWORD + '@' +
+			process.env.OPENSHIFT_MONGODB_DB_HOST + ':' +
+			process.env.OPENSHIFT_MONGODB_DB_PORT + '/' +
+			process.env.OPENSHIFT_APP_NAME;
 }
 
 // Connect to the selected uri
-var db = mongoose.connect(uristring, function(err, res) {
+mongoose.connect(uristring, function(err, res) {
 	if (err) {
 		logger.error('ERROR connecting to: ' + uristring + '. ' + err);
 	} else {
@@ -118,14 +122,14 @@ var db = mongoose.connect(uristring, function(err, res) {
 	}
 });
 
-function isMobile(req) {
+/*function isMobile(req) {
 	return (/mobile/i.test(req.headers['user-agent']));
-}
+}*/
 
 function isLessIE9(req) {
 	var ua = req.headers['user-agent'];
 	if (/MSIE (\d+\.\d+);/.test(ua)) { // test for MSIE x.x;
-		var ieversion = new Number(RegExp.$1) // capture x.x portion and store as a number
+		var ieversion = 0 - RegExp.$1; // capture x.x portion and store as a number
 		return (ieversion < 9);
 	} else {
 		return false;
@@ -134,7 +138,7 @@ function isLessIE9(req) {
 
 app.set('views', __dirname + '/app/views');
 app.set('view engine', 'jade');
-app.set("view options", {
+app.set('view options', {
 	layout : false
 });
 
@@ -148,7 +152,7 @@ app.configure(function() {
 	app.use(express.cookieParser());
 	//app.use(express.session({secret:'Secret'}));	
 	app.use(express.session({
-		store:new MongoStore({mongoose_connection:mongoose.connection},function(){logger.info('Session store connected !!')}),
+		store:new MongoStore({mongoose_connection:mongoose.connection},function(){logger.info('Session store connected !!');}),
 		cookie: { maxAge : 3600000 }, // 1 hour
 		key:'jsessionid', 
 		secret:crypto.randomBytes(16).toString('hex')}));
@@ -168,17 +172,17 @@ app.configure(function() {
 	express.logger.token('sessionid', function(req){
 		return req.cookies.jsessionid; 
 	});
-	express.logger.token("ip", function(request) {
-	   var retval = "";
-	   if (request["headers"] && request["headers"]["x-forwarded-for"]) {
+	express.logger.token('ip', function(request) {
+	   var retval = '';
+	   if (request.headers && request.headers['x-forwarded-for']) {
 	      // Proxied request
-	      retval = request["headers"]["x-forwarded-for"];
-	   } else if (request["socket"] && request["socket"]["remoteAddress"]) {
+	      retval = request.headers['x-forwarded-for'];
+	   } else if (request.socket && request.socket.remoteAddress) {
 	      // Direct request
-	      retval = request["socket"]["remoteAddress"];
-	   } else if (request["socket"] && request["socket"]["socket"] && request["socket"]["socket"]["remoteAddress"]) {
+	      retval = request.socket.remoteAddress;
+	   } else if (request.socket && request.socket.socket && request.socket.socket.remoteAddress) {
 	      // God only knows what happened here...
-	      retval = request["socket"]["socket"]["remoteAddress"];
+	      retval = request.socket.socket.remoteAddress;
 	   }
 	   return retval;
 	 
@@ -206,7 +210,7 @@ app.get('/chat/talk',function(req, res) {
 	// TODO: Get talk smart, do not read everything !!
 	var t = req.query.text;
 	if (t.length>35) t = t.substring(0,35)+';'+i18n.t('moretext');
-	var req = http.get(
+	var reqst = http.get(
 			{
 			 host:'translate.google.com',
 			 path:'/translate_tts?tl='+req.locale+'&q='+escape(t),
@@ -216,8 +220,8 @@ app.get('/chat/talk',function(req, res) {
 		res.setHeader('Content-Type','audio/mpeg');
 		response.pipe(res);
 	});
-	req.on('error', function(err) {
-	  logger.error("Talk translate error: " + err.message);
+	reqst.on('error', function(err) {
+	  logger.error('Talk translate error: ' + err.message);
 	});
 });
 
@@ -228,18 +232,18 @@ if (process.env.PORT || process.env.OPENSHIFT_NODEJS_PORT) {
 	/* At the top, with other redirect methods before other routes */
 	logger.info('Running production environment !!');
 	app.get('/', function(req, res, next) {
-		if (req.headers['x-forwarded-proto'] != 'https') {
-			res.setHeader("X-FRAME-OPTIONS","DENY");
-			res.redirect('https://' + req.host + req.url)
+		if (req.headers['x-forwarded-proto'] !== 'https') {
+			res.setHeader('X-FRAME-OPTIONS','DENY');
+			res.redirect('https://' + req.host + req.url);
 		} else {
 			if (isLessIE9(req)) {
-				res.setHeader("X-FRAME-OPTIONS","DENY");
+				res.setHeader('X-FRAME-OPTIONS','DENY');
 				res.sendfile(__dirname + '/public/landing.html');
 			} else {
-				res.setHeader("X-FRAME-OPTIONS","SAMEORIGIN");
+				res.setHeader('X-FRAME-OPTIONS','SAMEORIGIN');
 				res.render('index.jade', {
-					title : "Look what I'm doing!",
-					appName : "Loowid",
+					title : 'Look what I\'m doing!',
+					appName : 'Loowid',
 					version: pck.version
 				});
 			}
@@ -249,18 +253,18 @@ if (process.env.PORT || process.env.OPENSHIFT_NODEJS_PORT) {
 	logger.info('Running development environment !!');
 	// Local redirect
 	app.get('/', function(req, res) {
-		if (req.protocol == 'http' && defaultPort) {
-			res.setHeader("X-FRAME-OPTIONS","DENY");
+		if (req.protocol === 'http' && defaultPort) {
+			res.setHeader('X-FRAME-OPTIONS','DENY');
 			res.redirect('https://' + req.host + req.url);
 		} else {
 			if (isLessIE9(req)) {
-				res.setHeader("X-FRAME-OPTIONS","DENY");
+				res.setHeader('X-FRAME-OPTIONS','DENY');
 				res.sendfile(__dirname + '/public/landing.html');
 			} else {
-				res.setHeader("X-FRAME-OPTIONS","SAMEORIGIN");
+				res.setHeader('X-FRAME-OPTIONS','SAMEORIGIN');
 				res.render('index.jade', {
-					title : "Look what I'm doing!",
-					appName : "Loowid",
+					title : 'Look what I\'m doing!',
+					appName : 'Loowid',
 					version: pck.version
 				});
 			}

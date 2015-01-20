@@ -23,7 +23,7 @@ module.exports = function(grunt) {
             delayTime: 1,
             cwd: __dirname
         };		
-	}
+	};
 	
     // Project Configuration
     grunt.initConfig({
@@ -61,11 +61,14 @@ module.exports = function(grunt) {
             	files: { 
             		src: ['*.js',
             		      'app/**/*.js',
-            		      'client/js/**/*.js',
-            		      '!client/js/**/*min.js',
-            		      '!client/js/ventus.js',
-            		      '!client/js/modernizr.js',
-            		      '!client/js/jquery.js'
+            		      'spec/**/*.js'
+            		      //'client/js/**/*.js',
+            		      //'!client/js/**/*min.js',
+            		      //'!client/js/ventus.js',
+            		      //'!client/js/modernizr.js',
+            		      //'!client/js/jquery.js',
+            		      //'!client/js/angular-scroll-glue.js',
+            		      //'!client/js/handlebars.js',
             		      ] 
             	},
             	options: { 
@@ -159,7 +162,7 @@ module.exports = function(grunt) {
               specNameMatcher: 'spec',
               jUnit: {
                 report: false,
-                savePath : "./build/reports/jasmine/",
+                savePath : './build/reports/jasmine/',
                 useDotNotation: true,
                 consolidate: true
               }
@@ -189,8 +192,8 @@ module.exports = function(grunt) {
     // grunt cluster --nodes=N
     var nodes = grunt.option('nodes') || 2;
     // Create nodemon tasks for cluster
-    for (var k=0; k<nodes; k++) {
-    	grunt.config.data.nodemon['dev'+k] = { script: 'server.js', options: generateOptions([8000+k+1]) }
+    for (var k=0; k<nodes; k+=1) {
+    	grunt.config.data.nodemon['dev'+k] = { script: 'server.js', options: generateOptions([8000+k+1]) };
     	grunt.config.data.concurrent.cluster.tasks.push('nodemon:dev'+k);
     }
     // Setting number of cluster nodes

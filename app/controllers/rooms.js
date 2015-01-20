@@ -1,22 +1,38 @@
+'use strict';
 /**
 * Module dependencies.
 */
 var logger = require('../../log.js').getLog('rooms');
-var mongoose = require('mongoose'),
-models = require ('../models/rooms'),
-async = require('async'),
-Room = mongoose.model('Room'),
-_ = require('underscore');
+var mongoose = require('mongoose');
+require ('../models/rooms');
+//async = require('async'),
+var Room = mongoose.model('Room');
+//_ = require('underscore');
 
 
 var makeId = function(){
     var text = '';
-    var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-    for( var i=0; i < 7; i++ )
+    var possible = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+    for( var i=0; i < 7; i+=1 )
         text += possible.charAt(Math.floor(Math.random() * possible.length));
     return text;
-}
+};
 
+var isReloading = function(room,id) {
+	for (var k=0; k<room.guests.length;k+=1) {
+		if (room.guests[k].sessionid === id && room.guests[k].status==='DISCONNECTED') return true;
+	}
+	return false;
+};
+
+var isValid = function(room,id) {
+	for (var k=0; k<room.valid.length;k+=1) {
+		if (room.valid[k] === id) {
+			return true;
+		}
+	}
+	return false;
+};
 
 /**
 * Find a room by id
@@ -29,13 +45,13 @@ exports.room = function(req, res, next, id) {
 			error.http_code = 404;
 			next(error);
 		} else {
-			if (id != room.roomId && !Room.alias(room,req.sessionID,id)) {
+			if (id !== room.roomId && !Room.alias(room,req.sessionID,id)) {
 				var owner = false;
 				var len = room.alias.length;
-				for (var i=len-1; i>=0; i--) {
-					if (room.alias[i].session == req.sessionID) {
+				for (var i=len-1; i>=0; i-=1) {
+					if (room.alias[i].session === req.sessionID) {
 						room.alias.splice(i,1);
-					} else if (room.alias[i].id == id) {
+					} else if (room.alias[i].id === id) {
 						owner = room.alias[i].owner; 
 						if (room.alias[i].session) {
 							room.alias.splice(i,1);
@@ -60,7 +76,7 @@ exports.connection = function (req,res,next,id){
 	//In this case we just want to put the connectionId in the request not any object
 	req.connectionId = id;
 	next();
-}
+};
 
 exports.checkLockOrPassword = function(data,socket,success,error) {
 	Room.load(data.room,socket.sessionid,function(err, room) {
@@ -69,9 +85,9 @@ exports.checkLockOrPassword = function(data,socket,success,error) {
 		} else {
 			if (room) {
 				// Open room, or owner and room disconnected or valid password
-				if (room.access.shared!='PRIVATE' || room.access.passwd == data.pwd || (room.owner.sessionid == socket.sessionid && (room.status == 'DISCONNECTED' || room.status== 'CREATED'))) {
+				if (room.access.shared!=='PRIVATE' || room.access.passwd === data.pwd || (room.owner.sessionid === socket.sessionid && (room.status === 'DISCONNECTED' || room.status=== 'CREATED'))) {
 					// No locked room, or isReloading os is owner and room disconnected
-                    if (!room.access.locked || isReloading(room,socket.sessionid) || (room.owner.sessionid == socket.sessionid && (room.status == 'DISCONNECTED' || room.status== 'CREATED'))) {
+                    if (!room.access.locked || isReloading(room,socket.sessionid) || (room.owner.sessionid === socket.sessionid && (room.status === 'DISCONNECTED' || room.status=== 'CREATED'))) {
 						success(data,socket);
 					} else {
 						error(true);
@@ -85,7 +101,7 @@ exports.checkLockOrPassword = function(data,socket,success,error) {
 			}
 		}
 	});
-}
+};
 
 /**
 * Join a person to a room
@@ -94,7 +110,7 @@ exports.join = function (req, res, next){
 	var room = req.room;
     
     // Owner haciendo join en una sala sin owner => reload
-	if (room.owner.sessionid==req.sessionID && (room.status == 'DISCONNECTED' || room.status == 'CREATED')){
+	if (room.owner.sessionid===req.sessionID && (room.status === 'DISCONNECTED' || room.status === 'CREATED')){
 		
 		if (!room.owner.sessionid){
 			room.owner.sessionid = req.sessionID;
@@ -115,7 +131,7 @@ exports.join = function (req, res, next){
 		});
 	} else {
 		// Open room or is in valid list of users
-		if (room.access.shared!='PRIVATE' || isValid(room,req.sessionID)) {
+		if (room.access.shared!=='PRIVATE' || isValid(room,req.sessionID)) {
 			// No locked room or is reloading
 			if (!room.access.locked || isReloading(room,req.sessionID)) {
 				room.guests.push ({name: req.body.name, sessionid: req.sessionID, connectionId: req.body.connectionId, status: 'CONNECTED', avatar: req.body.avatar, source: []});
@@ -159,7 +175,7 @@ exports.createid = function(req, res, next) {
 		};
 		Room.load(req.session.roomId,0,result);
 	});
-}
+};
 
 /*
 * Create a room
@@ -201,15 +217,15 @@ exports.create = function(req, res, next) {
 		error.http_code = 500;
 		next(error);
 	}
-}
+};
 
 exports.users = function(req,res){
-	var isRoomUser = (req.room.owner.sessionid == req.sessionID);
+	var isRoomUser = (req.room.owner.sessionid === req.sessionID);
 	if (!isRoomUser) {
 		var i = 0;
 		while (i<req.room.guests.length && !isRoomUser) {
-			isRoomUser = (req.room.guests[i].sessionid == req.sessionID);
-			i++;
+			isRoomUser = (req.room.guests[i].sessionid === req.sessionID);
+			i+=1;
 		}
 	}
 	// Check if request is from any user inside the room
@@ -228,7 +244,7 @@ exports.chat = function(req,res){
 exports.editShared = function (req,res,next) {
 	var room = req.room;
 	// Only the owner can change his name
-	if (req.sessionID == room.owner.sessionid) {
+	if (req.sessionID === room.owner.sessionid) {
 		room.access = req.body.access;
 		if (room.access.permanent) {
 			var expireDate = new Date();
@@ -237,7 +253,7 @@ exports.editShared = function (req,res,next) {
 			room.markModified('alias');
 		} else {
 			var len = room.alias.length;
-			for (var i=len-1; i>=0; i--) {
+			for (var i=len-1; i>=0; i-=1) {
 				if (room.alias[i].id === room.access.permanentkey) {
 					room.alias.splice(i,1);
 				}
@@ -258,7 +274,7 @@ exports.editShared = function (req,res,next) {
 exports.editOwnerName = function (req,res,next) {
 	var room = req.room;
 	// Only the owner can change his name
-	if (req.sessionID == room.owner.sessionid) {
+	if (req.sessionID === room.owner.sessionid) {
 		room.owner.name = req.body.name;
 		room.owner.avatar = req.body.avatar;
 		room.save(function(err) {
@@ -275,7 +291,7 @@ exports.editOwnerName = function (req,res,next) {
 
 exports.changeRoomStatus = function (req,res,next){
 	var room = req.room;
-	if (req.sessionID == room.owner.sessionid) {
+	if (req.sessionID === room.owner.sessionid) {
 		room.status = req.body.status;
 		room.save(function(err) {
 			if (err) {
@@ -287,18 +303,18 @@ exports.changeRoomStatus = function (req,res,next){
 			}
 		});
 	}
-}
+};
 
 
 exports.editGuestName = function (req,res,next) {
 	var room = req.room;
 	var guests = room.guests;
-	var sessions = room.sessions
+	//var sessions = room.sessions;
 	var idx = guests ? guests.indexOfField('connectionId',req.connectionId) : -1;
 	// is it valid?
 	if (idx !== -1) {
 		// Only the guest can change his name
-		if (guests[idx].sessionid == req.sessionID) {
+		if (guests[idx].sessionid === req.sessionID) {
 			guests[idx].name=req.body.name;
 			guests[idx].avatar=req.body.avatar;
 	        // save the doc
@@ -355,22 +371,6 @@ exports.isActive = function(req,res,next){
 	}
 };
 
-var isReloading = function(room,id) {
-	for (var k=0; k<room.guests.length;k++) {
-		if (room.guests[k].sessionid == id && room.guests[k].status==='DISCONNECTED') return true;
-	}
-	return false;
-};
-
-var isValid = function(room,id) {
-	for (var k=0; k<room.valid.length;k++) {
-		if (room.valid[k] == id) {
-			return true;
-		}
-	}
-	return false;
-};
-
 exports.markValid = function (roomId,sessionId) {
 	// Add session to valid array
 	Room.load(roomId,sessionId,function(err,room){
@@ -385,8 +385,8 @@ exports.isJoinable = function(req,res,next){
 	var room = req.room;
 	var locked = !room.access || room.access.locked;
 	var permanent = room.access && room.access.permanent;
-	if (room.status != 'DISCONNECTED' && (!locked || isReloading(room,req.sessionID))){
-		return res.json({joinable:true,locked:false,private:(room.access && room.access.shared=='PRIVATE')});	
+	if (room.status !== 'DISCONNECTED' && (!locked || isReloading(room,req.sessionID))){
+		return res.json({joinable:true,locked:false,private:(room.access && room.access.shared==='PRIVATE')});	
 	}else{
 		return res.json({joinable:false,locked:locked,permanent:permanent});
 	}
@@ -399,7 +399,7 @@ exports.disconnectOwnerOrGuess = function (connectionId,success){
 			if (room){
 				room.status = 'DISCONNECTED';
 				room.save(function(err) {
-					if (err) logger.error ("Error saving room status" + connectionId + err); 
+					if (err) logger.error ('Error saving room status' + connectionId + err); 
 					success(room,true);
 				});
 			} else {
@@ -416,7 +416,7 @@ exports.disconnectOwnerOrGuess = function (connectionId,success){
 							        // save the doc
 							        room.markModified('guests');
 							        room.save(function(err) {
-										if (err) logger.error ("Error saving room status" + connectionId + err); 
+										if (err) logger.error ('Error saving room status' + connectionId + err); 
 										success(room,false);
 							        });
 							    }
@@ -432,7 +432,7 @@ exports.checkModerateOwnerOrAsked = function (id,room,type,success,failure){
 	Room.findOne(query,
 		function (err,room){
 			if (err) {
-				logger.error ("Alert: Error executing query checkModerateOwnerOrAsked. ConnectionId: " + id + " roomId " + room + " type " + type + " error " + error);
+				logger.error ('Alert: Error executing query checkModerateOwnerOrAsked. ConnectionId: ' + id + ' roomId ' + room + ' type ' + type + ' error ' + err);
 			}
 			if (room) {
 				success();
@@ -448,12 +448,12 @@ exports.checkModerateOwnerFiles = function (id,destinationId,room,success,failur
 	Room.findOne(query,
 		function (err,room){
 			if (err) {
-				logger.error ("Alert: Error executing query checkModerateOwnerOrAsked. ConnectionId: " + id + " roomId " + room + " destinationId " + destinationId + " error " + error);
+				logger.error ('Alert: Error executing query checkModerateOwnerOrAsked. ConnectionId: ' + id + ' roomId ' + room + ' destinationId ' + destinationId + ' error ' + err);
 			}
 			if (room) {
 				success();
 			} else {
-				if (failure != undefined) failure();
+				if (failure !== undefined) failure();
 			}
 		});
 };
@@ -464,7 +464,7 @@ exports.checkOwnerOrHandsUp = function (connectionId,destinationId,roomId,type,s
 	Room.findOne(query,
 		function (err,room){
 			if (err) {
-				logger.error ("Alert: Error executing query checkOwner. ConnectionId: " + connectionId + " roomId " + roomId + " error " + error);
+				logger.error ('Alert: Error executing query checkOwner. ConnectionId: ' + connectionId + ' roomId ' + roomId + ' error ' + err);
 			}
 			if (room) {
 				success();
@@ -480,7 +480,7 @@ exports.checkChatEnabled = function (connectionId,roomId,success,failure){
 	Room.findOne(query,
 		function (err,room){
 			if (err) {
-				logger.error ("Alert: Error executing query checkChatEnabled. RoomId " + roomId + " error " + error);
+				logger.error ('Alert: Error executing query checkChatEnabled. RoomId ' + roomId + ' error ' + err);
 			}
 			if (room) {
 				success();
@@ -496,7 +496,7 @@ exports.checkOwner = function (connectionId,roomId,success,failure){
 	Room.findOne(query,
 		function (err,room){
 			if (err) {
-				logger.error ("Alert: Error executing query checkOwner. ConnectionId: " + connectionId + " roomId " + roomId + " error " + error);
+				logger.error ('Alert: Error executing query checkOwner. ConnectionId: ' + connectionId + ' roomId ' + roomId + ' error ' + err);
 			}
 			if (room) {
 				success();
@@ -509,12 +509,12 @@ exports.checkOwner = function (connectionId,roomId,success,failure){
 exports.askForSharing = function (req,res,next) {
 	var room = req.room;
 	var guests = room.guests;
-	var sessions = room.sessions
+	//var sessions = room.sessions;
 	var idx = guests ? guests.indexOfField('connectionId',req.connectionId) : -1;
 	// is it valid?
 	if (idx !== -1) {
 		// Only the guest can share owner and itself
-		if (room.owner.sessionid == req.sessionID || guests[idx].sessionid == req.sessionID) {
+		if (room.owner.sessionid === req.sessionID || guests[idx].sessionid === req.sessionID) {
 			guests[idx].source.push(req.body.source);
 	        // save the doc
 	        room.markModified('guests');
@@ -532,12 +532,12 @@ exports.askForSharing = function (req,res,next) {
 exports.askForStopSharing = function (req,res,next) {
 	var room = req.room;
 	var guests = room.guests;
-	var sessions = room.sessions
+	//var sessions = room.sessions;
 	var idx = guests ? guests.indexOfField('connectionId',req.connectionId) : -1;
 	// is it valid?
 	if (idx !== -1) {
 		// Only the guest can share owner and itself
-		if (room.owner.sessionid == req.sessionID || guests[idx].sessionid == req.sessionID) {
+		if (room.owner.sessionid === req.sessionID || guests[idx].sessionid === req.sessionID) {
 			var i = guests[idx].source.indexOf(req.body.source);
 			if (i>=0) {
 				guests[idx].source.splice(i,1);
@@ -557,12 +557,13 @@ exports.askForStopSharing = function (req,res,next) {
 
 exports.moveRoom = function (req,res,next) {
 	var room = req.room;
+	var guests = room.guests;
 	// Only the owner can move the room
-	if (req.sessionID == room.owner.sessionid) {
+	if (req.sessionID === room.owner.sessionid) {
 		var newid = makeId();
 		var oldRoomId = room.roomId;
 		room.roomId = newid;
-		for (var x=0; x<req.body.list; x++) {
+		for (var x=0; x<req.body.list; x+=1) {
 			var idx = guests ? guests.indexOfField('connectionId',req.body.list[x]) : -1;
 			if (idx !== -1) {
 				guests[idx].status='DISCONNECTED'; // Maybe expulsed
@@ -584,7 +585,7 @@ exports.addChatMessage = function (connectionId,roomId,message,created,success) 
 		if (room) {
 			var senderId = connectionId;
 			// Owner is mark with generic id in mongo to let reload (and change his id without problem).
-			if (room.owner.connectionId == connectionId) {
+			if (room.owner.connectionId === connectionId) {
 				senderId = '||##||';
 			}
 			room.chat.push({id:senderId,text:message,time:created});
@@ -601,17 +602,17 @@ exports.realRoomId = function (aliasRoomId, sessionid, callback) {
 	Room.load(aliasRoomId,sessionid,function(err,room){
 		callback(room?room.roomId:aliasRoomId);
 	});
-}
+};
 
 Array.prototype.indexOfField = function (propertyName, value) {
-	for (var i = 0; i < this.length; i++)
+	for (var i = 0; i < this.length; i+=1)
 		if (this[i][propertyName] === value)
 			return i;
 	return -1;
-}
+};
 
 exports.stats = function(res) {
 	Room.all(function(err,list){
 		res.json(list);
 	});
-}
+};

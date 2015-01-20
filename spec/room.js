@@ -1,8 +1,9 @@
+'use strict';
 module.exports = function(request,test,utils) {
 
-	describe("Create room", function() {
+	describe('Create room', function() {
 		
-	    test("Keep call returns true.", function(done) {
+	    test('Keep call returns true.', function(done) {
 	    	request.post({
 	    		  headers: {'content-type':'application/x-www-form-urlencoded','x-csrf-token':utils.csrf},
 	    		  url:     'https://localhost/rooms/keep'
@@ -15,7 +16,7 @@ module.exports = function(request,test,utils) {
 	    	});
 	    });
 		
-	    test("Create room id returns a random id.", function(done) {
+	    test('Create room id returns a random id.', function(done) {
 	    	var requestDate = new Date();
 	    	requestDate.setTime(requestDate.getTime() - 1000);
 	    	request.post({
@@ -41,7 +42,7 @@ module.exports = function(request,test,utils) {
 	    	});
 	    });
 	    
-	    test("Create final room gets the previous id.", function(done) {
+	    test('Create final room gets the previous id.', function(done) {
 	    	var requestDate = new Date();
 	    	requestDate.setTime(requestDate.getTime() - 1000);
 	    	request.post({
@@ -68,7 +69,7 @@ module.exports = function(request,test,utils) {
 	    	});
 	    });
 	    
-	    test("WebSocket connection done.",function(done) {
+	    test('WebSocket connection done.',function(done) {
 	    	utils.addListener('get_updated_config',function(ice){
 	    		expect(ice.iceServers.length).toBeGreaterThan(0);
 	    		done();
@@ -77,18 +78,18 @@ module.exports = function(request,test,utils) {
         	utils.connect();
 	    });
 	    
-	    test("Join the room.",function(done) {
+	    test('Join the room.',function(done) {
 	    	utils.addListener('get_peers',function(join){
 	    		expect(join.you.length).toBeGreaterThan(0);
 	    		utils.owner = join.you;
 	    		done();
 	    	});
 	    	utils.ws.send(JSON.stringify({
-				"eventName": "join_room",
-				"data": {
-					"room": utils.roomID,
-					"pwd": '',
-					"reload": ''
+				'eventName': 'join_room',
+				'data': {
+					'room': utils.roomID,
+					'pwd': '',
+					'reload': ''
 				}
 	    	}));
 	    });
@@ -96,4 +97,4 @@ module.exports = function(request,test,utils) {
 	    
 	});	
 	
-}
+};

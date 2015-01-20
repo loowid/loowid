@@ -1,3 +1,4 @@
+'use strict';
 /**
  * Local proxy (load balancing for development)
  * node proxy [n] -> Run proxy over 443 try to find nodes, from 8001 to 8000+n
@@ -37,7 +38,7 @@ var addBackend = function(srv) {
 		console.log('Add backend '+srv);
 		targets.push(srv);
 	}
-}
+};
 
 var removeBackend = function(srv) {
 	var i = targets.indexOf(srv);
@@ -45,7 +46,7 @@ var removeBackend = function(srv) {
 		console.log('Remove backend '+srv);
 		targets.splice(i,1);
 	}
-}
+};
 
 var validateBackend = function(h,p) {
 	var options = {
@@ -59,15 +60,18 @@ var validateBackend = function(h,p) {
 	req.on('error',function(err){
 		removeBackend('http://'+h+':'+p);
 	});
-}
+};
+
 var backends = isNaN(process.argv[2])?2:(process.argv[2]-0);
+
 var checkServers = function() {
-	for (var j=1; j<=backends; j++) {
+	for (var j=1; j<=backends; j+=1) {
 		validateBackend('localhost',8000+j);
 	}
 	// Check new servers every 5 seconds !!
 	setTimeout(checkServers,5000);
-}
+};
+
 // Look for backends !!
 setTimeout(checkServers,100);
 
@@ -98,7 +102,7 @@ var httpServer = https.createServer({
 		removeBackend(tg);
 	});
 	targets.push(tg);
-}).listen(443, "0.0.0.0");
+}).listen(443, '0.0.0.0');
 
 httpServer.on('upgrade', function (req, socket, head) {
 	var tg = targets.shift();
