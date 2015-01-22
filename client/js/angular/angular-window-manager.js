@@ -33,8 +33,8 @@ angular.module('ngWindowManager',[])
 			maximize: '&',
 			restore: '&',
 			options: '@',
-			maximizable: '=',
-			closeable: '='
+			maximizable: '@',
+			closeable: '@'
 		},
 
 		link: function (scope, element) {

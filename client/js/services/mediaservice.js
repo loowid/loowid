@@ -57,7 +57,7 @@ angular.module('mean.rooms').factory("MediaService",['Rooms','UIHandler',functio
 
 					if (mediasource.playtype == 'video'){
 						var mediaElement = $('<video id="my_'+ source + '" style="display:none;" autoplay muted ></video>')
-						windowHandler.create ($scope,mediaElement,$scope.resourceBundle['wintitle'+source],source,mediasource.winratio,mediasource.winscale,
+						windowHandler.create ($scope,mediaElement,$scope.resourceBundle['wintitle'+source],source,mediasource.winratio,mediasource.winscale,true,
 							function (win){
 	           				//Attach the window reference to the media source
 	           				mediasource.window = win;
@@ -347,8 +347,7 @@ angular.module('mean.rooms').factory("MediaService",['Rooms','UIHandler',functio
 					
 					//The rest of code it by async thread to keep webrtc sync stream close quick. Bit tricky here
 					 setTimeout( function (){
-						 
-		            	windowHandler.create ($scope,mediaElement,$scope.getUserName(connectionId),streamId,mediasource.winratio,mediasource.winscale,
+					  	  windowHandler.create	 ($scope,mediaElement,$scope.getUserName(connectionId),streamId,mediasource.winratio,mediasource.winscale, uiHandler.isOwner,
 		            		function (win){
 		           				//Attach the window reference to the media source
 		           				mediasource.window = win;
@@ -362,7 +361,7 @@ angular.module('mean.rooms').factory("MediaService",['Rooms','UIHandler',functio
             					setTimeout(function (){win.height = $(mediaElement).height() + 20;},400);
 
 					            if (typeof onrecord !== 'undefined') {onrecord.call (self);}
-
+								uiHandler.safeApply($scope,function(){});
 		            		},
 		            		function (win){
 			            		if (uiHandler.isowner){
@@ -370,10 +369,9 @@ angular.module('mean.rooms').factory("MediaService",['Rooms','UIHandler',functio
 			            				$scope.askForStopSharing (connectionId,mediasource.type);
 			            			});	
 			            		}
-			            		
 		            		}
 		            	);
-					 },1000);
+					  },1000);
 			  	}else{ 
 			  		 var mediaElement = $('<audio id="remote_'+ streamId + '" style="display:none;" autoplay ></audio>')
 			  		$("#remoteAudios").append (mediaElement);

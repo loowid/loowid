@@ -33,7 +33,7 @@ angular.module('mean.rooms').factory("WindowHandler",[function(){
 		}
 
 
-		this.create = function ($scope,mediaElement,winTitle,source,winratio,winscale,onopen,onclose){
+		this.create = function ($scope,mediaElement,winTitle,source,winratio,winscale,closeable,onopen,onclose){
 		
 			var winWidth = this.getDefaultWidth(winscale);
 			var winHeight = this.getDefaultHeight(winratio,winscale);
@@ -68,6 +68,7 @@ angular.module('mean.rooms').factory("WindowHandler",[function(){
 				title: winTitle,
 				mediaElement: mediaElement,
 				//close: onclose,
+				closeable: (closeable===undefined) ? false :closeable,
 				open: $scope.open,
 			};
 			
