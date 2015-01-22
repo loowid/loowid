@@ -190,7 +190,10 @@ app.configure(function() {
 	app.use(express.bodyParser());
 	var csrf = express.csrf();
 	app.use(function(req,res,next){
-		// Skip CSRF Check for LTI Initial Route
+		// Skip CSRF Check for LTI Initial Route, and forces https
+		if ((req.protocol === 'http') && (req.url === LTI_PATH)) {
+			Object.defineProperty(req, "protocol", { value: "https", writable: false });
+		}
 		return (req.url === LTI_PATH)?next():csrf(req,res,next);
 	});
 	app.use(i18n.handle);
