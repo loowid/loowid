@@ -148,7 +148,38 @@ var auth = express.basicAuth(process.env.ADMIN_USERNAME || 'admin', process.env.
 // Save sessions on Mongo
 var MongoStore = require('connect-mongo')(express);
 
+// LTI Producer
+var passport = require('passport');
+var LTIStrategy = require('passport-lti');
+var strategy = new LTIStrategy({
+	consumerKey: process.env.LTI_KEY || 'key',
+  	consumerSecret: process.env.LTI_SECRET || 'secret',
+  	passReqToCallback : true
+}, function(req, lti, done) {
+	// LTI launch parameters
+	var is_owner = (lti.roles.indexOf(process.env.LTI_OWNER_ROLE || 'Instructor') > -1);
+	rooms.createOrFindLTI(req,lti,is_owner,function(r){
+		req.session.ltiname = lti.lis_person_name_full;
+		req.session.ltiavtr = rooms.getGravatarImg(lti.lis_person_contact_email_primary);
+		return done(null,{url:'/#!/r/'+r.roomId+(is_owner?'/join':'')});
+	},function(){
+		return done(null,{url:'/'});
+	});
+});
+passport.use('lti',strategy);
+passport.serializeUser(function(user, done) {
+	done(null, user);
+});
+passport.deserializeUser(function(user, done) {
+	done(null, user);
+});
+
+var LTI_PATH = process.env.LTI_PATH || '/lti';
+
 app.configure(function() {
+	// Passport Config
+	app.use(passport.initialize());
+	app.use(passport.session());
 	app.use(express.cookieParser());
 	//app.use(express.session({secret:'Secret'}));	
 	app.use(express.session({
@@ -159,7 +190,8 @@ app.configure(function() {
 	app.use(express.bodyParser());
 	var csrf = express.csrf();
 	app.use(function(req,res,next){
-		return csrf(req,res,next);
+		// Skip CSRF Check for LTI Initial Route
+		return (req.url === LTI_PATH)?next():csrf(req,res,next);
 	});
 	app.use(i18n.handle);
 	app.use(express.methodOverride());
@@ -199,6 +231,13 @@ app.configure(function() {
 	app.get('/stats/rooms',auth,function(req,res,next){
 		rooms.stats(res);
 	});
+	// LTI Routes
+	app.post(LTI_PATH,passport.authenticate('lti',{
+		failureRedirect: '/'
+	}),function(req,res){
+		res.redirect(req.user.url);
+	});
+
 });
 
 i18n.registerAppHelper(app);

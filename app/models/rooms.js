@@ -34,6 +34,7 @@ var RoomSchema = new Schema({
     created: { type: Date, expires: ttl },
     dueDate: Date,
     status: String,
+    lticontext: String,
     access: {
     	shared:String,       	
     	title: String,
@@ -47,7 +48,8 @@ var RoomSchema = new Schema({
     },
     owner: {
 		name: String, 
-		sessionid: String, 
+		sessionid: String,
+		status: String,
 		connectionId: String,
 		avatar: String
     },
@@ -66,6 +68,10 @@ RoomSchema.statics = {
     	// Only show the last 150 chat messages
     	var now = new Date();
     	this.findOne({'$or':[{roomId:id},{'alias.id':id,'alias.timestamp':{'$gte':now}},{'alias.session':sid,'alias.timestamp':{'$gte':now}}]},{chat:{'$slice':-150}}).exec(cb);
+    },
+    openByContext: function(id, cb) {
+    	// Only show the last 150 chat messages
+    	this.findOne({lticontext:id,status:'OPENED'},{chat:{'$slice':-150}}).exec(cb);
     },
     alias: function (room, sid, id) {
     	var len = room.alias.length;

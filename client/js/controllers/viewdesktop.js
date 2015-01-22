@@ -137,6 +137,14 @@ angular.module('mean.rooms').controller('ViewDesktopController', ['$scope', '$ro
         uiHandler.connectionError = false;
         uiHandler.access = results.access;
         chatService.init($scope,results.chat);
+        // Set my own name
+        for (var i=0; i<results.guests.length; i++) {
+            if (results.guests[i].connectionId === rtc._me) {
+            	console.log('Setting my own name!!');
+            	uiHandler.name = results.guests[i].name;
+            	uiHandler.avatar = results.guests[i].avatar;
+            }
+        }
         
     };
     
