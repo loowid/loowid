@@ -1,5 +1,5 @@
 @import "ng-tags-input.min.less";
-@import "ventus.less";
+@import "window-manager.less";
 @import "fontawesome.less";
 @import "animations.less";
 @import "css3.less";
@@ -782,6 +782,14 @@ header{
 	}
 }
 
+#moveZone {
+	position: absolute;
+	width: 100%;
+	top: 54px;
+	height: ~"calc(100% - 54px)";
+	overflow: hidden;
+}
+
 #dashboard{
 	margin: 20px 270px 0 220px;
 	.transition(all 0.5s ease );
@@ -845,8 +853,8 @@ header{
 	padding: 10px;
 	position: absolute;
 	z-index: 10000;
-	top: 54px;
-	height:  ~"calc(100% - 74px)";
+	top: 0px;
+	height:  ~"calc(100% - 20px)";
 	background: lighten(@bgcolor, 20%);
 	.box-shadow(0 0 5px rgba(0,0,0,.25) );
 	overflow: auto;

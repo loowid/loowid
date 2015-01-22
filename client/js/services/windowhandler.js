@@ -3,14 +3,15 @@ angular.module('mean.rooms').factory("WindowHandler",[function(){
 
 	return function (){
 	
-		var pwm = undefined;
+		//var pwm = undefined;
 		var defaultRelations = [{x:4,y:3},{x:16,y:9}];
-
-		WManager = function (){
+		var e= null;
+		
+		/*WManager = function (){
 	    	if (!this.pwm)
 	    		this.pwm = new Ventus.WindowManager();
 	    	return this.pwm;
-		};
+		};*/
 
 		this.getDefaultWidth = function (winscale){
 			return window.innerWidth * winscale;
@@ -27,21 +28,52 @@ angular.module('mean.rooms').factory("WindowHandler",[function(){
 		}
 
 		this.getSomeYPosition = function (){
-			var winCount = $(".wm-window").length;
-			return 40 + (20*winCount);
+			var winCount = $("wmwindow").length;
+			return 80 + (20*winCount);
 		}
 
 
-		this.create = function (mediaElement,winTitle,source,winratio,winscale,onopen,onclose){
-
-			
-
-			var window_class = 'my_' + source + '_window';
-
+		this.create = function ($scope,mediaElement,winTitle,source,winratio,winscale,onopen,onclose){
+		
 			var winWidth = this.getDefaultWidth(winscale);
 			var winHeight = this.getDefaultHeight(winratio,winscale);
-
-			var customWindow = WManager().createWindow.fromQuery(mediaElement,{
+		
+			if ($scope.windows === undefined){
+				$scope.windows = [];
+			}	
+			
+			var options = {
+				position: {
+					x: this.getCentered(winWidth),
+					y: this.getSomeYPosition ()
+				},
+				size : {
+					width: winWidth,
+					height: winHeight
+				},
+				windowContainer: 'moveZone',
+				title: winTitle	
+			};
+			
+			
+			$scope.open = function (element){
+				var container = element.find('video').parent();	
+				element.find('video').remove();
+				container.append (mediaElement);
+				onopen();
+			};	
+			
+			var window = {
+				options: options,
+				title: winTitle,
+				mediaElement: mediaElement,
+				//close: onclose,
+				open: $scope.open,
+			};
+			
+			$scope.windows.unshift (window);
+			
+			/*var customWindow = WManager().createWindow.fromQuery(mediaElement,{
 		                title: winTitle,
 		                classname: window_class,
 		                width: winWidth,
@@ -49,9 +81,12 @@ angular.module('mean.rooms').factory("WindowHandler",[function(){
 		                x: this.getCentered(winWidth),
 		                y: this.getSomeYPosition(),
 
-		    });
+		    });*/
+			
+			
+			
 	
-		    customWindow.signals.once('open', function (win){
+		    /*customWindow.signals.once('open', function (win){
 		    	if (onopen){onopen.call (this,win);}
 		    },customWindow);
 
@@ -80,17 +115,20 @@ angular.module('mean.rooms').factory("WindowHandler",[function(){
 		      		win.movable = true;
 		      	},200);
 		    });
-
-
-		    customWindow.signals.once('close', function (win){
+			*/
+			
+			
+		   /* customWindow.signals.once('close', function (win){
 		    	if (onclose) onclose.call(this,win);
 		    	$("."+window_class).remove();
 			},customWindow);
 
 		    customWindow.open();
-			
+			*/
 		};
-
+		this.init = function (scope){
+			this.scope = scope;	
+		}
 
 	};
 }]);

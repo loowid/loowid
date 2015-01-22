@@ -3,6 +3,7 @@ angular.module('mean.rooms').controller('RecordController', ['$scope', '$routePa
 	var uiHandler = UIHandler;
 	$scope.global = Global;
 	$scope.ui = uiHandler;
+	
     var room = new Rooms({});
     var fileService = new FileService();
     var chatService = new ChatService();
@@ -17,6 +18,8 @@ angular.module('mean.rooms').controller('RecordController', ['$scope', '$routePa
     //We had three objects stream to handle the diferent stream sources webcam/screen
 
 
+	
+	
 	uiHandler.conn_new = '';
 	uiHandler.connected_class = '';
 	uiHandler.chat_class = '';
@@ -276,6 +279,7 @@ angular.module('mean.rooms').controller('RecordController', ['$scope', '$routePa
 
       
         fileService.init ($scope);
+		windowHandler.init ($scope);
         mediaService.init ($scope,windowHandler);
   
 		

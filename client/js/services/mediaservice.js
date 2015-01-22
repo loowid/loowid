@@ -57,7 +57,7 @@ angular.module('mean.rooms').factory("MediaService",['Rooms','UIHandler',functio
 
 					if (mediasource.playtype == 'video'){
 						var mediaElement = $('<video id="my_'+ source + '" style="display:none;" autoplay muted ></video>')
-						windowHandler.create (mediaElement,$scope.resourceBundle['wintitle'+source],source,mediasource.winratio,mediasource.winscale,
+						windowHandler.create ($scope,mediaElement,$scope.resourceBundle['wintitle'+source],source,mediasource.winratio,mediasource.winscale,
 							function (win){
 	           				//Attach the window reference to the media source
 	           				mediasource.window = win;
@@ -348,16 +348,11 @@ angular.module('mean.rooms').factory("MediaService",['Rooms','UIHandler',functio
 					//The rest of code it by async thread to keep webrtc sync stream close quick. Bit tricky here
 					 setTimeout( function (){
 						 
-		            	windowHandler.create (mediaElement,$scope.getUserName(connectionId),streamId,mediasource.winratio,mediasource.winscale,
+		            	windowHandler.create ($scope,mediaElement,$scope.getUserName(connectionId),streamId,mediasource.winratio,mediasource.winscale,
 		            		function (win){
 		           				//Attach the window reference to the media source
 		           				mediasource.window = win;
-		    					
-		    					if (!uiHandler.isowner) {
-		    						$('.wm-close',win.el).remove();
-		    					}
-
-								
+		    												
 	    						$(mediaElement).show();
 								
 								//Press play again for firefox
