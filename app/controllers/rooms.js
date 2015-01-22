@@ -8,7 +8,7 @@ require ('../models/rooms');
 //async = require('async'),
 var Room = mongoose.model('Room');
 //_ = require('underscore');
-
+var crypto = require('crypto');
 
 var makeId = function(){
     var text = '';
@@ -116,7 +116,7 @@ exports.join = function (req, res, next){
 			room.owner.sessionid = req.sessionID;
 		}
 
-		room.owner.name = req.body.name;
+		//room.owner.name = req.body.name;
 		room.owner.connectionId = req.body.connectionId;
 		room.owner.status = 'CONNECTED';
 		room.owner.avatar = req.body.avatar;
@@ -134,7 +134,14 @@ exports.join = function (req, res, next){
 		if (room.access.shared!=='PRIVATE' || isValid(room,req.sessionID)) {
 			// No locked room or is reloading
 			if (!room.access.locked || isReloading(room,req.sessionID)) {
-				room.guests.push ({name: req.body.name, sessionid: req.sessionID, connectionId: req.body.connectionId, status: 'CONNECTED', avatar: req.body.avatar, source: []});
+				room.guests.push ({
+					name: req.session.ltiname?req.session.ltiname:req.body.name, 
+					sessionid: req.sessionID, 
+					connectionId: req.body.connectionId, 
+					status: 'CONNECTED', 
+					avatar: req.session.ltiavtr?req.session.ltiavtr:req.body.avatar, 
+					source: []
+				});
 				var ind = room.valid.indexOf(req.sessionID);
 				if (ind>=0) room.valid.splice(ind, 1);
 				room.save(function(err) {
@@ -184,7 +191,7 @@ exports.createid = function(req, res, next) {
 exports.create = function(req, res, next) {
 	// Check the id is the same as previously created
 	if (req.session.roomId === req.body.roomId){
-		var acc = {shared:'LINK',title:'',keywords:[],passwd:makeId(),moderated:false,chat:true,locked:false,permanent:false,permanentkey:makeId()};
+		var acc = {shared:'LINK',title:req.body.title,keywords:[],passwd:makeId(),moderated:false,chat:true,locked:false,permanent:false,permanentkey:makeId()};
 		var now = new Date();
 		var due = new Date();
 		due.setDate(new Date(now.getDate()+(process.env.ROOM_TIMEOUT || 15)));
@@ -192,12 +199,12 @@ exports.create = function(req, res, next) {
 				{roomId: req.session.roomId, 
 				 created: now,
 				 dueDate: due,
-				 status: 'OPENED',
+				 status: req.lti?'DISCONNECTED':'OPENED',
 				 access: acc,
 				 owner:
 				 	{name: req.body.name, 
 					 sessionid: req.sessionID,
-					 status:'CONNECTED',
+					 status:req.lti?'DISCONNECTED':'CONNECTED',
 					 connectionId: req.body.connectionId,
 					 avatar: req.body.avatar},
 				guests: [],
@@ -205,6 +212,9 @@ exports.create = function(req, res, next) {
 				chat: [],
 				alias: []
 		});
+		if (req.lti) {
+			room.lticontext = req.lti;
+		}
 		room.save(function(err) {
 			if (err) {
 				next(err);
@@ -217,6 +227,42 @@ exports.create = function(req, res, next) {
 		error.http_code = 500;
 		next(error);
 	}
+};
+
+exports.getGravatarImg = function(email) {
+	return '//www.gravatar.com/avatar/'+crypto.createHash('md5').update(email.trim().toLowerCase()).digest('hex');
+};
+
+exports.createOrFindLTI = function(req,lti,is_owner,success,fail) {
+	Room.openByContext(lti.context_id,function(err,room){
+		if (room) {
+			success(room);
+		} else {
+			if (is_owner) {
+				var wres = {
+					json: function(rid) {
+						req.lti = lti.context_id;
+						req.body = {
+							avatar: exports.getGravatarImg(lti.lis_person_contact_email_primary),
+							connectionId: '',
+							name: lti.lis_person_name_full,
+							roomId: rid.id,
+							title: lti.context_title
+						};
+						var wcres = {
+							json: function(nroom) {
+								success(nroom);
+							}
+						};
+						exports.create(req,wcres,fail);
+					}
+				};
+				exports.createid(req,wres);
+			} else {
+				fail();
+			}
+		}
+	});
 };
 
 exports.users = function(req,res){

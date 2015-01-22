@@ -76,3 +76,12 @@ https://www.loowid.com
   PRIVATE_KEY=<path-to-your-privatekey.pem>
   ```
 
+  6. LTI Producer Configuration. The consumer connects with multiple loowid rooms depends on LTI context, the first user with OWNER_ROLE will be the room owner. The loowid producer url is configured with LTI_PATH. 
+
+  ```
+  LTI_KEY=<lti-key>
+  LTI_SECRET=<lti-secret>
+  LTI_PATH=<lti-url>
+  LTI_OWNER_ROLE=<lti-owner-role>
+  ```
+
