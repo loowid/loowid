@@ -119,7 +119,7 @@ exports.join = function (req, res, next){
 		//room.owner.name = req.body.name;
 		room.owner.connectionId = req.body.connectionId;
 		room.owner.status = 'CONNECTED';
-		room.owner.avatar = req.body.avatar;
+		//room.owner.avatar = req.body.avatar;
 		room.status = 'OPENED';
 		room.save(function(err) {
 			if (err) {
