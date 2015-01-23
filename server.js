@@ -190,9 +190,12 @@ app.configure(function() {
 	app.use(express.bodyParser());
 	var csrf = express.csrf();
 	app.use(function(req,res,next){
+		if (isClustered && !req.cookies.stickyid) {
+			res.cookie('stickyid', req.headers.stickyid, { maxAge: 900000, httpOnly: true });
+		}
 		// Skip CSRF Check for LTI Initial Route, and forces https
 		if ((req.protocol === 'http') && (req.url === LTI_PATH)) {
-			Object.defineProperty(req, "protocol", { value: "https", writable: false });
+			Object.defineProperty(req, 'protocol', { value: 'https', writable: false });
 		}
 		return (req.url === LTI_PATH)?next():csrf(req,res,next);
 	});
@@ -268,6 +271,10 @@ app.get('/chat/talk',function(req, res) {
 });
 
 var pck = require('./package.json');
+var getClusterNode = function (req) {
+	var node = req.cookies.stickyid || req.headers.stickyid;
+	return ' ('+node.substring(node.lastIndexOf(':')+1)+')';
+};
 
 if (process.env.PORT || process.env.OPENSHIFT_NODEJS_PORT) {
 	// Heroku redirect
@@ -286,7 +293,9 @@ if (process.env.PORT || process.env.OPENSHIFT_NODEJS_PORT) {
 				res.render('index.jade', {
 					title : 'Look what I\'m doing!',
 					appName : 'Loowid',
-					version: pck.version
+					version: pck.version + (isClustered?getClusterNode(req):''),
+					host: req.host,
+					port: ':8443'
 				});
 			}
 		}
@@ -307,7 +316,9 @@ if (process.env.PORT || process.env.OPENSHIFT_NODEJS_PORT) {
 				res.render('index.jade', {
 					title : 'Look what I\'m doing!',
 					appName : 'Loowid',
-					version: pck.version
+					version: pck.version + (isClustered?getClusterNode(req):''),
+					host: req.host,
+					port: ''
 				});
 			}
 		}
