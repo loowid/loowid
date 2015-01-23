@@ -8,6 +8,8 @@ window.app.config(['$routeProvider',
             templateUrl: 'views/rooms/owner.html'
     	}).when ('/r/:roomId/claim',{
             templateUrl: 'views/rooms/claim.html'
+    	}).when ('/lti/error',{
+            templateUrl: 'views/rooms/lti.html'
         }).when ('/r/:roomId',{reloadOnSearch: false,
     		templateUrl: 'views/rooms/view.html'
     	}).when ('/about-desktop-sharing',{

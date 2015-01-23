@@ -163,7 +163,7 @@ var strategy = new LTIStrategy({
 		req.session.ltiavtr = rooms.getGravatarImg(lti.lis_person_contact_email_primary);
 		return done(null,{url:'/#!/r/'+r.roomId+(is_owner?'/join':'')});
 	},function(){
-		return done(null,{url:'/'});
+		return done(null,{url:'/#!/lti/error'});
 	});
 });
 passport.use('lti',strategy);
@@ -236,7 +236,7 @@ app.configure(function() {
 	});
 	// LTI Routes
 	app.post(LTI_PATH,passport.authenticate('lti',{
-		failureRedirect: '/'
+		failureRedirect: '/#!/lti/error'
 	}),function(req,res){
 		res.redirect(req.user.url);
 	});
