@@ -196,6 +196,7 @@ app.configure(function() {
 		// Skip CSRF Check for LTI Initial Route, and forces https
 		if ((req.protocol === 'http') && (req.url === LTI_PATH)) {
 			Object.defineProperty(req, 'protocol', { value: 'https', writable: false });
+			req.headers.host = process.env.LTI_DOMAIN || req.headers.host;
 		}
 		return (req.url === LTI_PATH)?next():csrf(req,res,next);
 	});
