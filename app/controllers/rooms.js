@@ -234,7 +234,7 @@ exports.getGravatarImg = function(email) {
 };
 
 exports.createOrFindLTI = function(req,lti,is_owner,success,fail) {
-	Room.openByContext(lti.context_id,function(err,room){
+	Room.openByContext(lti.context_id,req.sessionID,function(err,room){
 		if (room) {
 			success(room);
 		} else {
