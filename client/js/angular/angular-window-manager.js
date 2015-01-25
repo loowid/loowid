@@ -54,7 +54,11 @@ angular.module('ngWindowManager',[])
 			var positionState = null;
 			var sizeState = null;
 			var maximizeState = null;
-
+			
+			
+			var winHandler = {};
+			winHandler.elem = element;
+			
 			//Parse the options
 			var options = scope.options ? JSON.parse(scope.options) :{};
 	
@@ -76,7 +80,7 @@ angular.module('ngWindowManager',[])
 					},50);
             
 					if (scope.close){
-						scope.close(element);
+						scope.close(winHandler);
 					}
 				}
 			);
@@ -224,7 +228,7 @@ angular.module('ngWindowManager',[])
 			};
 			
 			//This function is executed when close button is pushed
-			var close = function (){
+			winHandler.close = function (){
 				scope.$destroy();
 			};
 			
@@ -240,13 +244,18 @@ angular.module('ngWindowManager',[])
 				};
 			
 				//Select the element where to maximize
-				var maximizeToElement = options.maximizeTo ? angular.element (options.maximizeTo) : windowArea;
+				var maximizeToElement  = window;
+			
+				if (options.maximizeTo!=='window'){
+					var elementToMaximize = document.getElementById (options.maximizeTo) || document.getElementsByTagName (options.maximizeTo);
+					maximizeToElement = options.maximizeTo ? (elementToMaximize) : windowArea;
+				}
 				
 				var maximizeCoords = {
-					x: 0,
-					y: 0,
-					width: parseInt(maximizeToElement.offsetWidth, 10),
-					height: parseInt(maximizeToElement.offsetHeight, 10)
+					x: parseInt(maximizeToElement.offsetLeft || 0, 10) ,
+					y: parseInt(maximizeToElement.offsetTop ||0, 10),
+					width: parseInt(maximizeToElement.offsetWidth ||maximizeToElement.innerWidth, 10),
+					height: parseInt(maximizeToElement.offsetHeight || maximizeToElement.innerHeight, 10)
 				};
 				
 				//Set it to 
@@ -255,6 +264,7 @@ angular.module('ngWindowManager',[])
 				//move, set the effect and resize 
 				move (maximizeCoords.x + 10,maximizeCoords.y +10 );
 				element.addClass ('maximizing');
+				element.addClass('maximized');
 				resize (maximizeCoords.width -20, maximizeCoords.height - 20);
 				
 				//Set the apropiate listeners
@@ -269,6 +279,7 @@ angular.module('ngWindowManager',[])
 				//Program the effect extraction
 				setTimeout (function (){
 					element.removeClass ('maximizing');
+
 				},500);
 				
 				if (scope.maximize){
@@ -280,6 +291,7 @@ angular.module('ngWindowManager',[])
 			var restore = function (){
 				//move and resize to previus state
 				element.addClass ('restoring');
+				element.removeClass ('maximized');
 				
 				//move and resize to prior state
 				move (maximizeState.x,maximizeState.y);
@@ -333,7 +345,7 @@ angular.module('ngWindowManager',[])
 			startWindowListeners ();
 			
 			//Set buttons listener
-			closeButton.addEventListener ('click',close);
+			closeButton.addEventListener ('click',winHandler.close);
 			maximizeButton.addEventListener ('click',maximize);
 			if (scope.maximizable) {titleBarElement.addEventListener ('dblclick', maximize);}
 			
@@ -355,7 +367,8 @@ angular.module('ngWindowManager',[])
 			
 				setTimeout (function (){
 					element.removeClass ('opening');
-					if (scope.open) scope.open(element);
+					if (scope.open) 
+						scope.open(winHandler);
 				},400);
 			},50);
 		}

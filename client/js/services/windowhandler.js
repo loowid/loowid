@@ -52,84 +52,38 @@ angular.module('mean.rooms').factory("WindowHandler",[function(){
 					height: winHeight
 				},
 				windowContainer: 'moveZone',
+				maximizeTo: 'moveZone',
 				title: winTitle	
+			};
+			
+			var open = function (win){
+				var container = win.elem.find('video').parent();	
+				win.elem.find('video').remove();
+				container.append (mediaElement);
+				onopen(win);
+			};	
+
+			var close = function (win){
+				onclose(win);
+				
+				for (i = 0; i< $scope.windows.length; i++){
+					if (window === $scope.windows[i]){
+						$scope.windows.splice(i,1);	
+					}
+				}
 			};
 			
 			var window = {
 				options: options,
 				title: winTitle,
 				mediaElement: mediaElement,
-				close: $scope.close,
+				close: close,
 				closeable: (closeable===undefined) ? false : closeable,
-				open: $scope.open
+				open: open
 			};
-			
-			$scope.open = function (element){
-				var container = element.find('video').parent();	
-				element.find('video').remove();
-				container.append (mediaElement);
-				onopen();
-			};	
-
-			$scope.close = function (element){
-				onclose();
-			};
-			
 			
 			$scope.windows.unshift (window);
-			
-			/*var customWindow = WManager().createWindow.fromQuery(mediaElement,{
-		                title: winTitle,
-		                classname: window_class,
-		                width: winWidth,
-		                height: winHeight,
-		                x: this.getCentered(winWidth),
-		                y: this.getSomeYPosition(),
 
-		    });*/
-			
-			
-			
-	
-		    /*customWindow.signals.once('open', function (win){
-		    	if (onopen){onopen.call (this,win);}
-		    },customWindow);
-
-		    customWindow.signals.on ('maximize', function (win){
-		    	$('body').prepend (win.el);
-		      	win.move(10,10);
-		      	var width =  '' + (window.innerWidth -20) + 'px';
-		      	var height = '' + (window.innerHeight -20) + 'px';
-        		win.el.css ({'z-index':'50000'});
-		      	$('section',win.el).css ('height','100%');
-		      	$('video',win.el).addClass('fullVideo');
-		      	$('video',win.el).get(0).play();
-		      	win.resize (width,height);
-		      	win.movable = false;
-		    });
-		    
-		    customWindow.signals.on ('restore', function (win){
-				$('.wm-space').prepend (win.el);
-				win.el.css ({'z-index':'10001'});
-				setTimeout (function (){
-					$('section',win.el).css('height','');
-					$('video',win.el).removeClass('fullVideo');
-			      	$('video',win.el).get(0).play();
-		      		$('.wm-window-title',win.el).click();
-		      		$('.wm-space',win.el).click();
-		      		win.movable = true;
-		      	},200);
-		    });
-			*/
-			
-			
-		   /* customWindow.signals.once('close', function (win){
-		    	if (onclose) onclose.call(this,win);
-		    	$("."+window_class).remove();
-			},customWindow);
-
-		    customWindow.open();
-			*/
 		};
 		this.init = function (scope){
 			this.scope = scope;	
