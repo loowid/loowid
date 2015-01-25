@@ -54,6 +54,7 @@ https://www.loowid.com
   ADMIN_PASSWORD=<your-admin-password>
   ```
   2. Chrome plugin extension id. Set the id of your own plugin extension for screen sharing. A generic domain plugin will be used by default.
+  
   ```
   CEXTID=<generic-domain-plugin-id>
   ```

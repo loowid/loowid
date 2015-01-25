@@ -18,7 +18,7 @@ if (!isNaN(process.argv[2]) || !isNaN(process.argv[3])) {
 	defaultPort = false;
 }
 
-var port = process.env.PORT || process.env.OPENSHIFT_NODEJS_PORT || portvalue;
+var port = process.env.OPENSHIFT_NODEJS_PORT ||  process.env.OPENSHIFT_INTERNAL_PORT || portvalue;
 var sport = 443;
 var sserver;
 
@@ -38,7 +38,7 @@ var rooms = require('./app/controllers/rooms');
 var wsevents = require('./app/controllers/events');
 var logs = require('./app/controllers/log');
 
-if (!process.env.PORT && !process.env.OPENSHIFT_NODEJS_PORT && defaultPort) {
+if (!process.env.OPENSHIFT_NODEJS_PORT && !process.env.OPENSHIFT_INTERNAL_PORT && defaultPort) {
 	var fs = require('fs');
 	// Certificado de pruebas para local
 	// Generado con http://www.cert-depot.com/
@@ -50,7 +50,7 @@ if (!process.env.PORT && !process.env.OPENSHIFT_NODEJS_PORT && defaultPort) {
 	};
 	sserver = require('https').createServer(credentials, app);
 }
-var ipaddr = process.env.OPENSHIFT_NODEJS_IP ||'0.0.0.0';
+var ipaddr = process.env.OPENSHIFT_NODEJS_IP || process.env.OPENSHIFT_INTERNAL_IP ||'0.0.0.0';
 var wserver = sserver?sserver:server;
 
 // load webrtc module
@@ -272,12 +272,12 @@ app.get('/chat/talk',function(req, res) {
 
 var pck = require('./package.json');
 var getClusterNode = function (req) {
-	var node = req.cookies.stickyid || req.headers.stickyid;
+	var node = req.cookies.stickyid || req.headers.stickyid || ':'+process.env.OPENSHIFT_GEAR_UUID;
 	return ' ('+node.substring(node.lastIndexOf(':')+1)+')';
 };
 
-if (process.env.PORT || process.env.OPENSHIFT_NODEJS_PORT) {
-	// Heroku redirect
+if (process.env.OPENSHIFT_NODEJS_PORT ||  process.env.OPENSHIFT_INTERNAL_PORT) {
+	// OpenShift Deployment
 	/* At the top, with other redirect methods before other routes */
 	logger.info('Running production environment !!');
 	app.get('/', function(req, res, next) {
