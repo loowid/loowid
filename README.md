@@ -54,6 +54,7 @@ https://www.loowid.com
   ADMIN_PASSWORD=<your-admin-password>
   ```
   2. Chrome plugin extension id. Set the id of your own plugin extension for screen sharing. A generic domain plugin will be used by default.
+  
   ```
   CEXTID=<generic-domain-plugin-id>
   ```
@@ -76,12 +77,14 @@ https://www.loowid.com
   PRIVATE_KEY=<path-to-your-privatekey.pem>
   ```
 
-  6. LTI Producer Configuration. The consumer connects with multiple loowid rooms depends on LTI context, the first user with OWNER_ROLE will be the room owner. The loowid producer url is configured with LTI_PATH. 
+  6. LTI Producer Configuration. The consumer connects with multiple loowid rooms depends on LTI context, the first user with OWNER_ROLE will be the room owner. 
+  The loowid producer entrypoint is configured with LTI_PATH (/lti). Set LTI_DOMAIN if your host is behind a proxy with other domain than req.headers.host. 
 
   ```
   LTI_KEY=<lti-key>
   LTI_SECRET=<lti-secret>
   LTI_PATH=<lti-url>
+  LTI_DOMAIN=<lti-host>
   LTI_OWNER_ROLE=<lti-owner-role>
   ```
 

@@ -201,9 +201,13 @@ module.exports = function(grunt) {
     grunt.config.data.nodemon.dev.options = generateOptions([]);
     grunt.registerTask('cluster', ['mini','concurrent:cluster']);
 
-    // Same as development but using min.js (to test if its working)
-    grunt.registerTask('prod', ['concurrent:prod']);
-
+    // Same as development but using min.js
+    // Do not run mongo in openshift environment
+    if (process.env.OPENSHIFT_NODEJS_PORT) {
+    	grunt.config.data.concurrent.prod.tasks.splice(0,1);
+    }
+    grunt.registerTask('prod', ['mini','concurrent:prod']);
+    
     // Minify tasks (generate min files)
     grunt.registerTask('minijs', ['uglify']);
     

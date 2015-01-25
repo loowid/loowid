@@ -1,4 +1,5 @@
 'use strict';
+/*global unescape: true */
 /**
  * Local proxy (load balancing for development)
  * node proxy [n] -> Run proxy over 443 try to find nodes, from 8001 to 8000+n
@@ -9,6 +10,7 @@ var httpProxy   = require('http-proxy');
 var fs = require('fs');
 var http = require('http');
 var https = require('https');
+var logger = require('./log.js').getLog('proxy');
 
 var server = http.createServer(function (req, res) {
   // optional, for HSTS
@@ -24,7 +26,7 @@ var server = http.createServer(function (req, res) {
 
 server.listen(80);
 
-console.log('Proxy listen port 80');
+logger.info('Proxy listen port 80');
 
 //
 //Create the HTTPS proxy server in front of a HTTP server
@@ -32,10 +34,32 @@ console.log('Proxy listen port 80');
 
 var targets = [];
 
+var parseCookies = function(request) {
+    var list = {}, rc = request.headers.cookie;
+    if (rc) { 
+    	rc.split(';').forEach(function( cookie ) {
+    		var parts = cookie.split('=');
+    		list[parts.shift().trim()] = decodeURI(parts.join('='));
+    	});
+    }
+    return list;
+};
+
+var findStickyServer = function(req) {
+	var sid = unescape(parseCookies(req).stickyid);
+	var id = targets.indexOf(sid);
+	if (id<0) {
+		sid = targets[Math.floor(Math.random()*targets.length)];
+		req.headers.stickyid = sid; 
+	}
+	logger.debug(sid+req.url);
+	return sid;
+};
+
 var addBackend = function(srv) {
 	var i = targets.indexOf(srv);
 	if (i<0) {
-		console.log('Add backend '+srv);
+		logger.info('Add backend '+srv);
 		targets.push(srv);
 	}
 };
@@ -43,7 +67,7 @@ var addBackend = function(srv) {
 var removeBackend = function(srv) {
 	var i = targets.indexOf(srv);
 	if (i>=0) {
-		console.log('Remove backend '+srv);
+		logger.info('Remove backend '+srv);
 		targets.splice(i,1);
 	}
 };
@@ -81,7 +105,8 @@ var proxy = httpProxy.createProxyServer({
 	 key: fs.readFileSync('private.pem', 'utf8'),
 	 cert: fs.readFileSync('public.pem', 'utf8')
 	},
-	ws:true
+	ws:true,
+	secure:true
 });
 
 process.on('uncaughtException', function (err) {
@@ -89,7 +114,7 @@ process.on('uncaughtException', function (err) {
 		// Backend server fail !!
 		checkServers();
 	} else {
-		console.log(err);
+		logger.error(err);
 	}
 });
 
@@ -97,20 +122,18 @@ var httpServer = https.createServer({
 	key: fs.readFileSync('private.pem', 'utf8'),
 	cert: fs.readFileSync('public.pem', 'utf8')
 }, function(req, res){
-	var tg = targets.shift();
+	var tg = findStickyServer(req);
 	proxy.web(req, res, {target:tg}, function(){
 		removeBackend(tg);
 	});
-	targets.push(tg);
 }).listen(443, '0.0.0.0');
 
 httpServer.on('upgrade', function (req, socket, head) {
-	var tg = targets.shift();
+	var tg = findStickyServer(req);
     proxy.ws(req, socket, head, {target:tg}, function(){
 		removeBackend(tg);
 	});
-    targets.push(tg);
 });
 
-console.log('Load Balancer in port 443');
+logger.info('Load Balancer in port 443');
 

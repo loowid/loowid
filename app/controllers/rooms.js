@@ -119,7 +119,7 @@ exports.join = function (req, res, next){
 		//room.owner.name = req.body.name;
 		room.owner.connectionId = req.body.connectionId;
 		room.owner.status = 'CONNECTED';
-		room.owner.avatar = req.body.avatar;
+		//room.owner.avatar = req.body.avatar;
 		room.status = 'OPENED';
 		room.save(function(err) {
 			if (err) {
@@ -234,7 +234,7 @@ exports.getGravatarImg = function(email) {
 };
 
 exports.createOrFindLTI = function(req,lti,is_owner,success,fail) {
-	Room.openByContext(lti.context_id,function(err,room){
+	Room.openByContext(lti.context_id,req.sessionID,function(err,room){
 		if (room) {
 			success(room);
 		} else {

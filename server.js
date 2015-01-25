@@ -18,7 +18,7 @@ if (!isNaN(process.argv[2]) || !isNaN(process.argv[3])) {
 	defaultPort = false;
 }
 
-var port = process.env.PORT || process.env.OPENSHIFT_NODEJS_PORT || portvalue;
+var port = process.env.OPENSHIFT_NODEJS_PORT ||  process.env.OPENSHIFT_INTERNAL_PORT || portvalue;
 var sport = 443;
 var sserver;
 
@@ -38,7 +38,7 @@ var rooms = require('./app/controllers/rooms');
 var wsevents = require('./app/controllers/events');
 var logs = require('./app/controllers/log');
 
-if (!process.env.PORT && !process.env.OPENSHIFT_NODEJS_PORT && defaultPort) {
+if (!process.env.OPENSHIFT_NODEJS_PORT && !process.env.OPENSHIFT_INTERNAL_PORT && defaultPort) {
 	var fs = require('fs');
 	// Certificado de pruebas para local
 	// Generado con http://www.cert-depot.com/
@@ -50,12 +50,11 @@ if (!process.env.PORT && !process.env.OPENSHIFT_NODEJS_PORT && defaultPort) {
 	};
 	sserver = require('https').createServer(credentials, app);
 }
-var ipaddr = process.env.OPENSHIFT_NODEJS_IP ||'0.0.0.0';
+var ipaddr = process.env.OPENSHIFT_NODEJS_IP || process.env.OPENSHIFT_INTERNAL_IP ||'0.0.0.0';
+var wserver = sserver?sserver:server;
 
 // load webrtc module
-var webRTC = require('./webrtc.io.js').listen(
-		(process.env.PORT || process.env.OPENSHIFT_NODEJS_PORT || !defaultPort) ? server
-				: sserver, ipaddr);
+var webRTC = require('./webrtc.io.js').listen(wserver,ipaddr);
 
 var serverId = (Math.random()/+new Date()).toString(36).replace(/[^a-z]+/g,'').substring(0,9);
 
@@ -163,7 +162,7 @@ var strategy = new LTIStrategy({
 		req.session.ltiavtr = rooms.getGravatarImg(lti.lis_person_contact_email_primary);
 		return done(null,{url:'/#!/r/'+r.roomId+(is_owner?'/join':'')});
 	},function(){
-		return done(null,{url:'/'});
+		return done(null,{url:'/#!/lti/error'});
 	});
 });
 passport.use('lti',strategy);
@@ -190,7 +189,14 @@ app.configure(function() {
 	app.use(express.bodyParser());
 	var csrf = express.csrf();
 	app.use(function(req,res,next){
-		// Skip CSRF Check for LTI Initial Route
+		if (isClustered && !req.cookies.stickyid && req.headers.stickyid) {
+			res.cookie('stickyid', req.headers.stickyid, { maxAge: 3600000, httpOnly: true });
+		}
+		// Skip CSRF Check for LTI Initial Route, and forces https
+		if ((req.protocol === 'http') && (req.url === LTI_PATH)) {
+			Object.defineProperty(req, 'protocol', { value: 'https', writable: false });
+			req.headers.host = process.env.LTI_DOMAIN || req.headers.host;
+		}
 		return (req.url === LTI_PATH)?next():csrf(req,res,next);
 	});
 	app.use(i18n.handle);
@@ -233,7 +239,7 @@ app.configure(function() {
 	});
 	// LTI Routes
 	app.post(LTI_PATH,passport.authenticate('lti',{
-		failureRedirect: '/'
+		failureRedirect: '/#!/lti/error'
 	}),function(req,res){
 		res.redirect(req.user.url);
 	});
@@ -265,9 +271,13 @@ app.get('/chat/talk',function(req, res) {
 });
 
 var pck = require('./package.json');
+var getClusterNode = function (req) {
+	var node = req.cookies.stickyid || req.headers.stickyid || ':'+(process.env.OPENSHIFT_GEAR_UUID || 'local');
+	return node.substring(node.lastIndexOf(':')+1);
+};
 
-if (process.env.PORT || process.env.OPENSHIFT_NODEJS_PORT) {
-	// Heroku redirect
+if (process.env.OPENSHIFT_NODEJS_PORT || process.env.OPENSHIFT_INTERNAL_PORT) {
+	// OpenShift Deployment
 	/* At the top, with other redirect methods before other routes */
 	logger.info('Running production environment !!');
 	app.get('/', function(req, res, next) {
@@ -283,7 +293,10 @@ if (process.env.PORT || process.env.OPENSHIFT_NODEJS_PORT) {
 				res.render('index.jade', {
 					title : 'Look what I\'m doing!',
 					appName : 'Loowid',
-					version: pck.version
+					version: pck.version,
+					node: getClusterNode(req),
+					host: req.host,
+					port: ':8443'
 				});
 			}
 		}
@@ -304,12 +317,18 @@ if (process.env.PORT || process.env.OPENSHIFT_NODEJS_PORT) {
 				res.render('index.jade', {
 					title : 'Look what I\'m doing!',
 					appName : 'Loowid',
-					version: pck.version
+					version: pck.version,
+					node: getClusterNode(req),
+					host: req.host,
+					port: ''
 				});
 			}
 		}
 	});
-	if (defaultPort) sserver.listen(sport, ipaddr);
+	if (defaultPort) {
+		logger.info('Express app started on port ' + sport);
+		sserver.listen(sport, ipaddr);
+	}
 }
 
 // Define the routes for room REST service
@@ -351,4 +370,4 @@ app.use(function(err, req, res, next) {
 
 server.listen(port, ipaddr);
 
-logger.info('Express app started on port ' + (defaultPort?sport:port));
+logger.info('Express app started on '+ipaddr+' port ' + port);

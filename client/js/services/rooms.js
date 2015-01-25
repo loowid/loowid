@@ -62,11 +62,13 @@ angular.module('mean.rooms').factory("Rooms", ['$resource','$http','$window', fu
     	}
 
         this.getWebSocketUrl = function() {
-            return location.origin.replace(/^http/, 'ws')
-        		.replace(/\.rhcloud\.com/,'.rhcloud.com:8'+(location.origin.indexOf('https')>=0?'443':'000'))
-        		.replace(/www\.loowid\.com/,'loowid-oscloud.rhcloud.com:8'+(location.origin.indexOf('https')>=0?'443':'000'));
+        	return 'wss://'+window.wsocket.host+window.wsocket.port;
         }
 		
+        this.getInitWebSocketUrl = function () {
+        	return (location.origin.indexOf('https://'+window.wsocket.host)<0)?'https://'+window.wsocket.host+'/rooms/hello':null;
+        }
+
 		this.create = function (name,success,ownerToken){
             var gravatar = this.getGravatar();
             var host = this.getWebSocketUrl();
@@ -89,14 +91,12 @@ angular.module('mean.rooms').factory("Rooms", ['$resource','$http','$window', fu
 				return 200;	
 			};
 			
-			
-			
-			if (location.origin.indexOf ('www\.loowid\.com') > -1){
-			
-				var wsproxyinit = $resource ('https\\://loowid-oscloud.rhcloud.com:443/rooms/hello',{},{
+			// Initialize session before connect to web socket
+			var initUrl = this.getInitWebSocketUrl();
+			if (initUrl){
+				var wsproxyinit = $resource (initUrl,{},{
 					hello: {method: "JSONP", params:{callback: 'JSON_CALLBACK'}, isArray: false}
 				});
-				
 				wsproxyinit.hello ({},function (){
 					connectFunction();	
 				},function (erro){
