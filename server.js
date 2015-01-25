@@ -189,8 +189,8 @@ app.configure(function() {
 	app.use(express.bodyParser());
 	var csrf = express.csrf();
 	app.use(function(req,res,next){
-		if (isClustered && !req.cookies.stickyid) {
-			res.cookie('stickyid', req.headers.stickyid, { maxAge: 900000, httpOnly: true });
+		if (isClustered && !req.cookies.stickyid && req.headers.stickyid) {
+			res.cookie('stickyid', req.headers.stickyid, { maxAge: 3600000, httpOnly: true });
 		}
 		// Skip CSRF Check for LTI Initial Route, and forces https
 		if ((req.protocol === 'http') && (req.url === LTI_PATH)) {
