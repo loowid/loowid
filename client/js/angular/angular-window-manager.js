@@ -28,10 +28,10 @@ angular.module('ngWindowManager',[])
 		transclude: true,
 		scope: {
 			title: '@',
-			close: '&',
+			close: '=',
 			open: '=',
-			maximize: '&',
-			restore: '&',
+			maximize: '=',
+			restore: '=',
 			options: '@',
 			maximizable: '@',
 			closeable: '@'
@@ -71,12 +71,12 @@ angular.module('ngWindowManager',[])
 				
 							setTimeout (function (){
 							element.removeClass ('closing');
-							element.detach();
+							element.remove();
 						},300);
 					},50);
             
 					if (scope.close){
-						scope.close();
+						scope.close(element);
 					}
 				}
 			);

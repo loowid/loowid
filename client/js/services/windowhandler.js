@@ -55,6 +55,14 @@ angular.module('mean.rooms').factory("WindowHandler",[function(){
 				title: winTitle	
 			};
 			
+			var window = {
+				options: options,
+				title: winTitle,
+				mediaElement: mediaElement,
+				close: $scope.close,
+				closeable: (closeable===undefined) ? false : closeable,
+				open: $scope.open
+			};
 			
 			$scope.open = function (element){
 				var container = element.find('video').parent();	
@@ -62,15 +70,11 @@ angular.module('mean.rooms').factory("WindowHandler",[function(){
 				container.append (mediaElement);
 				onopen();
 			};	
-			
-			var window = {
-				options: options,
-				title: winTitle,
-				mediaElement: mediaElement,
-				//close: onclose,
-				closeable: (closeable===undefined) ? false :closeable,
-				open: $scope.open,
+
+			$scope.close = function (element){
+				onclose();
 			};
+			
 			
 			$scope.windows.unshift (window);
 			

@@ -65,7 +65,7 @@ angular.module('mean.rooms').factory("MediaService",['Rooms','UIHandler',functio
 	           				$(mediaElement).show();
 
 	            			//Just delay it to take time to get the window opened effect and inherit the video size
-	            			setTimeout(function (){win.height = $(mediaElement).height() + 20;},500);
+	            			//setTimeout(function (){win.height = $(mediaElement).height() + 20;},500);
 
 	            			 if (typeof onrecord !== 'undefined' && onrecord != null) {onrecord.call (self);}
 	            			 uiHandler.safeApply($scope,function(){});

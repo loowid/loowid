@@ -160,7 +160,7 @@
 
 		<div id="remoteAudios" ></div>
 		<div id="remoteVideos" >
-			<wmwindow title="{{window.title}}" closeable="{{window.closeable}}" open="window.open" options="{{window.options}}" data-ng-repeat="window in windows" >
+			<wmwindow title="{{window.title}}" open="window.open"  close="window.close" closeable="{{window.closeable}}" options="{{window.options}}" data-ng-repeat="window in windows" >
 				<video></video>
 			</wmwindow>
 		</div>
