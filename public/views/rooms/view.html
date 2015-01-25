@@ -194,7 +194,7 @@
 	<span class="toggler" ng-click="toogleChat()"><i class="fa fa-angle-double-right"></i></span>
 	<form data-ng-submit="sendMessage()">
 	<fieldset id="chat_form">
-		<input type="text" ng-show="ui.access.chat" data-ng-model="ui.messageText" id="text_chat" placeholder="{{resourceBundle.sendamessge}}" autofocus>
+		<input type="text" ng-show="ui.access.chat" data-ng-model="ui.messageText" id="text_chat" placeholder="{{resourceBundle.sendamessge}}" data-ng-change="sendTyping()" autofocus>
 		<span ng-hide="ui.access.chat">{{resourceBundle.disablechat}}</span>
 	</fieldset>
 	</form>
@@ -203,7 +203,12 @@
 	  	<li ng-class="msg.class" ng-repeat="msg in ui.messages">
 	  		<div class="avatar"><img ng-src="{{getUser(msg.id).avatar}}" /></div>
 	  		<div class="messages">
-	  			<p ng-repeat="txt in msg.list track by $index" ng-bind-html="txt"></p>
+	  			<p ng-repeat="txt in msg.list track by $index" ng-bind-html="txt | to_trusted"></p>
+				<div class="spinner" ng-show="msg.istyping">
+				  <div class="bounce1"></div>
+				  <div class="bounce2"></div>
+				  <div class="bounce3"></div>
+				</div>	  			
 	  			<time datetime="{{msg.time}}">{{getUser(msg.id).name}} · {{timeAgo(msg.time)}}</time>
 	  		</div>
 	  	</li>

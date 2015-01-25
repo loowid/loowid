@@ -20,27 +20,66 @@ angular.module('mean.rooms').factory("ChatService",['$timeout','UIHandler',funct
 	        return secs>15;
 	    }
 	    
+	    this.youtube = function(url,vid) {
+	    	return '<iframe src="//www.youtube.com/embed/' + vid + '" width="100%" height="100%" frameborder="0" allowfullscreen></iframe>';
+	    }
+	    
+	    this.link = function(url) {
+	    	return '<a href="' + url + '" target="_blank">' + url + '</a>';
+	    }
+	    
+	    this.parseUrls = function(txt) {
+	    	return txt.replace(/https?:\/\/www\.youtube\.com\/watch\?v=([^\s]+)/g, this.youtube)
+	    			  .replace(/https?:\/\/youtu\.be\/([^\s]+)/g, this.youtube)
+	    			  .replace(/(https?:\/\/[^\s]+)/g, this.link);
+	    }
+	    
 	    this.getHtml = function($scope,data) {
 	        if (data.id==$scope.global.bot) {
-	            return data.text.replace(/(https?:\/\/[^\s]+)/g, function(url) { return '<a href="' + url + '" target="_blank">' + url + '</a>'; });
+	            return this.parseUrls(data.text);
 	        }
-	        return data.text.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/(https?:\/\/[^\s]+)/g, function(url) { return '<a href="' + url + '" target="_blank">' + url + '</a>'; });
+	        return this.parseUrls(data.text.replace(/&/g,'&amp;').replace(/</g,'&lt;'));
 	    }
 	    
 	    this.addNewMessage = function($scope,data) {
 	        var msgTime = new Date(data.time);
 	        var messageIndex = uiHandler.messages.length-1
 	        if (uiHandler.messages.length==0 || uiHandler.messages[messageIndex].id != data.id || this.longTimeAgo(msgTime,uiHandler.messages[messageIndex].time)) {
-	        	uiHandler.messages.push(
-	                    {'class':data.id == $scope.global.own?'self':'other',
-	                        'id': data.id,
-	                        'time': msgTime,
-	                        'list':[this.getHtml($scope,data)]});
+	        	var m = {'class':data.id == $scope.global.own?'self':'other',
+                        'id': data.id,
+                        'time': msgTime,
+                        'istyping': !data.text,
+                        'list':[]};
+	        	if (data.text) {
+	        		this.checkTypingIcons(data.id);
+	        		m.list.push(this.getHtml($scope,data)); 
+	        	}
+	        	uiHandler.messages.push(m);
 	        } else {
-	        	uiHandler.messages[messageIndex].list.push(this.getHtml($scope,data));
+	        	if (!data.text) {
+	        		uiHandler.messages[messageIndex].istyping = true;	
+	        	} else {
+	        		uiHandler.messages[messageIndex].istyping = false;
+	        		uiHandler.messages[messageIndex].list.push(this.getHtml($scope,data));
+	        	}
 	        }
 	    }
 
+	    this.checkTypingIcons = function(id) {
+	    	var nowTime = new Date();
+	    	for (var i=0; i<uiHandler.messages.length; i+=1) {
+	    		if (uiHandler.messages[i] === id || this.longTimeAgo(nowTime,uiHandler.messages[i].time)) {
+	    			uiHandler.messages[i].istyping = false;
+	    			if (uiHandler.messages[i].list.length===0) {
+	    				uiHandler.messages.splice(i,1);
+	    			}
+	    		}
+	    	}
+	    	if (!id) {
+	    		$timeout(function(){ self.checkTypingIcons(); },2000);
+	    	}
+	    }
+	    
 	    this.alertChatStatus = function ($scope,accessChat){
 			this.addNewMessage($scope,{id:$scope.global.bot,text:$scope.resourceBundle['chat'+(accessChat)],time:new Date()});
 	    }
@@ -57,6 +96,18 @@ angular.module('mean.rooms').factory("ChatService",['$timeout','UIHandler',funct
 	    		uiHandler.audible = !uiHandler.audible;
     		}
 
+	    	$scope.sendTyping = function() {
+			 	if (!uiHandler.isowner && uiHandler.passNeeded) {
+			   		chatService.alertNotConected ($scope);
+			        return;
+			    }
+			 	var now = new Date();
+			 	if (!self.lastTyping || self.longTimeAgo(now,self.lastTyping)) {
+			 		self.lastTyping = now;
+			 		rtc.sendChatTyping($scope.global.roomId);
+			 	}
+	    	}
+	    	
 		    //Control de chat
 		    $scope.sendMessage = function() {
 			 	if (!uiHandler.isowner && uiHandler.passNeeded) {
@@ -81,6 +132,11 @@ angular.module('mean.rooms').factory("ChatService",['$timeout','UIHandler',funct
 	        	uiHandler.safeApply($scope,function(){});
 	    	});
 
+			rtc.uniqueon('chat_typing',function(data){
+	        	self.addNewMessage($scope,data);
+	        	uiHandler.safeApply($scope,function(){});
+	    	});
+
 			if (chatmessages && uiHandler.messages.length==0) {
 			    for (var j=0; j< chatmessages.length; j++) {
 					this.addNewMessage($scope,chatmessages[j]);
@@ -98,7 +154,12 @@ angular.module('mean.rooms').factory("ChatService",['$timeout','UIHandler',funct
 			        self.addNewMessage($scope,{id:$scope.global.bot,text:$scope.resourceBundle.helpuschatmess,time:new Date()});
 			        self.welcomePublished =true;
 			    },5000);
+			    $timeout(function(){ self.checkTypingIcons(); },2000);
 			}
 		};
 	};
+}]).filter('to_trusted', ['$sce', function($sce){
+    return function(text) {
+        return $sce.trustAsHtml(text);
+    };
 }]);

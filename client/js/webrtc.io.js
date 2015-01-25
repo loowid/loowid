@@ -162,6 +162,10 @@ if (navigator.webkitGetUserMedia) {
 		rtc._socket.send(JSON.stringify({"eventName": "chat_message","data": {"room": room,"text":message}}));
 	}
 
+	rtc.sendChatTyping = function(room) {
+		rtc._socket.send(JSON.stringify({"eventName": "chat_typing","data": {"room": room}}));
+	}
+
 	/**
    * Connects to the websocket server.
    */

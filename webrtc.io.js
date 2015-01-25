@@ -452,6 +452,44 @@ function attachEvents(manager) {
 		});
 	});
 
+	rtc.on('chat_typing', function(data, socket) {
+		manager.rooms.checkChatEnabled(socket.id,data.room,function(room){
+			var created = new Date();
+			var senderId = (room.owner.connectionId === socket.id)?'||##||':socket.id;
+			var roomList = rtc.rooms[data.room] || [];
+			for ( var i = 0; i < roomList.length; i+=1) {
+				var id = roomList[i];
+				if (id === socket.id) {
+					continue;
+				} else {
+					var soc = rtc.getSocket(id);
+					// inform the peers that they have a new peer
+					if (soc) {
+						soc.send(JSON.stringify({
+							'eventName' : 'chat_typing',
+							'data' : {
+								'id' : senderId,
+								'time' : created
+							}
+						}), errorFn);
+					}
+				}
+			}
+		},function(){
+			var soc = rtc.getSocket(socket.id);
+			// inform the peers that they have a new peer
+			if (soc) {
+				soc.send(JSON.stringify({
+					'eventName' : 'chat_message',
+					'data' : {
+						'text' : 'The chat is closed.', // Input is disabled so only appears for hackers
+						'id' : '||@@||'
+					}
+				}), errorFn);
+			}
+		});
+	});
+
 	rtc.on('ask_for_sharing', function(data, socket) {
 		manager.rooms.checkOwnerOrHandsUp(socket.id, data.connectionId, data.room, data.source, function() {
 			var soc = rtc.getSocket(data.connectionId);
