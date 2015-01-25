@@ -51,11 +51,10 @@ if (!process.env.PORT && !process.env.OPENSHIFT_NODEJS_PORT && defaultPort) {
 	sserver = require('https').createServer(credentials, app);
 }
 var ipaddr = process.env.OPENSHIFT_NODEJS_IP ||'0.0.0.0';
+var wserver = sserver?sserver:server;
 
 // load webrtc module
-var webRTC = require('./webrtc.io.js').listen(
-		(process.env.PORT || process.env.OPENSHIFT_NODEJS_PORT || !defaultPort) ? server
-				: sserver, ipaddr);
+var webRTC = require('./webrtc.io.js').listen(wserver,ipaddr);
 
 var serverId = (Math.random()/+new Date()).toString(36).replace(/[^a-z]+/g,'').substring(0,9);
 
@@ -324,7 +323,10 @@ if (process.env.PORT || process.env.OPENSHIFT_NODEJS_PORT) {
 			}
 		}
 	});
-	if (defaultPort) sserver.listen(sport, ipaddr);
+	if (defaultPort) {
+		logger.info('Express app started on port ' + sport);
+		sserver.listen(sport, ipaddr);
+	}
 }
 
 // Define the routes for room REST service
@@ -366,4 +368,4 @@ app.use(function(err, req, res, next) {
 
 server.listen(port, ipaddr);
 
-logger.info('Express app started on port ' + (defaultPort?sport:port));
+logger.info('Express app started on '+ipaddr+' port ' + port);
