@@ -200,7 +200,7 @@
 	  	<li ng-class="msg.class" ng-repeat="msg in ui.messages">
 	  		<div class="avatar"><img ng-src="{{getUser(msg.id).avatar}}" /></div>
 	  		<div class="messages">
-	  			<p ng-repeat="txt in msg.list track by $index" ng-bind-html="txt"></p>
+	  			<p ng-repeat="txt in msg.list track by $index" ng-bind-html="txt | to_trusted"></p>
 				<div class="spinner" ng-show="msg.istyping">
 				  <div class="bounce1"></div>
 				  <div class="bounce2"></div>

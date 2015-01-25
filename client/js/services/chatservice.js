@@ -20,11 +20,25 @@ angular.module('mean.rooms').factory("ChatService",['$timeout','UIHandler',funct
 	        return secs>15;
 	    }
 	    
+	    this.youtube = function(url,vid) {
+	    	return '<iframe src="//www.youtube.com/embed/' + vid + '" width="100%" height="100%" frameborder="0" allowfullscreen></iframe>';
+	    }
+	    
+	    this.link = function(url) {
+	    	return '<a href="' + url + '" target="_blank">' + url + '</a>';
+	    }
+	    
+	    this.parseUrls = function(txt) {
+	    	return txt.replace(/https?:\/\/www\.youtube\.com\/watch\?v=([^\s]+)/g, this.youtube)
+	    			  .replace(/https?:\/\/youtu\.be\/([^\s]+)/g, this.youtube)
+	    			  .replace(/(https?:\/\/[^\s]+)/g, this.link);
+	    }
+	    
 	    this.getHtml = function($scope,data) {
 	        if (data.id==$scope.global.bot) {
-	            return data.text.replace(/(https?:\/\/[^\s]+)/g, function(url) { return '<a href="' + url + '" target="_blank">' + url + '</a>'; });
+	            return this.parseUrls(data.text);
 	        }
-	        return data.text.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/(https?:\/\/[^\s]+)/g, function(url) { return '<a href="' + url + '" target="_blank">' + url + '</a>'; });
+	        return this.parseUrls(data.text.replace(/&/g,'&amp;').replace(/</g,'&lt;'));
 	    }
 	    
 	    this.addNewMessage = function($scope,data) {
@@ -144,4 +158,8 @@ angular.module('mean.rooms').factory("ChatService",['$timeout','UIHandler',funct
 			}
 		};
 	};
+}]).filter('to_trusted', ['$sce', function($sce){
+    return function(text) {
+        return $sce.trustAsHtml(text);
+    };
 }]);
