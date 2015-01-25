@@ -22,7 +22,6 @@ angular.module('mean.rooms').factory("Rooms", ['$resource','$http','$window', fu
 	            keepSession: {method: "POST", params: {cmd: 'keep'},headers:{'x-csrf-token':csrf}},
                 claimforroom: {method: "POST", params:{cmd: 'claimforroom'},headers:{'x-csrf-token':csrf}},
 	            chat: {method: "POST", params: {cmd: 'chat'}, headers:{'x-csrf-token':csrf}},
-				
 	        });
 		
     	this.rememberUser = function() {
@@ -132,12 +131,12 @@ angular.module('mean.rooms').factory("Rooms", ['$resource','$http','$window', fu
 				rtc.connect(host, roomId, passwdVal, reload);
 			};
 			
-			if (location.origin.indexOf ('www\.loowid\.com') > -1){
-			
-				var wsproxyinit = $resource ('https\\://loowid-oscloud.rhcloud.com:443/rooms/hello',{},{
+			// Initialize session before connect to web socket
+			var initUrl = this.getInitWebSocketUrl();
+			if (initUrl){
+				var wsproxyinit = $resource (initUrl,{},{
 					hello: {method: "JSONP", params:{callback: 'JSON_CALLBACK'}, isArray: false}
 				});
-				
 				wsproxyinit.hello ({},function (){
 					connectFunction();	
 				},function (erro){
@@ -145,7 +144,7 @@ angular.module('mean.rooms').factory("Rooms", ['$resource','$http','$window', fu
 				});
 			}else{
 				connectFunction ();
-			}	
+			}
 				
 		}
 		
@@ -156,11 +155,15 @@ angular.module('mean.rooms').factory("Rooms", ['$resource','$http','$window', fu
         };
 
         this.chat = function (roomId,success){
+           this.chatPage(roomId,null,success);
+        };
+
+        this.chatPage = function (roomId,page,success){
             if (roomId){ 
-                room.chat ({id: roomId},success);
+                room.chat ({id: roomId,pag:page},success);
             }
         };
-        
+
         this.editOwnerName = function (roomId, name, gravatar, success) {
         	this.saveName(name);
         	this.saveGravatar(gravatar);

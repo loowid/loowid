@@ -1,9 +1,10 @@
-angular.module('mean.rooms').factory("ChatService",['$timeout','UIHandler',function($timeout,UIHandler){
+angular.module('mean.rooms').factory("ChatService",['$timeout','UIHandler','Rooms',function($timeout,UIHandler,Rooms){
 	return function (){
 
 		var uiHandler = UIHandler;
 		this.welcomePublished = false;
 		var self= this;
+		var room = new Rooms({});
 
 	    this.timeAgo = function($scope,t) {
 	        var t2 = (new Date()).getTime();
@@ -40,6 +41,22 @@ angular.module('mean.rooms').factory("ChatService",['$timeout','UIHandler',funct
 	        }
 	        return this.parseUrls(data.text.replace(/&/g,'&amp;').replace(/</g,'&lt;'));
 	    }
+	    
+	    this.addToQueue = function(data) {
+	    	if (!uiHandler.messageQueue) {
+	    		uiHandler.messageQueue = [];
+	    	}
+	    	uiHandler.messageQueue.push(data);
+	    };
+	    
+	    this.processQueue = function() {
+	    	if (uiHandler.messageQueue) {
+	    		for (var j=0; j<uiHandler.messageQueue.length; j+=1) {
+	    			rtc.fire('chat_message',uiHandler.messageQueue[j]);
+	    		}
+	    		uiHandler.messageQueue = [];
+	    	}
+	    };
 	    
 	    this.addNewMessage = function($scope,data) {
 	        var msgTime = new Date(data.time);
@@ -95,16 +112,24 @@ angular.module('mean.rooms').factory("ChatService",['$timeout','UIHandler',funct
 	    	$scope.enableAudio = function() {
 	    		uiHandler.audible = !uiHandler.audible;
     		}
+	    	
+	        $scope.toggleChat = function() { 
+	        	uiHandler.chat_class=(uiHandler.chat_class=='collapsed')?'':'collapsed';
+	        	uiHandler.helpchat_class=(uiHandler.helpchat_class=='showed')?'':'showed';
+	        	uiHandler.dash_chat=(uiHandler.chat_class=='collapsed')?'chat_collapsed':'';
+	        }
 
 	    	$scope.sendTyping = function() {
 			 	if (!uiHandler.isowner && uiHandler.passNeeded) {
 			   		chatService.alertNotConected ($scope);
 			        return;
 			    }
-			 	var now = new Date();
-			 	if (!self.lastTyping || self.longTimeAgo(now,self.lastTyping)) {
-			 		self.lastTyping = now;
-			 		rtc.sendChatTyping($scope.global.roomId);
+			 	if (uiHandler.messageText) {
+			 		var now = new Date();
+				 	if (!self.lastTyping || self.longTimeAgo(now,self.lastTyping)) {
+				 		self.lastTyping = now;
+				 		rtc.sendChatTyping($scope.global.roomId);
+				 	}
 			 	}
 	    	}
 	    	
@@ -114,12 +139,38 @@ angular.module('mean.rooms').factory("ChatService",['$timeout','UIHandler',funct
 			   		chatService.alertNotConected ($scope);
 			        return;
 			    }
-
-		        rtc.sendChatMessage($scope.global.roomId,uiHandler.messageText);
-		        uiHandler.messageText = "";
+			 	if (uiHandler.messageText) {
+			 		rtc.sendChatMessage($scope.global.roomId,uiHandler.messageText);
+			 		uiHandler.messageText = "";
+			 	}
 		    }
+		    
+		    angular.element(document.querySelector('#chat_discussion')).on('scroll', function(evt) {
+		    	if (!evt.target.scrollTop && uiHandler.chatPage>0 && !uiHandler.chatLoading) {
+		    		uiHandler.chatLoading = true;
+		    		setTimeout(function() {
+				    	room.chatPage($scope.global.roomId,uiHandler.chatPage,function(rdo){
+				    		var previousMessages = uiHandler.messages;
+				    		uiHandler.chatPage = rdo.page;
+				    		uiHandler.messages = []; 
+				    		for (var i=0; i<rdo.chat.length; i+=1) {
+				    			self.addNewMessage($scope,rdo.chat[i]);
+				    		}
+				    		for (var j=0; j<previousMessages.length; j+=1) {
+				    			uiHandler.messages.push(previousMessages[j]);
+				    		}
+				    		uiHandler.chatLoading = false;
+				    		self.processQueue();
+				    	});
+		    		},1500); // Is too fast to see that something is happening !!
+		    	}
+		    });
 
 			rtc.uniqueon('chat_message',function(data){
+				if (uiHandler.chatLoading) {
+					self.addToQueue(data);
+					return;
+				}
 	       		if ((uiHandler.helpchat_class=='showed' || !uiHandler.focused) && uiHandler.audible && data.id!=rtc._me) {
 	        		var readText = ($scope.connectedUsers()>1)?$scope.getUser(data.id).name+', '+data.text:data.text;
 	        		var audio = document.getElementById('audiotts')?document.getElementById('audiotts'):document.createElement('audio');

@@ -135,6 +135,11 @@ angular.module('mean.rooms').factory("UserHandler",['Rooms','UIHandler',function
 		        }
 	        	return null;
 	  	 	};
+	  		
+	  		$scope.toggleConnected = function() { 
+	  			uiHandler.connected_class=(uiHandler.connected_class=='collapsed')?'':'collapsed'; 
+	  			uiHandler.dash_conn=(uiHandler.connected_class=='collapsed')?'connected_collapsed':'';
+	  		};
 
 	    	$scope.getUserName = function (connectionId){
 	    		if (uiHandler.isowner && rtc._me == connectionId){

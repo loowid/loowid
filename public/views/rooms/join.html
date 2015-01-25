@@ -130,7 +130,7 @@
 	</div>
 </div>
 <aside id="connected" ng-class="ui.connected_class">
-	<span class="toggler" ng-click="toogleConnected()"><i class="fa fa-angle-double-left"></i></span>
+	<span class="toggler" ng-click="toggleConnected()"><i class="fa fa-angle-double-left"></i></span>
 	<h1>{{resourceBundle.peopleconnected}}</h1>
 	<div class="owner connected">
 		<img class="editable" ng-src="{{ui.avatar}}" ng-click="enableEditName()" title="{{resourceBundle.changemyidentity}}">
@@ -224,14 +224,19 @@
 <p id="helper_chat" ng-class="ui.helpchat_class" ng-click="enableAudio()"><i class="fa fa-volume-down"></i> {{ui.audible? resourceBundle.chatisaudible : resourceBundle.chatisnotaudible}}</p>
 <div id="error" ng-class="error_class" ng-click="hideError()"><div class="error"><h3 ng-bind-html="error_message"></h3></div></div>
 <aside id="chat" ng-class="ui.chat_class">
-	<span class="toggler" ng-click="toogleChat()"><i class="fa fa-angle-double-right"></i></span>
+	<span class="toggler" ng-click="toggleChat()"><i class="fa fa-angle-double-right"></i></span>
 	<form data-ng-submit="sendMessage()">
 	<fieldset id="chat_form">
 		<input type="text" data-ng-model="ui.messageText" id="text_chat" placeholder="{{resourceBundle.sendamessage}}" data-ng-change="sendTyping()" autofocus>
 	</fieldset>
 	</form>
 	<div id="chat_container">
-	  <ol class="discussion" scroll-glue > 
+	<div class="spinner" ng-show="ui.chatLoading">
+	  <div class="bounce1"></div>
+	  <div class="bounce2"></div>
+	  <div class="bounce3"></div>
+	</div>	  			
+	  <ol id="chat_discussion" class="discussion" scroll-glue > 
 	  	<li ng-class="msg.class" ng-repeat="msg in ui.messages">
 	  		<div class="avatar"><img ng-src="{{getUser(msg.id).avatar}}" /></div>
 	  		<div class="messages">
