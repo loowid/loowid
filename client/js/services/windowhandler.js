@@ -60,17 +60,28 @@ angular.module('mean.rooms').factory("WindowHandler",[function(){
 				var container = win.elem.find('video').parent();	
 				win.elem.find('video').remove();
 				container.append (mediaElement);
-				onopen(win);
+				window.winHandler = win;
+				onopen(window);
+			};	
+			
+			var selWindow = function (win){
+				//There is a perverse effect on window selection that pauses the video, lets play all 
+				var videos = document.getElementsByTagName('video');
+				for (i = 0; i< videos.length; i++){
+					videos[i].play();	
+				}
 			};	
 
 			var close = function (win){
-				onclose(win);
-				
+				onclose(window);
 				for (i = 0; i< $scope.windows.length; i++){
 					if (window === $scope.windows[i]){
 						$scope.windows.splice(i,1);	
 					}
 				}
+				
+				//We also try to enable videos after a close
+				setTimeout(function() {selWindow();}, 100);
 			};
 			
 			var window = {
@@ -79,7 +90,8 @@ angular.module('mean.rooms').factory("WindowHandler",[function(){
 				mediaElement: mediaElement,
 				close: close,
 				closeable: (closeable===undefined) ? false : closeable,
-				open: open
+				open: open,
+				selectwindow: selWindow 
 			};
 			
 			$scope.windows.unshift (window);

@@ -16,9 +16,6 @@ angular.module('mean.rooms').controller('RecordController', ['$scope', '$routePa
     document.getElementById('noscript').style.display = 'none';
     
     //We had three objects stream to handle the diferent stream sources webcam/screen
-
-
-	
 	
 	uiHandler.conn_new = '';
 	uiHandler.connected_class = '';

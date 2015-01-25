@@ -30,6 +30,7 @@ angular.module('ngWindowManager',[])
 			title: '@',
 			close: '=',
 			open: '=',
+			selectwindow: '=',
 			maximize: '=',
 			restore: '=',
 			options: '@',
@@ -68,22 +69,21 @@ angular.module('ngWindowManager',[])
 				windowArea = document.getElementById(options.windowContainer);
 			}
 		
-			//Set the destroy method. 
-			scope.$on('$destroy',function handleDestroyEvent() {
-						setTimeout (function (){
+			//This function is executed when close button is pushed
+			winHandler.close = function (){
+				setTimeout (function (){
 						element.addClass ('closing');
-				
-							setTimeout (function (){
-							element.removeClass ('closing');
-							element.remove();
-						},300);
-					},50);
-            
-					if (scope.close){
-						scope.close(winHandler);
-					}
+						setTimeout (function (){
+						element.removeClass ('closing');
+						element.remove();
+					},300);
+				},50);
+
+				if (scope.close){
+					scope.close(winHandler);
 				}
-			);
+			};
+		
 
 			scope.isMaximizable = function (){
 				return (scope.maximizable === undefined || scope.maximizable === true || scope.maximizable === 'true') ? true : false ;
@@ -137,25 +137,29 @@ angular.module('ngWindowManager',[])
 			//Execute when user moves the mouse after title is clicked
 			var dragWindow = function(e) {  
 				var moveRef = (e.targetTouches && e.targetTouches.length === 1) ?  e.targetTouches[0] : e;
-				
+			
 				if (positionState){
 					move(
 						moveRef.pageX - positionState.x,
 						moveRef.pageY - positionState.y
 					);
 				}
+				
+				e.preventDefault();
 			};
 
 			//Execute when user moves the pointer after resize button is clicked
 			var dragWindowCorner = function (e){
 				var moveRef = (e.targetTouches && e.targetTouches.length === 1) ?  e.targetTouches[0] : e;
-
+				
 				if (sizeState){
 					resize (
 						moveRef.pageX + sizeState.width,
 						moveRef.pageY + sizeState.height
 					);	
 				}
+				
+				e.preventDefault();
 			};
 
 			//The user ends moving window when mouseup or touchends
@@ -170,6 +174,8 @@ angular.module('ngWindowManager',[])
 				windowArea.removeEventListener (isTouch ? 'touchmove' : 'mousemove',dragWindow);
 				windowArea.removeEventListener (isTouch ? 'touchend' : 'mouseup',dragWindowEnds);
 				titleBarElement.removeEventListener ('click', selectWindow);
+				
+				e.preventDefault();
 			};
 			
 			
@@ -184,6 +190,8 @@ angular.module('ngWindowManager',[])
 				
 				windowArea.removeEventListener (isTouch ? 'touchmove' : 'mousemove',dragWindowCorner);
 				windowArea.removeEventListener (isTouch ? 'touchend' : 'mouseup',dragWindowCornerEnds);
+				
+				e.preventDefault();	
 			};
 
 			
@@ -225,11 +233,7 @@ angular.module('ngWindowManager',[])
 			//Move the current window to the highest position
 			var selectWindow = function (){
 				parentWindow.appendChild (element[0]);
-			};
-			
-			//This function is executed when close button is pushed
-			winHandler.close = function (){
-				scope.$destroy();
+				if (scope.selectwindow) scope.selectwindow(winHandler);
 			};
 			
 			//This functions is executed when maximize is executed

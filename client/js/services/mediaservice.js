@@ -137,7 +137,7 @@ angular.module('mean.rooms').factory("MediaService",['Rooms','UIHandler',functio
     		if (mediasource.recording){
     			//si no va hacerlo por el elemnto click
     			if (mediasource.playtype == 'video'){
-    				mediasource.window.close();	
+    				mediasource.window.winHandler.close();	
     			}else if (mediasource.playtype == 'audio'){
     				uiHandler.safeApply ($scope,function (){
     					self.stopMedia($scope,source);
@@ -260,7 +260,7 @@ angular.module('mean.rooms').factory("MediaService",['Rooms','UIHandler',functio
 		        if (self.receivedStreams.length>0) {
 		            for (var i=0; i<self.receivedStreams.length; i++) {
 		                if (self.receivedStreams[i].connectionId==connectionId) {
-		                	self.receivedStreams[i].window.$titlebar.prevObject[0].getElementsByTagName('h1')[0].innerText = name;
+		                	self.receivedStreams[i].window.title = name;
 		                }
 		            }
 		        }
@@ -393,7 +393,7 @@ angular.module('mean.rooms').factory("MediaService",['Rooms','UIHandler',functio
 	                    rtc.dropPeerConnection(data.connectionId,data.mediatype,false);
 
 	                	if (mediasource.playtype==='video'){
-	                		mediasource.window.close();
+	                		mediasource.window.winHandler.close();
 	            		}else{
 	            			$('#remote_' + streamId).remove();
 	            			$scope.askForStopSharing (data.connectionId,mediasource.type);
@@ -424,7 +424,7 @@ angular.module('mean.rooms').factory("MediaService",['Rooms','UIHandler',functio
 	      		                    rtc.dropPeerConnection(connectionId,mediasource.type,false);
 
 	                    			if (mediasource.playtype =='video'){
-		                    			mediasource.window.close();
+		                    			mediasource.window.winHandler.close();
 		                   	        }else{
 		                   	        	$('#remote_'+streamId).remove();
 		                   	        }
