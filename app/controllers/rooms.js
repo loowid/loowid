@@ -529,7 +529,7 @@ exports.checkChatEnabled = function (connectionId,roomId,success,failure){
 				logger.error ('Alert: Error executing query checkChatEnabled. RoomId ' + roomId + ' error ' + err);
 			}
 			if (room) {
-				success();
+				success(room);
 			} else {
 				failure();
 			}
