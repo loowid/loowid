@@ -13,6 +13,7 @@ angular.module('mean.rooms').factory("UIHandler",['$window','$timeout',function(
 
 	_this._data.debug = false;
 	_this._data.version = 'v'+window.loowid_version;
+	_this._data.node = window.loowid_node;
 	
 	var keyboardManagerService = {};
 

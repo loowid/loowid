@@ -272,11 +272,11 @@ app.get('/chat/talk',function(req, res) {
 
 var pck = require('./package.json');
 var getClusterNode = function (req) {
-	var node = req.cookies.stickyid || req.headers.stickyid || ':'+process.env.OPENSHIFT_GEAR_UUID;
-	return ' ('+node.substring(node.lastIndexOf(':')+1)+')';
+	var node = req.cookies.stickyid || req.headers.stickyid || ':'+(process.env.OPENSHIFT_GEAR_UUID || 'local');
+	return node.substring(node.lastIndexOf(':')+1);
 };
 
-if (process.env.OPENSHIFT_NODEJS_PORT ||  process.env.OPENSHIFT_INTERNAL_PORT) {
+if (process.env.OPENSHIFT_NODEJS_PORT || process.env.OPENSHIFT_INTERNAL_PORT) {
 	// OpenShift Deployment
 	/* At the top, with other redirect methods before other routes */
 	logger.info('Running production environment !!');
@@ -293,7 +293,8 @@ if (process.env.OPENSHIFT_NODEJS_PORT ||  process.env.OPENSHIFT_INTERNAL_PORT) {
 				res.render('index.jade', {
 					title : 'Look what I\'m doing!',
 					appName : 'Loowid',
-					version: pck.version + (isClustered?getClusterNode(req):''),
+					version: pck.version,
+					node: getClusterNode(req),
 					host: req.host,
 					port: ':8443'
 				});
@@ -316,7 +317,8 @@ if (process.env.OPENSHIFT_NODEJS_PORT ||  process.env.OPENSHIFT_INTERNAL_PORT) {
 				res.render('index.jade', {
 					title : 'Look what I\'m doing!',
 					appName : 'Loowid',
-					version: pck.version + (isClustered?getClusterNode(req):''),
+					version: pck.version,
+					node: getClusterNode(req),
 					host: req.host,
 					port: ''
 				});
