@@ -60,18 +60,33 @@ var RoomSchema = new Schema({
 });
 
 
+var maxChat = -50;
+var pageSize = 50;
 /**
  * Statics
  */
 RoomSchema.statics = {
     load: function(id, sid, cb) {
-    	// Only show the last 150 chat messages
+    	// Only show the last maxChat chat messages
     	var now = new Date();
-    	this.findOne({'$or':[{roomId:id},{'alias.id':id,'alias.timestamp':{'$gte':now}},{'alias.session':sid,'alias.timestamp':{'$gte':now}}]},{chat:{'$slice':-150}}).exec(cb);
+    	this.findOne({'$or':[{roomId:id},{'alias.id':id,'alias.timestamp':{'$gte':now}},{'alias.session':sid,'alias.timestamp':{'$gte':now}}]},{chat:{'$slice':maxChat}}).exec(cb);
     },
     openByContext: function(id, sid, cb) {
-    	// Only show the last 150 chat messages
-    	this.findOne({'$or':[{lticontext:id,status:'OPENED'},{lticontext:id,status:'DISCONNECTED','owner.sessionid':sid}]},{chat:{'$slice':-150}}).exec(cb);
+    	// Only show the last maxChat chat messages
+    	this.findOne({'$or':[{lticontext:id,status:'OPENED'},{lticontext:id,status:'DISCONNECTED','owner.sessionid':sid}]},{chat:{'$slice':maxChat}}).exec(cb);
+    },
+    chatMessages: function(id, p, cb) {
+    	var self = this;
+    	this.aggregate([{$match:{roomId:id}},{$project:{cnt:{$size:'$chat'}}}]).exec(function(err,rdo){
+        	if (!err) {
+        		var idx = (p || rdo[0].cnt || 0)-pageSize;
+        		self.findOne({roomId:id},{chat:{'$slice':[Math.max(idx,0),Math.min(pageSize,Math.max(pageSize + idx,1))]}}).exec(function(err2,room){
+        			cb(err2,room,Math.max(idx,0));
+        		});
+        	} else {
+        		cb(err,null);
+        	}
+    	});
     },
     alias: function (room, sid, id) {
     	var len = room.alias.length;

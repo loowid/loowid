@@ -46,11 +46,6 @@ angular.module('mean.rooms').controller('ViewDesktopController', ['$scope', '$ro
     	uiHandler.connected_class=(uiHandler.connected_class=='collapsed')?'':'collapsed'; 
     	uiHandler.dash_conn=(uiHandler.connected_class=='collapsed')?'connected_collapsed':'';
     }
-    $scope.toogleChat = function() { 
-    	uiHandler.chat_class=(uiHandler.chat_class=='collapsed')?'':'collapsed';
-    	uiHandler.helpchat_class=(uiHandler.helpchat_class=='showed')?'':'showed';
-    	uiHandler.dash_chat=(uiHandler.chat_class=='collapsed')?'chat_collapsed':'';
-    }
     
     uiHandler.focused = true;
     

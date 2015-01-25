@@ -44,16 +44,6 @@ angular.module('mean.rooms').controller('RecordController', ['$scope', '$routePa
 		$scope.global.hideError($scope);
 	}
 	
-	$scope.toogleConnected = function() { 
-		uiHandler.connected_class=(uiHandler.connected_class=='collapsed')?'':'collapsed'; 
-		uiHandler.dash_conn=(uiHandler.connected_class=='collapsed')?'connected_collapsed':'';
-	}
-	$scope.toogleChat = function() { 
-		uiHandler.chat_class=(uiHandler.chat_class=='collapsed')?'':'collapsed'; 
-		uiHandler.helpchat_class=(uiHandler.helpchat_class=='showed')?'':'showed';
-		uiHandler.dash_chat=(uiHandler.chat_class=='collapsed')?'chat_collapsed':'';
-	}
-	
     window.onfocus = function() {
     	uiHandler.focused = true;
     };
@@ -61,7 +51,6 @@ angular.module('mean.rooms').controller('RecordController', ['$scope', '$routePa
     window.onblur = function() {
     	uiHandler.focused = false;
     }
-
 
     uiHandler.focused = true;
 
@@ -238,7 +227,10 @@ angular.module('mean.rooms').controller('RecordController', ['$scope', '$routePa
 					    	$scope.global.avatar = uiHandler.avatar;
 					    	$scope.global.gravatar = uiHandler.gravatar;
 						 	rtc.updateOwnerData (uiHandler.roomId,uiHandler.name,uiHandler.avatar,uiHandler.status,uiHandler.access);
-						 	chatService.init ($scope,results.chat);
+		   					room.chat($scope.global.roomId,function(resu){
+		   						uiHandler.chatPage = resu.page;
+		   						chatService.init ($scope,resu.chat);
+		   					});
 			            });
 			            
                         uiHandler.name = joinUsr.name;
@@ -262,6 +254,7 @@ angular.module('mean.rooms').controller('RecordController', ['$scope', '$routePa
    					$location.path("r/"+$scope.global.roomId+'/owner');
    				} else {
    					room.chat($scope.global.roomId,function(results){
+   						uiHandler.chatPage = results.page;
    						chatService.init ($scope,results.chat);
    					});
    				}

@@ -284,7 +284,13 @@ exports.users = function(req,res){
 
 exports.chat = function(req,res){
 	var room = req.room;
-	res.json({chat:room?room.chat:[]});
+	Room.chatMessages(room.roomId,req.body.pag,function(err,nr,pg){
+		if (!err) {
+			res.json({chat:nr.chat,page:pg});
+		} else {
+			res.json({chat:[],page:0});
+		}
+	});
 };
 
 exports.editShared = function (req,res,next) {
