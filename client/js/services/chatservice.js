@@ -124,10 +124,12 @@ angular.module('mean.rooms').factory("ChatService",['$timeout','UIHandler','Room
 			   		chatService.alertNotConected ($scope);
 			        return;
 			    }
-			 	var now = new Date();
-			 	if (!self.lastTyping || self.longTimeAgo(now,self.lastTyping)) {
-			 		self.lastTyping = now;
-			 		rtc.sendChatTyping($scope.global.roomId);
+			 	if (uiHandler.messageText) {
+			 		var now = new Date();
+				 	if (!self.lastTyping || self.longTimeAgo(now,self.lastTyping)) {
+				 		self.lastTyping = now;
+				 		rtc.sendChatTyping($scope.global.roomId);
+				 	}
 			 	}
 	    	}
 	    	
@@ -137,9 +139,10 @@ angular.module('mean.rooms').factory("ChatService",['$timeout','UIHandler','Room
 			   		chatService.alertNotConected ($scope);
 			        return;
 			    }
-
-		        rtc.sendChatMessage($scope.global.roomId,uiHandler.messageText);
-		        uiHandler.messageText = "";
+			 	if (uiHandler.messageText) {
+			 		rtc.sendChatMessage($scope.global.roomId,uiHandler.messageText);
+			 		uiHandler.messageText = "";
+			 	}
 		    }
 		    
 		    angular.element(document.querySelector('#chat_discussion')).on('scroll', function(evt) {
