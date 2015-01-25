@@ -14,6 +14,7 @@
     "stopshareaudiobar":"Mikrofonfreigabe stoppen",
     "mutemainbar":"Ton stummschalten",
     "unmutemainbar":"Ton freischalten",
+	"initcapture": "Initialisieren Capture",
     "gravatarclose":"Schliessen",
     "gravatarname":"Name",
     "gravataremail":"Gravatar E-Mail-Adresse",

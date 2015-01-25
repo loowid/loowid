@@ -12,6 +12,7 @@
     "stopsharewebcammainbar":"Deja de compartir la cámara",
     "shareaudiobar":"Compartir micrófono",
     "stopshareaudiobar":"Deja de compartir el micrófono",
+	"initcapture": "Inicializando captura",
     "mutemainbar":"Silenciar el micrófono",
     "unmutemainbar":"Activar el micrófono",
     "gravatarclose":"Cerrar",
