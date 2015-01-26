@@ -2,7 +2,7 @@
 /*global unescape: true */
 /**
  * Local proxy (load balancing for development)
- * node proxy [n] -> Run proxy over 443 try to find nodes, from 8001 to 8000+n
+ * node proxy [n] -> Run proxy over 443 try to find nodes, from BasePort + 1 to BasePort + n
  */
 // This example demonstrates using sticky session
 // support
@@ -12,21 +12,24 @@ var http = require('http');
 var https = require('https');
 var logger = require('./log.js').getLog('proxy');
 
+var sport = process.env.LOOWID_HTTPS_PORT || 443;
+var port = process.env.LOOWID_HTTP_PORT || 80;
+var basePort = Number(process.env.LOOWID_BASE_PORT || 8000);
+
 var server = http.createServer(function (req, res) {
   // optional, for HSTS
   // see https://en.wikipedia.org/wiki/HTTP_Strict_Transport_Security
   res.setHeader('Strict-Transport-Security', 'max-age=8640000; includeSubDomains');
 
   if (req.headers['x-forwarded-proto'] !== 'https') {
-    var url = 'https://' + req.headers.host + '/';
+    var url = 'https://' + req.headers.host + (sport!==443?':'+sport:'') + '/';
     res.writeHead(301, {'location': url});
     return res.end('Redirecting to <a href="' + url + '">' + url + '</a>.');
   }
 });
 
-server.listen(80);
-
-logger.info('Proxy listen port 80');
+server.listen(port);
+logger.info('Proxy listen port ' + port);
 
 //
 //Create the HTTPS proxy server in front of a HTTP server
@@ -90,7 +93,7 @@ var backends = isNaN(process.argv[2])?2:(process.argv[2]-0);
 
 var checkServers = function() {
 	for (var j=1; j<=backends; j+=1) {
-		validateBackend('localhost',8000+j);
+		validateBackend('localhost',basePort+j);
 	}
 	// Check new servers every 5 seconds !!
 	setTimeout(checkServers,5000);
@@ -126,7 +129,7 @@ var httpServer = https.createServer({
 	proxy.web(req, res, {target:tg}, function(){
 		removeBackend(tg);
 	});
-}).listen(443, '0.0.0.0');
+}).listen(sport, '0.0.0.0');
 
 httpServer.on('upgrade', function (req, socket, head) {
 	var tg = findStickyServer(req);
@@ -135,5 +138,5 @@ httpServer.on('upgrade', function (req, socket, head) {
 	});
 });
 
-logger.info('Load Balancer in port 443');
+logger.info('Load Balancer in port '+sport);
 

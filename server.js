@@ -12,14 +12,14 @@ var crypto = require('crypto') ;
 var i18n = require('i18next');
 var express = require('express');//, jade = require('jade');
 var defaultPort = true;
-var portvalue = 80;
-if (!isNaN(process.argv[2]) || !isNaN(process.argv[3])) {
-	portvalue = isNaN(process.argv[2])?(process.argv[3]-0):(process.argv[2]-0);
+var portvalue = process.env.LOOWID_HTTP_PORT || 80;
+if (!isNaN(process.argv[2])) {
+	portvalue = (process.argv[2]-0);
 	defaultPort = false;
 }
 
 var port = process.env.OPENSHIFT_NODEJS_PORT ||  process.env.OPENSHIFT_INTERNAL_PORT || portvalue;
-var sport = 443;
+var sport = process.env.LOOWID_HTTPS_PORT || 443;
 var sserver;
 
 i18n.init({
@@ -283,7 +283,7 @@ var getClusterNode = function (req) {
 if (process.env.OPENSHIFT_NODEJS_PORT || process.env.OPENSHIFT_INTERNAL_PORT) {
 	// OpenShift Deployment
 	/* At the top, with other redirect methods before other routes */
-	logger.info('Running production environment !!');
+	logger.info('Running openshift environment !!');
 	app.get('/', function(req, res, next) {
 		if (req.headers['x-forwarded-proto'] !== 'https') {
 			res.setHeader('X-FRAME-OPTIONS','DENY');
@@ -306,12 +306,12 @@ if (process.env.OPENSHIFT_NODEJS_PORT || process.env.OPENSHIFT_INTERNAL_PORT) {
 		}
 	});
 } else {
-	logger.info('Running development environment !!');
+	logger.info('Running non-openshift environment !!');
 	// Local redirect
 	app.get('/', function(req, res) {
 		if (req.protocol === 'http' && defaultPort) {
 			res.setHeader('X-FRAME-OPTIONS','DENY');
-			res.redirect('https://' + req.host + req.url);
+			res.redirect('https://' + req.host + (sport!==443?':'+sport:'') + req.url);
 		} else {
 			if (isLessIE9(req)) {
 				res.setHeader('X-FRAME-OPTIONS','DENY');

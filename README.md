@@ -36,6 +36,16 @@ https://www.loowid.com
 	 * `grunt mini`		: Minify js files and compile less
 	 * `grunt jshint`	: Analyze js files to check style and best practices
 	 * `grunt test`		: Run unit tests
+
+	 ```
+	 Use --port=80 --sport=443 --bport=8000 to change default port values.
+	 ```
+	 ```
+	 grunt cluster --sport=9090 --port=8080 --bport=7000 --nodes=3 will listen in ports 8080, 7001, 7002, 7003 (http) and 9090 (https).
+	 ```
+	 ```
+	 grunt --port=8080 will listen in ports 443 (https) and 8080 (http).
+	 ```
    
   7. If you get some npm packages errors try `npm update` (We had that errors on Windows 7 64bits)
   
