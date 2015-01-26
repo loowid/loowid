@@ -35,9 +35,8 @@ angular.module('ngWindowManager',[])
 			restore: '=',
 			options: '@',
 			maximizable: '@',
-			closeable: '@'
+			closeable: '@',
 		},
-
 		link: function (scope, element) {
 			var parentWindow = element[0].parentElement;
 			var windowArea = parentWindow;
@@ -56,7 +55,6 @@ angular.module('ngWindowManager',[])
 			var sizeState = null;
 			var maximizeState = null;
 			
-			
 			var winHandler = {};
 			winHandler.elem = element;
 			
@@ -69,6 +67,11 @@ angular.module('ngWindowManager',[])
 				windowArea = document.getElementById(options.windowContainer);
 			}
 		
+			//Set some tricky controls to handle the layering
+			if (parentWindow.topZ === undefined){
+				parentWindow.topZ = options.initialZIndex || parentElement.css('z-index') || 100000;
+			}		
+			
 			//This function is executed when close button is pushed
 			winHandler.close = function (){
 				setTimeout (function (){
@@ -232,7 +235,8 @@ angular.module('ngWindowManager',[])
 
 			//Move the current window to the highest position
 			var selectWindow = function (){
-				parentWindow.appendChild (element[0]);
+				parentWindow.topZ = parentWindow.topZ +1;
+				element.css ('z-index', parentWindow.topZ);
 				if (scope.selectwindow) scope.selectwindow(winHandler);
 			};
 			
@@ -244,7 +248,8 @@ angular.module('ngWindowManager',[])
 					x: parseInt(element.prop('offsetLeft'), 10),
 					y: parseInt(element.prop('offsetTop'), 10),
 					width: parseInt(element.prop('offsetWidth'), 10),
-					height: parseInt(element.prop('offsetHeight'), 10)
+					height: parseInt(element.prop('offsetHeight'), 10),
+					z: element.css ('z-index')
 				};
 			
 				//Select the element where to maximize
@@ -262,9 +267,6 @@ angular.module('ngWindowManager',[])
 					height: parseInt(maximizeToElement.offsetHeight || maximizeToElement.innerHeight, 10)
 				};
 				
-				//Set it to 
-				selectWindow();
-			
 				//move, set the effect and resize 
 				move (maximizeCoords.x + 10,maximizeCoords.y +10 );
 				element.addClass ('maximizing');
@@ -300,7 +302,7 @@ angular.module('ngWindowManager',[])
 				//move and resize to prior state
 				move (maximizeState.x,maximizeState.y);
 				resize(maximizeState.width,maximizeState.height);
-					  
+				element.css ('z-index',maximizeState.z);	  
 				//Restore the listeners	   
 				maximizeButton.removeEventListener ('click',restore);
 				maximizeButton.addEventListener ('click',maximize);

@@ -9,7 +9,6 @@ angular.module('mean.rooms').factory("MediaService",['Rooms','UIHandler',functio
 		var self = this;
 		var room = new Rooms({});
 
-
 		this.screen_constraints = {
 			mandatory: { chromeMediaSource: 'screen','maxHeight': 600, 'maxWidth': 800},
 			optional: []
@@ -49,7 +48,6 @@ angular.module('mean.rooms').factory("MediaService",['Rooms','UIHandler',functio
 	    	var startRecordingFn = function (){
 
 				var mediasource = self.mediasources[source];
-
 				rtc.createStream(source, mediasource.constraints, function(stream){
 					mediasource.recording = true;
 					mediasource.onclose = onclose;
@@ -260,7 +258,8 @@ angular.module('mean.rooms').factory("MediaService",['Rooms','UIHandler',functio
 		        if (self.receivedStreams.length>0) {
 		            for (var i=0; i<self.receivedStreams.length; i++) {
 		                if (self.receivedStreams[i].connectionId==connectionId) {
-		                	self.receivedStreams[i].window.title = name;
+							//Could be that the window could not be setup already because the method was called for a new status of member
+		                	if (self.receivedStreams[i].window) self.receivedStreams[i].window.title = name;
 		                }
 		            }
 		        }

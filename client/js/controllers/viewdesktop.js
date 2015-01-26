@@ -184,7 +184,8 @@ angular.module('mean.rooms').controller('ViewDesktopController', ['$scope', '$ro
             //When this method is triggered is possible that we didn't know anything about the room 
             //We must wait until data is ready
             userHandler.init ($scope);
-            mediaService.init($scope,windowHandler);
+           	windowHandler.init ($scope);
+			mediaService.init($scope,windowHandler);
 
             if (window.innerWidth <= 800 ){
                 $scope.toogleConnected();
