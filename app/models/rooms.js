@@ -77,9 +77,11 @@ RoomSchema.statics = {
     },
     chatMessages: function(id, p, cb) {
     	var self = this;
-    	this.aggregate([{$match:{roomId:id}},{$project:{cnt:{$size:'$chat'}}}]).exec(function(err,rdo){
+    	// this.aggregate([{$match:{roomId:id}},{$project:{cnt:{$size:'$chat'}}}])
+    	this.aggregate([{$match:{roomId:id}},{$unwind:'$chat'},{$group:{_id:'$chat'}},{$group:{_id:'_id',cnt:{'$sum':1}}}]).exec(function(err,rdo){
         	if (!err) {
-        		var idx = (p || rdo[0].cnt || 0)-pageSize;
+        		var cnt = rdo.length > 0 ? rdo[0].cnt : 0;
+        		var idx = (p || cnt || 0)-pageSize;
         		self.findOne({roomId:id},{chat:{'$slice':[Math.max(idx,0),Math.min(pageSize,Math.max(pageSize + idx,1))]}}).exec(function(err2,room){
         			cb(err2,room,Math.max(idx,0));
         		});
