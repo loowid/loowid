@@ -187,6 +187,9 @@
 	"permanentReload": "You can wait for the room's owner, or reload to check if the room is activated.",
 	"ownerMultiple": "You are already connected as the owner of this room, only one connection to the room as the owner is allowed.",
 	"loowid" : "Look what I'm doing",
-	"ltiErrorText" : "The room is not available. You must wait for the owner to connect to begin the meeting."
-	
+	"ltiErrorText" : "The room is not available. You must wait for the owner to connect to begin the meeting.",
+	"days" : "days",
+	"hours" : "hours",
+	"minutes" : "minutes",
+	"seconds" : "seconds"
 }

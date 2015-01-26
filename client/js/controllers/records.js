@@ -188,12 +188,15 @@ angular.module('mean.rooms').controller('RecordController', ['$scope', '$routePa
 		// Show Timeout CountDown
 		window.clearInterval($scope.global.countDownInterval);
 		$scope.global.countDownInterval = window.setInterval(function(){
-			var now = new Date();
-			var dueDate = new Date($scope.global.roomDueDate);
-			var hours = Math.floor(Math.abs(dueDate - now) / 36e5);
-			var mins = Math.floor((Math.abs(dueDate - now) - (hours * 36e5)) / 6e4);
-			var secs = Math.floor((Math.abs(dueDate - now) - (hours * 36e5) - (mins * 6e4)) / 1e3);
-			uiHandler.countDown = (hours>9?hours:'0'+hours)+'h'+(mins>9?mins:'0'+mins)+'m'+(secs>9?secs:'0'+secs)+'s';
+			var now      = new Date();
+			var dueDate  = new Date($scope.global.roomDueDate);
+            var hours    = Math.floor(Math.abs(dueDate - now) / 36e5);
+            var days     = Math.floor( hours / 24 );
+            var mins     = Math.floor((Math.abs(dueDate - now) - (hours * 36e5)) / 6e4);
+            var secs     = Math.floor((Math.abs(dueDate - now) - (hours * 36e5) - (mins * 6e4)) / 1e3);
+                hours    = ( hours % 24 );
+
+            uiHandler.countDown = (days>9?days:'0'+days) + ' ' + $scope.resourceBundle.days + ' ' +  (hours>9?hours:'0'+hours)+ ' ' + $scope.resourceBundle.hours +' '+(mins>9?mins:'0'+mins)+ ' ' + $scope.resourceBundle.minutes + ' '+(secs>9?secs:'0'+secs)+ ' ' + $scope.resourceBundle.seconds;
 			uiHandler.safeApply($scope,function(){});
 		},1000);
 		
