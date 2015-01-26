@@ -229,6 +229,9 @@ angular.module('mean.rooms').controller('RecordController', ['$scope', '$routePa
 		   					room.chat($scope.global.roomId,function(resu){
 		   						uiHandler.chatPage = resu.page;
 		   						chatService.init ($scope,resu.chat);
+		                        if (window.innerWidth <= 800 ){
+		                            $scope.toggleChat();
+		                        }
 		   					});
 			            });
 			            
@@ -239,8 +242,7 @@ angular.module('mean.rooms').controller('RecordController', ['$scope', '$routePa
 			            $scope.global.gravatar = uiHandler.gravatar;
 
                         if (window.innerWidth <= 800 ){
-                            $scope.toogleConnected();
-                            $scope.toogleChat();
+                            $scope.toggleConnected();
                         }
                         
 				 	} else {
