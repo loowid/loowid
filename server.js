@@ -115,14 +115,15 @@ if (process.env.OPENSHIFT_MONGODB_DB_PASSWORD) {
 }
 
 // Connect to the selected uri
-mongoose.connect(uristring, function(err, res) {
-	if (err) {
-		logger.error('ERROR connecting to: ' + uristring + '. ' + err);
-	} else {
-		logger.info('Succeeded connected to: ' + uristring);
-		exports.dbReady = true;
-	}
+var db = mongoose.connection;
+db.on('connected',function() {
+	logger.info('Succeeded connected to: ' + uristring);
+	exports.dbReady = true;
 });
+db.on('error',function(err) {
+	logger.error('ERROR connecting to: ' + uristring + '. ' + err);
+});
+mongoose.connect(uristring,{server:{auto_reconnect:true}});
 
 /*function isMobile(req) {
 	return (/mobile/i.test(req.headers['user-agent']));
