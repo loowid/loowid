@@ -91,7 +91,10 @@ wsevents.initListener(serverId,function(event) {
 			args.push(event.eventName);
 			args.push(event.data);
 			var newsocket = event.socket;
-			if (event.socket.id) newsocket.send = function(){};
+			if (event.socket.id) {
+				newsocket.send = function(){};
+				newsocket.distributed = true;
+			}
 			args.push(newsocket);
 			fireOrig.apply(null,args);
 		}

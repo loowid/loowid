@@ -632,7 +632,7 @@ exports.moveRoom = function (req,res,next) {
 	}
 };
 
-exports.addChatMessage = function (connectionId,roomId,message,created,success) {
+exports.addChatMessage = function (connectionId,roomId,message,created,save,success) {
 	Room.load(roomId,0,function(err, room) {
 		if (room) {
 			var senderId = connectionId;
@@ -640,12 +640,16 @@ exports.addChatMessage = function (connectionId,roomId,message,created,success) 
 			if (room.owner.connectionId === connectionId) {
 				senderId = '||##||';
 			}
-			room.chat.push({id:senderId,text:message,time:created});
-			room.save(function(err){
-				if (!err) {
-					success(senderId);
-				}
-			});
+			if (save) {
+				room.chat.push({id:senderId,text:message,time:created});
+				room.save(function(err){
+					if (!err) {
+						success(senderId);
+					}
+				});
+			} else {
+				success(senderId);
+			}
 		}
 	});
 };
