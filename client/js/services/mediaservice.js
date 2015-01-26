@@ -9,7 +9,6 @@ angular.module('mean.rooms').factory("MediaService",['Rooms','UIHandler',functio
 		var self = this;
 		var room = new Rooms({});
 
-
 		this.screen_constraints = {
 			mandatory: { chromeMediaSource: 'screen','maxHeight': 600, 'maxWidth': 800},
 			optional: []
@@ -49,6 +48,7 @@ angular.module('mean.rooms').factory("MediaService",['Rooms','UIHandler',functio
 	    	var startRecordingFn = function (){
 
 				var mediasource = self.mediasources[source];
+
 				mediasource.initializingMedia = true;
 				rtc.createStream(source, mediasource.constraints, function(stream){
 					mediasource.recording = true;
@@ -58,7 +58,7 @@ angular.module('mean.rooms').factory("MediaService",['Rooms','UIHandler',functio
 
 					if (mediasource.playtype == 'video'){
 						var mediaElement = $('<video id="my_'+ source + '" style="display:none;" autoplay muted ></video>')
-						windowHandler.create (mediaElement,$scope.resourceBundle['wintitle'+source],source,mediasource.winratio,mediasource.winscale,
+						windowHandler.create ($scope,mediaElement,$scope.resourceBundle['wintitle'+source],source,mediasource.winratio,mediasource.winscale,true,
 							function (win){
 	           				//Attach the window reference to the media source
 	           				mediasource.window = win;
@@ -66,7 +66,7 @@ angular.module('mean.rooms').factory("MediaService",['Rooms','UIHandler',functio
 	           				$(mediaElement).show();
 
 	            			//Just delay it to take time to get the window opened effect and inherit the video size
-	            			setTimeout(function (){win.height = $(mediaElement).height() + 20;},500);
+	            			//setTimeout(function (){win.height = $(mediaElement).height() + 20;},500);
 
 	            			 if (typeof onrecord !== 'undefined' && onrecord != null) {onrecord.call (self);}
 	            			 uiHandler.safeApply($scope,function(){});
@@ -139,7 +139,7 @@ angular.module('mean.rooms').factory("MediaService",['Rooms','UIHandler',functio
     		if (mediasource.recording){
     			//si no va hacerlo por el elemnto click
     			if (mediasource.playtype == 'video'){
-    				mediasource.window.close();	
+    				mediasource.window.winHandler.close();	
     			}else if (mediasource.playtype == 'audio'){
     				uiHandler.safeApply ($scope,function (){
     					self.stopMedia($scope,source);
@@ -265,7 +265,8 @@ angular.module('mean.rooms').factory("MediaService",['Rooms','UIHandler',functio
 		        if (self.receivedStreams.length>0) {
 		            for (var i=0; i<self.receivedStreams.length; i++) {
 		                if (self.receivedStreams[i].connectionId==connectionId) {
-		                	self.receivedStreams[i].window.$titlebar.prevObject[0].getElementsByTagName('h1')[0].innerText = name;
+							//Could be that the window could not be setup already because the method was called for a new status of member
+		                	if (self.receivedStreams[i].window) self.receivedStreams[i].window.title = name;
 		                }
 		            }
 		        }
@@ -352,17 +353,11 @@ angular.module('mean.rooms').factory("MediaService",['Rooms','UIHandler',functio
 					
 					//The rest of code it by async thread to keep webrtc sync stream close quick. Bit tricky here
 					 setTimeout( function (){
-						 
-		            	windowHandler.create (mediaElement,$scope.getUserName(connectionId),streamId,mediasource.winratio,mediasource.winscale,
+					  	  windowHandler.create	 ($scope,mediaElement,$scope.getUserName(connectionId),streamId,mediasource.winratio,mediasource.winscale, uiHandler.isOwner,
 		            		function (win){
 		           				//Attach the window reference to the media source
 		           				mediasource.window = win;
-		    					
-		    					if (!uiHandler.isowner) {
-		    						$('.wm-close',win.el).remove();
-		    					}
-
-								
+		    												
 	    						$(mediaElement).show();
 								
 								//Press play again for firefox
@@ -372,7 +367,7 @@ angular.module('mean.rooms').factory("MediaService",['Rooms','UIHandler',functio
             					setTimeout(function (){win.height = $(mediaElement).height() + 20;},400);
 
 					            if (typeof onrecord !== 'undefined') {onrecord.call (self);}
-
+								uiHandler.safeApply($scope,function(){});
 		            		},
 		            		function (win){
 			            		if (uiHandler.isowner){
@@ -380,10 +375,9 @@ angular.module('mean.rooms').factory("MediaService",['Rooms','UIHandler',functio
 			            				$scope.askForStopSharing (connectionId,mediasource.type);
 			            			});	
 			            		}
-			            		
 		            		}
 		            	);
-					 },1000);
+					  },1000);
 			  	}else{ 
 			  		 var mediaElement = $('<audio id="remote_'+ streamId + '" style="display:none;" autoplay ></audio>')
 			  		$("#remoteAudios").append (mediaElement);
@@ -405,7 +399,7 @@ angular.module('mean.rooms').factory("MediaService",['Rooms','UIHandler',functio
 	                    rtc.dropPeerConnection(data.connectionId,data.mediatype,false);
 
 	                	if (mediasource.playtype==='video'){
-	                		mediasource.window.close();
+	                		mediasource.window.winHandler.close();
 	            		}else{
 	            			$('#remote_' + streamId).remove();
 	            			$scope.askForStopSharing (data.connectionId,mediasource.type);
@@ -436,7 +430,7 @@ angular.module('mean.rooms').factory("MediaService",['Rooms','UIHandler',functio
 	      		                    rtc.dropPeerConnection(connectionId,mediasource.type,false);
 
 	                    			if (mediasource.playtype =='video'){
-		                    			mediasource.window.close();
+		                    			mediasource.window.winHandler.close();
 		                   	        }else{
 		                   	        	$('#remote_'+streamId).remove();
 		                   	        }

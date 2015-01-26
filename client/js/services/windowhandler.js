@@ -3,14 +3,8 @@ angular.module('mean.rooms').factory("WindowHandler",[function(){
 
 	return function (){
 	
-		var pwm = undefined;
 		var defaultRelations = [{x:4,y:3},{x:16,y:9}];
-
-		WManager = function (){
-	    	if (!this.pwm)
-	    		this.pwm = new Ventus.WindowManager();
-	    	return this.pwm;
-		};
+		var e= null;
 
 		this.getDefaultWidth = function (winscale){
 			return window.innerWidth * winscale;
@@ -27,70 +21,66 @@ angular.module('mean.rooms').factory("WindowHandler",[function(){
 		}
 
 		this.getSomeYPosition = function (){
-			var winCount = $(".wm-window").length;
-			return 40 + (20*winCount);
+			var winCount = $("wmwindow").length;
+			return 80 + (20*winCount);
 		}
 
-
-		this.create = function (mediaElement,winTitle,source,winratio,winscale,onopen,onclose){
-
-			
-
-			var window_class = 'my_' + source + '_window';
-
+		this.create = function ($scope,mediaElement,winTitle,source,winratio,winscale,closeable,onopen,onclose){
+		
 			var winWidth = this.getDefaultWidth(winscale);
 			var winHeight = this.getDefaultHeight(winratio,winscale);
-
-			var customWindow = WManager().createWindow.fromQuery(mediaElement,{
-		                title: winTitle,
-		                classname: window_class,
-		                width: winWidth,
-		                height: winHeight,
-		                x: this.getCentered(winWidth),
-		                y: this.getSomeYPosition(),
-
-		    });
-	
-		    customWindow.signals.once('open', function (win){
-		    	if (onopen){onopen.call (this,win);}
-		    },customWindow);
-
-		    customWindow.signals.on ('maximize', function (win){
-		    	$('body').prepend (win.el);
-		      	win.move(10,10);
-		      	var width =  '' + (window.innerWidth -20) + 'px';
-		      	var height = '' + (window.innerHeight -20) + 'px';
-        		win.el.css ({'z-index':'50000'});
-		      	$('section',win.el).css ('height','100%');
-		      	$('video',win.el).addClass('fullVideo');
-		      	$('video',win.el).get(0).play();
-		      	win.resize (width,height);
-		      	win.movable = false;
-		    });
-		    
-		    customWindow.signals.on ('restore', function (win){
-				$('.wm-space').prepend (win.el);
-				win.el.css ({'z-index':'10001'});
-				setTimeout (function (){
-					$('section',win.el).css('height','');
-					$('video',win.el).removeClass('fullVideo');
-			      	$('video',win.el).get(0).play();
-		      		$('.wm-window-title',win.el).click();
-		      		$('.wm-space',win.el).click();
-		      		win.movable = true;
-		      	},200);
-		    });
-
-
-		    customWindow.signals.once('close', function (win){
-		    	if (onclose) onclose.call(this,win);
-		    	$("."+window_class).remove();
-			},customWindow);
-
-		    customWindow.open();
 			
-		};
+			var options = {
+				position: {
+					x: this.getCentered(winWidth),
+					y: this.getSomeYPosition ()
+				},
+				size : {
+					width: winWidth,
+					height: winHeight
+				},
+				windowContainer: 'moveZone',
+				maximizeTo: 'moveZone',
+				title: winTitle,
+				initialZIndex: 500
+			};
+			
+			var open = function (win){
+				var container = win.elem.find('video').parent();	
+				win.elem.find('video').remove();
+				container.append (mediaElement);
+				window.winHandler = win;
+				onopen(window);
+			};	
+			
+			var close = function (win){
+				onclose(window);
+				for (i = 0; i< $scope.windows.length; i++){
+					if (window === $scope.windows[i]){
+						$scope.windows.splice(i,1);	
+					}
+				}
+				
+				//We also try to enable videos after a close
+				setTimeout(function() {selWindow();}, 100);
+			};
+			
+			var window = {
+				options: options,
+				title: winTitle,
+				mediaElement: mediaElement,
+				close: close,
+				closeable: (closeable===undefined) ? false : closeable,
+				open: open,
+			};
+			
+			$scope.windows.unshift (window);
 
+		};
+		
+		this.init = function ($scope){
+			$scope.windows = [];
+		}
 
 	};
 }]);

@@ -1,4 +1,4 @@
-<div id="boradcaster" data-ng-controller="ViewDesktopController" data-ng-init="init()">
+<div id="broadcaster" data-ng-controller="ViewDesktopController" data-ng-init="init()">
 <header>
 	<div class="main-header">
 		<span class="loowidLogo">LooWID</span>
@@ -41,6 +41,7 @@
 		</ul>
 	</nav>
 </header>
+<div id="moveZone">
 <div id="editName" ng-class="ui.editNameClass">
 	<form novalidate data-ng-submit="changeName()">
 		<fieldset>
@@ -159,8 +160,13 @@
 	</ul>
 </aside>
 <section id="dashboard" ng-class="[ui.dash_conn,ui.dash_chat]">
-	<div id="desktopZone">
+
 		<div id="remoteAudios" ></div>
+		<div id="remoteVideos" >
+			<wmwindow title="{{window.title}}" open="window.open"  close="window.close" selectwindow="window.selectwindow" closeable="{{window.closeable}}" options="{{window.options}}" data-ng-repeat="window in windows" >
+				<video></video>
+			</wmwindow>
+		</div>
 		<article class="creator_message" data-ng-show="ui.joinable==false && ui.locked==false">
 			<h1>{{resourceBundle.roomisinactive}}</h1>
 			<h6 data-ng-show="ui.permanent">{{resourceBundle.permanentReload}}</h6>
@@ -184,9 +190,6 @@
 				<h5 ng-show="ui.connectionError">{{resourceBundle.passwordincorrect}}</h5>
 			</div>
 		</article>
-
-	</div>
-
 </section>
 <p id="helper_chat" ng-class="ui.helpchat_class" ng-click="enableAudio()"><i class="fa fa-volume-down"></i> {{ui.audible? resourceBundle.chatisaudible : resourceBundle.chatisnotaudible}}</p>
 <div id="error" ng-class="error_class" ng-click="hideError()"><div class="error"><h3<h3 ng-bind-html="error_message"></h3></div></div>
@@ -220,4 +223,5 @@
 	  </ol>
 	</div>
 </aside>
+</div>
 </div>
