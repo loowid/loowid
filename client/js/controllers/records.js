@@ -197,8 +197,6 @@ angular.module('mean.rooms').controller('RecordController', ['$scope', '$routePa
                 hours    = ( hours % 24 );
 
             uiHandler.countDown = (days>9?days:'0'+days) + ' ' + $scope.resourceBundle.days + ' ' +  (hours>9?hours:'0'+hours)+ ' ' + $scope.resourceBundle.hours +' '+(mins>9?mins:'0'+mins)+ ' ' + $scope.resourceBundle.minutes + ' '+(secs>9?secs:'0'+secs)+ ' ' + $scope.resourceBundle.seconds;
-            //uiHandler.countDown = days+' '+hours+' '+' '+mins+' '+secs;
-			//uiHandler.countDown = 'Testing...';
 			uiHandler.safeApply($scope,function(){});
 		},1000);
 		
