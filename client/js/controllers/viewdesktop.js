@@ -42,11 +42,6 @@ angular.module('mean.rooms').controller('ViewDesktopController', ['$scope', '$ro
         $scope.global.hideError($scope);
     }
     
-    $scope.toogleConnected = function() { 
-    	uiHandler.connected_class=(uiHandler.connected_class=='collapsed')?'':'collapsed'; 
-    	uiHandler.dash_conn=(uiHandler.connected_class=='collapsed')?'connected_collapsed':'';
-    }
-    
     uiHandler.focused = true;
     
     window.onfocus = function() {
@@ -134,6 +129,9 @@ angular.module('mean.rooms').controller('ViewDesktopController', ['$scope', '$ro
 		room.chat($scope.global.roomId,function(resu){
 			uiHandler.chatPage = resu.page;
 			chatService.init ($scope,resu.chat);
+            if (window.innerWidth <= 800 ){
+                $scope.toggleChat();
+            }
 		});
         // Set my own name
         for (var i=0; i<results.guests.length; i++) {
@@ -188,7 +186,6 @@ angular.module('mean.rooms').controller('ViewDesktopController', ['$scope', '$ro
 
             if (window.innerWidth <= 800 ){
                 $scope.toogleConnected();
-                //$scope.toogleChat();
             }
 
         }else{
