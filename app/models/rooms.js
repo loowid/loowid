@@ -60,8 +60,8 @@ var RoomSchema = new Schema({
 });
 
 
-var maxChat = -50;
-var pageSize = 50;
+var pageSize = process.env.CHAT_PAGE_SIZE || 50;
+var maxChat = 0 - pageSize;
 /**
  * Statics
  */
