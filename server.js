@@ -132,7 +132,7 @@ mongoose.connect(uristring,{server:{auto_reconnect:true}});
 function isLessIE9(req) {
 	var ua = req.headers['user-agent'];
 	if (/MSIE (\d+\.\d+);/.test(ua)) { // test for MSIE x.x;
-		var ieversion = 0 - RegExp.$1; // capture x.x portion and store as a number
+		var ieversion = Number(RegExp.$1); // capture x.x portion and store as a number
 		return (ieversion < 9);
 	} else {
 		return false;
