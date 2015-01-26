@@ -1,7 +1,7 @@
 <div id="broadcaster" data-ng-controller="RecordController" data-ng-init="init()">
 <header>
 	<div class="main-header">
-		<span class="loowidLogo">L<span id="eyesLogo"></span>WID</span>
+		<span class="loowidLogo">LooWID</span>
 		<span>{{global.access.title}}</span>
 		<a class="loowidurl expanded" href="{{ui.screenurl}}" target="_blank">{{ui.screenurl}}</a>
 		<a class="loowidurl short" href="{{ui.screenurl}}" target="_blank">https://...{{lastCharsUrl(ui.screenurl)}}</a>
@@ -15,11 +15,14 @@
 				<p ng-click="showDesktopAlertMessage()"><i class="fa fa-desktop"></i> <span class="title">{{resourceBundle.sharedesktopmainbar}}</span></p>
 			</li>
 			<li id="share_screen" ng-show="ui.canShareDesktop">
-				<p ng-hide="isRecording('screen')" ng-click="startRecording('screen')"><i class="fa fa-desktop"></i> <span class="title">{{resourceBundle.sharedesktopmainbar}}</span></p>
+				<p ng-hide="isRecording('screen') || isInitializingMedia('screen')" ng-click="startRecording('screen')"><i class="fa fa-desktop"></i> <span class="title">{{resourceBundle.sharedesktopmainbar}}</span></p>
+				<p ng-show="isInitializingMedia('screen')"><i class="fa fa-desktop"></i> <span class="title">{{resourceBundle.initcapture}}</span></p>
+				
+				
 				<p ng-show="isRecording('screen')" ng-click="stopRecording('screen')"><i class="tachado activo">/</i><i class="fa fa-desktop activo"></i><span class="title">{{resourceBundle.stopsharedesktopmainbar}}</span></p>
 			</li>
 			<li id="dropdown" ng-show="ui.canShareDesktop" ng-click="ui.showResolutionMenu=!ui.showResolutionMenu"	>
-				<p ng-hide="isRecording('screen')" ><i class="fa fa-sort-down"></i> <span class="title"></span></p>
+				<p ng-hide="isRecording('screen') || isInitializingMedia('screen')" ><i class="fa fa-sort-down"></i> <span class="title"></span></p>
 				<ul ng-show="!isRecording('screen') && ui.showResolutionMenu" class="resolutionlist">
 					<li  data-ng-repeat="resolution in ui.resolutions" >
 						<p ng-click="changeToResolution($index)"><span>{{resolution.x}}</span> x <span> {{resolution.y}}</span><i ng-show="ui.currentResolution==$index" class ="fa fa-circle"></i></p>
@@ -27,11 +30,13 @@
 				</ul>
 			</li>
 			<li id="share_webcam">
-				<p ng-hide="isRecording('video')" ng-click="startRecording('video')"><i class="fa fa-video-camera"></i> <span class="title">{{resourceBundle.sharewebcammainbar}}</span></p>
+				<p ng-hide="isRecording('video') || isInitializingMedia('video') " ng-click="startRecording('video')"><i class="fa fa-video-camera"></i> <span class="title">{{resourceBundle.sharewebcammainbar}}</span></p>
+				<p ng-show="isInitializingMedia('video')"><i class="fa fa-video-camera"></i> <span class="title">{{resourceBundle.initcapture}}</span></p>
 				<p ng-show="isRecording('video')" ng-click="stopRecording('video')"><i class="tachado activo">/</i><i class="fa fa-video-camera activo"></i> <span class="title">{{resourceBundle.stopsharewebcammainbar}}</span></p>
 			</li>
 			<li id="share_audio">
-				<p ng-hide="isRecording('audio')" ng-click="startRecording('audio')"><i class="fa fa-microphone"></i> <span class="title">{{resourceBundle.shareaudiobar}}</span></p>
+				<p ng-hide="isRecording('audio')  || isInitializingMedia('audio')" ng-click="startRecording('audio')"><i class="fa fa-microphone"></i> <span class="title">{{resourceBundle.shareaudiobar}}</span></p>
+				<p ng-show="isInitializingMedia('audio')"><i class="fa fa-micophone"></i> <span class="title">{{resourceBundle.initcapture}}</span></p>
 				<p ng-show="isRecording('audio')" ng-click="stopRecording('audio')"><i class="tachado activo">/</i><i class="fa fa-microphone activo"></i> <span class="title">{{resourceBundle.stopshareaudiobar}}</span></p>
 			</li>
 

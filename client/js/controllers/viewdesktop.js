@@ -131,7 +131,10 @@ angular.module('mean.rooms').controller('ViewDesktopController', ['$scope', '$ro
         uiHandler.passNeeded = false;
         uiHandler.connectionError = false;
         uiHandler.access = results.access;
-        chatService.init($scope,results.chat);
+		room.chat($scope.global.roomId,function(resu){
+			uiHandler.chatPage = resu.page;
+			chatService.init ($scope,resu.chat);
+		});
         // Set my own name
         for (var i=0; i<results.guests.length; i++) {
             if (results.guests[i].connectionId === rtc._me) {
@@ -161,10 +164,6 @@ angular.module('mean.rooms').controller('ViewDesktopController', ['$scope', '$ro
         $scope.global.roomId = uiHandler.roomId = roomId;
         $scope.isowner = false;
         $scope.isRoomJoinable();
-
-        var guy = new Guy( {
-           'appendElement': document.getElementById( 'eyesLogo' ),'color':'#FFFFFF','scale':0.30
-        });
 
         // Keep Session with auto request every 15 min
 		window.clearInterval($scope.global.keepInterval);

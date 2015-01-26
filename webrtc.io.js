@@ -228,7 +228,7 @@ function attachEvents(manager) {
         } else {
 			iceServers = rtc.iceSERVERS().iceServers;
 			if (response || body) logger.error ('Error connecting to get servers ['+error+']: ' + response  + '\n' + body);
-			else logger.info('Returning default ice servers.');
+			else logger.debug('Returning default ice servers.');
 		}
 			
 		//Send the correct list
@@ -419,7 +419,7 @@ function attachEvents(manager) {
 	rtc.on('chat_message', function(data, socket) {
 		manager.rooms.checkChatEnabled(socket.id,data.room,function(){
 			var created = new Date();
-			manager.rooms.addChatMessage(socket.id,data.room,data.text,created,function(senderId){
+			manager.rooms.addChatMessage(socket.id,data.room,data.text,created,!socket.distributed,function(senderId){
 				var roomList = rtc.rooms[data.room] || [];
 				for ( var i = 0; i < roomList.length; i+=1) {
 					var id = roomList[i];

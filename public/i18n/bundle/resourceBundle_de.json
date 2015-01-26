@@ -14,6 +14,7 @@
     "stopshareaudiobar":"Mikrofonfreigabe stoppen",
     "mutemainbar":"Ton stummschalten",
     "unmutemainbar":"Ton freischalten",
+	"initcapture": "Initialisieren Capture",
     "gravatarclose":"Schliessen",
     "gravatarname":"Name",
     "gravataremail":"Gravatar E-Mail-Adresse",
@@ -186,6 +187,9 @@
 	"permanentReload": "Du kannst auf den Raumeigentümer warten oder die Seite erneut laden, um zu sehen, ob der Raum aktiviert ist",
 	"ownerMultiple": "Du bist schon als Raumeigentümer mit diesem Raum verbunden, es ist nur eine Verbindung als Raumeigentümer erlaubt",
 	"loowid" : "Look what I'm doing",
-	"ltiErrorText" : "Das Zimmer ist nicht verfügbar. Sie müssen für die Besitzer warten, um eine Verbindung mit der Sitzung beginnen."
-	
+	"ltiErrorText" : "Das Zimmer ist nicht verfügbar. Sie müssen für die Besitzer warten, um eine Verbindung mit der Sitzung beginnen.",
+	"days" : "Tage",
+	"hours" : "Stunden",
+	"minutes" : "Minuten",
+	"seconds" : "Sekunden"
 }

@@ -48,8 +48,10 @@ angular.module('mean.rooms').factory("MediaService",['Rooms','UIHandler',functio
 	    	var startRecordingFn = function (){
 
 				var mediasource = self.mediasources[source];
+				mediasource.initializingMedia = true;
 				rtc.createStream(source, mediasource.constraints, function(stream){
 					mediasource.recording = true;
+					mediasource.initializingMedia = false;
 					mediasource.onclose = onclose;
 					mediasource.stream = stream;
 
@@ -83,6 +85,7 @@ angular.module('mean.rooms').factory("MediaService",['Rooms','UIHandler',functio
 					}
 				},function (error){
 					mediasource.recording = false;
+					mediasource.initializingMedia = false;
 					var errmsg = '';
 					
 					if (source === 'screen'){
@@ -218,6 +221,9 @@ angular.module('mean.rooms').factory("MediaService",['Rooms','UIHandler',functio
 	    	$scope.isRecording = function (source){
 	    		return self.mediasources[source].recording;
 	    	}
+			$scope.isInitializingMedia = function (source){
+				return self.mediasources[source].initializingMedia;
+			}	
 
 		    $scope.startRecording = function (source){
 		        self.startRecording ($scope,windowHandler,source,uiHandler.isowner ?
