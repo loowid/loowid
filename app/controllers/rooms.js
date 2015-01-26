@@ -288,7 +288,7 @@ exports.chat = function(req,res){
 		if (!err) {
 			res.json({chat:nr.chat,page:pg});
 		} else {
-			res.json({chat:[],page:0});
+			res.json({chat:[],page:0,error:err});
 		}
 	});
 };

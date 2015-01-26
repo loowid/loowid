@@ -60,7 +60,7 @@ var RoomSchema = new Schema({
 });
 
 
-var pageSize = process.env.CHAT_PAGE_SIZE || 50;
+var pageSize = Number(process.env.CHAT_PAGE_SIZE || 50);
 var maxChat = 0 - pageSize;
 /**
  * Statics
@@ -81,7 +81,7 @@ RoomSchema.statics = {
     	this.aggregate([{$match:{roomId:id}},{$unwind:'$chat'},{$group:{_id:'$chat'}},{$group:{_id:'_id',cnt:{'$sum':1}}}]).exec(function(err,rdo){
         	if (!err) {
         		var cnt = rdo.length > 0 ? rdo[0].cnt : 0;
-        		var idx = (p || cnt || 0)-pageSize;
+        		var idx = Number(p || cnt || 0) - pageSize;
         		self.findOne({roomId:id},{chat:{'$slice':[Math.max(idx,0),Math.min(pageSize,Math.max(pageSize + idx,1))]}}).exec(function(err2,room){
         			cb(err2,room,Math.max(idx,0));
         		});
