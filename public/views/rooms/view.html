@@ -16,7 +16,7 @@
 				<p ng-show="isRecording('screen')" ng-click="stopRecording('screen')"><i class="tachado activo">/</i><i class="fa fa-desktop activo"></i> <span class="title">{{resourceBundle.stopsharedesktopmainbar}}</span></p>
 			</li>
 			<li id="dropdown"  ng-show="ui.canShareDesktop && !ui.access.moderated  || isInitializingMedia('screen') " ng-click="ui.showResolutionMenu=!ui.showResolutionMenu"	>
-				<p ng-hide="isRecording('screen') || ui.access.moderated || || isInitializingMedia('screen')" ><i class="fa fa-sort-down"></i> <span class="title"></span></p>
+				<p ng-hide="isRecording('screen') || ui.access.moderated || isInitializingMedia('screen')" ><i class="fa fa-sort-down"></i> <span class="title"></span></p>
 				<ul ng-show="!isRecording('screen') && ui.showResolutionMenu && !ui.access.moderated" class="resolutionlist">
 					<li  data-ng-repeat="resolution in ui.resolutions" >
 						<p ng-click="changeToResolution($index)"><span>{{resolution.x}}</span> x <span> {{resolution.y}}</span><i ng-show="ui.currentResolution==$index" class ="fa fa-circle"></i></p>
