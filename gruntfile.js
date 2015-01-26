@@ -188,12 +188,21 @@ module.exports = function(grunt) {
     //Default task(s).
     grunt.registerTask('default', ['mini','concurrent:default']);
 
-    //Cluster local configuration N nodes 8001,8002,...
+    // Do not run mongo in openshift environment
+    if (process.env.OPENSHIFT_NODEJS_PORT) {
+    	grunt.config.data.concurrent.prod.tasks.splice(0,1);
+    } else {
+        process.env.LOOWID_HTTP_PORT = grunt.option('port') || 80;
+        process.env.LOOWID_HTTPS_PORT = grunt.option('sport') || 443;
+        process.env.LOOWID_BASE_PORT = grunt.option('bport') || 8000;
+    }
+
+    //Cluster local configuration N nodes BasePort + 1, BasePort + 2,...
     // grunt cluster --nodes=N
     var nodes = grunt.option('nodes') || 2;
     // Create nodemon tasks for cluster
     for (var k=0; k<nodes; k+=1) {
-    	grunt.config.data.nodemon['dev'+k] = { script: 'server.js', options: generateOptions([8000+k+1]) };
+    	grunt.config.data.nodemon['dev'+k] = { script: 'server.js', options: generateOptions([Number(process.env.LOOWID_BASE_PORT)+k+1]) };
     	grunt.config.data.concurrent.cluster.tasks.push('nodemon:dev'+k);
     }
     // Setting number of cluster nodes
@@ -201,11 +210,6 @@ module.exports = function(grunt) {
     grunt.config.data.nodemon.dev.options = generateOptions([]);
     grunt.registerTask('cluster', ['mini','concurrent:cluster']);
 
-    // Same as development but using min.js
-    // Do not run mongo in openshift environment
-    if (process.env.OPENSHIFT_NODEJS_PORT) {
-    	grunt.config.data.concurrent.prod.tasks.splice(0,1);
-    }
     grunt.registerTask('prod', ['mini','concurrent:prod']);
     
     // Minify tasks (generate min files)
