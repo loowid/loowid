@@ -99,9 +99,6 @@ angular.module('mean.rooms').controller('RoomsController', ['$scope', '$routePar
    }
 
    $scope.init = function(){
-		var guy = new Guy( {
-           'appendElement': document.getElementById( 'eyesLogo' ),'color':'#FFFFFF','scale':0.40
-       	});   
    }
 
 

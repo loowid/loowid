@@ -162,10 +162,6 @@ angular.module('mean.rooms').controller('ViewDesktopController', ['$scope', '$ro
         $scope.isowner = false;
         $scope.isRoomJoinable();
 
-        var guy = new Guy( {
-           'appendElement': document.getElementById( 'eyesLogo' ),'color':'#FFFFFF','scale':0.30
-        });
-
         // Keep Session with auto request every 15 min
 		window.clearInterval($scope.global.keepInterval);
 		$scope.global.keepInterval = window.setInterval(function(){

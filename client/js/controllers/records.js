@@ -175,10 +175,6 @@ angular.module('mean.rooms').controller('RecordController', ['$scope', '$routePa
     	uiHandler.roomId = $scope.global.roomId = rid;	
     	uiHandler.screenurl = $location.$$protocol+ "://"+ $location.$$host +  "/#!/r/" + $scope.global.roomId;
 
-		var guy = new Guy( {
-           'appendElement': document.getElementById( 'eyesLogo' ),'color':'#FFFFFF','scale':0.30
-       	});
-
 		// Keep Session with auto request every 15 min
 		window.clearInterval($scope.global.keepInterval);
 		$scope.global.keepInterval = window.setInterval(function(){
