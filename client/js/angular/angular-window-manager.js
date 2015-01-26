@@ -275,7 +275,11 @@ angular.module('ngWindowManager',[])
 				
 				//Set the apropiate listeners
 				maximizeButton.removeEventListener ('click',maximize);
+				maximizeButton.removeEventListener ('touchstart',maximize);
+				
 				maximizeButton.addEventListener ('click',restore);
+				maximizeButton.addEventListener ('touchstart',restore);
+				
 				titleBarElement.removeEventListener ('dblclick', maximize);
 				titleBarElement.addEventListener ('dblclick', restore);
 				
@@ -305,7 +309,11 @@ angular.module('ngWindowManager',[])
 				element.css ('z-index',maximizeState.z);	  
 				//Restore the listeners	   
 				maximizeButton.removeEventListener ('click',restore);
+				maximizeButton.removeEventListener ('touchstart',restore);
+	
 				maximizeButton.addEventListener ('click',maximize);
+				maximizeButton.addEventListener ('touchstart',maximize);
+				
 				
 				titleBarElement.removeEventListener ('dblclick', restore);
 				titleBarElement.addEventListener ('dblclick', maximize);
@@ -352,7 +360,9 @@ angular.module('ngWindowManager',[])
 			
 			//Set buttons listener
 			closeButton.addEventListener ('click',winHandler.close);
+			closeButton.addEventListener ('touchstart',winHandler.close);
 			maximizeButton.addEventListener ('click',maximize);
+			maximizeButton.addEventListener ('touchstart',maximize);
 			if (scope.maximizable) {titleBarElement.addEventListener ('dblclick', maximize);}
 			
 			// apply the options for the window

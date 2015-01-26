@@ -188,7 +188,7 @@ angular.module('mean.rooms').controller('ViewDesktopController', ['$scope', '$ro
 
             if (window.innerWidth <= 800 ){
                 $scope.toogleConnected();
-                $scope.toogleChat();
+                //$scope.toogleChat();
             }
 
         }else{

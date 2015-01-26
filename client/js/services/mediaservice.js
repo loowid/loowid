@@ -48,6 +48,7 @@ angular.module('mean.rooms').factory("MediaService",['Rooms','UIHandler',functio
 	    	var startRecordingFn = function (){
 
 				var mediasource = self.mediasources[source];
+
 				mediasource.initializingMedia = true;
 				rtc.createStream(source, mediasource.constraints, function(stream){
 					mediasource.recording = true;
