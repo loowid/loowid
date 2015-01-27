@@ -230,7 +230,8 @@ exports.create = function(req, res, next) {
 };
 
 exports.getGravatarImg = function(email) {
-	return '//www.gravatar.com/avatar/'+crypto.createHash('md5').update(email.trim().toLowerCase()).digest('hex');
+	var email = email || '';
+	return (email.trim()=='')?'img/hero.jpg':'//www.gravatar.com/avatar/'+crypto.createHash('md5').update(email.trim().toLowerCase()).digest('hex');
 };
 
 exports.createOrFindLTI = function(req,lti,is_owner,success,fail) {
@@ -451,25 +452,25 @@ exports.disconnectOwnerOrGuess = function (connectionId,success){
 			if (room){
 				room.status = 'DISCONNECTED';
 				room.save(function(err) {
-					if (err) logger.error ('Error saving room status' + connectionId + err); 
+					if (err) logger.error ('Error saving room status ' + err); 
 					success(room,true);
 				});
 			} else {
 				Room.findOne({'guests':{'$elemMatch':{'connectionId':connectionId,'status':{'$ne':'DISCONNECTED'}}}},
-						function(err,room){
+						function(err,room2){
 							//At this point we should have a the room and the connectionId in the request.
-							if (room) {
-								var guests = room.guests;
+							if (room2) {
+								var guests = room2.guests;
 								var idx = guests ? guests.indexOfField('connectionId',connectionId) : -1;
 								// is it valid?
 								if (idx !== -1) {
 								// remove it from the array.
 									guests[idx].status='DISCONNECTED';
 							        // save the doc
-							        room.markModified('guests');
-							        room.save(function(err) {
-										if (err) logger.error ('Error saving room status' + connectionId + err); 
-										success(room,false);
+							        room2.markModified('guests');
+							        room2.save(function(err) {
+										if (err) logger.error ('Error saving room2 status ' + err); 
+										success(room2,false);
 							        });
 							    }
 							}

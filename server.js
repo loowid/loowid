@@ -200,6 +200,7 @@ app.configure(function() {
 		if ((req.protocol === 'http') && (req.url === LTI_PATH)) {
 			Object.defineProperty(req, 'protocol', { value: 'https', writable: false });
 			req.headers.host = process.env.LTI_DOMAIN || req.headers.host;
+			logger.debug(req.protocol+"://"+req.headers.host+(req.port?':'+req.port:'')+'/'+req.url);
 		}
 		return (req.url === LTI_PATH)?next():csrf(req,res,next);
 	});
