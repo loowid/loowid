@@ -214,22 +214,23 @@ angular.module('mean.rooms').factory("Rooms", ['$resource','$http','$window','No
         }
         
         this.notifyIn = function($scope) {
+        	var self = this;
    		    var notification = new Notification($scope.resourceBundle.welcometo, {
 		            body: $scope.resourceBundle.connectedto.replace('{0}',$scope.global.roomId),
 		            icon: 'img/icons/favicon.ico',
 		            delay: 3000
 		    });
 			notification.$on('error',function(){
-    			uiHandler.modals.push({'text': $scope.resourceBundle.allownotifications,
+    			$scope.ui.modals.push({'text': $scope.resourceBundle.allownotifications,
     				'yes': function (index){
-    					uiHandler.modals.splice(index,1);
+    					$scope.ui.modals.splice(index,1);
     				},
     				"class":'modalform editable',
     				"done":false
     			});	
 			});
 	        notification.$on('click', function () {
-	        	if (!uiHandler.focused) window.focus();
+	        	if (!$scope.ui.focused) window.focus();
 	        });
         }
         
