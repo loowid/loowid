@@ -69,6 +69,45 @@ h1, h2, h3, h4, h5, h6{
 	}
 }
 
+.url-message{
+	position: fixed;
+	bottom: 40px;
+	right: 260px;
+	width: 350px;
+	background: #FFF;
+	padding: 0.35em 0.55em;
+	border-left: 5px solid @maincolor;
+	.box-shadow(0 0 5px rgba(0,0,0,.25) );
+	h3{
+		color: #646464;
+		margin: 0 0 0.2em 0;
+	}
+	a{
+		display: block;
+		margin: 0 0 0.15em 0;
+		.transition(all 1s linear);
+	}
+	p{
+		margin: 0 0 0.15em 0;
+		font-size: 0.85em;
+		&.message{
+			
+		}
+	}
+	&.active-broadcasting{
+		border-left: 0px none;
+		background: rgba(255,255,255,0.3);
+		.box-shadow(0 0 0px rgba(255,255,255,.1) );
+		p, h3{
+			opacity: 0.1;
+		}
+		a{
+            .filter( blur(10px) grayscale(100%) );
+		}
+	}
+}
+
+
 .version{
 	position: absolute;
 	top: 0px;

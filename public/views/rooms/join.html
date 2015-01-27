@@ -218,13 +218,13 @@
 		<article class="creator_message" data-ng-show="ui.roomStatus == 'active' && !areWindowsOpened()  && shareDesktopStatus != 'failed'">
 			<h1>{{resourceBundle.sharethisurl}}</h1>
 			<a href="{{ui.screenurl}}" target="_blank">{{ui.screenurl}}</a>
-			<div ng-show="global.access.permanent">
-				<h5>{{resourceBundle.permanentUrl}}</h5>
-				<a href="{{ui.permanenturl}}">{{ui.permanenturl}}</a>
-				<h6>{{ui.countDown}}</h6>
-			</div>
 		</article>
-
+		<div class="url-message" ng-show="global.access.permanent" ng-class="{'active-broadcasting' : isRecording('screen') || isInitializingMedia('screen')}">
+			<h3>{{resourceBundle.permanentroom}} - {{resourceBundle.roomowner}}</h3>
+			<p class="message">{{resourceBundle.permanentUrl}}</p>
+			<a href="{{ui.permanenturl}}">{{ui.permanenturl}}</a>
+			<p class="datetime">{{ui.countDown}}</p>
+		</div>
 </section>
 <p id="helper_chat" ng-class="ui.helpchat_class" ng-click="enableAudio()"><i class="fa fa-volume-down"></i> {{ui.audible? resourceBundle.chatisaudible : resourceBundle.chatisnotaudible}}</p>
 <div id="error" ng-class="error_class" ng-click="hideError()"><div class="error"><h3 ng-bind-html="error_message"></h3></div></div>
