@@ -230,8 +230,8 @@ exports.create = function(req, res, next) {
 };
 
 exports.getGravatarImg = function(email) {
-	var email = email || '';
-	return (email.trim()=='')?'img/hero.jpg':'//www.gravatar.com/avatar/'+crypto.createHash('md5').update(email.trim().toLowerCase()).digest('hex');
+	var remail = email || '';
+	return (remail.trim()==='')?'img/hero.jpg':'//www.gravatar.com/avatar/'+crypto.createHash('md5').update(remail.trim().toLowerCase()).digest('hex');
 };
 
 exports.createOrFindLTI = function(req,lti,is_owner,success,fail) {
