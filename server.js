@@ -105,10 +105,16 @@ wsevents.initListener(serverId,function(event) {
 var mongoose = require('mongoose');
 
 var uristring = process.env.MONGOLAB_URI || process.env.MONGOHQ_URL	|| 'mongodb://localhost/loowid';
+var safeUriString = uristring;
 // if OPENSHIFT env variables are present, use the available connection info:
 if (process.env.OPENSHIFT_MONGODB_DB_PASSWORD) {
 	uristring = process.env.OPENSHIFT_MONGODB_DB_USERNAME + ':' +
 			process.env.OPENSHIFT_MONGODB_DB_PASSWORD + '@' +
+			process.env.OPENSHIFT_MONGODB_DB_HOST + ':' +
+			process.env.OPENSHIFT_MONGODB_DB_PORT + '/' +
+			process.env.OPENSHIFT_APP_NAME;
+	// Safe string for log purposes
+	safeUriString = process.env.OPENSHIFT_MONGODB_DB_USERNAME + ':*****@' +
 			process.env.OPENSHIFT_MONGODB_DB_HOST + ':' +
 			process.env.OPENSHIFT_MONGODB_DB_PORT + '/' +
 			process.env.OPENSHIFT_APP_NAME;
@@ -117,11 +123,11 @@ if (process.env.OPENSHIFT_MONGODB_DB_PASSWORD) {
 // Connect to the selected uri
 var db = mongoose.connection;
 db.on('connected',function() {
-	logger.info('Succeeded connected to: ' + uristring);
+	logger.info('Succeeded connected to: ' + safeUriString);
 	exports.dbReady = true;
 });
 db.on('error',function(err) {
-	logger.error('ERROR connecting to: ' + uristring + '. ' + err);
+	logger.error('ERROR connecting to: ' + safeUriString + '. ' + err);
 });
 mongoose.connect(uristring,{server:{auto_reconnect:true}});
 
