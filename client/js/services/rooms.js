@@ -1,5 +1,5 @@
 //Rooms service used for articles REST endpoint
-angular.module('mean.rooms').factory("Rooms", ['$resource','$http','$window', function($resource,$http,$window) {
+angular.module('mean.rooms').factory("Rooms", ['$resource','$http','$window','Notification', function($resource,$http,$window,Notification) {
     return function (){
     	
 		var csrf = window.csrf;
@@ -212,6 +212,27 @@ angular.module('mean.rooms').factory("Rooms", ['$resource','$http','$window', fu
         this.keepSession = function (success,failure) {
         	room.keepSession(success,failure);
         }
+        
+        this.notifyIn = function($scope) {
+   		    var notification = new Notification($scope.resourceBundle.welcometo, {
+		            body: $scope.resourceBundle.connectedto.replace('{0}',$scope.global.roomId),
+		            icon: 'img/icons/favicon.ico',
+		            delay: 3000
+		    });
+			notification.$on('error',function(){
+    			uiHandler.modals.push({'text': $scope.resourceBundle.allownotifications,
+    				'yes': function (index){
+    					uiHandler.modals.splice(index,1);
+    				},
+    				"class":'modalform editable',
+    				"done":false
+    			});	
+			});
+	        notification.$on('click', function () {
+	        	if (!uiHandler.focused) window.focus();
+	        });
+        }
+        
      };
 
 }]);

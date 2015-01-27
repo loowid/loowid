@@ -126,6 +126,7 @@ angular.module('mean.rooms').controller('ViewDesktopController', ['$scope', '$ro
         uiHandler.passNeeded = false;
         uiHandler.connectionError = false;
         uiHandler.access = results.access;
+        room.notifyIn($scope);
 		room.chat($scope.global.roomId,function(resu){
 			uiHandler.chatPage = resu.page;
 			chatService.init ($scope,resu.chat);

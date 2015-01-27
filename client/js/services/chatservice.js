@@ -1,4 +1,4 @@
-angular.module('mean.rooms').factory("ChatService",['$timeout','UIHandler','Rooms',function($timeout,UIHandler,Rooms){
+angular.module('mean.rooms').factory("ChatService",['$timeout','UIHandler','Rooms','Notification',function($timeout,UIHandler,Rooms,Notification){
 	return function (){
 
 		var uiHandler = UIHandler;
@@ -172,12 +172,24 @@ angular.module('mean.rooms').factory("ChatService",['$timeout','UIHandler','Room
 					return;
 				}
 	       		if ((uiHandler.helpchat_class=='showed' || !uiHandler.focused) && uiHandler.audible && data.id!=rtc._me) {
-	        		var readText = ($scope.connectedUsers()>1)?$scope.getUser(data.id).name+', '+data.text:data.text;
-	        		var audio = document.getElementById('audiotts')?document.getElementById('audiotts'):document.createElement('audio');
-	        		audio.setAttribute('id', 'audiotts');
-	        		audio.setAttribute('src', '/chat/talk?text=' + encodeURIComponent(readText));
-	        		audio.load();
-	        		audio.play();
+	       		    var notification = new Notification($scope.getUser(data.id).name, {
+	       		            body: data.text.length>50?data.text.substring(0,50)+'...':data.text,
+	       		            icon: $scope.getUser(data.id).avatar,
+	       		            delay: 3000
+	       		    });
+	       			notification.$on('error',function(){
+		        		var readText = ($scope.connectedUsers()>1)?$scope.getUser(data.id).name+', '+data.text:data.text;
+		        		var audio = document.getElementById('audiotts')?document.getElementById('audiotts'):document.createElement('audio');
+		        		audio.setAttribute('id', 'audiotts');
+		        		audio.setAttribute('src', '/chat/talk?text=' + encodeURIComponent(readText));
+		        		audio.load();
+		        		audio.play();
+	       			});
+	       	        notification.$on('click', function () {
+	       	        	if (!uiHandler.focused) window.focus();
+	       	        	if (uiHandler.helpchat_class==='showed') $scope.toggleChat();
+	       	        	
+	       	        });
 	       		}
 	        	self.addNewMessage($scope,data);
 	        	uiHandler.safeApply($scope,function(){});
@@ -207,6 +219,7 @@ angular.module('mean.rooms').factory("ChatService",['$timeout','UIHandler','Room
 			    },5000);
 			    $timeout(function(){ self.checkTypingIcons(); },2000);
 			}
+			
 		};
 	};
 }]).filter('to_trusted', ['$sce', function($sce){

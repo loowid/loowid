@@ -191,5 +191,8 @@
 	"days" : "Tage",
 	"hours" : "Stunden",
 	"minutes" : "Minuten",
-	"seconds" : "Sekunden"
+	"seconds" : "Sekunden",
+	"welcometo" : "Welcome to Loowid !!",
+	"connectedto" : "Sie haben in den Wohn ({0}), genießen verbunden !!",
+	"allownotifications" : "Sie müssen loowid Show-Benachrichtigungen für eine optimale Leistung zu ermöglichen."	
 }

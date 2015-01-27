@@ -191,5 +191,8 @@
 	"days" : "dies",
 	"hours" : "hores",
 	"minutes" : "minuts",
-	"seconds" : "segons"
+	"seconds" : "segons",
+	"welcometo": "Benvingut a Loowid !!",
+	"connectedto": "Has connectat a la sala ({0}), gaudeix !!",
+	"allownotifications": "Has de permetre que loowid mostri notificacions per a un funcionament òptim."	
 }

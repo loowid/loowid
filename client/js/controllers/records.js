@@ -226,6 +226,7 @@ angular.module('mean.rooms').controller('RecordController', ['$scope', '$routePa
 					    	$scope.global.avatar = uiHandler.avatar;
 					    	$scope.global.gravatar = uiHandler.gravatar;
 						 	rtc.updateOwnerData (uiHandler.roomId,uiHandler.name,uiHandler.avatar,uiHandler.status,uiHandler.access);
+						 	room.notifyIn($scope);
 		   					room.chat($scope.global.roomId,function(resu){
 		   						uiHandler.chatPage = resu.page;
 		   						chatService.init ($scope,resu.chat);

@@ -1,4 +1,4 @@
-angular.module('mean.rooms').factory("UserHandler",['Rooms','UIHandler',function(Rooms,UIHandler){
+angular.module('mean.rooms').factory("UserHandler",['Rooms','UIHandler','Notification',function(Rooms,UIHandler,Notification){
 	return function (){
 
 		var room = new Rooms({});
@@ -111,9 +111,28 @@ angular.module('mean.rooms').factory("UserHandler",['Rooms','UIHandler',function
 		        	uiHandler.newusers = result;
 		        	uiHandler.users = result;
 		        }
-		        if (uiHandler.connected_class!='') {
-		        	uiHandler.conn_new = 'connected_now';
-		            setTimeout(function(){ uiHandler.conn_new = ''; uiHandler.safeApply($scope,function(){}); },3000);
+		        if (uiHandler.connected_class!='' || !uiHandler.focused) {
+		        	var bd = '';
+		        	for (var u=0; u<uiHandler.newusers.length; u+=1) {
+		        		bd = uiHandler.newusers[u].name + ' ' + (uiHandler.newusers[u].status == 'CONNECTED'?'(+)':'(-)');
+		        	}
+	       		    var notification = new Notification($scope.resourceBundle.usertypeviewer, {
+       		            body: bd,
+       		            icon: uiHandler.newusers.length>1?'img/icons/favicon.ico':uiHandler.newusers[0].avatar,
+       		            delay: 3000
+	       		    });
+	       			notification.$on('error',function(){
+	       				// Doit traditional
+	       				if (uiHandler.connected_class!='') {
+	       					uiHandler.conn_new = 'connected_now';
+	       					setTimeout(function(){ uiHandler.conn_new = ''; uiHandler.safeApply($scope,function(){}); },3000);
+	       				}
+	       			});
+	       	        notification.$on('click', function () {
+	       	        	if (!uiHandler.focused) window.focus();
+	       	        	if (uiHandler.connected_class!='') $scope.toggleConnected();
+	       	        	
+	       	        });
 		        }
 		        //uiHandler.users = result;
 		    };
