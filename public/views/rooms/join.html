@@ -6,8 +6,8 @@
 		<a class="loowidurl expanded" href="{{ui.screenurl}}" target="_blank">{{ui.screenurl}}</a>
 		<a class="loowidurl short" href="{{ui.screenurl}}" target="_blank">https://...{{lastCharsUrl(ui.screenurl)}}</a>
 		<a href="" class="btn btn-icon" ng-click="enableEditAccess()"><i class="fa fa-gear"></i><span class="inner_label">{{resourceBundle.configureroom}}</span></a>
-		<a ng-show="ui.audible" ng-click="enableAudio()" class="btn btn-icon" href=""><i class="fa fa-bell"></i><span class="inner_label">{{resourceBundle.notifaudible}}</span></a>
-		<a ng-hide="ui.audible" ng-click="enableAudio()" class="btn btn-icon" href=""><i class="fa fa-bell-o"></i><span class="inner_label">{{resourceBundle.notifnotaudible}}</span></a>
+		<a ng-hide="ui.notificationReady || !ui.audible" ng-click="enableAudio()" class="btn btn-icon" href=""><i class="fa fa-bell"></i><span class="inner_label">{{resourceBundle.notifaudible}}</span></a>
+		<a ng-hide="ui.notificationReady || ui.audible" ng-click="enableAudio()" class="btn btn-icon" href=""><i class="fa fa-bell-o"></i><span class="inner_label">{{resourceBundle.notifnotaudible}}</span></a>
 		<a ng-click="roomLeave()" href=""><span class="btn leave">{{resourceBundle.leaveroom}} <i class="fa fa-power-off"></i></span></a>
 </div>
 	<nav class="toolbar">
