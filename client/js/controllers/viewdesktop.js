@@ -189,6 +189,7 @@ angular.module('mean.rooms').controller('ViewDesktopController', ['$scope', '$ro
             }
 
         }else{
+        	$location.search('r',null);
             $location.path("/");
         }
 
@@ -264,6 +265,7 @@ angular.module('mean.rooms').controller('ViewDesktopController', ['$scope', '$ro
           
 
         }else{
+        	$location.search('r',null);
             $location.path("/");
         }
 
@@ -286,8 +288,10 @@ angular.module('mean.rooms').controller('ViewDesktopController', ['$scope', '$ro
                 }
             }
         },function (err){
+        	if (rtc._me) rtc.reset();
         	$scope.global.roomId ='';
         	uiHandler.joinable = false;
+        	$location.search('r',null);
             $location.path("/");
         });
     };
