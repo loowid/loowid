@@ -168,8 +168,8 @@ angular.module('mean.rooms').controller('RecordController', ['$scope', '$routePa
   
 
  	$scope.init = function (){
-    	var rid = $location.search().r;
-    	if (!rid) rid = $scope.global.roomId?$scope.global.roomId:$routeParams.roomId;
+    	var rid = $location.search().r || $routeParams.roomId;
+    	//if (!rid) rid = $scope.global.roomId?$scope.global.roomId:$routeParams.roomId;
 
     	uiHandler.roomId = $scope.global.roomId = rid;	
     	uiHandler.screenurl = $location.$$protocol+ "://"+ $location.$$host +  "/#!/r/" + $scope.global.roomId;

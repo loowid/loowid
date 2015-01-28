@@ -155,8 +155,8 @@ angular.module('mean.rooms').controller('ViewDesktopController', ['$scope', '$ro
         }
         
         if (!uiHandler.roomPassword) rtc.reset();
-    	var rid = $location.search().r;
-    	if (!rid) rid = $scope.global.roomId?$scope.global.roomId:$routeParams.roomId;
+    	var rid = $location.search().r||$routeParams.roomId;
+    	//if (!rid) rid = $scope.global.roomId?$scope.global.roomId:$routeParams.roomId;
         var roomId = $scope.global.roomId = rid;
         
         $scope.global.roomId = uiHandler.roomId = roomId;
