@@ -232,6 +232,9 @@ angular.module('mean.rooms').factory("Rooms", ['$resource','$http','$window','No
 	        notification.$on('click', function () {
 	        	if (!$scope.ui.focused) window.focus();
 	        });
+	        notification.$on('show', function () {
+	        	$scope.ui.notificationReady = true;
+	        });
         }
         
      };

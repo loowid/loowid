@@ -112,27 +112,38 @@ angular.module('mean.rooms').factory("UserHandler",['Rooms','UIHandler','Notific
 		        	uiHandler.users = result;
 		        }
 		        if (uiHandler.connected_class!='' || !uiHandler.focused) {
-		        	var bd = '';
-		        	for (var u=0; u<uiHandler.newusers.length; u+=1) {
-		        		bd = uiHandler.newusers[u].name + ' ' + (uiHandler.newusers[u].status == 'CONNECTED'?'(+)':'(-)');
-		        	}
-	       		    var notification = new Notification($scope.resourceBundle.usertypeviewer, {
-       		            body: bd,
-       		            icon: uiHandler.newusers.length>1?'img/icons/favicon.ico':uiHandler.newusers[0].avatar,
-       		            delay: 3000
-	       		    });
-	       			notification.$on('error',function(){
+		        	if (uiHandler.notificationReady) {
+			        	var bd = '';
+			        	for (var u=0; u<uiHandler.newusers.length; u+=1) {
+			        		bd = uiHandler.newusers[u].name + ' ' + (uiHandler.newusers[u].status == 'CONNECTED'?'(+)':'(-)');
+			        	}
+		       		    var notification = new Notification($scope.resourceBundle.usertypeviewer, {
+	       		            body: bd,
+	       		            icon: uiHandler.newusers.length>1?'img/icons/favicon.ico':uiHandler.newusers[0].avatar,
+	       		            delay: 3000
+		       		    });
+		       	        notification.$on('click', function () {
+		       	        	if (!uiHandler.focused) window.focus();
+		       	        	if (uiHandler.connected_class!='') $scope.toggleConnected();
+		       	        });
+		        	} else {
 	       				// Doit traditional
-	       				if (uiHandler.connected_class!='') {
+		        		if (!uiHandler.focused) {
+			        		var readText = $scope.resourceBundle.onlinenews;
+			        		if (uiHandler.newusers.length===1) {
+			        			readText = (uiHandler.newusers[0].status === 'CONNECTED')?$scope.resourceBundle.joinroom:$scope.resourceBundle.uleaveroom;
+			        			readText = readText.replace('{0}',uiHandler.newusers[0].name); 
+			        		}
+			        		var audio = document.getElementById('audiotts')?document.getElementById('audiotts'):document.createElement('audio');
+			        		audio.setAttribute('id', 'audiotts');
+			        		audio.setAttribute('src', '/chat/talk?text=' + encodeURIComponent(readText));
+			        		audio.load();
+			        		audio.play();
+		        		} else {
 	       					uiHandler.conn_new = 'connected_now';
 	       					setTimeout(function(){ uiHandler.conn_new = ''; uiHandler.safeApply($scope,function(){}); },3000);
 	       				}
-	       			});
-	       	        notification.$on('click', function () {
-	       	        	if (!uiHandler.focused) window.focus();
-	       	        	if (uiHandler.connected_class!='') $scope.toggleConnected();
-	       	        	
-	       	        });
+		        	}
 		        }
 		        //uiHandler.users = result;
 		    };

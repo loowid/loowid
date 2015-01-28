@@ -255,6 +255,7 @@ angular.module('mean.rooms').controller('RecordController', ['$scope', '$routePa
    				if (result.owner || !rtc._me) {
    					$location.path("r/"+$scope.global.roomId+'/owner');
    				} else {
+   					room.notifyIn($scope);
    					room.chat($scope.global.roomId,function(results){
    						uiHandler.chatPage = results.page;
    						chatService.init ($scope,results.chat);

@@ -194,5 +194,9 @@
 	"seconds" : "seconds",
 	"welcometo" : "Welcome to Loowid !!",
 	"connectedto" : "You have connected to the ({0}) room, enjoy !!",
-	"allownotifications" : "You must permit loowid notifications for optimal performance."	
+	"allownotifications" : "You must permit loowid notifications for optimal performance.",
+	"joinroom" : "{0} join the room.",
+	"uleaveroom" : "{0} leave the room.",
+	"onlinenews" : "Room viewers has changed."
+	
 }

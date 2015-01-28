@@ -194,5 +194,8 @@
 	"seconds" : "segundos",
 	"welcometo" : "Bienvenido a Loowid!!",
 	"connectedto" : "Has conectado a la sala ({0}), disfruta !!",
-	"allownotifications" : "Debes permitir que loowid muestre notificaciones para un funcionamiento óptimo."
+	"allownotifications" : "Debes permitir que loowid muestre notificaciones para un funcionamiento óptimo.",
+	"joinroom" : "{0} ha entrado en la sala.",
+	"uleaveroom" : "{0} ha abandonado la sala.",
+	"onlinenews" : "Los espectadores de la sala han cambiado."
 }

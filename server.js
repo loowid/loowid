@@ -265,7 +265,7 @@ app.get('/i18n/bundle/resourceBundle.json', function(req, res) {
 app.get('/chat/talk',function(req, res) {
 	// TODO: Get talk smart, do not read everything !!
 	var t = req.query.text;
-	if (t.length>35) t = t.substring(0,35)+';'+i18n.t('moretext');
+	if (t.length>50) t = t.substring(0,50)+';'+i18n.t('moretext');
 	var reqst = http.get(
 			{
 			 host:'translate.google.com',

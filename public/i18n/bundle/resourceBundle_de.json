@@ -194,5 +194,8 @@
 	"seconds" : "Sekunden",
 	"welcometo" : "Welcome to Loowid !!",
 	"connectedto" : "Sie haben in den Wohn ({0}), genießen verbunden !!",
-	"allownotifications" : "Sie müssen loowid Show-Benachrichtigungen für eine optimale Leistung zu ermöglichen."	
+	"allownotifications" : "Sie müssen loowid Show-Benachrichtigungen für eine optimale Leistung zu ermöglichen.",
+	"joinroom": "{0} verbinden den Raum.",
+	"uleaveroom": "{0} den Raum verlassen.",
+	"onlinenews": "Room Zuschauer hat sich geändert."		
 }

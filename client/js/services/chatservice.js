@@ -172,24 +172,24 @@ angular.module('mean.rooms').factory("ChatService",['$timeout','UIHandler','Room
 					return;
 				}
 	       		if ((uiHandler.helpchat_class=='showed' || !uiHandler.focused) && uiHandler.audible && data.id!=rtc._me) {
-	       		    var notification = new Notification($scope.getUser(data.id).name, {
-	       		            body: data.text.length>50?data.text.substring(0,50)+'...':data.text,
-	       		            icon: $scope.getUser(data.id).avatar,
-	       		            delay: 3000
-	       		    });
-	       			notification.$on('error',function(){
+	       			if (uiHandler.notificationReady) {
+		       		    var notification = new Notification($scope.getUser(data.id).name, {
+		       		            body: data.text.length>50?data.text.substring(0,50)+'...':data.text,
+		       		            icon: $scope.getUser(data.id).avatar,
+		       		            delay: 3000
+		       		    });
+		       	        notification.$on('click', function () {
+		       	        	if (!uiHandler.focused) window.focus();
+		       	        	if (uiHandler.helpchat_class==='showed') $scope.toggleChat();
+		       	        });
+	       			} else {
 		        		var readText = ($scope.connectedUsers()>1)?$scope.getUser(data.id).name+', '+data.text:data.text;
 		        		var audio = document.getElementById('audiotts')?document.getElementById('audiotts'):document.createElement('audio');
 		        		audio.setAttribute('id', 'audiotts');
 		        		audio.setAttribute('src', '/chat/talk?text=' + encodeURIComponent(readText));
 		        		audio.load();
 		        		audio.play();
-	       			});
-	       	        notification.$on('click', function () {
-	       	        	if (!uiHandler.focused) window.focus();
-	       	        	if (uiHandler.helpchat_class==='showed') $scope.toggleChat();
-	       	        	
-	       	        });
+	       			}
 	       		}
 	        	self.addNewMessage($scope,data);
 	        	uiHandler.safeApply($scope,function(){});
