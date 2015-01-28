@@ -191,7 +191,7 @@ exports.createid = function(req, res, next) {
 exports.create = function(req, res, next) {
 	// Check the id is the same as previously created
 	if (req.session.roomId === req.body.roomId){
-		var acc = {shared:'LINK',title:req.body.title,keywords:[],passwd:makeId(),moderated:false,chat:true,locked:false,permanent:false,permanentkey:makeId()};
+		var acc = {shared:'LINK',title:req.body.title,keywords:[],passwd:makeId(),moderated:req.lti?true:false,chat:true,locked:false,permanent:false,permanentkey:makeId()};
 		var now = new Date();
 		var due = new Date();
 		due.setDate(new Date(now.getDate()+(process.env.ROOM_TIMEOUT || 15)));
