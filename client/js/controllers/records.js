@@ -263,6 +263,7 @@ angular.module('mean.rooms').controller('RecordController', ['$scope', '$routePa
    			}
 
 		},function (error){
+			if (rtc._me) rtc.reset();
 			uiHandler.roomStatus = 'inactive';
 			$scope.global.roomId ='';
 			$scope.global.sessionclosed =true;
