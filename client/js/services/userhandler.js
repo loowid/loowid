@@ -128,7 +128,7 @@ angular.module('mean.rooms').factory("UserHandler",['Rooms','UIHandler','Notific
 		       	        });
 		        	} else {
 	       				// Doit traditional
-		        		if (!uiHandler.focused) {
+		        		if (!uiHandler.focused && uiHandler.audible) {
 			        		var readText = $scope.resourceBundle.onlinenews;
 			        		if (uiHandler.newusers.length===1) {
 			        			readText = (uiHandler.newusers[0].status === 'CONNECTED')?$scope.resourceBundle.joinroom:$scope.resourceBundle.uleaveroom;

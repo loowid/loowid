@@ -3,6 +3,8 @@
 	<div class="main-header">
 		<span class="loowidLogo">LooWID</span>
 		<span>{{ui.access.title}}</span>
+		<a ng-show="ui.audible" ng-click="enableAudio()" class="btn btn-icon" href=""><i class="fa fa-bell"></i><span class="inner_label">{{resourceBundle.notifaudible}}</span></a>
+		<a ng-hide="ui.audible" ng-click="enableAudio()" class="btn btn-icon" href=""><i class="fa fa-bell-o"></i><span class="inner_label">{{resourceBundle.notifnotaudible}}</span></a>
 		<a ng-click="roomLeave()" href=""><span class="btn leave">{{resourceBundle.leaveroom}}  <i class="fa fa-power-off"></i></span></a></a>
 	</div>
 	<nav class="toolbar">
@@ -191,7 +193,6 @@
 			</div>
 		</article>
 </section>
-<p id="helper_chat" ng-class="ui.helpchat_class" ng-click="enableAudio()"><i class="fa fa-volume-down"></i> {{ui.audible? resourceBundle.chatisaudible : resourceBundle.chatisnotaudible}}</p>
 <div id="error" ng-class="error_class" ng-click="hideError()"><div class="error"><h3<h3 ng-bind-html="error_message"></h3></div></div>
 <aside id="chat" ng-class="ui.chat_class">
 	<span class="toggler" ng-click="toggleChat()"><i class="fa fa-angle-double-right"></i></span>

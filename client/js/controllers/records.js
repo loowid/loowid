@@ -20,7 +20,6 @@ angular.module('mean.rooms').controller('RecordController', ['$scope', '$routePa
 	uiHandler.conn_new = '';
 	uiHandler.connected_class = '';
 	uiHandler.chat_class = '';
-	uiHandler.helpchat_class = '';
 	uiHandler.dash_conn = '';
 	uiHandler.dash_chat = '';
 	

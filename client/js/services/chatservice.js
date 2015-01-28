@@ -6,12 +6,32 @@ angular.module('mean.rooms').factory("ChatService",['$timeout','UIHandler','Room
 		var self= this;
 		var room = new Rooms({});
 
+		this.formatDate = function($scope,t,fm) {
+		   var yyyy = t.getFullYear().toString();
+		   var mm = (t.getMonth()+1).toString();
+		   var dd  = t.getDate().toString();
+		   var mi = t.getMinutes().toString();
+		   var hh = t.getHours().toString();
+		   var dm = $scope.resourceBundle.dateformat
+		   			.replace('yyyy',yyyy)
+		   			.replace('mm',(mm[1]?mm:"0"+mm[0]))
+		   			.replace('dd',(dd[1]?dd:"0"+dd[0]));
+		   var tm = $scope.resourceBundle.timeformat
+		   			.replace('hh',(hh[1]?hh:"0"+hh[0]))
+		   			.replace('mi',(mi[1]?mi:"0"+mi[0]));
+		   return fm?dm+' '+tm:tm;
+		}
+		
 	    this.timeAgo = function($scope,t) {
 	        var t2 = (new Date()).getTime();
 	        var t1 = t.getTime();
 	        var secs =  parseInt((t2-t1)/(1000));
 	        var mins = parseInt((t2-t1)/(1000*60));
-	        return $scope.resourceBundle.timeprep + (secs>59 ? (mins + $scope.resourceBundle.minago) : (secs + $scope.resourceBundle.secago));
+	        if (secs>59) {
+        		return (mins>59)?this.formatDate($scope,t,(mins>60*24)):$scope.resourceBundle.timeprep.replace('{0}',mins);
+	        } else {
+        		return (secs>30)?$scope.resourceBundle.lessthanaminute:$scope.resourceBundle.justnow;
+	        }
 	    }
 	    
 	    this.longTimeAgo = function(newTime,lastTime) {
@@ -115,7 +135,6 @@ angular.module('mean.rooms').factory("ChatService",['$timeout','UIHandler','Room
 	    	
 	        $scope.toggleChat = function() { 
 	        	uiHandler.chat_class=(uiHandler.chat_class=='collapsed')?'':'collapsed';
-	        	uiHandler.helpchat_class=(uiHandler.helpchat_class=='showed')?'':'showed';
 	        	uiHandler.dash_chat=(uiHandler.chat_class=='collapsed')?'chat_collapsed':'';
 	        }
 
@@ -171,7 +190,7 @@ angular.module('mean.rooms').factory("ChatService",['$timeout','UIHandler','Room
 					self.addToQueue(data);
 					return;
 				}
-	       		if ((uiHandler.helpchat_class=='showed' || !uiHandler.focused) && uiHandler.audible && data.id!=rtc._me) {
+	       		if ((uiHandler.chat_class!='' || !uiHandler.focused) && data.id!=rtc._me) {
 	       			if (uiHandler.notificationReady) {
 		       		    var notification = new Notification($scope.getUser(data.id).name, {
 		       		            body: data.text.length>50?data.text.substring(0,50)+'...':data.text,
@@ -180,9 +199,9 @@ angular.module('mean.rooms').factory("ChatService",['$timeout','UIHandler','Room
 		       		    });
 		       	        notification.$on('click', function () {
 		       	        	if (!uiHandler.focused) window.focus();
-		       	        	if (uiHandler.helpchat_class==='showed') $scope.toggleChat();
+		       	        	if (uiHandler.chat_class!='') $scope.toggleChat();
 		       	        });
-	       			} else {
+	       			} else if (uiHandler.audible) {
 		        		var readText = ($scope.connectedUsers()>1)?$scope.getUser(data.id).name+', '+data.text:data.text;
 		        		var audio = document.getElementById('audiotts')?document.getElementById('audiotts'):document.createElement('audio');
 		        		audio.setAttribute('id', 'audiotts');
@@ -216,7 +235,7 @@ angular.module('mean.rooms').factory("ChatService",['$timeout','UIHandler','Room
 			        self.addNewMessage($scope,{id:$scope.global.bot,text:$scope.resourceBundle.welcomechatmess,time:new Date()});
 			        self.addNewMessage($scope,{id:$scope.global.bot,text:$scope.resourceBundle.helpuschatmess,time:new Date()});
 			        self.welcomePublished =true;
-			    },5000);
+			    },1000);
 			    $timeout(function(){ self.checkTypingIcons(); },2000);
 			}
 			

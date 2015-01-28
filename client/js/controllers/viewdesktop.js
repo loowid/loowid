@@ -7,7 +7,6 @@ angular.module('mean.rooms').controller('ViewDesktopController', ['$scope', '$ro
     
     uiHandler.connected_class = '';
     uiHandler.chat_class = '';
-    uiHandler.helpchat_class = '';
     uiHandler.remote_screen_class ='';
     
     uiHandler.dash_conn = '';
