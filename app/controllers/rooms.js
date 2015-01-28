@@ -194,7 +194,7 @@ exports.create = function(req, res, next) {
 		var acc = {shared:'LINK',title:req.body.title,keywords:[],passwd:makeId(),moderated:req.lti?true:false,chat:true,locked:false,permanent:false,permanentkey:makeId()};
 		var now = new Date();
 		var due = new Date();
-		due.setDate(new Date(now.getDate()+(process.env.ROOM_TIMEOUT || 15)));
+		due.setDate(new Date(now.getDate()+Number(process.env.ROOM_TIMEOUT || 15)));
 		var room = new Room (
 				{roomId: req.session.roomId, 
 				 created: now,

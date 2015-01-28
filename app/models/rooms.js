@@ -5,7 +5,7 @@ var Schema = mongoose.Schema;
 /**
  * Room schema
  */
-var ttl = 3600 * 24 * (process.env.ROOM_TIMEOUT || 15); // Room expires after 15 days
+var ttl = 3600 * 24 * Number(process.env.ROOM_TIMEOUT || 15); // Room expires after 15 days
 
 var UserSchema = new Schema ({
 	name: String, 
