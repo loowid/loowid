@@ -223,6 +223,7 @@
 		</article>
 		<div class="url-message" ng-show="global.access.permanent" ng-class="{'active-broadcasting' : isRecording('screen') || isInitializingMedia('screen')}">
 			<h3>{{resourceBundle.permanentroom}} - {{resourceBundle.roomowner}}</h3>
+			<div class="nomsg">Deja de compartir la pantalla para ver la URL privada</div>
 			<p class="message">{{resourceBundle.permanentUrl}}</p>
 			<a href="{{ui.permanenturl}}">{{ui.permanenturl}}</a>
 			<p class="datetime">{{ui.countDown}}</p>
