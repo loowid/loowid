@@ -94,7 +94,12 @@ h1, h2, h3, h4, h5, h6{
 			
 		}
 	}
+	.nomsg{
+		display: none;
+		z-index: 99;
+	}
 	&.active-broadcasting{
+		bottom: 0px;
 		border-left: 0px none;
 		background: rgba(255,255,255,0.3);
 		.box-shadow(0 0 0px rgba(255,255,255,.1) );
@@ -103,6 +108,17 @@ h1, h2, h3, h4, h5, h6{
 		}
 		a{
             .filter( blur(10px) grayscale(100%) );
+		}
+		.nomsg{
+			display: block;
+			width: 80%;
+			margin: 0 auto 0 auto;
+			bottom: 5px;
+			position: fixed;
+			background: @maincolor;
+			color: @bgcolor;
+			padding: 0.85em;
+			font-size: 0.8em;
 		}
 	}
 }
