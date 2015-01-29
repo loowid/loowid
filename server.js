@@ -13,9 +13,8 @@ var i18n = require('i18next');
 var express = require('express');//, jade = require('jade');
 var defaultPort = isNaN(process.argv[2]) && process.argv[2]!=='jasmine_node';
 var portvalue = process.env.LOOWID_HTTP_PORT || 80;
-if (!isNaN(process.argv[2])) {
-	portvalue = (process.argv[2]-0);
-	defaultPort = false;
+if (!isNaN(process.argv[2]) || !defaultPort) {
+	portvalue = !isNaN(process.argv[2])?(process.argv[2]-0):8080;
 }
 
 var port = process.env.OPENSHIFT_NODEJS_PORT ||  process.env.OPENSHIFT_INTERNAL_PORT || portvalue;

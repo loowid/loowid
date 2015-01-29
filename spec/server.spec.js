@@ -15,7 +15,7 @@ describe('Main Server Tests', function() {
 	utils.Log = mongoose.model('Log');
 	utils.WSEvent = mongoose.model('WSEvent');
 	utils.Room = mongoose.model('Room');
-	utils.testDomain = 'http://localhost';
+	utils.testDomain = 'http://localhost:8080';
 
 	utils._events = {};
 	utils.addListener = function(eventName, callback) {
@@ -34,7 +34,7 @@ describe('Main Server Tests', function() {
 	};
 	utils.connect = function() {
 		//utils.ws = new WebSocket('ws://localhost/',null,utils.options);
-		utils.ws = new WebSocket('ws://localhost/');
+		utils.ws = new WebSocket('ws://localhost:8080/');
 		utils.ws.on('open', function(){
 			// Initial call in open
 			utils.ws.send(JSON.stringify({'eventName': 'update_server_config','data': {	'room': utils.room	}}));
