@@ -199,6 +199,6 @@
 	"allownotifications": "Has de permetre que loowid mostri notificacions per a un funcionament òptim.",
 	"joinroom" : "{0} ha entrat a la sala.",
 	"uleaveroom" : "{0} ha abandonat la sala.",
-	"onlinenews" : "Els espectadors de la sala d'han canviat."
-		
+	"onlinenews" : "Els espectadors de la sala d'han canviat.",
+	"hideUrl" : "Deixa de compartir la pantalla per veure la URL privada"
 }
