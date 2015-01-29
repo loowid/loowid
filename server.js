@@ -11,7 +11,7 @@ var logger = log4js.getLog('server');
 var crypto = require('crypto') ;
 var i18n = require('i18next');
 var express = require('express');//, jade = require('jade');
-var defaultPort = true;
+var defaultPort = isNaN(process.argv[2]) && process.argv[2]!=='jasmine_node';
 var portvalue = process.env.LOOWID_HTTP_PORT || 80;
 if (!isNaN(process.argv[2])) {
 	portvalue = (process.argv[2]-0);

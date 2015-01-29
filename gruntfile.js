@@ -222,6 +222,6 @@ module.exports = function(grunt) {
     grunt.registerTask('mini', ['minijs','less']);
     
     // Run tests
-    grunt.registerTask('test', ['concurrent:test']);
+    grunt.registerTask('test', ['jshint','concurrent:test']);
 
 };

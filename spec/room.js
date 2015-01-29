@@ -6,7 +6,7 @@ module.exports = function(request,test,utils) {
 	    test('Keep call returns true.', function(done) {
 	    	request.post({
 	    		  headers: {'content-type':'application/x-www-form-urlencoded','x-csrf-token':utils.csrf},
-	    		  url:     'https://localhost/rooms/keep'
+	    		  url:     utils.testDomain+'/rooms/keep'
 	    	}, function(error, response, body){
 	            expect(error).toBeNull();
 	            expect(response.statusCode).toBe(200);
@@ -21,7 +21,7 @@ module.exports = function(request,test,utils) {
 	    	requestDate.setTime(requestDate.getTime() - 1000);
 	    	request.post({
 	    		  headers: {'content-type':'application/x-www-form-urlencoded','x-csrf-token':utils.csrf},
-	    		  url:     'https://localhost/rooms/createid'
+	    		  url:     utils.testDomain+'/rooms/createid'
 	    	}, function(error, response, body){
 	            expect(error).toBeNull();
 	            expect(response.statusCode).toBe(200);
@@ -47,7 +47,7 @@ module.exports = function(request,test,utils) {
 	    	requestDate.setTime(requestDate.getTime() - 1000);
 	    	request.post({
 	    		  headers: {'content-type':'application/x-www-form-urlencoded','x-csrf-token':utils.csrf},
-	    		  url:     'https://localhost/rooms/create',
+	    		  url:     utils.testDomain+'/rooms/create',
 	    		  form:    {roomId: utils.roomID, name: 'test',connectionId: 'socketid', avatar: 'test/avatar'}
 	    	}, function(error, response, body){
 	            expect(error).toBeNull();
@@ -93,7 +93,6 @@ module.exports = function(request,test,utils) {
 				}
 	    	}));
 	    });
-	    
 	    
 	});	
 	
