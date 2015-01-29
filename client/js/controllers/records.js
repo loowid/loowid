@@ -231,6 +231,7 @@ angular.module('mean.rooms').controller('RecordController', ['$scope', '$routePa
 		   						chatService.init ($scope,resu.chat);
 		                        if (window.innerWidth <= 800 ){
 		                            $scope.toggleChat();
+									$scope.toggleConnected();
 		                        }
 		   					});
 			            });
@@ -240,10 +241,7 @@ angular.module('mean.rooms').controller('RecordController', ['$scope', '$routePa
                         uiHandler.gravatar = joinUsr.gravatar;
 			            $scope.global.name = uiHandler.name;
 			            $scope.global.gravatar = uiHandler.gravatar;
-
-                        if (window.innerWidth <= 800 ){
-                            $scope.toggleConnected();
-                        }
+                       
                         
 				 	} else {
 				 		// Probably is a viewer trying to use join url
