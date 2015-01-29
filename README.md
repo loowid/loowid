@@ -95,6 +95,6 @@ https://www.loowid.com
   LTI_SECRET=<lti-secret>
   LTI_PATH=<lti-url>
   LTI_DOMAIN=<lti-host>
-  LTI_OWNER_ROLE=<lti-owner-role>
+  LTI_OWNER_ROLES=<lti-owner-role1>,<lti-owner-role2>,...
   ```
 

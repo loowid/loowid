@@ -166,7 +166,11 @@ var strategy = new LTIStrategy({
   	passReqToCallback : true
 }, function(req, lti, done) {
 	// LTI launch parameters
-	var is_owner = (lti.roles.indexOf(process.env.LTI_OWNER_ROLE || 'Instructor') > -1);
+	var definedRole = (process.env.LTI_OWNER_ROLES || 'Instructor').split(',');
+	var is_owner = false;
+	for (var k=0; k<definedRole.length && !is_owner; k+=1) {
+		is_owner = (lti.roles.indexOf(definedRole[k]) > -1);
+	}
 	rooms.createOrFindLTI(req,lti,is_owner,function(r){
 		req.session.ltiname = lti.lis_person_name_full;
 		req.session.ltiavtr = rooms.getGravatarImg(lti.lis_person_contact_email_primary);
