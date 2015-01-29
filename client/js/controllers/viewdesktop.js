@@ -131,7 +131,6 @@ angular.module('mean.rooms').controller('ViewDesktopController', ['$scope', '$ro
 			chatService.init ($scope,resu.chat);
             if (window.innerWidth <= 800 ){
                 $scope.toggleChat();
-				$scope.toggleConnected();
             }
 		});
         // Set my own name
