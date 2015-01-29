@@ -215,26 +215,28 @@ angular.module('mean.rooms').factory("Rooms", ['$resource','$http','$window','No
         
         this.notifyIn = function($scope) {
         	var self = this;
-   		    var notification = new Notification($scope.resourceBundle.welcometo, {
-		            body: $scope.resourceBundle.connectedto.replace('{0}',$scope.global.roomId),
-		            icon: 'img/icons/favicon.ico',
-		            delay: 3000
-		    });
-			notification.$on('error',function(){
-    			$scope.ui.modals.push({'text': $scope.resourceBundle.allownotifications,
-    				'yes': function (index){
-    					$scope.ui.modals.splice(index,1);
-    				},
-    				"class":'modalform editable',
-    				"done":false
-    			});	
+   		    Notification.requestPermission(function (){
+				var notification = new Notification($scope.resourceBundle.welcometo, {
+						body: $scope.resourceBundle.connectedto.replace('{0}',$scope.global.roomId),
+						icon: 'img/icons/favicon.ico',
+						delay: 3000
+				});
+				notification.$on('error',function(){
+					$scope.ui.modals.push({'text': $scope.resourceBundle.allownotifications,
+						'yes': function (index){
+							$scope.ui.modals.splice(index,1);
+						},
+						"class":'modalform editable',
+						"done":false
+					});	
+				});
+				notification.$on('click', function () {
+					if (!$scope.ui.focused) window.focus();
+				});
+				notification.$on('show', function () {
+					$scope.ui.notificationReady = true;
+				});
 			});
-	        notification.$on('click', function () {
-	        	if (!$scope.ui.focused) window.focus();
-	        });
-	        notification.$on('show', function () {
-	        	$scope.ui.notificationReady = true;
-	        });
         }
         
      };
