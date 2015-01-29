@@ -111,7 +111,7 @@ angular.module('ngWindowManager',[])
 				windowArea.addEventListener (isTouch ? 'touchmove' : 'mousemove',dragWindow);
 				windowArea.addEventListener (isTouch ? 'touchend' : 'mouseup',dragWindowEnds);
 
-				selectWindow();
+				winHandler.selectWindow();
 				
 				e.preventDefault();
 			};
@@ -131,7 +131,7 @@ angular.module('ngWindowManager',[])
 
 				windowArea.addEventListener (isTouch ? 'touchmove' : 'mousemove',dragWindowCorner);
 				windowArea.addEventListener (isTouch ? 'touchend' : 'mouseup', dragWindowCornerEnds);
-				selectWindow();
+				winHandler.selectWindow();
 				
 				e.preventDefault();
 
@@ -142,7 +142,7 @@ angular.module('ngWindowManager',[])
 				var moveRef = (e.targetTouches && e.targetTouches.length === 1) ?  e.targetTouches[0] : e;
 			
 				if (positionState){
-					move(
+					winHandler.move(
 						moveRef.pageX - positionState.x,
 						moveRef.pageY - positionState.y
 					);
@@ -156,7 +156,7 @@ angular.module('ngWindowManager',[])
 				var moveRef = (e.targetTouches && e.targetTouches.length === 1) ?  e.targetTouches[0] : e;
 				
 				if (sizeState){
-					resize (
+					winHandler.resize (
 						moveRef.pageX + sizeState.width,
 						moveRef.pageY + sizeState.height
 					);	
@@ -176,7 +176,7 @@ angular.module('ngWindowManager',[])
 
 				windowArea.removeEventListener (isTouch ? 'touchmove' : 'mousemove',dragWindow);
 				windowArea.removeEventListener (isTouch ? 'touchend' : 'mouseup',dragWindowEnds);
-				titleBarElement.removeEventListener ('click', selectWindow);
+				titleBarElement.removeEventListener ('click', winHandler.selectWindow);
 				
 				e.preventDefault();
 			};
@@ -221,27 +221,27 @@ angular.module('ngWindowManager',[])
 			};
 
 			//set the element in the specified position
-			var move = function(x, y) {
+			winHandler.move = function(x, y) {
 				element.css('left',x +'px');
 				element.css('top',y + 'px');
 
 			};
 
 			//set the new size of the element
-			var resize = function (width,height) {
+			winHandler.resize = function (width,height) {
 				element.css ('width', width + 'px');
 				element.css ('height', height + 'px');
 			};
 
 			//Move the current window to the highest position
-			var selectWindow = function (){
+			winHandler.selectWindow = function (){
 				parentWindow.topZ = parentWindow.topZ +1;
 				element.css ('z-index', parentWindow.topZ);
 				if (scope.selectwindow) scope.selectwindow(winHandler);
 			};
 			
 			//This functions is executed when maximize is executed
-			var maximize = function (){
+			winHandler.maximize = function (){
 				
 				//Store the position and the size state
 				maximizeState = {
@@ -268,20 +268,20 @@ angular.module('ngWindowManager',[])
 				};
 				
 				//move, set the effect and resize 
-				move (maximizeCoords.x + 10,maximizeCoords.y +10 );
+				winHandler.move (maximizeCoords.x + 10,maximizeCoords.y +10 );
 				element.addClass ('maximizing');
 				element.addClass('maximized');
-				resize (maximizeCoords.width -20, maximizeCoords.height - 20);
+				winHandler.resize (maximizeCoords.width -20, maximizeCoords.height - 20);
 				
 				//Set the apropiate listeners
-				maximizeButton.removeEventListener ('click',maximize);
-				maximizeButton.removeEventListener ('touchstart',maximize);
+				maximizeButton.removeEventListener ('click',winHandler.maximize);
+				maximizeButton.removeEventListener ('touchstart',winHandler.maximize);
 				
-				maximizeButton.addEventListener ('click',restore);
-				maximizeButton.addEventListener ('touchstart',restore);
+				maximizeButton.addEventListener ('click',winHandler.restore);
+				maximizeButton.addEventListener ('touchstart',winHandler.restore);
 				
-				titleBarElement.removeEventListener ('dblclick', maximize);
-				titleBarElement.addEventListener ('dblclick', restore);
+				titleBarElement.removeEventListener ('dblclick', winHandler.maximize);
+				titleBarElement.addEventListener ('dblclick', winHandler.restore);
 				
 				//Stop all the window listener (drag,resize...)
 				stopWindowListeners();
@@ -298,25 +298,25 @@ angular.module('ngWindowManager',[])
 				
 			};
 			
-			var restore = function (){
+			winHandler.restore = function (){
 				//move and resize to previus state
 				element.addClass ('restoring');
 				element.removeClass ('maximized');
 				
 				//move and resize to prior state
-				move (maximizeState.x,maximizeState.y);
-				resize(maximizeState.width,maximizeState.height);
+				winHandler.move (maximizeState.x,maximizeState.y);
+				winHandler.resize(maximizeState.width,maximizeState.height);
 				element.css ('z-index',maximizeState.z);	  
 				//Restore the listeners	   
-				maximizeButton.removeEventListener ('click',restore);
-				maximizeButton.removeEventListener ('touchstart',restore);
+				maximizeButton.removeEventListener ('click',winHandler.restore);
+				maximizeButton.removeEventListener ('touchstart',winHandler.restore);
 	
-				maximizeButton.addEventListener ('click',maximize);
-				maximizeButton.addEventListener ('touchstart',maximize);
+				maximizeButton.addEventListener ('click',winHandler.maximize);
+				maximizeButton.addEventListener ('touchstart',winHandler.maximize);
 				
 				
-				titleBarElement.removeEventListener ('dblclick', restore);
-				titleBarElement.addEventListener ('dblclick', maximize);
+				titleBarElement.removeEventListener ('dblclick',winHandler.restore);
+				titleBarElement.addEventListener ('dblclick', winHandler.maximize);
 				
 				//start all the window listener (drag,resize...)
 				startWindowListeners();
@@ -340,7 +340,7 @@ angular.module('ngWindowManager',[])
 				
 				resizeButtonElement.addEventListener ('mousedown',startResizing);
 				resizeButtonElement.addEventListener ('touchstart',startResizing);
-				contentButtonElement.addEventListener ('click', selectWindow);
+				contentButtonElement.addEventListener ('click', winHandler.selectWindow);
 				
 			};
 			
@@ -350,7 +350,7 @@ angular.module('ngWindowManager',[])
 				
 				resizeButtonElement.removeEventListener ('mousedown',startResizing);
 				resizeButtonElement.removeEventListener ('touchstart',startResizing);
-				contentButtonElement.removeEventListener ('click', selectWindow);
+				contentButtonElement.removeEventListener ('click', winHandler.selectWindow);
 			};
 			
 			//Set the window in creatio
@@ -361,25 +361,25 @@ angular.module('ngWindowManager',[])
 			//Set buttons listener
 			closeButton.addEventListener ('click',winHandler.close);
 			closeButton.addEventListener ('touchstart',winHandler.close);
-			maximizeButton.addEventListener ('click',maximize);
-			maximizeButton.addEventListener ('touchstart',maximize);
-			if (scope.maximizable) {titleBarElement.addEventListener ('dblclick', maximize);}
+			maximizeButton.addEventListener ('click',winHandler.maximize);
+			maximizeButton.addEventListener ('touchstart',winHandler.maximize);
+			if (scope.maximizable) {titleBarElement.addEventListener ('dblclick', winHandler.maximize);}
 			
 			// apply the options for the window
 			if (options.position){
 				var position = options.position;
-				move (position.x,position.y);	
+				winHandler.move (position.x,position.y);	
 			}
 			if (options.size){
 				var size = options.size;
-				resize (size.width,size.height);
+				winHandler.resize (size.width,size.height);
 			}
 			
 			//To avoid adding transition listeners we remove tha clas after some time
 			setTimeout (function (){
 				element.addClass ('active');
 				element.addClass ('opening');
-				selectWindow();
+				winHandler.selectWindow();
 			
 				setTimeout (function (){
 					element.removeClass ('opening');
