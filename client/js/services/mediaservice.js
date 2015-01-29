@@ -353,7 +353,7 @@ angular.module('mean.rooms').factory("MediaService",['Rooms','UIHandler',functio
 					
 					//The rest of code it by async thread to keep webrtc sync stream close quick. Bit tricky here
 					 setTimeout( function (){
-					  	  windowHandler.create	 ($scope,mediaElement,$scope.getUserName(connectionId),streamId,mediasource.winratio,mediasource.winscale, uiHandler.isOwner,
+					  	  windowHandler.create	 ($scope,mediaElement,$scope.getUserName(connectionId),streamId,mediasource.winratio,mediasource.winscale, uiHandler.isowner,
 		            		function (win){
 		           				//Attach the window reference to the media source
 		           				mediasource.window = win;
@@ -417,30 +417,32 @@ angular.module('mean.rooms').factory("MediaService",['Rooms','UIHandler',functio
         		//If any body disconnects we try to remove possible streams windows
 	        	if (connectionId){
 		    		//we turn off all their streams 
-		    		for (var i = 0; i< uiHandler.users.length; i++){
-	            		
+		    	
+					for (var i = 0; i< uiHandler.users.length; i++){
 
-	            	    if (connectionId === uiHandler.users[i].connectionId){
-	                        
-	                        for (var j = 0 ; j < self.receivedStreams.length ; j++){
-	                            var mediasource = self.receivedStreams [j];
-	                            
-	                            if (mediasource.connectionId == connectionId){
-	                    			var streamId = mediasource.connectionId + "_" + mediasource.type;
-	      		                    rtc.dropPeerConnection(connectionId,mediasource.type,false);
+							if (connectionId === uiHandler.users[i].connectionId || connectionId === uiHandler.ownerConnectionId){
 
-	                    			if (mediasource.playtype =='video'){
-		                    			mediasource.window.winHandler.close();
-		                   	        }else{
-		                   	        	$('#remote_'+streamId).remove();
-		                   	        }
+								for (var j = 0 ; j < self.receivedStreams.length ; j++){
+									var mediasource = self.receivedStreams [j];
 
-		                   	     self.receivedStreams.splice (j,1);
-		                   	     j--;
-		                   	    }
-	                        }
-	                    }   
-	                }
+									if (mediasource.connectionId == connectionId){
+										var streamId = mediasource.connectionId + "_" + mediasource.type;
+										rtc.dropPeerConnection(connectionId,mediasource.type,false);
+
+										if (mediasource.playtype =='video'){
+											mediasource.window.winHandler.close();
+										}else{
+											$('#remote_'+streamId).remove();
+										}
+
+									 self.receivedStreams.splice (j,1);
+									 j--;
+									}
+								}
+								break;
+							}   
+						}
+					
 	        	}
 	        });
  
