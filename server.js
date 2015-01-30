@@ -286,7 +286,9 @@ app.get('/chat/talk',function(req, res) {
 
 var pck = require('./package.json');
 var getClusterNode = function (req) {
-	var node = req.cookies.stickyid || req.headers.stickyid || ':'+(process.env.OPENSHIFT_GEAR_UUID || 'local');
+	var machineId = (process.env.OPENSHIFT_GEAR_UUID || 'local');
+	machineId = machineId.substring(machineId.length-5);
+	var node = req.cookies.stickyid || req.headers.stickyid || ':'+machineId;
 	return node.substring(node.lastIndexOf(':')+1);
 };
 
