@@ -217,7 +217,7 @@ angular.module('mean.rooms').controller('ViewDesktopController', ['$scope', '$ro
             uiHandler.chatstatus = data.access.chat;
             
             if (chatModified) {
-                chatService.alertChatStatus($scope,data.access.chat== true ?'enabled':'disabled');
+                chatService.alertChatStatus($scope,data.access.chat?'disabled':'enabled');
             }
             $scope.$apply();
         });

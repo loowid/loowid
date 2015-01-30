@@ -59,7 +59,7 @@ angular.module('mean.rooms').controller('RecordController', ['$scope', '$routePa
             $scope.global.access = angular.copy(uiHandler.access);
             rtc.updateOwnerData(uiHandler.roomId,uiHandler.name,uiHandler.avatar,uiHandler.status,uiHandler.access);
             if (uiHandler.enabledChat !=  uiHandler.access.chat) {
-                chatService.alertChatStatus($scope,rdo.access.chat?'enabled':'disabled');
+                chatService.alertChatStatus($scope,rdo.access.chat?'disabled':'enabled');
             };
               $scope.enableEditAccess();
         });
