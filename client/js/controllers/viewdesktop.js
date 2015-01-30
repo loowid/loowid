@@ -185,7 +185,7 @@ angular.module('mean.rooms').controller('ViewDesktopController', ['$scope', '$ro
 			mediaService.init($scope,windowHandler);
 
             if (window.innerWidth <= 800 ){
-                $scope.toogleConnected();
+                $scope.toggleConnected();
             }
 
         }else{
