@@ -311,7 +311,7 @@ if (process.env.OPENSHIFT_NODEJS_PORT || process.env.OPENSHIFT_INTERNAL_PORT) {
 					appName : 'Loowid',
 					version: pck.version,
 					node: getClusterNode(req),
-					host: req.host,
+					host: process.env.WS_HOST || req.host,
 					port: ':8443'
 				});
 			}
@@ -335,7 +335,7 @@ if (process.env.OPENSHIFT_NODEJS_PORT || process.env.OPENSHIFT_INTERNAL_PORT) {
 					appName : 'Loowid',
 					version: pck.version,
 					node: getClusterNode(req),
-					host: req.host,
+					host: process.env.WS_HOST || req.host,
 					port: ''
 				});
 			}
