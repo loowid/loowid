@@ -17,6 +17,8 @@ https://www.loowid.com
   5. `npm start`
   6. Connect to https://localhost/
 
+**Note**: If you want to work with the **latest stable release** then you must clone `https://github.com/loowid/loowid/tree/1.1.0`
+
 ## Docker
 
   Too many steps to install? Don't worry loowid is also dockerized !!
