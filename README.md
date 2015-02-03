@@ -4,6 +4,9 @@
 *LOOk What I'm Doing* is a web application that allows you to connect with other users and share audio, video, screen and files without any plugin using WebRTC technology.
 
 https://www.loowid.com
+
+Vote us !! [![Loowid Bitnami Contest](https://d33np9n32j53g7.cloudfront.net/assets/stacks/loowid/img/loowid-module-20caa0b9cc4fc99d7b5929ab83f8418f.png)](https://bitnami.com/stack/loowid?utm_source=bitnami&utm_medium=badge&utm_term=loowid&utm_campaign=Application%2BContest)
+
   
 ## Install
 
