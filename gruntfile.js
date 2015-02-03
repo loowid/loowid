@@ -124,6 +124,12 @@ module.exports = function(grunt) {
 	            options: {
 	                logConcurrentOutput: true
 	            }
+        	},
+        	travis_test: {
+	            tasks: ['jasmine_node'], 
+	            options: {
+	                logConcurrentOutput: true
+	            }
         	}
         },
         uglify: {
@@ -223,5 +229,7 @@ module.exports = function(grunt) {
     
     // Run tests
     grunt.registerTask('test', ['jshint','concurrent:test']);
+    
+    grunt.registerTask('travis_test', ['jshint','concurrent:travis_test']);
 
 };
