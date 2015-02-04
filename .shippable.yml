@@ -1,0 +1,21 @@
+language: node_js
+
+branches:
+  only:
+    - master
+
+node_js:
+  - "0.10"
+
+services:
+  - mongodb  
+
+before_script:
+  - npm install -g grunt-cli
+  - mkdir -p shippable/testresults
+  - mkdir -p shippable/codecoverage
+  
+after_success:
+  - cp ./coverage/* ./shippable/codecoverage/.
+  - cp ./build/reports/jasmine/* ./shippable/testresults/. 
+  

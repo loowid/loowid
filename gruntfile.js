@@ -170,7 +170,7 @@ module.exports = function(grunt) {
               extensions: 'js',
               specNameMatcher: 'spec',
               jUnit: {
-                report: false,
+                report: true,
                 savePath : './build/reports/jasmine/',
                 useDotNotation: true,
                 consolidate: true
