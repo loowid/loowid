@@ -17,9 +17,10 @@
     "test": "node node_modules/grunt-cli/bin/grunt travis_test"
   },
   "devDependencies": {
-    "grunt-contrib-watch": "0.6.1",
     "grunt-contrib-jshint": "0.10.0",
+    "grunt-contrib-watch": "0.6.1",
     "grunt-jasmine-node": "^0.2.1",
+    "grunt-jasmine-node-istanbul": "0.0.5",
     "mockgoose": "^1.10.7"
   },
   "dependencies": {

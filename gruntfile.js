@@ -176,6 +176,15 @@ module.exports = function(grunt) {
                 consolidate: true
               }
             },
+            coverage: {
+                options : {
+                    failTask: false,
+                    branches : 100 ,
+                    functions: 100,
+                    statements:100,
+                    lines:100
+                }
+            },
             all: ['spec/']
         }
     });
@@ -190,6 +199,7 @@ module.exports = function(grunt) {
     grunt.loadNpmTasks('grunt-contrib-uglify');
     grunt.loadNpmTasks('grunt-contrib-less');
     grunt.loadNpmTasks('grunt-jasmine-node');
+    grunt.loadNpmTasks('grunt-jasmine-node-istanbul');
     
     //Making grunt default to force in order not to break the project.
     grunt.option('force', true);

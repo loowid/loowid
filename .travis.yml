@@ -1,7 +1,17 @@
 language: node_js
+
+branches:
+  only:
+    - master
+
 node_js:
   - "0.10"
+
 services:
   - mongodb  
+
 before_script:
   - npm install -g grunt-cli
+  
+after_success:
+  - coveralls
