@@ -12,10 +12,10 @@ services:
 
 before_script:
   - npm install -g grunt-cli
+  - npm install -g istanbul
   - mkdir -p shippable/testresults
   - mkdir -p shippable/codecoverage
   
 after_success:
-  - cp -R ./coverage ./shippable/codecoverage
-  - cp -R ./reports ./shippable/testresults 
-  
+  - cp -R ./reports ./shippable/testresults
+  - istanbul report cobertura --dir  ./shippable/codecoverage/ 
