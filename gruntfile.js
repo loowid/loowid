@@ -169,9 +169,9 @@ module.exports = function(grunt) {
               matchall: false,
               extensions: 'js',
               specNameMatcher: 'spec',
-              jUnit: {
+              junitreport: {
                 report: true,
-                savePath : './build/reports/jasmine/',
+                savePath : './reports/',
                 useDotNotation: true,
                 consolidate: true
               }

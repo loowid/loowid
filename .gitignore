@@ -32,3 +32,4 @@ node_modules
 /public.pem
 /.DS_Store
 /bower_components/
+/reports/
