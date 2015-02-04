@@ -28,7 +28,7 @@ angular.module('mean.rooms').factory("ChatService",['$timeout','UIHandler','Room
 	        var secs =  parseInt((t2-t1)/(1000));
 	        var mins = parseInt((t2-t1)/(1000*60));
 	        if (secs>59) {
-        		return (mins>59)?this.formatDate($scope,t,(mins>60*24)):$scope.resourceBundle.timeprep.replace('{0}',mins);
+        		return (mins>59)?this.formatDate($scope,t,(mins>60*24)):$scope.resourceBundle._('timeprep',mins);
 	        } else {
         		return (secs>30)?$scope.resourceBundle.lessthanaminute:$scope.resourceBundle.justnow;
 	        }

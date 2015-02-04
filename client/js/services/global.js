@@ -30,12 +30,26 @@ angular.module('mean.system').factory("Global", [function() {
         showError: function(scope,err) {
             scope.error_class = 'error_now';
             scope.error_message = err;
-            uiHandler.safeApply(scope,function(){});
-            setTimeout(function(){scope.error_class='';scope.error_message='';uiHandler.safeApply(scope,function(){});},10000);
+            scope.ui.safeApply(scope,function(){});
+            setTimeout(function(){scope.error_class='';scope.error_message='';scope.ui.safeApply(scope,function(){});},10000);
         },
         hideError: function(scope) {
             scope.error_class = '';
             scope.error_message = '';
+        },
+        _: function() {
+        	if (arguments.length>0) {
+        		var txt = this[arguments[0]];
+        		if (txt) {
+	        		for (var z=0; z<arguments.length; z+=1) {
+	        			txt = txt.replace('{'+z+'}',arguments[z+1]);
+	        		}
+	        		return txt;
+        		} else {
+        			return 'not found: '+argumens[0];
+        		}
+        	}
+        	return null;
         }
     };
 

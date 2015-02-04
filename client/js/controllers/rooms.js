@@ -17,6 +17,7 @@ angular.module('mean.rooms').controller('RoomsController', ['$scope', '$routePar
 
     ngI18nResourceBundle.get().success(function (resourceBundle) {
             $scope.resourceBundle = resourceBundle;
+            $scope.resourceBundle._ = $scope.global._;
     });
     uiHandler.liveRooms = [];
     uiHandler.liveRoomsCurrent = 0;

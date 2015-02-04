@@ -111,7 +111,7 @@ angular.module('mean.rooms').factory("MediaService",['Rooms','UIHandler',functio
 	    		uiHandler.safeApply ($scope,function (){
 	    			if (!uiHandler.modals) uiHandler.modals = [];
 
-	    			uiHandler.modals.push({'text': '<strong>' + uiHandler.ownerName + '</strong>' + $scope.resourceBundle['wantsyoushare'+source],
+	    			uiHandler.modals.push({'text': $scope.resourceBundle._('wantsyoushare'+source,uiHandler.ownerName),
 	    				'yes': function (index){
 	    					uiHandler.safeApply ($scope,function(){
 								uiHandler.modals.splice(index,1);
@@ -454,7 +454,7 @@ angular.module('mean.rooms').factory("MediaService",['Rooms','UIHandler',functio
 					uiHandler.safeApply ($scope,function (){
 		    			if (!uiHandler.modals) uiHandler.modals = [];
 
-		    			uiHandler.modals.push({'text': '<strong>' + $scope.getUserName(data.id) +'</strong>' + $scope.resourceBundle['requestfor'+data.source],
+		    			uiHandler.modals.push({'text': $scope.resourceBundle._('requestfor'+data.source,$scope.getUserName(data.id)),
 		    				'yes': function (index){
 		    					uiHandler.modals.splice(index,1);
 				                $scope.askForSharing(data.id,data.source);
@@ -493,7 +493,7 @@ angular.module('mean.rooms').factory("MediaService",['Rooms','UIHandler',functio
                             //Look for status to change the controls of the user
 	            if (uiHandler.isowner && uiHandler.userStatus[data.connectionId] &&  uiHandler.userStatus[data.connectionId][data.origin]){
 	            	uiHandler.userStatus[data.connectionId][data.origin] = false;  
-	                var errMessage = $scope.getUserName(data.connectionId) +  $scope.resourceBundle[data.type];
+	                var errMessage = $scope.resourceBundle._(data.type,$scope.getUserName(data.connectionId));
 	                $scope.global.showError($scope,errMessage);
 	            }else if (uiHandler.isowner){
 	            	var errMessage = $scope.getUserName(data.connectionId) + ' ' + $scope.resourceBundle['deny'+data.type+'request'];

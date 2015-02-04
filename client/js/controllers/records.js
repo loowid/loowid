@@ -35,6 +35,7 @@ angular.module('mean.rooms').controller('RecordController', ['$scope', '$routePa
 	uiHandler.cache = ngI18nConfig.cache;
    	ngI18nResourceBundle.get().success(function (resourceBundle) {
             $scope.resourceBundle = resourceBundle;
+            $scope.resourceBundle._ = $scope.global._;
     });
 
     //Controles de salao

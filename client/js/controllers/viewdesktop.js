@@ -33,7 +33,8 @@ angular.module('mean.rooms').controller('ViewDesktopController', ['$scope', '$ro
     uiHandler.basePath = ngI18nConfig.basePath;
     uiHandler.cache = ngI18nConfig.cache;
     ngI18nResourceBundle.get().success(function (resourceBundle) {
-    $scope.resourceBundle = resourceBundle;
+    	$scope.resourceBundle = resourceBundle;
+        $scope.resourceBundle._ = $scope.global._;
     });
  
 

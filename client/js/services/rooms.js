@@ -217,7 +217,7 @@ angular.module('mean.rooms').factory("Rooms", ['$resource','$http','$window','No
         	var self = this;
    		    Notification.requestPermission(function (){
 				var notification = new Notification($scope.resourceBundle.welcometo, {
-						body: $scope.resourceBundle.connectedto.replace('{0}',$scope.global.roomId),
+						body: $scope.resourceBundle._('connectedto',$scope.global.roomId),
 						icon: 'img/icons/favicon.ico',
 						delay: 3000
 				});

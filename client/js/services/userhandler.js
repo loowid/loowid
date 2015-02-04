@@ -131,8 +131,7 @@ angular.module('mean.rooms').factory("UserHandler",['Rooms','UIHandler','Notific
 		        		if (!uiHandler.focused && uiHandler.audible) {
 			        		var readText = $scope.resourceBundle.onlinenews;
 			        		if (uiHandler.newusers.length===1) {
-			        			readText = (uiHandler.newusers[0].status === 'CONNECTED')?$scope.resourceBundle.joinroom:$scope.resourceBundle.uleaveroom;
-			        			readText = readText.replace('{0}',uiHandler.newusers[0].name); 
+			        			readText = (uiHandler.newusers[0].status === 'CONNECTED')?$scope.resourceBundle._('joinroom',uiHandler.newusers[0].name):$scope.resourceBundle._('uleaveroom',uiHandler.newusers[0].name);
 			        		}
 			        		var audio = document.getElementById('audiotts')?document.getElementById('audiotts'):document.createElement('audio');
 			        		audio.setAttribute('id', 'audiotts');
