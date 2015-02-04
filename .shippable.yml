@@ -16,6 +16,6 @@ before_script:
   - mkdir -p shippable/codecoverage
   
 after_success:
-  - cp ./coverage/* ./shippable/codecoverage/.
-  - cp ./build/reports/jasmine/* ./shippable/testresults/. 
+  - cp -R ./coverage ./shippable/codecoverage
+  - cp -R ./build/reports/jasmine ./shippable/testresults 
   
