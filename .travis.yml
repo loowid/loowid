@@ -12,8 +12,7 @@ services:
 
 before_script:
   - npm install -g grunt-cli
-  - npm install -g istanbul
   
 after_success:
-  - istanbul cover jasmine-node --captureExceptions spec/ && cat ./coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js && rm -rf ./coverage
+  - cat ./coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js && rm -rf ./coverage
   
