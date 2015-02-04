@@ -1,4 +1,4 @@
-# Loowid [![Build Status](https://travis-ci.org/loowid/loowid.svg?branch=master)](https://travis-ci.org/loowid/loowid)
+# Loowid [![Build Status](https://travis-ci.org/loowid/loowid.svg?branch=master)](https://travis-ci.org/loowid/loowid) [![Coverage Status](https://coveralls.io/repos/loowid/loowid/badge.svg?branch=master)](https://coveralls.io/r/loowid/loowid?branch=master)
 
 
 *LOOk What I'm Doing* is a web application that allows you to connect with other users and share audio, video, screen and files without any plugin using WebRTC technology.
