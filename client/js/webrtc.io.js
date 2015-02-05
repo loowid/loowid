@@ -1053,7 +1053,7 @@ function mergeConstraints(cons1, cons2) {
 	};
 
 
-}).call(window); // original this
+}).call(this); // is possible put window instead of this????
 
 /*
 function extractSdp(sdpLine, pattern) {
