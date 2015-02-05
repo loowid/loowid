@@ -1,3 +1,4 @@
+'use strict';
 //Setting up route
 window.app.config(['$routeProvider',
     function($routeProvider) {
@@ -33,7 +34,7 @@ window.app.config(['$routeProvider',
 //Setting HTML5 Location Mode
 window.app.config(['$locationProvider',
     function($locationProvider) {
-        $locationProvider.hashPrefix("!");
+        $locationProvider.hashPrefix('!');
     }
 ]);
 

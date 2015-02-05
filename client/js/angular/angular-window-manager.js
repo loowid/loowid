@@ -90,11 +90,11 @@ angular.module('ngWindowManager',[])
 
 			scope.isMaximizable = function (){
 				return (scope.maximizable === undefined || scope.maximizable === true || scope.maximizable === 'true') ? true : false ;
-			}
+			};
 			
 			scope.isCloseable = function (){
 				return (scope.closeable === undefined || scope.closeable === true || scope.closeable === 'true') ? true : false ;
-			}
+			};
 			
 			//Executed when touches or clicks in the title bar 
 			var startMoving = function (e){

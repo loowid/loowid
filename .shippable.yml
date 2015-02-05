@@ -4,8 +4,8 @@ branches:
   only:
     - master
 
-commit_container: 
-	- loowid/loowid
+#commit_container: 
+#	- loowid/loowid
 
 node_js:
   - "0.10"

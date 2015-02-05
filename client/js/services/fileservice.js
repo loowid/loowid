@@ -1,4 +1,7 @@
-angular.module('mean.rooms').factory("FileService",['$sce','UIHandler',function($sce,UIHandler){
+'use strict';
+/*global rtc: true */
+/*global $: true */
+angular.module('mean.rooms').factory('FileService',['$sce','UIHandler',function($sce,UIHandler){
 	return function (){
 
 	    //Control files
@@ -35,7 +38,7 @@ angular.module('mean.rooms').factory("FileService",['$sce','UIHandler',function(
 	                fileOffer.files = {};
 	                fileOffer.attended =false;
 	             
-	                for (var i = 0 ; i < fileContainer.files.length ; i++){
+	                for (var i = 0 ; i < fileContainer.files.length ; i+=1){
 	                     var fileId = self.makeId();
 	                     fileOffer.files[fileId] = {'id':fileId, 'file': fileContainer.files[i]};
 	                     files.push ({'id': fileId, 'name': fileContainer.files[i].name, 'completed': 0,'direction':'upload','requestId':fileOfferId});
@@ -50,13 +53,13 @@ angular.module('mean.rooms').factory("FileService",['$sce','UIHandler',function(
 		this.sendFile = function ($scope,userindex,ofile,requestId,token){
 	        var connectionId = {};
 
-	        if (typeof(userindex) === "string"){
+	        if (typeof(userindex) === 'string'){
 	            connectionId = userindex;
 	         }else{
 	            connectionId = uiHandler.users[userindex].connectionId;
 	         }    
 
-			if (typeof(userindex) === "string"){
+			if (typeof(userindex) === 'string'){
 	            if (userindex === 'owner'){
 	                connectionId = uiHandler.ownerConnectionId;
 	            }else{
@@ -71,7 +74,7 @@ angular.module('mean.rooms').factory("FileService",['$sce','UIHandler',function(
             
             reader.onload = function (event){
                 self.onReadAsDataURL ($scope,event,ofile.id, undefined, undefined,connectionId,requestId,token);
-            }
+            };
 	    };
 
 		this.onReadAsDataURL = function ($scope,event,id, text,chunks,connectionId,requestId,token) {
@@ -100,7 +103,7 @@ angular.module('mean.rooms').factory("FileService",['$sce','UIHandler',function(
 	        data.remainigChunks = remainigChunks-1;
 	        data.chunks = orinalChunks;
 
-	        rtc.sendMessage(connectionId,"filedata",data,requestId,token);
+	        rtc.sendMessage(connectionId,'filedata',data,requestId,token);
 	        
 	        $scope.getFile((uiHandler.isowner ? $scope.getUser(connectionId).files : uiHandler.ownerFiles ),id).completed = Math.floor((1 - (data.remainigChunks / data.chunks)) * 100);
 
@@ -124,13 +127,13 @@ angular.module('mean.rooms').factory("FileService",['$sce','UIHandler',function(
 
     	this.bytesToSize = function (bytes) {
              var sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB'];
-             if (bytes == 0) return '0 Bytes';
+             if (bytes === 0) return '0 Bytes';
              var i = parseInt(Math.floor(Math.log(bytes) / Math.log(1024)));
              return Math.round(bytes / Math.pow(1024, i), 2) + ' ' + sizes[i];
     	};
 
 		this.cancelFile = function ($scope,connectionId,file){
-    		if (file.direction == 'upload'){
+    		if (file.direction === 'upload'){
          		rtc.cancelFile ($scope.global.roomId,connectionId,file.requestId,file.id,self.sentFileOffers[file.requestId].token,'upload');
             	self.sentFileOffers[file.requestId].files[file.id].canceled = true;
             	file.canceled = true;
@@ -138,14 +141,14 @@ angular.module('mean.rooms').factory("FileService",['$sce','UIHandler',function(
             	rtc.cancelFile ($scope.global.roomId,connectionId,file.requestId,file.id,self.acceptedFileOffers[file.requestId].token,'download');
             	//Now simulate that you received a cancel signal from emisor
             	var data = {'requestId':file.requestId,'id':connectionId,'fileid':file.id,'token':self.acceptedFileOffers[file.requestId].token,'direction':'upload'};
-            	rtc.fire("file canceled",data);
+            	rtc.fire('file canceled',data);
         	}
     	};
 
     	this.makeId = function(){
-    	    var text = "";
-    	    var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-    	    for( var i=0; i < 7; i++ )
+    	    var text = '';
+    	    var possible = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+    	    for( var i=0; i < 7; i+=1 )
     	        text += possible.charAt(Math.floor(Math.random() * possible.length));
     	    return text;
     	};
@@ -153,7 +156,7 @@ angular.module('mean.rooms').factory("FileService",['$sce','UIHandler',function(
     	this.dataUrlToBlob = function(dataURL) {
             var binary = atob(dataURL.substr(dataURL.indexOf(',') + 1));
             var array = [];
-            for (var i = 0; i < binary.length; i++) {
+            for (var i = 0; i < binary.length; i+=1) {
                 array.push(binary.charCodeAt(i));
             }
 
@@ -179,7 +182,7 @@ angular.module('mean.rooms').factory("FileService",['$sce','UIHandler',function(
 		        });
 		        
 	    	    $('#userfiles_'+index).click();
-		    }
+		    };
 
 		    $scope.cancelFile = function (connectionId,file){
 		         self.cancelFile ($scope,connectionId,file);
@@ -187,8 +190,8 @@ angular.module('mean.rooms').factory("FileService",['$sce','UIHandler',function(
 
 		    $scope.getFile = function (files,fileid){
 		        if (files) {
-		            for (var i = 0; i < files.length; i++){
-		                if (files[i].id == fileid){
+		            for (var i = 0; i < files.length; i+=1){
+		                if (files[i].id === fileid){
 		                    return files[i];
 		                }
 		            }
@@ -200,7 +203,7 @@ angular.module('mean.rooms').factory("FileService",['$sce','UIHandler',function(
 			rtc.uniqueon ('receive file offer',function (data){
 	            
 	            if (data.token && data.requestId && self.acceptedFileOffers[data.requestId]){
-	                if (self.acceptedFileOffers[data.requestId].token == data.token && self.acceptedFileOffers[data.requestId].connectionId == data.socketId){
+	                if (self.acceptedFileOffers[data.requestId].token === data.token && self.acceptedFileOffers[data.requestId].connectionId === data.socketId){
 	                    rtc.receiveOffer(data.socketId, data.sdp, data.mediatype,data.requestId);
 	                }
 	            }
@@ -224,41 +227,41 @@ angular.module('mean.rooms').factory("FileService",['$sce','UIHandler',function(
 	           		files = uiHandler.ownerFiles;
 	           }
 
-	            if (data.direction == 'upload'){
+	            if (data.direction === 'upload'){
 	                if (data.token && data.requestId && self.acceptedFileOffers[data.requestId]){
-	                    if (self.acceptedFileOffers[data.requestId].token == data.token && self.acceptedFileOffers[data.requestId].connectionId == data.id){
+	                    if (self.acceptedFileOffers[data.requestId].token === data.token && self.acceptedFileOffers[data.requestId].connectionId === data.id){
 	                           //If the file exist and is not completed
 	                        if (self.acceptedFileOffers[data.requestId].files[data.fileid] ){
-	                            var fileToCancel = self.acceptedFileOffers[data.requestId].files[data.fileid]
+	                            var fileToCancel = self.acceptedFileOffers[data.requestId].files[data.fileid];
 	                            if(!fileToCancel.completed){
 	                                //We don't delete the file, we just mark as canceled and completed
 	                                fileToCancel.canceled = true;
 	                                fileToCancel.completed = true;
-	                                self.acceptedFileOffers[data.requestId].filesCompleted ++;
+	                                self.acceptedFileOffers[data.requestId].filesCompleted+=1;
 
 	                                //if all files are completed send the signal
-	                                if (self.acceptedFileOffers[data.requestId].filesCompleted == Object.keys(self.acceptedFileOffers[data.requestId].files).length){
+	                                if (self.acceptedFileOffers[data.requestId].filesCompleted === Object.keys(self.acceptedFileOffers[data.requestId].files).length){
 	                                    // All files were completed, we should drop the conection
-	                                    rtc.dataChannels[data.id]["filedata_" +data.requestId].channel.close();
+	                                    rtc.dataChannels[data.id]['filedata_' +data.requestId].channel.close();
 	                                     //Drop the accepted files token. User can't use it anymore
 	                                    delete self.acceptedFileOffers [data.requestId];
-	                                    rtc.dropPeerConnection (data.id,"filedata_" +data.requestId,false); 
+	                                    rtc.dropPeerConnection (data.id,'filedata_' +data.requestId,false); 
 	                                    rtc.allRequestCompleted ($scope.global.roomId,data.id,data.requestId);
 	                                } 
 
-	                                var renderedIndex = self.arrayToStoreChunks[data.id]["filedata_" +data.requestId][data.fileid].renderedFile;
+	                                var renderedIndex = self.arrayToStoreChunks[data.id]['filedata_' +data.requestId][data.fileid].renderedFile;
 	                                files[renderedIndex].completed = 101;
 	                                files[renderedIndex].canceled = true;  
 	                            }
 	                        }
 	                    }
 	                }    
-	            }else if (data.direction == 'download'){
+	            } else if (data.direction === 'download'){
 	                self.sentFileOffers[data.requestId].files[data.fileid].canceled = true;
-	                var fileToCancel = $scope.getFile(files,data.fileid);
-	                fileToCancel.completed = 101;
-	                fileToCancel.canceled = true;
-	            };
+	                var fileToCancel2 = $scope.getFile(files,data.fileid);
+	                fileToCancel2.completed = 101;
+	                fileToCancel2.canceled = true;
+	            }
 
 	            uiHandler.safeApply($scope,function(){});  
 	            
@@ -316,14 +319,15 @@ angular.module('mean.rooms').factory("FileService",['$sce','UIHandler',function(
 	            self.arrayToStoreChunks[connectionId][mediatype][data.fileid].push(data.message); // pushing chunks in array
 	            var renderedIndex = self.arrayToStoreChunks[connectionId][mediatype][data.fileid].renderedFile;
 	            
-	            if (self.acceptedFileOffers[requestId].files[data.fileid].processedChunks == 0){
+	            if (self.acceptedFileOffers[requestId].files[data.fileid].processedChunks === 0){
 	                self.acceptedFileOffers[requestId].files[data.fileid].totalChunks = data.chunks;
 	            }
 	            
-	            self.acceptedFileOffers[requestId].files[data.fileid].processedChunks ++;
+	            self.acceptedFileOffers[requestId].files[data.fileid].processedChunks+=1;
 
 	            //Control flow chunk
-	            if(!(data.chunks == self.acceptedFileOffers[requestId].files[data.fileid].totalChunks) || !((data.chunks - data.remainigChunks) == self.acceptedFileOffers[requestId].files[data.fileid].processedChunks)){
+	            if((data.chunks !== self.acceptedFileOffers[requestId].files[data.fileid].totalChunks) ||
+	              ((data.chunks - data.remainigChunks) !== self.acceptedFileOffers[requestId].files[data.fileid].processedChunks)){
 	                rtc.fileRequestFailed ($scope.global.roomId,connectionId,requestId,'data sequence not valid');
 	                channel.close();
 	                 rtc.dropPeerConnection (connectionId,mediatype,false); 
@@ -332,10 +336,10 @@ angular.module('mean.rooms').factory("FileService",['$sce','UIHandler',function(
 	                return;
 	            }
 
-	            if (data.remainigChunks == 0) {
+	            if (data.remainigChunks === 0) {
 	                //Re-join: Take care using join method couls explode on a memory leak
 	                
-	                var dataUrl = "";
+	                var dataUrl = '';
 
 	                 //Now we can release the connection sending transfer completed
 	                //Check if all files are completed
@@ -349,11 +353,11 @@ angular.module('mean.rooms').factory("FileService",['$sce','UIHandler',function(
 	                }
 
 	                self.acceptedFileOffers[requestId].files[data.fileid].completed = true;
-	                self.acceptedFileOffers[requestId].filesCompleted ++;
+	                self.acceptedFileOffers[requestId].filesCompleted+=1;
 
-	                var filename = self.acceptedFileOffers[requestId].files[data.fileid].name;
+	                var filename2 = self.acceptedFileOffers[requestId].files[data.fileid].name;
 
-	                if (self.acceptedFileOffers[requestId].filesCompleted == Object.keys(self.acceptedFileOffers[requestId].files).length){
+	                if (self.acceptedFileOffers[requestId].filesCompleted === Object.keys(self.acceptedFileOffers[requestId].files).length){
 	                    // All files were completed, we should drop the conection
 	                    channel.close();
 	                     //Drop the accepted files token. User can't use it anymore
@@ -374,7 +378,7 @@ angular.module('mean.rooms').factory("FileService",['$sce','UIHandler',function(
 
 	                var virtualURL = (window.URL || window.webkitURL).createObjectURL(blob);
 
-	                files[renderedIndex].name = $sce.trustAsHtml('<a target="_blank" download="'+filename+'" href="'+virtualURL+'" >' + filename +'</a>');
+	                files[renderedIndex].name = $sce.trustAsHtml('<a target="_blank" download="'+filename2+'" href="'+virtualURL+'" >' + filename2 +'</a>');
 	                self.arrayToStoreChunks[connectionId][mediatype][data.fileid] = []; // resetting array
 	                self.hasToRefresh=true;
 	            }else{
@@ -398,9 +402,9 @@ angular.module('mean.rooms').factory("FileService",['$sce','UIHandler',function(
 
 	        rtc.uniqueon ('request_for_accept_files', function(data){
 	            if (data.files && data.requestId){
-	                var confirmationStr = '<strong>' +(uiHandler.isowner ? uiHandler.name : $scope.getUserName(data.id)) + '</strong> ' + $scope.resourceBundle['wantstosharefiles']  +'<br/>';
+	                var confirmationStr = '<strong>' +(uiHandler.isowner ? uiHandler.name : $scope.getUserName(data.id)) + '</strong> ' + $scope.resourceBundle.wantstosharefiles  +'<br/>';
 
-	                for (fileId in data.files){
+	                for (var fileId in data.files){
 	                    var curFile = data.files[fileId];
 	                    //Set the first chunk
 	                    curFile.processedChunks = 0;
@@ -426,8 +430,8 @@ angular.module('mean.rooms').factory("FileService",['$sce','UIHandler',function(
 									uiHandler.modals.splice(index,1);
 			 		                rtc.reportErrorToUser($scope.global.roomId,data.id,data.source);
 								},
-			    				"class":'modalform editable',
-			    				"done":false
+			    				'class':'modalform editable',
+			    				'done':false
 			    			});	
 			    		});
 	                }
@@ -438,10 +442,10 @@ angular.module('mean.rooms').factory("FileService",['$sce','UIHandler',function(
 	        rtc.uniqueon ('files accepted',function(data){
 	            var fileOffer = self.sentFileOffers[data.requestId];
 
-	            if (fileOffer && fileOffer.attended==false && fileOffer.destinationId == data.id){
+	            if (fileOffer && fileOffer.attended===false && fileOffer.destinationId === data.id){
 	                fileOffer.attended = true; // We try to avoid masive sent of files for duplicated answers
 	                fileOffer.token = data.token;
-	                for (fileId in fileOffer.files){
+	                for (var fileId in fileOffer.files){
 	                    self.sendFile ($scope,fileOffer.destinationId,fileOffer.files[fileId],data.requestId,data.token);
 	                }
 	            }
@@ -460,7 +464,7 @@ angular.module('mean.rooms').factory("FileService",['$sce','UIHandler',function(
 	                delete rtc.dataChannels[data.id]['filedata_'+ data.requestId];
 	                rtc.dropPeerConnection (data.id,'filedata_' + data.requestId,true);
 
-	                var errMessage = $scope.getUserName(data.connectionId) +  $scope.resourceBundle['error_sharefiles'];
+	                var errMessage = $scope.getUserName(data.connectionId) +  $scope.resourceBundle.error_sharefiles;
 	                $scope.global.showError($scope,errMessage);
 	        });
     	};

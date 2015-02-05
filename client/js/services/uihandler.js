@@ -1,15 +1,17 @@
-angular.module('mean.rooms').factory("UIHandler",['$window','$timeout',function($window, $timeout){
+'use strict';
+/*global rtc: true */
+angular.module('mean.rooms').factory('UIHandler',['$window','$timeout',function($window, $timeout){
     var _this = this;
     _this._data = {};
     
     //necessary to avoid asyncronious errors
 	_this._data.safeApply = function(scope, fn) {
 			var phase = scope.$root.$$phase;
-			if(phase == '$apply' || phase == '$digest')
+			if(phase === '$apply' || phase === '$digest')
 			scope.$eval(fn);
 			else
 			scope.$apply(fn);
-	}
+	};
 
 	_this._data.debug = false;
 	_this._data.version = 'v'+window.loowid_version;
@@ -25,7 +27,7 @@ angular.module('mean.rooms').factory("UIHandler",['$window','$timeout',function(
 		'keyCode':          false
 	};
 	// Store all keyboard combination shortcuts
-	keyboardManagerService.keyboardEvent = {}
+	keyboardManagerService.keyboardEvent = {};
 	// Add a new keyboard combination shortcut
 	keyboardManagerService.bind = function (label, callback, opt) {
 		var fct, elt, code, k;
@@ -33,18 +35,18 @@ angular.module('mean.rooms').factory("UIHandler",['$window','$timeout',function(
 		opt   = angular.extend({}, defaultOpt, opt);
 		label = label.toLowerCase();
 		elt   = opt.target;
-		if(typeof opt.target == 'string') elt = document.getElementById(opt.target);
+		if(typeof opt.target === 'string') elt = document.getElementById(opt.target);
 
 		fct = function (e) {
 			e = e || $window.event;
 
 			// Disable event handler when focus input and textarea
-			if (opt['inputDisabled']) {
+			if (opt.inputDisabled) {
 				var elt;
 				if (e.target) elt = e.target;
 				else if (e.srcElement) elt = e.srcElement;
-				if (elt.nodeType == 3) elt = elt.parentNode;
-				if (elt.tagName == 'INPUT' || elt.tagName == 'TEXTAREA') return;
+				if (elt.nodeType === 3) elt = elt.parentNode;
+				if (elt.tagName === 'INPUT' || elt.tagName === 'TEXTAREA') return;
 			}
 
 			// Find out which key is pressed
@@ -52,18 +54,18 @@ angular.module('mean.rooms').factory("UIHandler",['$window','$timeout',function(
 			else if (e.which) code = e.which;
 			var character = String.fromCharCode(code).toLowerCase();
 
-			if (code == 188) character = ","; // If the user presses , when the type is onkeydown
-			if (code == 190) character = "."; // If the user presses , when the type is onkeydown
+			if (code === 188) character = ','; // If the user presses , when the type is onkeydown
+			if (code === 190) character = '.'; // If the user presses , when the type is onkeydown
 
-			var keys = label.split("+");
+			var keys = label.split('+');
 			// Key Pressed - counts the number of valid keypresses - if it is same as the number of keys, the shortcut function is invoked
 			var kp = 0;
 			// Work around for stupid Shift key bug created by using lowercase - as a result the shift+num combination was broken
 			var shift_nums = {
-				"`":"~","1":"!","2":"@","3":"#","4":"$","5":"%",
-				"6":"^","7":"&","8":"*","9":"(","0":")","-":"_",
-				"=":"+",";":":","'":"\"",",":"<",".":">","/":"?",
-				"\\":"|"
+				'`':'~','1':'!','2':'@','3':'#','4':'$','5':'%',
+				'6':'^','7':'&','8':'*','9':'(','0':')','-':'_',
+				'=':'+',';':':','\'':'\'',',':'<','.':'>','/':'?',
+				'\\':'|'
 			};
 			// Special Keys - and their codes
 			var special_keys = {
@@ -96,46 +98,46 @@ angular.module('mean.rooms').factory("UIHandler",['$window','$timeout',function(
 				}
 			};
 			// Foreach keys in label (split on +)
-			for(var i=0, l=keys.length; k=keys[i],i<l; i++) {
+			for(var i=0, l=keys.length; k=keys[i],i<l; i+=1) {
 				switch (k) {
 					case 'ctrl':
 					case 'control':
-						kp++;
+						kp+=1;
 						modifiers.ctrl.wanted = true;
 						break;
 					case 'shift':
 					case 'alt':
 					case 'meta':
-						kp++;
+						kp+=1;
 						modifiers[k].wanted = true;
 						break;
 				}
 
 				if (k.length > 1) { // If it is a special key
-					if(special_keys[k] == code) kp++;
-				} else if (opt['keyCode']) { // If a specific key is set into the config
-					if (opt['keyCode'] == code) kp++;
+					if(special_keys[k] === code) kp+=1;
+				} else if (opt.keyCode) { // If a specific key is set into the config
+					if (opt.keyCode === code) kp+=1;
 				} else { // The special keys did not match
-					if(character == k) kp++;
+					if(character === k) kp+=1;
 					else {
 						if(shift_nums[character] && e.shiftKey) { // Stupid Shift key bug created by using lowercase
 							character = shift_nums[character];
-							if(character == k) kp++;
+							if(character === k) kp+=1;
 						}
 					}
 				}
 			}
 
-			if(kp == keys.length &&
-				modifiers.ctrl.pressed == modifiers.ctrl.wanted &&
-				modifiers.shift.pressed == modifiers.shift.wanted &&
-				modifiers.alt.pressed == modifiers.alt.wanted &&
-				modifiers.meta.pressed == modifiers.meta.wanted) {
+			if(kp === keys.length &&
+				modifiers.ctrl.pressed === modifiers.ctrl.wanted &&
+				modifiers.shift.pressed === modifiers.shift.wanted &&
+				modifiers.alt.pressed === modifiers.alt.wanted &&
+				modifiers.meta.pressed === modifiers.meta.wanted) {
         $timeout(function() {
 				  callback(e);
         }, 1);
 
-				if(!opt['propagate']) { // Stop the event
+				if(!opt.propagate) { // Stop the event
 					// e.cancelBubble is supported by IE - this will kill the bubbling process.
 					e.cancelBubble = true;
 					e.returnValue = false;
@@ -154,22 +156,22 @@ angular.module('mean.rooms').factory("UIHandler",['$window','$timeout',function(
 		keyboardManagerService.keyboardEvent[label] = {
 			'callback': fct,
 			'target':   elt,
-			'event':    opt['type']
+			'event':    opt.type
 		};
 		//Attach the function with the event
-		if(elt.addEventListener) elt.addEventListener(opt['type'], fct, false);
-		else if(elt.attachEvent) elt.attachEvent('on' + opt['type'], fct);
-		else elt['on' + opt['type']] = fct;
+		if(elt.addEventListener) elt.addEventListener(opt.type, fct, false);
+		else if(elt.attachEvent) elt.attachEvent('on' + opt.type, fct);
+		else elt['on' + opt.type] = fct;
 	};
 	// Remove the shortcut - just specify the shortcut and I will remove the binding
 	keyboardManagerService.unbind = function (label) {
 		label = label.toLowerCase();
 		var binding = keyboardManagerService.keyboardEvent[label];
-		delete(keyboardManagerService.keyboardEvent[label])
+		delete(keyboardManagerService.keyboardEvent[label]);
 		if(!binding) return;
-		var type		= binding['event'],
-		elt			= binding['target'],
-		callback	= binding['callback'];
+		var type		= binding.event,
+		elt			= binding.target,
+		callback	= binding.callback;
 		if(elt.detachEvent) elt.detachEvent('on' + type, callback);
 		else if(elt.removeEventListener) elt.removeEventListener(type, callback, false);
 		else elt['on'+type] = false;

@@ -1,72 +1,74 @@
+'use strict';
+/*global rtc: true */
 //Rooms service used for articles REST endpoint
-angular.module('mean.rooms').factory("Rooms", ['$resource','$http','$window','Notification', function($resource,$http,$window,Notification) {
+angular.module('mean.rooms').factory('Rooms', ['$resource','$http','$window','Notification', function($resource,$http,$window,Notification) {
     return function (){
     	
 		var csrf = window.csrf;
 		var room = $resource('/rooms/:roomId/:connectionId/:cmd', 
 	    	{roomId:'@id', connectionId: '@cid'},
 	    	{
-	    		create: {method: "POST", params:{cmd: 'create'}, headers:{'x-csrf-token':csrf}},
-	    		createid: {method: "POST", params:{cmd: 'createid'}, headers:{'x-csrf-token':csrf}},
-	    		join: {method:"POST", params: {cmd:'join'}, headers:{'x-csrf-token':csrf}},
-	            users: {method: "POST", params: {cmd: 'users'}, isArray:true, headers:{'x-csrf-token':csrf}},
-	            editOwnerName: {method: "POST", params: {cmd: 'editName'}, headers:{'x-csrf-token':csrf}},
-	            editShared: {method: "POST", params: {cmd: 'editShared'}, headers:{'x-csrf-token':csrf}},
-	            changeRoomStatus: {method: "POST", params: {cmd: 'changeRoomStatus'}, headers:{'x-csrf-token':csrf}},
-	            editGuestName: {method: "POST", params: {cmd: 'editName'}, headers:{'x-csrf-token':csrf}},
-	            isRoomAvailable: {method: "POST", params: {cmd: 'isActive'}, headers:{'x-csrf-token':csrf}},
-	            isRoomJoinable: {method: "POST", params: {cmd: 'isJoinable'}, headers:{'x-csrf-token':csrf}},
-	            askForSharing: {method: "POST", params: {cmd: 'askForSharing'}, headers:{'x-csrf-token':csrf}},
-	            askForStopSharing: {method: "POST", params: {cmd: 'askForStopSharing'}, headers:{'x-csrf-token':csrf}},
-	            moveRoom: {method: "POST", params: {cmd: 'move'},headers:{'x-csrf-token':csrf}},
-	            keepSession: {method: "POST", params: {cmd: 'keep'},headers:{'x-csrf-token':csrf}},
-                claimforroom: {method: "POST", params:{cmd: 'claimforroom'},headers:{'x-csrf-token':csrf}},
-	            chat: {method: "POST", params: {cmd: 'chat'}, headers:{'x-csrf-token':csrf}},
+	    		create: {method: 'POST', params:{cmd: 'create'}, headers:{'x-csrf-token':csrf}},
+	    		createid: {method: 'POST', params:{cmd: 'createid'}, headers:{'x-csrf-token':csrf}},
+	    		join: {method:'POST', params: {cmd:'join'}, headers:{'x-csrf-token':csrf}},
+	            users: {method: 'POST', params: {cmd: 'users'}, isArray:true, headers:{'x-csrf-token':csrf}},
+	            editOwnerName: {method: 'POST', params: {cmd: 'editName'}, headers:{'x-csrf-token':csrf}},
+	            editShared: {method: 'POST', params: {cmd: 'editShared'}, headers:{'x-csrf-token':csrf}},
+	            changeRoomStatus: {method: 'POST', params: {cmd: 'changeRoomStatus'}, headers:{'x-csrf-token':csrf}},
+	            editGuestName: {method: 'POST', params: {cmd: 'editName'}, headers:{'x-csrf-token':csrf}},
+	            isRoomAvailable: {method: 'POST', params: {cmd: 'isActive'}, headers:{'x-csrf-token':csrf}},
+	            isRoomJoinable: {method: 'POST', params: {cmd: 'isJoinable'}, headers:{'x-csrf-token':csrf}},
+	            askForSharing: {method: 'POST', params: {cmd: 'askForSharing'}, headers:{'x-csrf-token':csrf}},
+	            askForStopSharing: {method: 'POST', params: {cmd: 'askForStopSharing'}, headers:{'x-csrf-token':csrf}},
+	            moveRoom: {method: 'POST', params: {cmd: 'move'},headers:{'x-csrf-token':csrf}},
+	            keepSession: {method: 'POST', params: {cmd: 'keep'},headers:{'x-csrf-token':csrf}},
+                claimforroom: {method: 'POST', params:{cmd: 'claimforroom'},headers:{'x-csrf-token':csrf}},
+	            chat: {method: 'POST', params: {cmd: 'chat'}, headers:{'x-csrf-token':csrf}},
 	        });
 		
     	this.rememberUser = function() {
-    		var userName = (typeof(Storage)!=="undefined")?localStorage.loowidUserName:null;
+    		var userName = (typeof(Storage)!=='undefined')?localStorage.loowidUserName:null;
     		if (!userName) {
     			userName = $window.getSuperHero();
     		}
            	return userName;
-    	}
+    	};
     	
     	this.makeId = function(){
-    	    var text = "";
-    	    var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-    	    for( var i=0; i < 7; i++ )
+    	    var text = '';
+    	    var possible = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+    	    for( var i=0; i < 7; i+=1 )
     	        text += possible.charAt(Math.floor(Math.random() * possible.length));
     	    return text;
-    	}
+    	};
     	
     	this.getGravatar = function() {
-    		var gravatarEmail = (typeof(Storage)!=="undefined")?localStorage.loowidGravatarEmail:null;
+    		var gravatarEmail = (typeof(Storage)!=='undefined')?localStorage.loowidGravatarEmail:null;
     		if (!gravatarEmail) {
     			gravatarEmail = '';
     		}
     		return gravatarEmail;
-    	}
+    	};
 
     	this.saveGravatar = function(gravatar) {
-     	   if (typeof(Storage)!=="undefined") localStorage.loowidGravatarEmail = gravatar;
-     	}
+     	   if (typeof(Storage)!=='undefined') localStorage.loowidGravatarEmail = gravatar;
+     	};
     	
     	this.saveName = function(name) {
-    	   if (typeof(Storage)!=="undefined") localStorage.loowidUserName = name;
-    	}
+    	   if (typeof(Storage)!=='undefined') localStorage.loowidUserName = name;
+    	};
     	
     	this.resetName = function() {
-    		if (typeof(Storage)!=="undefined") localStorage.loowidUserName = '';
-    	}
+    		if (typeof(Storage)!=='undefined') localStorage.loowidUserName = '';
+    	};
 
         this.getWebSocketUrl = function() {
         	return 'wss://'+window.wsocket.host+window.wsocket.port;
-        }
+        };
 		
         this.getInitWebSocketUrl = function () {
         	return (location.origin.indexOf('https://'+window.wsocket.host)<0)?'https://'+window.wsocket.host+'/rooms/hello':null;
-        }
+        };
 
 		this.create = function (name,success,ownerToken){
             var gravatar = this.getGravatar();
@@ -94,7 +96,7 @@ angular.module('mean.rooms').factory("Rooms", ['$resource','$http','$window','No
 			var initUrl = this.getInitWebSocketUrl();
 			if (initUrl){
 				var wsproxyinit = $resource (initUrl,{},{
-					hello: {method: "JSONP", params:{callback: 'JSON_CALLBACK'}, isArray: false}
+					hello: {method: 'JSONP', params:{callback: 'JSON_CALLBACK'}, isArray: false}
 				});
 				wsproxyinit.hello ({},function (){
 					connectFunction();	
@@ -113,7 +115,7 @@ angular.module('mean.rooms').factory("Rooms", ['$resource','$http','$window','No
             },function(err){
             	failure(err);
             });
-        }
+        };
         
 		this.join = function (roomId,success){
 			var userName = this.rememberUser();
@@ -135,7 +137,7 @@ angular.module('mean.rooms').factory("Rooms", ['$resource','$http','$window','No
 			var initUrl = this.getInitWebSocketUrl();
 			if (initUrl){
 				var wsproxyinit = $resource (initUrl,{},{
-					hello: {method: "JSONP", params:{callback: 'JSON_CALLBACK'}, isArray: false}
+					hello: {method: 'JSONP', params:{callback: 'JSON_CALLBACK'}, isArray: false}
 				});
 				wsproxyinit.hello ({},function (){
 					connectFunction();	
@@ -146,7 +148,7 @@ angular.module('mean.rooms').factory("Rooms", ['$resource','$http','$window','No
 				connectFunction ();
 			}
 				
-		}
+		};
 		
         this.users = function (roomId,success){
             if (roomId){ 
@@ -186,7 +188,7 @@ angular.module('mean.rooms').factory("Rooms", ['$resource','$http','$window','No
 
         this.getConnectionId = function() {
         	return rtc._me;
-        }
+        };
         
         this.isRoomAvailable = function (roomId,success,failure){
             var connectionId = rtc._me ? rtc._me : 'not valid id';
@@ -211,10 +213,9 @@ angular.module('mean.rooms').factory("Rooms", ['$resource','$http','$window','No
 
         this.keepSession = function (success,failure) {
         	room.keepSession(success,failure);
-        }
+        };
         
         this.notifyIn = function($scope) {
-        	var self = this;
    		    Notification.requestPermission(function (){
 				var notification = new Notification($scope.resourceBundle.welcometo, {
 						body: $scope.resourceBundle._('connectedto',$scope.global.roomId),
@@ -226,8 +227,8 @@ angular.module('mean.rooms').factory("Rooms", ['$resource','$http','$window','No
 						'yes': function (index){
 							$scope.ui.modals.splice(index,1);
 						},
-						"class":'modalform editable',
-						"done":false
+						'class':'modalform editable',
+						'done':false
 					});	
 				});
 				notification.$on('click', function () {
@@ -237,7 +238,7 @@ angular.module('mean.rooms').factory("Rooms", ['$resource','$http','$window','No
 					$scope.ui.notificationReady = true;
 				});
 			});
-        }
+        };
         
      };
 

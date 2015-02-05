@@ -1,3 +1,4 @@
+'use strict';
 angular.module('mean.rooms').controller('RoomsController', ['$scope', '$routeParams', '$location', 'Global', 'Rooms','$timeout', 'ngI18nResourceBundle','ngI18nConfig','$document','UIHandler', function ($scope, $routeParams, $location, Global, Rooms, $timeout,ngI18nResourceBundle, ngI18nConfig, $document, UIHandler) {
 	
 	var uiHandler = UIHandler;
@@ -22,8 +23,8 @@ angular.module('mean.rooms').controller('RoomsController', ['$scope', '$routePar
     uiHandler.liveRooms = [];
     uiHandler.liveRoomsCurrent = 0;
     $scope.gotoRoom = function(id) {
-    	$location.path("r/" + id);
-    }
+    	$location.path('r/' + id);
+    };
     
     $scope.create = function() {
 		if ($scope.termsaccepted || $scope.isRoomAvailable()){
@@ -31,7 +32,7 @@ angular.module('mean.rooms').controller('RoomsController', ['$scope', '$routePar
 		  document.getElementById('noscript').style.display = '';
 		  $scope.global.sessionclosed = false;
 		  if ($scope.isRoomAvailable()) {
-			   $location.path("r/" + $scope.global.roomId + '/join');   
+			   $location.path('r/' + $scope.global.roomId + '/join');   
 		  }else {
 			   uiHandler.creating=true;
 			   room.create(uiHandler.name,function(id,gav,av,acc,dueDate){
@@ -41,21 +42,21 @@ angular.module('mean.rooms').controller('RoomsController', ['$scope', '$routePar
 				   $scope.global.access = acc;
 				   $scope.global.gravatar = gav;
 				   $scope.global.roomDueDate = dueDate; 
-			       uiHandler.permanenturl = $location.$$protocol+ "://"+ $location.$$host +  "/#!/r/" + $scope.global.access.permanentkey + "/claim";
-				   $location.path("r/" + id + '/join');
+			       uiHandler.permanenturl = $location.$$protocol+ '://'+ $location.$$host +  '/#!/r/' + $scope.global.access.permanentkey + '/claim';
+				   $location.path('r/' + id + '/join');
 			   });
 		   }
 		}else{
 			$scope.termsnotaccepted = true;
 		}
-   };
+    };
 
 	$scope.clickterms = function ($event){
 		var checkbox = $event.target;
 		$scope.termsnotaccepted =  !checkbox.checked;
-	}
+	};
 
-   $scope.setupExternal = function (){
+	$scope.setupExternal = function (){
       $scope.global.roomId = uiHandler.roomId =  $routeParams.roomId;
       document.getElementById('noscript').style.display = '';
       $scope.global.sessionclosed = false;
@@ -78,29 +79,29 @@ angular.module('mean.rooms').controller('RoomsController', ['$scope', '$routePar
    $scope.resetName = function() {
 	   room.resetName();
 	   uiHandler.name = room.rememberUser();
-   }
+   };
    
    $scope.join = function() {
        var roomId = $scope.global.roomId;
-       uiHandler.screenurl = $location.$$protocol+ "://"+ $location.$$host +  "/#!/r/" + roomId;
-       $location.path("r/" +roomId + '/join');
+       uiHandler.screenurl = $location.$$protocol+ '://'+ $location.$$host +  '/#!/r/' + roomId;
+       $location.path('r/' +roomId + '/join');
    };
 
    $scope.isRoomAvailable = function() {
 	   return $scope.global.roomId && $scope.global.roomId.length>0;
-   }
+   };
 
    $scope.isValidBrowser = function() {
 	   return $scope.global.isValidSender();
-   }
+   };
 
    $scope.isSessionClosed = function (){
       var sessionclosed =  $scope.global.sessionclosed ? true : false;
       return sessionclosed;
-   }
+   };
 
    $scope.init = function(){
-   }
+   };
 
 
 }]);

@@ -1,4 +1,7 @@
-angular.module('mean.rooms').factory("MediaService",['Rooms','UIHandler',function(Rooms,UIHandler){
+'use strict';
+/*global rtc: true */
+/*global $: true */
+angular.module('mean.rooms').factory('MediaService',['Rooms','UIHandler',function(Rooms,UIHandler){
 	
 	var RATIO_4_3 = 0;
 	var RATIO_16_9 = 1;
@@ -56,8 +59,8 @@ angular.module('mean.rooms').factory("MediaService",['Rooms','UIHandler',functio
 					mediasource.onclose = onclose;
 					mediasource.stream = stream;
 
-					if (mediasource.playtype == 'video'){
-						var mediaElement = $('<video id="my_'+ source + '" style="display:none;" autoplay muted ></video>')
+					if (mediasource.playtype === 'video'){
+						var mediaElement = $('<video id="my_'+ source + '" style="display:none;" autoplay muted ></video>');
 						windowHandler.create ($scope,mediaElement,$scope.resourceBundle['wintitle'+source],source,mediasource.winratio,mediasource.winscale,true,
 							function (win){
 	           				//Attach the window reference to the media source
@@ -68,7 +71,7 @@ angular.module('mean.rooms').factory("MediaService",['Rooms','UIHandler',functio
 	            			//Just delay it to take time to get the window opened effect and inherit the video size
 	            			//setTimeout(function (){win.height = $(mediaElement).height() + 20;},500);
 
-	            			 if (typeof onrecord !== 'undefined' && onrecord != null) {onrecord.call (self);}
+	            			 if (typeof onrecord !== 'undefined' && onrecord !== null) {onrecord.call (self);}
 	            			 uiHandler.safeApply($scope,function(){});
 
 	            		},
@@ -80,7 +83,7 @@ angular.module('mean.rooms').factory("MediaService",['Rooms','UIHandler',functio
 	            			
 	            		}
 	            		);
-					}else if (mediasource.playtype == 'audio'){
+					}else if (mediasource.playtype === 'audio'){
 						if (onrecord) {onrecord.call (self);}
 						uiHandler.safeApply($scope,function(){});
 					}
@@ -93,10 +96,10 @@ angular.module('mean.rooms').factory("MediaService",['Rooms','UIHandler',functio
 						if (error==='installed-disabled'){
 							errmsg = $scope.resourceBundle['loowid-extension-activate'];
 						}else if (error === 'not-installed'){
-							errmsg = $scope.resourceBundle['loowid-extension-message'] + "<a target='_blank'  href='https://chrome.google.com/webstore/detail/loowid-screen-capturing/" + rtc.chromeDesktopExtensionId + "' >" +$scope.resourceBundle['loowid-extension-install']   +  "  </a>";
+							errmsg = $scope.resourceBundle['loowid-extension-message'] + '<a target="_blank"  href="https://chrome.google.com/webstore/detail/loowid-screen-capturing/' + rtc.chromeDesktopExtensionId + '" >' +$scope.resourceBundle['loowid-extension-install']   +  '  </a>';
 						}
 					}else{
-						errmsg = $scope.resourceBundle['unablepermission'+source] +  (source ==='screen' ? $scope.resourceBundle['readmore'] : '');
+						errmsg = $scope.resourceBundle['unablepermission'+source] +  (source ==='screen' ? $scope.resourceBundle.readmore : '');
 					}
 					if (errmsg !== '') $scope.global.showError($scope,errmsg);
 					if (uiHandler.access.moderated) {
@@ -125,9 +128,9 @@ angular.module('mean.rooms').factory("MediaService",['Rooms','UIHandler',functio
 	    					});
 	    					 rtc.reportErrorToOwner($scope.global.roomId,source,'denied'+source);
 						},
-	    				"class":'modalform editable',
-	    				"done":false,
-	    				"avatar":uiHandler.ownerAvatar, 
+	    				'class':'modalform editable',
+	    				'done':false,
+	    				'avatar':uiHandler.ownerAvatar, 
 	    			});	
 	    		});
 	    	}
@@ -138,9 +141,9 @@ angular.module('mean.rooms').factory("MediaService",['Rooms','UIHandler',functio
     		var mediasource = this.mediasources[source];
     		if (mediasource.recording){
     			//si no va hacerlo por el elemnto click
-    			if (mediasource.playtype == 'video'){
+    			if (mediasource.playtype === 'video'){
     				mediasource.window.winHandler.close();	
-    			}else if (mediasource.playtype == 'audio'){
+    			}else if (mediasource.playtype === 'audio'){
     				uiHandler.safeApply ($scope,function (){
     					self.stopMedia($scope,source);
     				});
@@ -173,15 +176,14 @@ angular.module('mean.rooms').factory("MediaService",['Rooms','UIHandler',functio
 			//Initialize resolutions
 
 			var addedResolution = {x:0,y:0};
-			var resolutions = {};
 			
-			for (el in self.possibleResolutions){
+			for (var el in self.possibleResolutions){
 				if (self.possibleResolutions[el].x <= screen.width && self.possibleResolutions[el].y <= screen.height){
 					addedResolution = self.possibleResolutions[el];
 					self.resolutions.push(addedResolution);
 				}else{
 					//if the last resolutiona added is not our resolution we also add it
-					if (addedResolution.x != screen.width || addedResolution.y != screen.height)
+					if (addedResolution.x !== screen.width || addedResolution.y !== screen.height)
 						self.resolutions.push ({x:screen.width,y:screen.height});
 					break;
 				}
@@ -192,18 +194,18 @@ angular.module('mean.rooms').factory("MediaService",['Rooms','UIHandler',functio
 	    	$scope.muteAudio = function (){
 	    		uiHandler.isMuted = true; 
 		        
-		        if (self.mediasources['audio'].recording){
-		            self.mute (self.mediasources['audio'].stream,true);
+		        if (self.mediasources.audio.recording){
+		            self.mute (self.mediasources.audio.stream,true);
 		        }
-		    }
+		    };
 
 		    $scope.unmuteAudio = function (){
 		    	uiHandler.isMuted = false;
 		        
-		        if (self.mediasources['audio'].recording){
-		            self.mute (self.mediasources['audio'].stream,false);
+		        if (self.mediasources.audio.recording){
+		            self.mute (self.mediasources.audio.stream,false);
 		        }   
-		    }
+		    };
 
 
 	    	$scope.changeToResolution  = function (index){
@@ -214,17 +216,18 @@ angular.module('mean.rooms').factory("MediaService",['Rooms','UIHandler',functio
 		            csource.maxHeight = self.resolutions[index].y;
 		        }
 
-	    	}
+	    	};
 			
 			//Initialize the resolution to the top
 			$scope.changeToResolution(self.resolutions.length-1);
 
 	    	$scope.isRecording = function (source){
 	    		return self.mediasources[source].recording;
-	    	}
+	    	};
+	    	
 			$scope.isInitializingMedia = function (source){
 				return self.mediasources[source].initializingMedia;
-			}	
+			};
 
 		    $scope.startRecording = function (source){
 		        self.startRecording ($scope,windowHandler,source,uiHandler.isowner ?
@@ -235,7 +238,7 @@ angular.module('mean.rooms').factory("MediaService",['Rooms','UIHandler',functio
 		                    rtc.updateOwnerData ($scope.global.roomId,uiHandler.name,uiHandler.avatar,uiHandler.status,uiHandler.access);
 		                });
 		            } : null , uiHandler.isowner ? function (){//On close all windows
-		                if (uiHandler.status == 'STOPPED'){
+		                if (uiHandler.status === 'STOPPED'){
 		                    room.changeRoomStatus($scope.global.roomId,'STOPPED',function(){
 		                        //Refresh the view to restore the button state          
 		                        rtc.updateOwnerData (uiHandler.roomId,uiHandler.name,uiHandler.avatar,uiHandler.status,uiHandler.access);
@@ -249,7 +252,7 @@ angular.module('mean.rooms').factory("MediaService",['Rooms','UIHandler',functio
 		    	uiHandler.safeApply ($scope,function (){
 		    			if (!uiHandler.tutorials) uiHandler.tutorials = [];
 
-		    			uiHandler.tutorials.push({'text': $scope.resourceBundle['justchrome'],
+		    			uiHandler.tutorials.push({'text': $scope.resourceBundle.justchrome,
 		    				'ok': function (index){
 		    					uiHandler.tutorials.splice(index,1);
 		    				},
@@ -259,18 +262,18 @@ angular.module('mean.rooms').factory("MediaService",['Rooms','UIHandler',functio
 		    				'done':false
 		    			});	
 		    		});
-		    }
+		    };
 
 		    $scope.changeWindowName = function(connectionId,name) {
 		        if (self.receivedStreams.length>0) {
-		            for (var i=0; i<self.receivedStreams.length; i++) {
-		                if (self.receivedStreams[i].connectionId==connectionId) {
+		            for (var i=0; i<self.receivedStreams.length; i+=1) {
+		                if (self.receivedStreams[i].connectionId===connectionId) {
 							//Could be that the window could not be setup already because the method was called for a new status of member
 		                	if (self.receivedStreams[i].window) self.receivedStreams[i].window.title = name;
 		                }
 		            }
 		        }
-		    }
+		    };
 
 
 	    	$scope.stopRecording = function (source){
@@ -309,8 +312,8 @@ angular.module('mean.rooms').factory("MediaService",['Rooms','UIHandler',functio
 		    				'no': function (index){
 								 uiHandler.modals.splice(index,1);
 							},
-		    				"class":'modalform editable',
-		    				"done":false
+		    				'class':'modalform editable',
+		    				'done':false
 		    			});	
 		    		});
 				}
@@ -342,12 +345,12 @@ angular.module('mean.rooms').factory("MediaService",['Rooms','UIHandler',functio
 	            mediasource.playtype = self.mediasources[mediatype] ? self.mediasources[mediatype].playtype : 'unknow';
 	            self.receivedStreams.push (mediasource); 
 
-	            var streamId = connectionId + "_" + mediatype;
+	            var streamId = connectionId + '_' + mediatype;
 				
-	            if (mediasource.playtype == 'video'){
+	            if (mediasource.playtype === 'video'){
 	           		 mediasource.winratio = self.mediasources[mediatype].winratio;
 	           		 mediasource.winscale = self.mediasources[mediatype].winscale;
-	           		 var mediaElement = $('<video id="remote_'+ streamId + '" style="display:none;" autoplay muted></video>')
+	           		 var mediaElement = $('<video id="remote_'+ streamId + '" style="display:none;" autoplay muted></video>');
 					 rtc.attachStream (mediasource.stream,mediaElement.get(0));
 					 
 					
@@ -379,11 +382,11 @@ angular.module('mean.rooms').factory("MediaService",['Rooms','UIHandler',functio
 		            	);
 					  },1000);
 			  	}else{ 
-			  		 var mediaElement = $('<audio id="remote_'+ streamId + '" style="display:none;" autoplay ></audio>')
-			  		$("#remoteAudios").append (mediaElement);
+			  		var mediaElement2 = $('<audio id="remote_'+ streamId + '" style="display:none;" autoplay ></audio>');
+			  		$('#remoteAudios').append (mediaElement2);
 			  		rtc.attachStream(mediasource.stream,'remote_' + streamId);
 					//Press play again for firefox
-					mediaElement.get(0).play();
+					mediaElement2.get(0).play();
 			  	}
 	            uiHandler.safeApply($scope,function(){});
 			});
@@ -391,11 +394,11 @@ angular.module('mean.rooms').factory("MediaService",['Rooms','UIHandler',functio
 			
 			rtc.uniqueon('stream_closed',function(data){
             
-	            for (var i=0; i< self.receivedStreams.length; i++){
+	            for (var i=0; i< self.receivedStreams.length; i+=1){
 	                var mediasource = self.receivedStreams[i];
 	            
-	            	var streamId = mediasource.connectionId + "_" + mediasource.type;
-	                if (mediasource.stream && streamId === (data.connectionId + "_" + data.mediatype)){
+	            	var streamId = mediasource.connectionId + '_' + mediasource.type;
+	                if (mediasource.stream && streamId === (data.connectionId + '_' + data.mediatype)){
 	                    rtc.dropPeerConnection(data.connectionId,data.mediatype,false);
 
 	                	if (mediasource.playtype==='video'){
@@ -418,25 +421,25 @@ angular.module('mean.rooms').factory("MediaService",['Rooms','UIHandler',functio
 	        	if (connectionId){
 		    		//we turn off all their streams 
 		    	
-					for (var i = 0; i< uiHandler.users.length; i++){
+					for (var i = 0; i< uiHandler.users.length; i+=1){
 
 							if (connectionId === uiHandler.users[i].connectionId || connectionId === uiHandler.ownerConnectionId){
 
-								for (var j = 0 ; j < self.receivedStreams.length ; j++){
+								for (var j = 0 ; j < self.receivedStreams.length ; j+=1){
 									var mediasource = self.receivedStreams [j];
 
-									if (mediasource.connectionId == connectionId){
-										var streamId = mediasource.connectionId + "_" + mediasource.type;
+									if (mediasource.connectionId === connectionId){
+										var streamId = mediasource.connectionId + '_' + mediasource.type;
 										rtc.dropPeerConnection(connectionId,mediasource.type,false);
 
-										if (mediasource.playtype =='video'){
+										if (mediasource.playtype ==='video'){
 											mediasource.window.winHandler.close();
 										}else{
 											$('#remote_'+streamId).remove();
 										}
 
 									 self.receivedStreams.splice (j,1);
-									 j--;
+									 j-=1;
 									}
 								}
 								break;
@@ -463,13 +466,13 @@ angular.module('mean.rooms').factory("MediaService",['Rooms','UIHandler',functio
 								 uiHandler.modals.splice(index,1);
 		 		                rtc.reportErrorToUser($scope.global.roomId,data.id,data.source);
 							},
-		    				"class":'modalform editable',
-		    				"done":false,
-		    				"avatar": $scope.getUser(data.id).avatar
+		    				'class':'modalform editable',
+		    				'done':false,
+		    				'avatar': $scope.getUser(data.id).avatar
 		    			});	
 		    		});
 		        }else{
-		        	  $scope.startRecording(data.source)
+		        	  $scope.startRecording(data.source);
 		        }
             
          	}); 
@@ -483,7 +486,7 @@ angular.module('mean.rooms').factory("MediaService",['Rooms','UIHandler',functio
 	   				}
 	   			}else{
 					if (data.connectionId === rtc._me){ // In that case he has to stop request take care with other requests
-	               		$scope.stopRecording(data.source)
+	               		$scope.stopRecording(data.source);
 	      	      	}
 	   			}
 	 			
@@ -496,14 +499,14 @@ angular.module('mean.rooms').factory("MediaService",['Rooms','UIHandler',functio
 	                var errMessage = $scope.resourceBundle._(data.type,$scope.getUserName(data.connectionId));
 	                $scope.global.showError($scope,errMessage);
 	            }else if (uiHandler.isowner){
-	            	var errMessage = $scope.getUserName(data.connectionId) + ' ' + $scope.resourceBundle['deny'+data.type+'request'];
-					$scope.global.showError($scope,errMessage);
+	            	var errMessage2 = $scope.getUserName(data.connectionId) + ' ' + $scope.resourceBundle['deny'+data.type+'request'];
+					$scope.global.showError($scope,errMessage2);
 			    }
             
 	            uiHandler.safeApply($scope,function(){});
 
         	});	
 
-	    }
+	    };
 	};
 }]);

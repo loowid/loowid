@@ -1,4 +1,5 @@
-angular.module('mean.system').factory("Global", [function() {
+'use strict';
+angular.module('mean.system').factory('Global', [function() {
     var _this = this;
     _this._data = {
         user: window.user,
@@ -46,7 +47,7 @@ angular.module('mean.system').factory("Global", [function() {
 	        		}
 	        		return txt;
         		} else {
-        			return 'not found: '+argumens[0];
+        			return 'not found: '+arguments[0];
         		}
         	}
         	return null;

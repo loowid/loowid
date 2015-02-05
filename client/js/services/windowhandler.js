@@ -1,29 +1,31 @@
-angular.module('mean.rooms').factory("WindowHandler",[function(){
+'use strict';
+/*global $: true */
+angular.module('mean.rooms').factory('WindowHandler',[function(){
 	
 
 	return function (){
 	
 		var defaultRelations = [{x:4,y:3},{x:16,y:9}];
-		var e= null;
 
 		this.getDefaultWidth = function (winscale){
 			return window.innerWidth * winscale;
-		}
+		};
+		
 		this.getDefaultHeight = function(winratio,winscale){
 			if (window.innerWidth <= 800) winscale = 0.75;
 
 			var width = this.getDefaultWidth (winscale);
 			return (width / defaultRelations[winratio].x * defaultRelations[winratio].y);
-		}
+		};
 
 		this.getCentered = function (width){
 			return  ((window.innerWidth - width) / 2);
-		}
+		};
 
 		this.getSomeYPosition = function (){
-			var winCount = $("wmwindow").length;
+			var winCount = $('wmwindow').length;
 			return 80 + (20*winCount);
-		}
+		};
 
 		this.create = function ($scope,mediaElement,winTitle,source,winratio,winscale,closeable,onopen,onclose){
 		
@@ -55,7 +57,7 @@ angular.module('mean.rooms').factory("WindowHandler",[function(){
 			
 			var close = function (win){
 				onclose(window);
-				for (i = 0; i< $scope.windows.length; i++){
+				for (var i = 0; i< $scope.windows.length; i+=1){
 					if (window === $scope.windows[i]){
 						$scope.windows.splice(i,1);	
 					}
@@ -65,13 +67,13 @@ angular.module('mean.rooms').factory("WindowHandler",[function(){
 				setTimeout(function() {selWindow();}, 100);
 			};
 			
-				var selWindow = function (win){
-					//There is a perverse effect on window selection that pauses the video, lets play all 
-					var videos = document.getElementsByTagName('video');
-					for (i = 0; i< videos.length; i++){
-						videos[i].play();	
-					}
-				};
+			var selWindow = function (win){
+				//There is a perverse effect on window selection that pauses the video, lets play all 
+				var videos = document.getElementsByTagName('video');
+				for (var i = 0; i< videos.length; i+=1){
+					videos[i].play();	
+				}
+			};
 			
 			var window = {
 				options: options,
@@ -89,7 +91,7 @@ angular.module('mean.rooms').factory("WindowHandler",[function(){
 		
 		this.init = function ($scope){
 			$scope.windows = [];
-		}
+		};
 
 	};
 }]);

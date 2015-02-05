@@ -1,3 +1,5 @@
+'use strict';
+/*global rtc: true */
 angular.module('mean.rooms').controller('ViewDesktopController', ['$scope', '$routeParams', '$location', 'Global', 'Rooms', '$timeout','ngI18nResourceBundle','ngI18nConfig','$sce','FileService','ChatService','MediaService','WindowHandler','UserHandler','UIHandler',function ($scope, $routeParams, $location, Global, Rooms, $timeout,ngI18nResourceBundle, ngI18nConfig,$sce,FileService,ChatService,MediaService,WindowHandler,UserHandler,UIHandler){
 	var uiHandler = UIHandler;
     $scope.global = Global;
@@ -40,7 +42,7 @@ angular.module('mean.rooms').controller('ViewDesktopController', ['$scope', '$ro
 
     $scope.hideError = function() {
         $scope.global.hideError($scope);
-    }
+    };
     
     uiHandler.focused = true;
     
@@ -50,7 +52,7 @@ angular.module('mean.rooms').controller('ViewDesktopController', ['$scope', '$ro
     
     window.onblur = function() {
     	uiHandler.focused = false;
-    }
+    };
 
     $scope.$on('$locationChangeStart', function(obj, next, current) { 
     	if (next.indexOf('/join')>0) {
@@ -58,22 +60,20 @@ angular.module('mean.rooms').controller('ViewDesktopController', ['$scope', '$ro
     	}
     });
 
-
-    
     $scope.changeOwnerConnectionId = function (id) {
     	uiHandler.ownerConnectionId = id;
-    }
+    };
   
-   $scope.roomLeave = function (){
+    $scope.roomLeave = function (){
         
         var leaveFn = function (){
             if (!uiHandler.passNeeded && uiHandler.joinable) rtc.reset();
             $scope.global.roomId ='';
             $location.search('r',null);
-            $location.path("/");
-        }
+            $location.path('/');
+        };
 
-        if (uiHandler.status=='DISCONNECTED' || !uiHandler.joinable){
+        if (uiHandler.status==='DISCONNECTED' || !uiHandler.joinable){
             leaveFn ();
         }else {
             uiHandler.safeApply ($scope,function (){
@@ -93,8 +93,8 @@ angular.module('mean.rooms').controller('ViewDesktopController', ['$scope', '$ro
                         });
                             
                     },
-                    "class":'modalform editable',
-                    "done":false
+                    'class':'modalform editable',
+                    'done':false
                 }); 
             });
         }
@@ -135,7 +135,7 @@ angular.module('mean.rooms').controller('ViewDesktopController', ['$scope', '$ro
             }
 		});
         // Set my own name
-        for (var i=0; i<results.guests.length; i++) {
+        for (var i=0; i<results.guests.length; i+=1) {
             if (results.guests[i].connectionId === rtc._me) {
             	uiHandler.name = results.guests[i].name;
             	uiHandler.avatar = results.guests[i].avatar;
@@ -148,7 +148,7 @@ angular.module('mean.rooms').controller('ViewDesktopController', ['$scope', '$ro
     
     $scope.init = function (){
         if ($routeParams.accessKey){
-            uiHandler.roomPassword=$routeParams.accessKey
+            uiHandler.roomPassword=$routeParams.accessKey;
             uiHandler.passNeeded = false;
             uiHandler.connectionError = false;
             uiHandler.sendingPwd = false;
@@ -173,7 +173,7 @@ angular.module('mean.rooms').controller('ViewDesktopController', ['$scope', '$ro
 		// Reload if is a permanent room
 		window.clearInterval($scope.global.reloadInterval);
 		$scope.global.reloadInterval = window.setInterval(function(){
-			if (uiHandler.joinable==false && uiHandler.locked==false && uiHandler.permanent) {
+			if (uiHandler.joinable===false && uiHandler.locked===false && uiHandler.permanent) {
 				window.location.reload();
 			}
 		},30000);
@@ -191,7 +191,7 @@ angular.module('mean.rooms').controller('ViewDesktopController', ['$scope', '$ro
 
         }else{
         	$location.search('r',null);
-            $location.path("/");
+            $location.path('/');
         }
 
         rtc.on ('password_failed', function(data) {
@@ -201,12 +201,12 @@ angular.module('mean.rooms').controller('ViewDesktopController', ['$scope', '$ro
         	$scope.$apply();
             // Close socket and listeners
             rtc._socket.close();
-            delete rtc._events['get_peers'];
-            delete rtc._events['receive_ice_candidate'];
-            delete rtc._events['new_peer_connected'];
-            delete rtc._events['remove_peer_connected'];
-            delete rtc._events['receive_offer'];
-            delete rtc._events['receive_answer'];
+            delete rtc._events.get_peers;
+            delete rtc._events.receive_ice_candidate;
+            delete rtc._events.new_peer_connected;
+            delete rtc._events.remove_peer_connected;
+            delete rtc._events.receive_offer;
+            delete rtc._events.receive_answer;
         });
 
         
@@ -214,7 +214,7 @@ angular.module('mean.rooms').controller('ViewDesktopController', ['$scope', '$ro
         rtc.on ('owner_data_updated',function(data){
        		uiHandler.status = data.status;
     		uiHandler.access = data.access;
-            var chatModified = (uiHandler.chatstatus != undefined && uiHandler.chatstatus != data.access.chat); 
+            var chatModified = (uiHandler.chatstatus !== undefined && uiHandler.chatstatus !== data.access.chat); 
             uiHandler.chatstatus = data.access.chat;
             
             if (chatModified) {
@@ -244,8 +244,8 @@ angular.module('mean.rooms').controller('ViewDesktopController', ['$scope', '$ro
                        uiHandler.status = 'DISCONNECTED';
                       $scope.roomLeave();
                     },
-                    "class":'modalform editable',
-                    "done":false
+                    'class':'modalform editable',
+                    'done':false
                 }); 
             });
         });
@@ -267,7 +267,7 @@ angular.module('mean.rooms').controller('ViewDesktopController', ['$scope', '$ro
 
         }else{
         	$location.search('r',null);
-            $location.path("/");
+            $location.path('/');
         }
 
     };
@@ -293,7 +293,7 @@ angular.module('mean.rooms').controller('ViewDesktopController', ['$scope', '$ro
         	$scope.global.roomId ='';
         	uiHandler.joinable = false;
         	$location.search('r',null);
-            $location.path("/");
+            $location.path('/');
         });
     };
 
@@ -303,7 +303,7 @@ angular.module('mean.rooms').controller('ViewDesktopController', ['$scope', '$ro
     $sceProvider.enabled(true);
 }).directive('ngEscape', function () {
     return function (scope, element, attrs) {
-        element.bind("keydown keypress", function (event) {
+        element.bind('keydown keypress', function (event) {
         });
     };
 });

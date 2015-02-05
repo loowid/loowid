@@ -1,3 +1,5 @@
+'use strict';
+/*global rtc: true */
 angular.module('mean.rooms').controller('RecordController', ['$scope', '$routeParams', '$location', 'Global','Rooms','$timeout','ngI18nResourceBundle','ngI18nConfig','$cookieStore','$sce','FileService','ChatService','MediaService','WindowHandler','UserHandler','UIHandler',function ($scope, $routeParams, $location, Global, Rooms, $timeout,ngI18nResourceBundle, ngI18nConfig, $cookieStore,$sce,FileService,ChatService,MediaService,WindowHandler,UserHandler,UIHandler) {    
 
 	var uiHandler = UIHandler;
@@ -42,7 +44,7 @@ angular.module('mean.rooms').controller('RecordController', ['$scope', '$routePa
 
 	$scope.hideError = function() {
 		$scope.global.hideError($scope);
-	}
+	};
 	
     window.onfocus = function() {
     	uiHandler.focused = true;
@@ -50,7 +52,7 @@ angular.module('mean.rooms').controller('RecordController', ['$scope', '$routePa
     
     window.onblur = function() {
     	uiHandler.focused = false;
-    }
+    };
 
     uiHandler.focused = true;
 
@@ -59,17 +61,17 @@ angular.module('mean.rooms').controller('RecordController', ['$scope', '$routePa
         room.editShared($scope.global.roomId, uiHandler.access, function(rdo){
             $scope.global.access = angular.copy(uiHandler.access);
             rtc.updateOwnerData(uiHandler.roomId,uiHandler.name,uiHandler.avatar,uiHandler.status,uiHandler.access);
-            if (uiHandler.enabledChat !=  uiHandler.access.chat) {
+            if (uiHandler.enabledChat !==  uiHandler.access.chat) {
                 chatService.alertChatStatus($scope,rdo.access.chat?'disabled':'enabled');
-            };
-              $scope.enableEditAccess();
+            }
+            $scope.enableEditAccess();
         });
     };
 
 
     $scope.fireUser = function (index){
          var users = [];
-         if (typeof(index) === "string"){
+         if (typeof(index) === 'string'){
             users.push(index);
          }else{
             users.push(uiHandler.users[index].connectionId);
@@ -80,13 +82,13 @@ angular.module('mean.rooms').controller('RecordController', ['$scope', '$routePa
                 if (rdo.success) {
                     uiHandler.roomId = $scope.global.roomId = rdo.toRoomId;
                     $location.search('r',uiHandler.roomId);
-                    uiHandler.screenurl = $location.$$protocol+ "://"+ $location.$$host +  "/#!/r/" + $scope.global.roomId;
+                    uiHandler.screenurl = $location.$$protocol+ '://'+ $location.$$host +  '/#!/r/' + $scope.global.roomId;
                     rtc.moveRoom(uiHandler.roomId,rdo.fromRoomId,users);
                 }
             });
-         }
+         };
 
-        uiHandler.safeApply ($scope,function (){
+         uiHandler.safeApply ($scope,function (){
             if (!uiHandler.modals) uiHandler.modals = [];
 
             uiHandler.modals.push({'text': '<strong>' + $scope.getUserName(users[0]) + '</strong> ' + $scope.resourceBundle.fireuser,
@@ -103,12 +105,12 @@ angular.module('mean.rooms').controller('RecordController', ['$scope', '$routePa
                     });
                         
                 },
-                "class":'modalform editable',
-                "done":false,
-                "avatar": $scope.getUser(users[0]).avatar
+                'class':'modalform editable',
+                'done':false,
+                'avatar': $scope.getUser(users[0]).avatar
             }); 
         });
-   };
+    };
     
 
     $scope.enableEditAccess = function() {
@@ -118,23 +120,23 @@ angular.module('mean.rooms').controller('RecordController', ['$scope', '$routePa
 
         if (uiHandler.editAccess) {
         	uiHandler.editAccessClass = 'editable';
-            setTimeout('document.getElementById("chgacctitle").focus();',100);
+            setTimeout(function(){document.getElementById('chgacctitle').focus();},100);
         } else {
         	uiHandler.editAccessClass = '';
-            setTimeout('document.getElementById("chgacctitle").blur();',100);
+            setTimeout(function(){document.getElementById('chgacctitle').blur();},100);
         }
         return false;
-    }
+    };
 
     $scope.roomLeave = function (){
         var leaveFn = function (){
             rtc.reset();
             $scope.global.roomId ='';
             $location.search('r',null);
-            $location.path("/");
-        }
+            $location.path('/');
+        };
 
-        if (uiHandler.status=='DISCONNECTED') {
+        if (uiHandler.status==='DISCONNECTED') {
             leaveFn ();
         }else {
             uiHandler.safeApply ($scope,function (){
@@ -154,8 +156,8 @@ angular.module('mean.rooms').controller('RecordController', ['$scope', '$routePa
                         });
                             
                     },
-                    "class":'modalform editable',
-                    "done":false
+                    'class':'modalform editable',
+                    'done':false
                 }); 
             });
         }
@@ -165,7 +167,7 @@ angular.module('mean.rooms').controller('RecordController', ['$scope', '$routePa
     //control de media
 	$scope.lastCharsUrl = function (url){
 		return url.substring (url.length -10);
-	}
+	};
   
 
  	$scope.init = function (){
@@ -173,7 +175,7 @@ angular.module('mean.rooms').controller('RecordController', ['$scope', '$routePa
     	//if (!rid) rid = $scope.global.roomId?$scope.global.roomId:$routeParams.roomId;
 
     	uiHandler.roomId = $scope.global.roomId = rid;	
-    	uiHandler.screenurl = $location.$$protocol+ "://"+ $location.$$host +  "/#!/r/" + $scope.global.roomId;
+    	uiHandler.screenurl = $location.$$protocol+ '://'+ $location.$$host +  '/#!/r/' + $scope.global.roomId;
 
 		// Keep Session with auto request every 15 min
 		window.clearInterval($scope.global.keepInterval);
@@ -204,7 +206,7 @@ angular.module('mean.rooms').controller('RecordController', ['$scope', '$routePa
             //Initialize userHandler options
             userHandler.init ($scope);
 
-			if (uiHandler.roomStatus == 'inactive'){
+			if (uiHandler.roomStatus === 'inactive'){
 				 	//$scope.global.sessionclosed=true;
 				 	if (result.owner) {
 				 		room.joinPass($scope.global.roomId,'',true);
@@ -221,7 +223,7 @@ angular.module('mean.rooms').controller('RecordController', ['$scope', '$routePa
 						 	uiHandler.gravatar = results.owner.gravatar;
 						 	$scope.global.roomDueDate = results.dueDate;
 					    	$scope.global.access = uiHandler.access;
-					    	uiHandler.permanenturl = $location.$$protocol+ "://"+ $location.$$host +  "/#!/r/" + uiHandler.access.permanentkey + "/claim";
+					    	uiHandler.permanenturl = $location.$$protocol+ '://'+ $location.$$host +  '/#!/r/' + uiHandler.access.permanentkey + '/claim';
                             $scope.global.name = uiHandler.name;
 					    	$scope.global.avatar = uiHandler.avatar;
 					    	$scope.global.gravatar = uiHandler.gravatar;
@@ -248,12 +250,12 @@ angular.module('mean.rooms').controller('RecordController', ['$scope', '$routePa
                         
 				 	} else {
 				 		// Probably is a viewer trying to use join url
-				 		$location.path("r/"+$scope.global.roomId);
+				 		$location.path('r/'+$scope.global.roomId);
 				 	}
    			} else {
    				// Owner trying to open multiple tabs not allowed
    				if (result.owner || !rtc._me) {
-   					$location.path("r/"+$scope.global.roomId+'/owner');
+   					$location.path('r/'+$scope.global.roomId+'/owner');
    				} else {
    					room.notifyIn($scope);
    					room.chat($scope.global.roomId,function(results){
@@ -269,7 +271,7 @@ angular.module('mean.rooms').controller('RecordController', ['$scope', '$routePa
 			$scope.global.roomId ='';
 			$scope.global.sessionclosed =true;
 			$location.search('r',null);
-	 		$location.path("/");
+	 		$location.path('/');
 		});
 
       
@@ -284,7 +286,7 @@ angular.module('mean.rooms').controller('RecordController', ['$scope', '$routePa
 	$sceProvider.enabled(true);
 }).directive('ngEscape', function () {
     return function (scope, element, attrs) {
-        element.bind("keydown keypress", function (event) {
+        element.bind('keydown keypress', function (event) {
         });
     };
 });
