@@ -1,6 +1,5 @@
 'use strict';
 /*global rtc: true */
-/*global $: true */
 angular.module('mean.rooms').factory('FileService',['$sce','UIHandler',function($sce,UIHandler){
 	return function (){
 
@@ -46,7 +45,7 @@ angular.module('mean.rooms').factory('FileService',['$sce','UIHandler',function(
 
 	            rtc.askForAcceptFiles ($scope.global.roomId,fileOfferId,fileOffer);
 	            //reset the file input stream
-	            $('#'+inputId).val ('');
+	            document.getElementById(inputId).value='';
 	          }
 	    };
 
@@ -176,12 +175,11 @@ angular.module('mean.rooms').factory('FileService',['$sce','UIHandler',function(
 
     	    $scope.openFileDialog = function(index){
        
-		        $('#userfiles_'+index).change (function (){
-		            $(this).unbind('change');
+		        document.getElementById('userfiles_'+index).addEventListener('change',function (){
 		            self.uploadFiles($scope,this.id);
 		        });
 		        
-	    	    $('#userfiles_'+index).click();
+	    	    document.getElementById('userfiles_'+index).click();
 		    };
 
 		    $scope.cancelFile = function (connectionId,file){

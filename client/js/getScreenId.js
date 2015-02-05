@@ -1,3 +1,4 @@
+'use strict';
 // Last time updated at Sep 07, 2014, 08:32:23
 
 // Latest file can be found here: https://cdn.webrtc-experiment.com/getScreenId.js
@@ -40,8 +41,6 @@ getScreenId(function (error, sourceId, screen_constraints) {
 
         postMessage();
 
-        window.addEventListener('message', onIFrameCallback);
-
         function onIFrameCallback(event) {
             if (!event.data) return;
 
@@ -58,6 +57,9 @@ getScreenId(function (error, sourceId, screen_constraints) {
             // this event listener is no more needed
             window.removeEventListener('message', onIFrameCallback);
         }
+        
+        window.addEventListener('message', onIFrameCallback);
+        
     };
 
     function getScreenConstraints(error, sourceId) {
@@ -86,7 +88,7 @@ getScreenId(function (error, sourceId, screen_constraints) {
             return;
         }
 
-        iframe.contentWindow.postMessage({
+        iframe.contentWindow.postMessage({/*jshint validthis:true */
             captureSourceId: this.extensionId
         }, '*');
     }

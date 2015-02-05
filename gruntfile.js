@@ -63,12 +63,7 @@ module.exports = function(grunt) {
             		      'app/**/*.js',
             		      'spec/**/*.js',
             		      'client/js/**/*.js',
-            		      '!client/js/**/*min.js',
-            		      '!client/js/jquery.js',
-            		      '!client/js/getScreenId.js',
-            		      '!client/js/gravatar.js',
-            		      '!client/js/heroes.js',
-            		      '!client/js/angular-scroll-glue.js'
+            		      '!client/js/**/*min.js'
             		      ] 
             	},
             	options: { 

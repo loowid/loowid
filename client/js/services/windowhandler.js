@@ -1,5 +1,4 @@
 'use strict';
-/*global $: true */
 angular.module('mean.rooms').factory('WindowHandler',[function(){
 	
 
@@ -23,7 +22,7 @@ angular.module('mean.rooms').factory('WindowHandler',[function(){
 		};
 
 		this.getSomeYPosition = function (){
-			var winCount = $('wmwindow').length;
+			var winCount = document.getElementsByTagName('wmwindow').length;
 			return 80 + (20*winCount);
 		};
 

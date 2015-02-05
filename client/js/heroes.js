@@ -1,3 +1,5 @@
+'use strict';
+/*exported getSuperHero */
 var animals = [ 'adder', 'ant', 'anteater', 'antelope', 'badger', 'bat',
 		'bear', 'beaver', 'bee', 'beetle', 'bird', 'bison', 'boar', 'buffalo',
 		'bull', 'butterfly', 'calf', 'camel', 'canary', 'cat', 'caterpillar',
@@ -27,11 +29,11 @@ var end_heroes = ['man','woman','boy','girl','diamond','shadow','rider'];
 var getCapitalize = function(list) {
 	var string = list[Math.round(Math.random()*(list.length-1))];
 	return string.charAt(0).toUpperCase() + string.slice(1);
-}
+};
 
 var getSuperHero = function() {
 	var animal = getCapitalize(animals);
 	var hero_beg = getCapitalize(begin_heroes);
 	var hero_end = getCapitalize(end_heroes);
 	return (Math.random()*10 > 4) ? animal + hero_end : hero_beg + animal;
-}
+};

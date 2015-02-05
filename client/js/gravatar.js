@@ -1,8 +1,6 @@
-var getGravatarImg = function(email) {
-  var email = email || '';
-  return (email.trim()=='')?'img/hero.jpg':'//www.gravatar.com/avatar/'+gravatarMd5(email.trim().toLowerCase());
-}
-
+'use strict';
+/*jslint bitwise: true */
+/*exported getGravatarImg */
 var gravatarMd5 = function(str) {
   // http://kevin.vanzonneveld.net
   // +   original by: Webtoolkit.info (http://www.webtoolkit.info/)
@@ -87,7 +85,7 @@ var gravatarMd5 = function(str) {
       lWordCount = (lByteCount - (lByteCount % 4)) / 4;
       lBytePosition = (lByteCount % 4) * 8;
       lWordArray[lWordCount] = (lWordArray[lWordCount] | (str.charCodeAt(lByteCount) << lBytePosition));
-      lByteCount++;
+      lByteCount+=1;
     }
     lWordCount = (lByteCount - (lByteCount % 4)) / 4;
     lBytePosition = (lByteCount % 4) * 8;
@@ -98,12 +96,12 @@ var gravatarMd5 = function(str) {
   };
 
   var wordToHex = function (lValue) {
-    var wordToHexValue = "",
-      wordToHexValue_temp = "",
+    var wordToHexValue = '',
+      wordToHexValue_temp = '',
       lByte, lCount;
-    for (lCount = 0; lCount <= 3; lCount++) {
+    for (lCount = 0; lCount <= 3; lCount+=1) {
       lByte = (lValue >>> (lCount * 8)) & 255;
-      wordToHexValue_temp = "0" + lByte.toString(16);
+      wordToHexValue_temp = '0' + lByte.toString(16);
       wordToHexValue = wordToHexValue + wordToHexValue_temp.substr(wordToHexValue_temp.length - 2, 2);
     }
     return wordToHexValue;
@@ -213,4 +211,10 @@ var gravatarMd5 = function(str) {
   var temp = wordToHex(a) + wordToHex(b) + wordToHex(c) + wordToHex(d);
 
   return temp.toLowerCase();
-}
+};
+
+var getGravatarImg = function(email) {
+  var email2 = email || '';
+  return (email2.trim()==='')?'img/hero.jpg':'//www.gravatar.com/avatar/'+gravatarMd5(email2.trim().toLowerCase());
+};
+
