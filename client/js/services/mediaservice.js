@@ -363,7 +363,7 @@ angular.module('mean.rooms').factory('MediaService',['Rooms','UIHandler',functio
 					
 					//The rest of code it by async thread to keep webrtc sync stream close quick. Bit tricky here
 					 setTimeout( function (){
-					  	  windowHandler.create	 ($scope,mediaElement,$scope.getUserName(connectionId),streamId,mediasource.winratio,mediasource.winscale, uiHandler.isowner,
+					  	  windowHandler.create	 ($scope,mediaElement,$scope.getUserName(connectionId),streamId,mediasource.winratio,mediasource.winscale, (uiHandler.isowner && uiHandler.access.moderated) ,
 		            		function (win){
 		           				//Attach the window reference to the media source
 		           				mediasource.window = win;
