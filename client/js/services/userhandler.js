@@ -48,7 +48,7 @@ angular.module('mean.rooms').factory('UserHandler',['Rooms','UIHandler','Notific
 		    };
 
 		    $scope.enableEditName = function() {
-  				if (!uiHandler.isowner && uiHandler.passNeeded) return;
+  				if (!uiHandler.isowner && uiHandler.passNeeded) { return; }
         
 		        if (!uiHandler.name) { uiHandler.name = $scope.global.name; return; }
 		        uiHandler.editName = !uiHandler.editName;
@@ -125,8 +125,8 @@ angular.module('mean.rooms').factory('UserHandler',['Rooms','UIHandler','Notific
 	       		            delay: 3000
 		       		    });
 		       	        notification.$on('click', function () {
-		       	        	if (!uiHandler.focused) window.focus();
-		       	        	if (uiHandler.connected_class!=='') $scope.toggleConnected();
+		       	        	if (!uiHandler.focused) { window.focus(); }
+		       	        	if (uiHandler.connected_class!=='') { $scope.toggleConnected(); }
 		       	        });
 		        	} else {
 	       				// Doit traditional
@@ -154,9 +154,9 @@ angular.module('mean.rooms').factory('UserHandler',['Rooms','UIHandler','Notific
     		};
 
     		$scope.getUser = function (connectionId){
-		        if (connectionId === $scope.global.bot) return {name:'loowid',avatar:'img/icons/favicon.ico'};
-		        if (rtc._me === connectionId || (connectionId === $scope.global.own && uiHandler.isowner)) return $scope.ui; 
-		        if (!uiHandler.isowner && $scope.isOwner(connectionId)) return {avatar:uiHandler.ownerAvatar,name:uiHandler.ownerName};
+		        if (connectionId === $scope.global.bot) { return {name:'loowid',avatar:'img/icons/favicon.ico'}; }
+		        if (rtc._me === connectionId || (connectionId === $scope.global.own && uiHandler.isowner)) { return $scope.ui; } 
+		        if (!uiHandler.isowner && $scope.isOwner(connectionId)) { return {avatar:uiHandler.ownerAvatar,name:uiHandler.ownerName}; }
 		        if (uiHandler.users) {
 		            for (var i = 0; i < uiHandler.users.length; i+=1){
 		                if (uiHandler.users[i].connectionId === connectionId){

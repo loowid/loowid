@@ -203,8 +203,8 @@ angular.module('mean.rooms').factory('ChatService',['$timeout','UIHandler','Room
 		       		            delay: 3000
 		       		    });
 		       	        notification.$on('click', function () {
-		       	        	if (!uiHandler.focused) window.focus();
-		       	        	if (uiHandler.chat_class!=='') $scope.toggleChat();
+		       	        	if (!uiHandler.focused) { window.focus(); }
+		       	        	if (uiHandler.chat_class!=='') { $scope.toggleChat(); }
 		       	        });
 	       			} else if (uiHandler.audible) {
 		        		var readText = ($scope.connectedUsers()>1)?$scope.getUser(data.id).name+', '+data.text:data.text;

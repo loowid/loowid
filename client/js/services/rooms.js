@@ -37,8 +37,9 @@ angular.module('mean.rooms').factory('Rooms', ['$resource','$http','$window','No
     	this.makeId = function(){
     	    var text = '';
     	    var possible = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-    	    for( var i=0; i < 7; i+=1 )
+    	    for( var i=0; i < 7; i+=1 ) {
     	        text += possible.charAt(Math.floor(Math.random() * possible.length));
+    	    }
     	    return text;
     	};
     	
@@ -51,15 +52,15 @@ angular.module('mean.rooms').factory('Rooms', ['$resource','$http','$window','No
     	};
 
     	this.saveGravatar = function(gravatar) {
-     	   if (typeof(Storage)!=='undefined') localStorage.loowidGravatarEmail = gravatar;
+     	   if (typeof(Storage)!=='undefined') { localStorage.loowidGravatarEmail = gravatar; }
      	};
     	
     	this.saveName = function(name) {
-    	   if (typeof(Storage)!=='undefined') localStorage.loowidUserName = name;
+    	   if (typeof(Storage)!=='undefined') { localStorage.loowidUserName = name; }
     	};
     	
     	this.resetName = function() {
-    		if (typeof(Storage)!=='undefined') localStorage.loowidUserName = '';
+    		if (typeof(Storage)!=='undefined') { localStorage.loowidUserName = ''; }
     	};
 
         this.getWebSocketUrl = function() {
@@ -232,7 +233,7 @@ angular.module('mean.rooms').factory('Rooms', ['$resource','$http','$window','No
 					});	
 				});
 				notification.$on('click', function () {
-					if (!$scope.ui.focused) window.focus();
+					if (!$scope.ui.focused) { window.focus(); }
 				});
 				notification.$on('show', function () {
 					$scope.ui.notificationReady = true;

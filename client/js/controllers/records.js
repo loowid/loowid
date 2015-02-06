@@ -89,7 +89,7 @@ angular.module('mean.rooms').controller('RecordController', ['$scope', '$routePa
          };
 
          uiHandler.safeApply ($scope,function (){
-            if (!uiHandler.modals) uiHandler.modals = [];
+            if (!uiHandler.modals) { uiHandler.modals = []; }
 
             uiHandler.modals.push({'text': '<strong>' + $scope.getUserName(users[0]) + '</strong> ' + $scope.resourceBundle.fireuser,
                 'yes': function (index){
@@ -140,7 +140,7 @@ angular.module('mean.rooms').controller('RecordController', ['$scope', '$routePa
             leaveFn ();
         }else {
             uiHandler.safeApply ($scope,function (){
-                if (!uiHandler.modals) uiHandler.modals = [];
+                if (!uiHandler.modals) { uiHandler.modals = []; }
 
                 uiHandler.modals.push({'text': $scope.resourceBundle.errorleavetheroom,
                     'yes': function (index){
@@ -266,7 +266,7 @@ angular.module('mean.rooms').controller('RecordController', ['$scope', '$routePa
    			}
 
 		},function (error){
-			if (rtc._me) rtc.reset();
+			if (rtc._me) { rtc.reset(); }
 			uiHandler.roomStatus = 'inactive';
 			$scope.global.roomId ='';
 			$scope.global.sessionclosed =true;

@@ -83,7 +83,7 @@ angular.module('mean.rooms').factory('FileService',['$sce','UIHandler',function(
 	        var orinalChunks = chunks;
 	        var remainigChunks = 0;
 
-	        if (event) text = event.target.result; // on first invocation
+	        if (event) { text = event.target.result; }// on first invocation
 	        
 	        if (self.sentFileOffers[requestId].files[id].canceled){
 	            return;
@@ -97,7 +97,7 @@ angular.module('mean.rooms').factory('FileService',['$sce','UIHandler',function(
 	            data.message = text;
 	        }
 	        
-	        if (!orinalChunks) orinalChunks = remainigChunks;
+	        if (!orinalChunks) { orinalChunks = remainigChunks; }
 	        data.fileid = id;
 	        data.remainigChunks = remainigChunks-1;
 	        data.chunks = orinalChunks;
@@ -119,14 +119,16 @@ angular.module('mean.rooms').factory('FileService',['$sce','UIHandler',function(
 	        var remainingDataURL = text.slice(data.message.length);
 	        
 	        // we try to do it semiasync
-	        if (remainingDataURL.length) setTimeout(function () {
-	            self.onReadAsDataURL($scope,null,id,remainingDataURL,orinalChunks,connectionId,requestId,token); // continue transmitting
-	        }, 50);
+	        if (remainingDataURL.length) {
+	        	setTimeout(function () {
+	        		self.onReadAsDataURL($scope,null,id,remainingDataURL,orinalChunks,connectionId,requestId,token); // continue transmitting
+	        	}, 50);
+	        }
     	};
 
     	this.bytesToSize = function (bytes) {
              var sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB'];
-             if (bytes === 0) return '0 Bytes';
+             if (bytes === 0) { return '0 Bytes'; }
              var i = parseInt(Math.floor(Math.log(bytes) / Math.log(1024)));
              return Math.round(bytes / Math.pow(1024, i), 2) + ' ' + sizes[i];
     	};
@@ -147,8 +149,9 @@ angular.module('mean.rooms').factory('FileService',['$sce','UIHandler',function(
     	this.makeId = function(){
     	    var text = '';
     	    var possible = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-    	    for( var i=0; i < 7; i+=1 )
+    	    for( var i=0; i < 7; i+=1 ) {
     	        text += possible.charAt(Math.floor(Math.random() * possible.length));
+    	    }
     	    return text;
     	};
 
@@ -284,10 +287,11 @@ angular.module('mean.rooms').factory('FileService',['$sce','UIHandler',function(
 		 			files =  user.files; 
 	            }
 
-	          if (!self.arrayToStoreChunks [connectionId])
+	            if (!self.arrayToStoreChunks [connectionId]) {
 	                self.arrayToStoreChunks[connectionId] ={};
-
-	            if (!self.arrayToStoreChunks[connectionId][mediatype]){
+	            }
+	            
+	            if (!self.arrayToStoreChunks[connectionId][mediatype]) {
 	                self.arrayToStoreChunks[connectionId][mediatype] = {};                
 	            }
 
@@ -411,7 +415,7 @@ angular.module('mean.rooms').factory('FileService',['$sce','UIHandler',function(
 
 	                if (!self.acceptedFileOffers[data.requestId]){
 	                	uiHandler.safeApply ($scope,function (){
-		    				if (!uiHandler.modals) uiHandler.modals = [];
+		    				if (!uiHandler.modals) { uiHandler.modals = []; }
 
 			    			uiHandler.modals.push({'text': confirmationStr,
 			    				'yes': function (index){

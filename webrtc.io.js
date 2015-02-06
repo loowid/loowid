@@ -227,8 +227,11 @@ function attachEvents(manager) {
 			}
         } else {
 			iceServers = rtc.iceSERVERS().iceServers;
-			if (response || body) logger.error ('Error connecting to get servers ['+error+']: ' + response  + '\n' + body);
-			else logger.debug('Returning default ice servers.');
+			if (response || body) { 
+				logger.error ('Error connecting to get servers ['+error+']: ' + response  + '\n' + body);
+			} else {
+				logger.debug('Returning default ice servers.');
+			}
 		}
 			
 		//Send the correct list
@@ -707,7 +710,7 @@ function attachEvents(manager) {
 		manager.rooms.checkOwner(socket.id, data.toRoom, function() {
 			rtc.rooms[data.toRoom] = roomList;
 			delete rtc.rooms[data.fromRoom];
-			if (!roomList) roomList = [];
+			if (!roomList) { roomList = []; }
 			var toClose = [];
 			for ( var i = 0; i < roomList.length; i+=1) {
 				var id = roomList[i];

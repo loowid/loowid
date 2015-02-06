@@ -69,7 +69,7 @@ angular.module('ngWindowManager',[])
 		
 			//Set some tricky controls to handle the layering
 			if (parentWindow.topZ === undefined){
-				parentWindow.topZ = options.initialZIndex || parentElement.css('z-index') || 100000;
+				parentWindow.topZ = options.initialZIndex || parentWindow.css('z-index') || 100000;
 			}		
 			
 			//This function is executed when close button is pushed
@@ -237,7 +237,7 @@ angular.module('ngWindowManager',[])
 			winHandler.selectWindow = function (){
 				parentWindow.topZ = parentWindow.topZ +1;
 				element.css ('z-index', parentWindow.topZ);
-				if (scope.selectwindow) scope.selectwindow(winHandler);
+				if (scope.selectwindow) { scope.selectwindow(winHandler); }
 			};
 			
 			//This functions is executed when maximize is executed
@@ -383,8 +383,9 @@ angular.module('ngWindowManager',[])
 			
 				setTimeout (function (){
 					element.removeClass ('opening');
-					if (scope.open) 
+					if (scope.open) {
 						scope.open(winHandler);
+					}
 				},400);
 			},50);
 		}

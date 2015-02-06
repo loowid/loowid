@@ -70,9 +70,9 @@ describe('Main Server Tests', function() {
 				if (count===0) {
 					// WSEvent can't be removed (is capped)
 					utils.Log.remove().exec(function(err){
-						if (err) console.log('Log: Error removing collection!!');
+						if (err) { console.log('Log: Error removing collection!!'); }
 						utils.Room.remove().exec(function(err){
-							if (err) console.log('Room: Error removing collection!!');
+							if (err) { console.log('Room: Error removing collection!!'); }
 							done();
 						});
 					});
@@ -104,7 +104,7 @@ describe('Main Server Tests', function() {
 	
 	afterEach(function(done){
 		count+=1;
-		if (count===total) fin();
+		if (count===total) { fin(); }
 		done();
 	});
 	

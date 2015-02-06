@@ -104,7 +104,7 @@ angular.module('mean.rooms').factory('MediaService',['Rooms','UIHandler',functio
 					}else{
 						errmsg = $scope.resourceBundle['unablepermission'+source] +  (source ==='screen' ? $scope.resourceBundle.readmore : '');
 					}
-					if (errmsg !== '') $scope.global.showError($scope,errmsg);
+					if (errmsg !== '') { $scope.global.showError($scope,errmsg); }
 					if (uiHandler.access.moderated) {
                 		rtc.reportErrorToOwner($scope.global.roomId,source,'cantaccess'+source);
                 	}
@@ -115,7 +115,7 @@ angular.module('mean.rooms').factory('MediaService',['Rooms','UIHandler',functio
 	    		startRecordingFn ();
 	    	}else{
 	    		uiHandler.safeApply ($scope,function (){
-	    			if (!uiHandler.modals) uiHandler.modals = [];
+	    			if (!uiHandler.modals) { uiHandler.modals = []; }
 
 	    			uiHandler.modals.push({'text': $scope.resourceBundle._('wantsyoushare'+source,uiHandler.ownerName),
 	    				'yes': function (index){
@@ -159,7 +159,7 @@ angular.module('mean.rooms').factory('MediaService',['Rooms','UIHandler',functio
     		 var mediasource = this.mediasources[source];
     		mediasource.recording = false;
 			rtc.removeStream($scope.global.roomId,source);
-			if (!this.isAnythingRecording()) uiHandler.status = 'STOPPED';
+			if (!this.isAnythingRecording()) { uiHandler.status = 'STOPPED'; }
 			if (mediasource.onclose) {mediasource.onclose.call (self);}
 			mediasource.onclose = null;			
     		mediasource.stream = null;
@@ -186,8 +186,9 @@ angular.module('mean.rooms').factory('MediaService',['Rooms','UIHandler',functio
 					self.resolutions.push(addedResolution);
 				}else{
 					//if the last resolutiona added is not our resolution we also add it
-					if (addedResolution.x !== screen.width || addedResolution.y !== screen.height)
+					if (addedResolution.x !== screen.width || addedResolution.y !== screen.height) {
 						self.resolutions.push ({x:screen.width,y:screen.height});
+					}
 					break;
 				}
 			}
@@ -253,7 +254,7 @@ angular.module('mean.rooms').factory('MediaService',['Rooms','UIHandler',functio
 
 		    $scope.showDesktopAlertMessage = function(){
 		    	uiHandler.safeApply ($scope,function (){
-		    			if (!uiHandler.tutorials) uiHandler.tutorials = [];
+		    			if (!uiHandler.tutorials) { uiHandler.tutorials = []; }
 
 		    			uiHandler.tutorials.push({'text': $scope.resourceBundle.justchrome,
 		    				'ok': function (index){
@@ -272,7 +273,7 @@ angular.module('mean.rooms').factory('MediaService',['Rooms','UIHandler',functio
 		            for (var i=0; i<self.receivedStreams.length; i+=1) {
 		                if (self.receivedStreams[i].connectionId===connectionId) {
 							//Could be that the window could not be setup already because the method was called for a new status of member
-		                	if (self.receivedStreams[i].window) self.receivedStreams[i].window.title = name;
+		                	if (self.receivedStreams[i].window) { self.receivedStreams[i].window.title = name; }
 		                }
 		            }
 		        }
@@ -305,7 +306,7 @@ angular.module('mean.rooms').factory('MediaService',['Rooms','UIHandler',functio
 					askForSharingFn();
 				}else{
 					uiHandler.safeApply ($scope,function (){
-		    			if (!uiHandler.modals) uiHandler.modals = [];
+		    			if (!uiHandler.modals) { uiHandler.modals = []; }
 
 		    			uiHandler.modals.push({'text': $scope.resourceBundle['requestownerfor'+share],
 		    				'yes': function (index){
@@ -376,7 +377,7 @@ angular.module('mean.rooms').factory('MediaService',['Rooms','UIHandler',functio
 		            		    //Just delay it to take time to get the window opened effect and inherit the video size
             					setTimeout(function (){win.height = mediaElement.getAttribute('height') + 20;},400);
 
-					            if (typeof onrecord !== 'undefined') {onrecord.call (self);}
+					            //if (typeof onrecord !== 'undefined') {onrecord.call (self);}
 								uiHandler.safeApply($scope,function(){});
 		            		},
 		            		function (win){
@@ -467,7 +468,7 @@ angular.module('mean.rooms').factory('MediaService',['Rooms','UIHandler',functio
 		        if (uiHandler.isowner){
 
 					uiHandler.safeApply ($scope,function (){
-		    			if (!uiHandler.modals) uiHandler.modals = [];
+		    			if (!uiHandler.modals) { uiHandler.modals = []; }
 
 		    			uiHandler.modals.push({'text': $scope.resourceBundle._('requestfor'+data.source,$scope.getUserName(data.id)),
 		    				'yes': function (index){
