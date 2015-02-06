@@ -18,13 +18,17 @@ describe('Main Server Tests', function() {
 	utils.testDomain = 'http://localhost:8080';
 
 	utils._events = {};
-	utils.addListener = function(eventName, callback) {
-		utils._events[eventName] = utils._events[eventName] || [];
-		utils._events[eventName].push(callback);
+	
+	utils.addListener = function(id,eventName, callback) {
+		utils._events = utils._events || [];
+		utils._events[id] = utils._events[id] || [];
+		utils._events[id][eventName] = utils._events[id][eventName] || [];
+		utils._events[id][eventName].push(callback);
 	};
-	utils.call = function(eventName, _) {
-		var events = utils._events[eventName];
-		var args = Array.prototype.slice.call(arguments, 1);
+	
+	utils.call = function(id,eventName, _) {
+		var events = utils._events[id][eventName];
+		var args = Array.prototype.slice.call(arguments, 2);
 		if (!events) {
 			return;
 		}
@@ -32,28 +36,30 @@ describe('Main Server Tests', function() {
 			events[i].apply(null, args);
 		}
 	};
-	utils.connect = function() {
+	
+	utils.connect = function(id) {
 		//utils.ws = new WebSocket('ws://localhost/',null,utils.options);
-		utils.ws = new WebSocket('ws://localhost:8080/');
-		utils.ws.on('open', function(){
+		utils.ws = utils.ws || [];
+		utils.ws[id] = new WebSocket('ws://localhost:8080/');
+		utils.ws[id].on('open', function(){
 			// Initial call in open
-			utils.ws.send(JSON.stringify({'eventName': 'update_server_config','data': {	'room': utils.room	}}));
+			utils.ws[id].send(JSON.stringify({'eventName': 'update_server_config','data': {	'room': utils.room	}}));
 		});
-		utils.ws.on('message', function(msg){
+		utils.ws[id].on('message', function(msg){
 			try {
 				var json = JSON.parse(msg);
-				utils.call(json.eventName,json.data);
+				utils.call(id,json.eventName,json.data);
 			} catch (err) {
 				console.log(err);
 			}
 		});
-		utils.ws.on('close', function(){
+		utils.ws[id].on('close', function(){
 			console.log('Close');
 		});
 	};
 	
-	utils.disconnect = function() {
-		utils.ws.close();
+	utils.disconnect = function(id) {
+		utils.ws[id].close();
 	};
 	
 	beforeEach(function(done){
