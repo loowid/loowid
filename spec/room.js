@@ -171,10 +171,19 @@ module.exports = function(request,test,utils) {
 	    });
 	    
 	    test('One viewer joins the room.',function(done) {
+	    	utils.addListener('owner','new_peer_connected',function(peer){
+		    	utils.addListener('owner','peer_list_updated',function(peer){
+		    		expect(peer.socketId).toBe(utils.viewer);
+		    		done();
+		    	});
+	    	});
 	    	utils.addListener('viewer','get_peers',function(join){
 	    		expect(join.you.length).toBeGreaterThan(0);
 	    		utils.viewer = join.you;
-	    		done();
+		    	utils.ws.viewer.send(JSON.stringify({
+					'eventName': 'peer_list_updated',
+					'data': { 'room': utils.roomID }
+		    	}));
 	    	});
 	    	utils.ws.viewer.send(JSON.stringify({
 				'eventName': 'join_room',
@@ -202,6 +211,22 @@ module.exports = function(request,test,utils) {
 	            expect(st.guests.length).toBe(1);
 	            expect(st.guests[0].name).toBe('Client');
 	            expect(st.guests[0].status).toBe('CONNECTED');
+	            done();
+	    	});
+	    });
+	    
+	    test('The users is not empty.', function(done) {
+	    	var requestDate = new Date();
+	    	requestDate.setTime(requestDate.getTime() - 1000);
+	    	request.post({
+	    		  headers: {'content-type':'application/x-www-form-urlencoded','x-csrf-token':utils.csrf},
+	    		  url:     utils.testDomain+'/rooms/'+utils.roomID+'/users',
+	    		  form:    {id: utils.roomID, pag: null}
+	    	}, function(error, response, body){
+	            expect(error).toBeNull();
+	            expect(response.statusCode).toBe(200);
+	            var st = JSON.parse(body);
+	            expect(st.length).toBe(1);
 	            done();
 	    	});
 	    });
@@ -249,7 +274,7 @@ module.exports = function(request,test,utils) {
 	            done();
 	    	});
 	    });
-	    
+
 	});	
 	
 };
