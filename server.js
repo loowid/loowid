@@ -343,7 +343,7 @@ if (process.env.OPENSHIFT_NODEJS_PORT || process.env.OPENSHIFT_INTERNAL_PORT) {
 					version: pck.version,
 					node: getClusterNode(req),
 					host: process.env.WS_HOST || req.host,
-					port: ':' + (process.env.WS_PORT || process.env.LOOWID_HTTPS_PORT || wsport)
+					port: ':' + (process.env.WS_PORT || wsport)
 				});
 			}
 		}
