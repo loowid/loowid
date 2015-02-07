@@ -126,24 +126,26 @@ function attachEvents(manager) {
       var room;
       
       for (var key in rtc.rooms) {
-        room = rtc.rooms[key];
-        var exist = room.indexOf(socket.id);
-        if (exist !== -1) {
-          room.splice(room.indexOf(socket.id), 1);
-          for (var j = 0; j < room.length; j+=1) {
-            var soc = rtc.getSocket(room[j]);
-            if (soc) { // This check is missing (bug)
-	            soc.send(JSON.stringify({
-	              'eventName': 'remove_peer_connected',
-	              'data': {
-	                'socketId': socket.id
-	              }
-	            }), errorFn);
-            }
-          }
-          room = key; // This line is missing (bug)
-          break;
-        }
+		  if (rtc.rooms.hasOwnProperty(key)) {
+			room = rtc.rooms[key];
+			var exist = room.indexOf(socket.id);
+			if (exist !== -1) {
+			  room.splice(room.indexOf(socket.id), 1);
+			  for (var j = 0; j < room.length; j+=1) {
+				var soc = rtc.getSocket(room[j]);
+				if (soc) { // This check is missing (bug)
+					soc.send(JSON.stringify({
+					  'eventName': 'remove_peer_connected',
+					  'data': {
+						'socketId': socket.id
+					  }
+					}), errorFn);
+				}
+			  }
+			  room = key; // This line is missing (bug)
+			  break;
+			}
+		  }  
       }
       // we are leaved the room so lets notify about that
 	  rtc.fire('room_leave', room, socket.id);
