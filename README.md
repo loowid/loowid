@@ -18,6 +18,8 @@ Wiki Documentation | Vote us !! | Bitnami Contest
 `
   3. Create and download public and private keys of your self-signed certificate.
       http://www.cert-depot.com/
+      If no certificate available loowid startup in http port. 
+      When https port is running http port is used only to redirect to https port.
   4. `npm install --production`
   5. `npm start`
   6. Connect to https://localhost/
@@ -35,23 +37,27 @@ Wiki Documentation | Vote us !! | Bitnami Contest
   Follow the same steps but chage steps 5 and 6:
   
   5. `npm install`
-  6. `grunt` (Default development server, "grunt prod" for production environment)
+  
+  6. `grunt` (Default development server)
   
 	 * `grunt cluster`	: Run default development cluster server with 2 nodes (--nodes=N change default value)
-	 * `grunt minijs`	: Minify client js files
-	 * `grunt less`		: Compile less sources to css
-	 * `grunt mini`		: Minify js files and compile less
-	 * `grunt jshint`	: Analyze js files to check style and best practices
+	 * `grunt prod`		: Rn production environment do not watch for code changes
 	 * `grunt test`		: Run unit tests
 
 	 ```
 	 Use --port=80 --sport=443 --bport=8000 to change default port values.
 	 ```
 	 ```
-	 grunt cluster --sport=9090 --port=8080 --bport=7000 --nodes=3 will listen in ports 8080, 7001, 7002, 7003 (http) and 9090 (https).
+	 grunt cluster --sport=9090 --port=8080 --bport=7000 --nodes=3 
+	 listen in ports 8080, 7001, 7002, 7003 (http) and 9090 (https).
 	 ```
 	 ```
-	 grunt --port=8080 will listen in ports 443 (https) and 8080 (http).
+	 grunt --port=8080 
+	 will listen in ports 443 (https) and 8080 (http).
+	 ```
+	 ```
+	 grunt --mongodb=off 
+	 won't startup mongodb
 	 ```
    
   7. If you get some npm packages errors try `npm update` (We had that errors on Windows 7 64bits)
@@ -105,3 +111,16 @@ Wiki Documentation | Vote us !! | Bitnami Contest
   LTI_OWNER_ROLES=<lti-owner-role1>,<lti-owner-role2>,...
   ```
 
+  7. Control host and port for websocket connection. 
+
+  ```
+  WS_HOST=<websocket-host-server>
+  WS_PORT=<websocket-port-server>
+  ```
+
+  8. MongoDB URL. By Default loowid uses localhost to connect with mongodb, set one of this variables to connect to other URL. 
+
+  ```
+  MONGOLAB_URI=<MongoDB URI>
+  MONGOHQ_URL=<MongoDB URL>
+  ```

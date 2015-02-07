@@ -42,8 +42,8 @@ if (!process.env.OPENSHIFT_NODEJS_PORT && !process.env.OPENSHIFT_INTERNAL_PORT &
 		var fs = require('fs');
 		// Certificado de pruebas para local
 		// Generado con http://www.cert-depot.com/
-		var privateKey = fs.readFileSync(process.env.PRIVATE_KEY || 'private.pem');
-		var certificate = fs.readFileSync(process.env.PUBLIC_KEY || 'public.pem');
+		var privateKey = fs.readFileSync(process.env.PRIVATE_KEY || 'private.pem','utf-8');
+		var certificate = fs.readFileSync(process.env.PUBLIC_KEY || 'public.pem','utf-8');
 		var credentials = {
 			key : privateKey,
 			cert : certificate
@@ -207,7 +207,7 @@ app.configure(function() {
 	app.use(express.bodyParser());
 	var csrf = express.csrf();
 	app.use(function(req,res,next){
-		if (isClustered && !req.cookies.stickyid && req.headers.stickyid) {
+		if (isClustered && (!req.cookies.stickyid || (req.headers.stickyid && req.cookies.stickyid !== req.headers.stickyid)) && req.headers.stickyid) {
 			res.cookie('stickyid', req.headers.stickyid, { maxAge: 3600000, httpOnly: true });
 		}
 		// Skip CSRF Check for LTI Initial Route, and forces https
@@ -317,7 +317,7 @@ if (process.env.OPENSHIFT_NODEJS_PORT || process.env.OPENSHIFT_INTERNAL_PORT) {
 					version: pck.version,
 					node: getClusterNode(req),
 					host: process.env.WS_HOST || req.host,
-					port: process.env.WS_PORT || ':8443'
+					port: ':' + (process.env.WS_PORT || '8443')
 				});
 			}
 		}
@@ -326,7 +326,9 @@ if (process.env.OPENSHIFT_NODEJS_PORT || process.env.OPENSHIFT_INTERNAL_PORT) {
 	logger.info('Running non-openshift environment !!');
 	// Local redirect
 	app.get('/', function(req, res) {
-		if (req.protocol === 'http' && defaultPort) {
+		var ind = req.headers.host.indexOf(':');
+		var wsport = (ind>0?req.headers.host.substring(ind+1):(req.protocol==='http'?'80':'443'));
+		if ((req.headers['x-forwarded-proto'] && req.headers['x-forwarded-proto'] !== 'https') || (req.protocol === 'http' && defaultPort)) {
 			res.setHeader('X-FRAME-OPTIONS','DENY');
 			res.redirect('https://' + req.host + (sport!==443?':'+sport:'') + req.url);
 		} else {
@@ -341,13 +343,13 @@ if (process.env.OPENSHIFT_NODEJS_PORT || process.env.OPENSHIFT_INTERNAL_PORT) {
 					version: pck.version,
 					node: getClusterNode(req),
 					host: process.env.WS_HOST || req.host,
-					port: process.env.WS_PORT || ':'+(defaultPort?sport:port)
+					port: ':' + (process.env.WS_PORT || process.env.LOOWID_HTTPS_PORT || wsport)
 				});
 			}
 		}
 	});
 	if (defaultPort) {
-		logger.info('Express app started on port ' + sport);
+		logger.info('Express app started on '+ipaddr+' port ' + sport);
 		sserver.listen(sport, ipaddr);
 	}
 }
@@ -391,4 +393,8 @@ app.use(function(err, req, res, next) {
 
 server.listen(port, ipaddr);
 
-logger.info('Express app started on '+ipaddr+' port ' + port);
+if (defaultPort) {
+	logger.info('Listen for redirect on '+ipaddr+' port ' + port);
+} else {
+	logger.info('Express app started on '+ipaddr+' port ' + port);
+}

@@ -16,21 +16,6 @@ var sport = process.env.LOOWID_HTTPS_PORT || 443;
 var port = process.env.LOOWID_HTTP_PORT || 80;
 var basePort = Number(process.env.LOOWID_BASE_PORT || 8000);
 
-var server = http.createServer(function (req, res) {
-  // optional, for HSTS
-  // see https://en.wikipedia.org/wiki/HTTP_Strict_Transport_Security
-  res.setHeader('Strict-Transport-Security', 'max-age=8640000; includeSubDomains');
-
-  if (req.headers['x-forwarded-proto'] !== 'https') {
-    var url = 'https://' + req.headers.host + (sport!==443?':'+sport:'') + '/';
-    res.writeHead(301, {'location': url});
-    return res.end('Redirecting to <a href="' + url + '">' + url + '</a>.');
-  }
-});
-
-server.listen(port);
-logger.info('Proxy listen port ' + port);
-
 //
 //Create the HTTPS proxy server in front of a HTTP server
 //
@@ -99,44 +84,69 @@ var checkServers = function() {
 	setTimeout(checkServers,5000);
 };
 
-// Look for backends !!
-setTimeout(checkServers,100);
+try {
+	
+	var prvf = process.env.PRIVATE_KEY || 'private.pem';
+	var pubf = process.env.PUBLIC_KEY || 'public.pem';	
 
-var proxy = httpProxy.createProxyServer({
-	target: 'http://localhost:8080',
-	ssl: {
-	 key: fs.readFileSync('private.pem', 'utf8'),
-	 cert: fs.readFileSync('public.pem', 'utf8')
-	},
-	ws:true,
-	secure:true
-});
-
-process.on('uncaughtException', function (err) {
-	if (err.errno === 'ECONNRESET') {
-		// Backend server fail !!
-		checkServers();
-	} else {
-		logger.error(err);
-	}
-});
-
-var httpServer = https.createServer({
-	key: fs.readFileSync('private.pem', 'utf8'),
-	cert: fs.readFileSync('public.pem', 'utf8')
-}, function(req, res){
-	var tg = findStickyServer(req);
-	proxy.web(req, res, {target:tg}, function(){
-		removeBackend(tg);
+	var proxy = httpProxy.createProxyServer({
+		target: 'http://localhost:8080',
+		ssl: {
+		 key: fs.readFileSync(prvf, 'utf8'),
+		 cert: fs.readFileSync(pubf, 'utf8')
+		},
+		ws:true,
+		secure:true
 	});
-}).listen(sport, '0.0.0.0');
-
-httpServer.on('upgrade', function (req, socket, head) {
-	var tg = findStickyServer(req);
-    proxy.ws(req, socket, head, {target:tg}, function(){
-		removeBackend(tg);
+	
+	process.on('uncaughtException', function (err) {
+		if (err.errno === 'ECONNRESET') {
+			// Backend server fail !!
+			checkServers();
+		} else {
+			logger.error(err);
+		}
 	});
-});
+	
+	var httpServer = https.createServer({
+		key: fs.readFileSync(prvf, 'utf8'),
+		cert: fs.readFileSync(pubf, 'utf8')
+	}, function(req, res){
+		var tg = findStickyServer(req);
+		proxy.web(req, res, {target:tg}, function(){
+			removeBackend(tg);
+		});
+	}).listen(sport, '0.0.0.0');
+	
+	httpServer.on('upgrade', function (req, socket, head) {
+		var tg = findStickyServer(req);
+	    proxy.ws(req, socket, head, {target:tg}, function(){
+			removeBackend(tg);
+		});
+	});
+	
+	logger.info('Running load balancer in port '+sport);
 
-logger.info('Load Balancer in port '+sport);
+	// Look for backends !!
+	setTimeout(checkServers,100);
 
+	var server = http.createServer(function (req, res) {
+	  // optional, for HSTS
+	  // see https://en.wikipedia.org/wiki/HTTP_Strict_Transport_Security
+	  res.setHeader('Strict-Transport-Security', 'max-age=8640000; includeSubDomains');
+
+	  if (req.headers['x-forwarded-proto'] !== 'https') {
+	    var url = 'https://' + req.headers.host + (sport!==443?':'+sport:'') + '/';
+	    res.writeHead(301, {'location': url});
+	    return res.end('Redirecting to <a href="' + url + '">' + url + '</a>.');
+	  }
+	});
+
+	server.listen(port);
+	logger.info('Listen for redirect on port ' + port);
+
+} catch (ex) {
+	
+	logger.warn(ex.message);
+	
+}

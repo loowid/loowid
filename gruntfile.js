@@ -203,10 +203,15 @@ module.exports = function(grunt) {
     //Default task(s).
     grunt.registerTask('default', ['minicheck','concurrent:default']);
 
+    var mongodb = grunt.option('mongodb') || 'on';
+
     // Do not run mongo in openshift environment
-    if (process.env.OPENSHIFT_NODEJS_PORT) {
+    if (process.env.OPENSHIFT_NODEJS_PORT || mongodb==='off') {
     	grunt.config.data.concurrent.prod.tasks.splice(0,1);
-    } else {
+    	grunt.config.data.concurrent.default.tasks.splice(0,1);
+    	grunt.config.data.concurrent.cluster.tasks.splice(0,1);
+    } 
+    if (!process.env.OPENSHIFT_NODEJS_PORT) {
         process.env.LOOWID_HTTP_PORT = grunt.option('port') || 80;
         process.env.LOOWID_HTTPS_PORT = grunt.option('sport') || 443;
         process.env.LOOWID_BASE_PORT = grunt.option('bport') || 8000;
@@ -220,6 +225,7 @@ module.exports = function(grunt) {
     	grunt.config.data.nodemon['dev'+k] = { script: 'server.js', options: generateOptions([Number(process.env.LOOWID_BASE_PORT)+k+1]) };
     	grunt.config.data.concurrent.cluster.tasks.push('nodemon:dev'+k);
     }
+
     // Setting number of cluster nodes
     grunt.config.data.nodemon.proxy.options = generateOptions([nodes]);
     grunt.config.data.nodemon.dev.options = generateOptions([]);
