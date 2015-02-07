@@ -17,9 +17,13 @@ Wiki Documentation | Vote us !! | Bitnami Contest
       git clone https://github.com/loowid/loowid /install/dir
 `
   3. Create and download public and private keys of your self-signed certificate.
+
+      ```
       http://www.cert-depot.com/
       If no certificate available loowid startup in http port. 
-      When https port is running http port is used only to redirect to https port.
+      When https port is running, http port is used only to redirect to https port.
+      ```
+      
   4. `npm install --production`
   5. `npm start`
   6. Connect to https://localhost/
@@ -40,12 +44,13 @@ Wiki Documentation | Vote us !! | Bitnami Contest
   
   6. `grunt` (Default development server)
   
-	 * `grunt cluster`	: Run default development cluster server with 2 nodes (--nodes=N change default value)
-	 * `grunt prod`		: Rn production environment do not watch for code changes
+	 * `grunt cluster`	: Run cluster server with 2 nodes (--nodes=N change default value)
+	 * `grunt prod`		: Run production environment do not watch for code changes
 	 * `grunt test`		: Run unit tests
 
 	 ```
 	 Use --port=80 --sport=443 --bport=8000 to change default port values.
+	 And --mongodb=off to don't startup mongodb and provide it independently
 	 ```
 	 ```
 	 grunt cluster --sport=9090 --port=8080 --bport=7000 --nodes=3 
@@ -118,7 +123,7 @@ Wiki Documentation | Vote us !! | Bitnami Contest
   WS_PORT=<websocket-port-server>
   ```
 
-  8. MongoDB URL. By Default loowid uses localhost to connect with mongodb, set one of this variables to connect to other URL. 
+  8. MongoDB URL. By Default loowid uses localhost to connect with mongodb, set one of this variables to connect to another URL. 
 
   ```
   MONGOLAB_URI=<MongoDB URI>
