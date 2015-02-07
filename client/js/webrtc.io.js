@@ -56,7 +56,9 @@ function changeBitrate (sdp,bitrate){
 function mergeConstraints(cons1, cons2) {
 	var merged = cons1;
 	for (var name in cons2.mandatory) {
-		merged.mandatory[name] = cons2.mandatory[name];
+		if (cons2.mandatory.hasOwnProperty(name)) {
+			merged.mandatory[name] = cons2.mandatory[name];
+		}
 	}
 	merged.optional.concat(cons2.optional);
 	return merged;
@@ -676,7 +678,9 @@ function mergeConstraints(cons1, cons2) {
 			var streamObj = rtc.streams[i];
 			if (streamObj.mediatype === mediatype){
 				for (var connection in rtc.producedPeerConnections) {
-					rtc.producedPeerConnections[connection][mediatype].addStream(streamObj.mediastream);
+					if (rtc.producedPeerConnections.hasOwnProperty(connection)) {
+						rtc.producedPeerConnections[connection][mediatype].addStream(streamObj.mediastream);
+					}
 				}
 			}
 		}
@@ -945,8 +949,10 @@ function mergeConstraints(cons1, cons2) {
 		var filesInfo = {};
 
 		for (var fileind in fileOffer.files){
-			var procFile = fileOffer.files[fileind];
-			filesInfo[fileind]  = {'id':fileind, 'name': procFile.file.name, 'size': procFile.file.size};
+			if (fileOffer.files.hasOwnProperty(fileind)) {
+				var procFile = fileOffer.files[fileind];
+				filesInfo[fileind]  = {'id':fileind, 'name': procFile.file.name, 'size': procFile.file.size};
+			}
 		}
 
 		rtc._socket.send(JSON.stringify({
