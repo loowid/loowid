@@ -31,13 +31,14 @@ module.exports = function(grunt) {
         watch: {
             jade: {
                 files: ['app/views/**'],
+                tasks: ['jshint'],
                 options: {
                     livereload: true,
                 },
             },
             js: {
                 files: ['client/js/**/*js'],
-                tasks: ['minijs'],
+                tasks: ['minicheck'],
                 options: {
                     livereload: true,
                 },
@@ -200,7 +201,7 @@ module.exports = function(grunt) {
     grunt.option('force', true);
 
     //Default task(s).
-    grunt.registerTask('default', ['mini','concurrent:default']);
+    grunt.registerTask('default', ['minicheck','concurrent:default']);
 
     // Do not run mongo in openshift environment
     if (process.env.OPENSHIFT_NODEJS_PORT) {
@@ -222,7 +223,7 @@ module.exports = function(grunt) {
     // Setting number of cluster nodes
     grunt.config.data.nodemon.proxy.options = generateOptions([nodes]);
     grunt.config.data.nodemon.dev.options = generateOptions([]);
-    grunt.registerTask('cluster', ['mini','concurrent:cluster']);
+    grunt.registerTask('cluster', ['minicheck','concurrent:cluster']);
 
     grunt.registerTask('prod', ['mini','concurrent:prod']);
     
@@ -231,6 +232,7 @@ module.exports = function(grunt) {
     
     // Minify tasks (generate min files)
     grunt.registerTask('mini', ['minijs','less']);
+    grunt.registerTask('minicheck', ['jshint','minijs','less']);
     
     // Run tests
     grunt.registerTask('test', ['jshint','concurrent:test']);

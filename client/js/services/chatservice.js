@@ -57,7 +57,7 @@ angular.module('mean.rooms').factory('ChatService',['$timeout','UIHandler','Room
 				var openyoutube = function (event){
 					$scope.openVideoFromYoutube(vid);
 					event.preventDefault();
-				}
+				};
 
 				setTimeout (function (){
 					var element = document.getElementById ('max_' + vid);

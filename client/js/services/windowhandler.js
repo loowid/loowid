@@ -51,11 +51,11 @@ angular.module('mean.rooms').factory('WindowHandler',[function(){
 				win.elem.find('video').remove();
 				container.append (mediaElement);
 				window.winHandler = win;
-				if (onopen!==undefined) {onopen(window)};
+				if (onopen!==undefined) { onopen(window); }
 			};	
 			
 			var close = function (win){
-				if (onclose!=undefined) {onclose(window);}
+				if (onclose!==undefined) { onclose(window); }
 				for (var i = 0; i< $scope.windows.length; i+=1){
 					if (window === $scope.windows[i]){
 						$scope.windows.splice(i,1);	
