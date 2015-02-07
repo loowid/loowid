@@ -67,7 +67,7 @@ angular.module('mean.rooms').controller('ViewDesktopController', ['$scope', '$ro
     $scope.roomLeave = function (){
         
         var leaveFn = function (){
-            if (!uiHandler.passNeeded && uiHandler.joinable) rtc.reset();
+            if (!uiHandler.passNeeded && uiHandler.joinable) { rtc.reset(); }
             $scope.global.roomId ='';
             $location.search('r',null);
             $location.path('/');
@@ -77,7 +77,7 @@ angular.module('mean.rooms').controller('ViewDesktopController', ['$scope', '$ro
             leaveFn ();
         }else {
             uiHandler.safeApply ($scope,function (){
-                if (!uiHandler.modals) uiHandler.modals = [];
+                if (!uiHandler.modals) { uiHandler.modals = []; }
 
                 uiHandler.modals.push({'text': $scope.resourceBundle.warningleavetheroom,
                     'yes': function (index){
@@ -101,7 +101,7 @@ angular.module('mean.rooms').controller('ViewDesktopController', ['$scope', '$ro
     };
     
     $scope.addPassword = function() {
-        if (!uiHandler.roomPassword) return;
+        if (!uiHandler.roomPassword) { return; }
         uiHandler.passNeeded = false;
         uiHandler.connectionError = false;
         uiHandler.sendingPwd = true;
@@ -155,7 +155,7 @@ angular.module('mean.rooms').controller('ViewDesktopController', ['$scope', '$ro
             room.joinPass($scope.global.roomId,uiHandler.roomPassword,true);
         }
         
-        if (!uiHandler.roomPassword) rtc.reset();
+        if (!uiHandler.roomPassword) { rtc.reset(); }
     	var rid = $location.search().r||$routeParams.roomId;
     	//if (!rid) rid = $scope.global.roomId?$scope.global.roomId:$routeParams.roomId;
         var roomId = $scope.global.roomId = rid;
@@ -233,7 +233,7 @@ angular.module('mean.rooms').controller('ViewDesktopController', ['$scope', '$ro
         rtc.on('room_out',function(data){
         	
             uiHandler.safeApply ($scope,function (){
-                if (!uiHandler.modals) uiHandler.modals = [];
+                if (!uiHandler.modals) { uiHandler.modals = []; }
 
                 uiHandler.modals.push({'text': $scope.resourceBundle.youarefired,
                     'ok': function (index){
@@ -289,7 +289,7 @@ angular.module('mean.rooms').controller('ViewDesktopController', ['$scope', '$ro
                 }
             }
         },function (err){
-        	if (rtc._me) rtc.reset();
+        	if (rtc._me) { rtc.reset(); }
         	$scope.global.roomId ='';
         	uiHandler.joinable = false;
         	$location.search('r',null);

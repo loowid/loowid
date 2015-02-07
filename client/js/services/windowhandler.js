@@ -11,7 +11,7 @@ angular.module('mean.rooms').factory('WindowHandler',[function(){
 		};
 		
 		this.getDefaultHeight = function(winratio,winscale){
-			if (window.innerWidth <= 800) winscale = 0.75;
+			if (window.innerWidth <= 800) { winscale = 0.75; }
 
 			var width = this.getDefaultWidth (winscale);
 			return (width / defaultRelations[winratio].x * defaultRelations[winratio].y);

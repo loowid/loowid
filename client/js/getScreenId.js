@@ -42,12 +42,14 @@ getScreenId(function (error, sourceId, screen_constraints) {
         postMessage();
 
         function onIFrameCallback(event) {
-            if (!event.data) return;
+            if (!event.data) { return; }
 
             if (event.data.chromeMediaSourceId) {
                 if (event.data.chromeMediaSourceId === 'PermissionDeniedError') {
                     callback('permission-denied');
-                } else callback(null, event.data.chromeMediaSourceId, getScreenConstraints(null, event.data.chromeMediaSourceId));
+                } else {
+                	callback(null, event.data.chromeMediaSourceId, getScreenConstraints(null, event.data.chromeMediaSourceId));
+                }
             }
 
             if (event.data.chromeExtensionStatus) {

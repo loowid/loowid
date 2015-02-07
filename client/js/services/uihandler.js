@@ -7,10 +7,11 @@ angular.module('mean.rooms').factory('UIHandler',['$window','$timeout',function(
     //necessary to avoid asyncronious errors
 	_this._data.safeApply = function(scope, fn) {
 			var phase = scope.$root.$$phase;
-			if(phase === '$apply' || phase === '$digest')
-			scope.$eval(fn);
-			else
-			scope.$apply(fn);
+			if(phase === '$apply' || phase === '$digest') {
+				scope.$eval(fn);
+			} else {
+				scope.$apply(fn);
+			}
 	};
 
 	_this._data.debug = false;
@@ -35,7 +36,7 @@ angular.module('mean.rooms').factory('UIHandler',['$window','$timeout',function(
 		opt   = angular.extend({}, defaultOpt, opt);
 		label = label.toLowerCase();
 		elt   = opt.target;
-		if(typeof opt.target === 'string') elt = document.getElementById(opt.target);
+		if(typeof opt.target === 'string') { elt = document.getElementById(opt.target); }
 
 		fct = function (e) {
 			e = e || $window.event;
@@ -43,19 +44,19 @@ angular.module('mean.rooms').factory('UIHandler',['$window','$timeout',function(
 			// Disable event handler when focus input and textarea
 			if (opt.inputDisabled) {
 				var elt;
-				if (e.target) elt = e.target;
-				else if (e.srcElement) elt = e.srcElement;
-				if (elt.nodeType === 3) elt = elt.parentNode;
-				if (elt.tagName === 'INPUT' || elt.tagName === 'TEXTAREA') return;
+				if (e.target) { elt = e.target; }
+				else { if (e.srcElement) { elt = e.srcElement; } }
+				if (elt.nodeType === 3) { elt = elt.parentNode; }
+				if (elt.tagName === 'INPUT' || elt.tagName === 'TEXTAREA') { return; }
 			}
 
 			// Find out which key is pressed
-			if (e.keyCode) code = e.keyCode;
-			else if (e.which) code = e.which;
+			if (e.keyCode) { code = e.keyCode; }
+			else { if (e.which) { code = e.which; } }
 			var character = String.fromCharCode(code).toLowerCase();
 
-			if (code === 188) character = ','; // If the user presses , when the type is onkeydown
-			if (code === 190) character = '.'; // If the user presses , when the type is onkeydown
+			if (code === 188) { character = ','; } // If the user presses , when the type is onkeydown
+			if (code === 190) { character = '.'; } // If the user presses , when the type is onkeydown
 
 			var keys = label.split('+');
 			// Key Pressed - counts the number of valid keypresses - if it is same as the number of keys, the shortcut function is invoked
@@ -114,15 +115,15 @@ angular.module('mean.rooms').factory('UIHandler',['$window','$timeout',function(
 				}
 
 				if (k.length > 1) { // If it is a special key
-					if(special_keys[k] === code) kp+=1;
+					if(special_keys[k] === code) { kp+=1; }
 				} else if (opt.keyCode) { // If a specific key is set into the config
-					if (opt.keyCode === code) kp+=1;
+					if (opt.keyCode === code) { kp+=1; }
 				} else { // The special keys did not match
-					if(character === k) kp+=1;
+					if(character === k) { kp+=1; }
 					else {
 						if(shift_nums[character] && e.shiftKey) { // Stupid Shift key bug created by using lowercase
 							character = shift_nums[character];
-							if(character === k) kp+=1;
+							if(character === k) { kp+=1; }
 						}
 					}
 				}
@@ -133,9 +134,9 @@ angular.module('mean.rooms').factory('UIHandler',['$window','$timeout',function(
 				modifiers.shift.pressed === modifiers.shift.wanted &&
 				modifiers.alt.pressed === modifiers.alt.wanted &&
 				modifiers.meta.pressed === modifiers.meta.wanted) {
-        $timeout(function() {
-				  callback(e);
-        }, 1);
+		        $timeout(function() {
+						  callback(e);
+		        }, 1);
 
 				if(!opt.propagate) { // Stop the event
 					// e.cancelBubble is supported by IE - this will kill the bubbling process.
@@ -159,22 +160,26 @@ angular.module('mean.rooms').factory('UIHandler',['$window','$timeout',function(
 			'event':    opt.type
 		};
 		//Attach the function with the event
-		if(elt.addEventListener) elt.addEventListener(opt.type, fct, false);
-		else if(elt.attachEvent) elt.attachEvent('on' + opt.type, fct);
-		else elt['on' + opt.type] = fct;
+		if (elt.addEventListener) { 
+			elt.addEventListener(opt.type, fct, false);
+		} else { 
+			if (elt.attachEvent) { elt.attachEvent('on' + opt.type, fct); }
+			else { elt['on' + opt.type] = fct; }
+		}
 	};
 	// Remove the shortcut - just specify the shortcut and I will remove the binding
 	keyboardManagerService.unbind = function (label) {
 		label = label.toLowerCase();
 		var binding = keyboardManagerService.keyboardEvent[label];
 		delete(keyboardManagerService.keyboardEvent[label]);
-		if(!binding) return;
-		var type		= binding.event,
-		elt			= binding.target,
-		callback	= binding.callback;
-		if(elt.detachEvent) elt.detachEvent('on' + type, callback);
-		else if(elt.removeEventListener) elt.removeEventListener(type, callback, false);
-		else elt['on'+type] = false;
+		if(!binding) { return; }
+		var type = binding.event, elt = binding.target,	callback = binding.callback;
+		if (elt.detachEvent) {
+			elt.detachEvent('on' + type, callback);
+		} else { 
+			if (elt.removeEventListener) { elt.removeEventListener(type, callback, false); }
+			else { elt['on'+type] = false; }
+		}
 	};
 
 	keyboardManagerService.bind('ctrl+shift+d', function(){

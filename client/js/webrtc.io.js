@@ -92,8 +92,8 @@ function mergeConstraints(cons1, cons2) {
 	rtc.connected = false;
 
 	rtc.reset = function() {
-		if (rtc._socket) rtc._socket.close();
-		if (rtc.pingInterval) window.clearInterval(rtc.pingInterval);
+		if (rtc._socket) { rtc._socket.close(); }
+		if (rtc.pingInterval) { window.clearInterval(rtc.pingInterval); }
 		rtc._me = null;
 		rtc._events = {};
 		rtc.pingInterval = null;
@@ -208,8 +208,8 @@ function mergeConstraints(cons1, cons2) {
 				rtc.iceServers = data.iceServers;
 				rtc.chromeDesktopExtensionId = data.chromeDesktopExtensionId;
 
-				if (rtc.debug) console.log ('serverList updated' + JSON.stringify (rtc.iceServers));
-				if (rtc.debug) console.log ('extension id ' + rtc.chromeDesktopExtensionId);
+				if (rtc.debug) { console.log ('serverList updated' + JSON.stringify (rtc.iceServers)); }
+				if (rtc.debug) { console.log ('extension id ' + rtc.chromeDesktopExtensionId); }
 			});	
 
 			rtc.askForUpdateConfig(); 	
@@ -296,15 +296,16 @@ function mergeConstraints(cons1, cons2) {
 
 				//We store temporaly candidates
 				if (!peerConnections[data.socketId][data.mediatype]){
-					if (rtc.debug) console.log ('Peer not ready, so storing ICE candidate for a while');
-					if (!peerConnections[data.socketId]['temp_'+data.mediatype]) 
+					if (rtc.debug) { console.log ('Peer not ready, so storing ICE candidate for a while'); }
+					if (!peerConnections[data.socketId]['temp_'+data.mediatype]) { 
 						peerConnections[data.socketId]['temp_'+data.mediatype] = [];
+					}
             		peerConnections[data.socketId]['temp_'+data.mediatype].push(candidate);
 					return;
 				}else{
 					peerConnections[data.socketId][data.mediatype].addIceCandidate(candidate,
-							function (){ if (rtc.debug) console.log ('ICE candidate added'); },
-							function (error) { if (rtc.debug) console.log ('Error adding an ICE candidate ' + JSON.stringify (error)); } );
+							function (){ if (rtc.debug) { console.log ('ICE candidate added'); } },
+							function (error) { if (rtc.debug) { console.log ('Error adding an ICE candidate ' + JSON.stringify (error)); } } );
 				
 				}
 
@@ -321,7 +322,7 @@ function mergeConstraints(cons1, cons2) {
 				var sendDelayedOffer =  function (id, mediatype){
 					setTimeout (function (){
 						rtc.sendOffer (id,mediatype);
-						if (rtc.debug) console.log ('Sending to ' + id + ' a ' + mediatype + 'offer');
+						if (rtc.debug) { console.log ('Sending to ' + id + ' a ' + mediatype + 'offer'); }
 					},2000);
 				};  
 
@@ -344,16 +345,18 @@ function mergeConstraints(cons1, cons2) {
 				delete rtc.dataChannels[id];
 
 				for (var i=0; i<rtc.sources.length && rtc.receivedPeerConnections[id]; i+=1){
-					if (rtc.receivedPeerConnections[id][rtc.sources[i]])
+					if (rtc.receivedPeerConnections[id][rtc.sources[i]]) {
 						//delete received stream peers
 						rtc.dropPeerConnection(id,rtc.sources[i],false);
+					}
 				}
 
 
 				for (var i2=0; i2<rtc.sources.length && rtc.producedPeerConnections[id]; i2+=1){
-					if (rtc.producedPeerConnections[id][rtc.sources[i2]])
+					if (rtc.producedPeerConnections[id][rtc.sources[i2]]) {
 						//delete produced stream peers
 						rtc.dropPeerConnection(id,rtc.sources[i2],true);
+					}
 				}
 
 				for (var j=0; j < rtc.connections.length; j+=1 ){
@@ -426,7 +429,7 @@ function mergeConstraints(cons1, cons2) {
 
 		pc.onicecandidate = function(event) {
 			if (event.candidate && event.candidate.candidate) {
-				if (rtc.debug) console.log ('Sending an ICE candidate');
+				if (rtc.debug) { console.log ('Sending an ICE candidate'); }
 				rtc._socket.send(JSON.stringify({
 					'eventName': 'send_ice_candidate',
 					'data': {
@@ -457,13 +460,13 @@ function mergeConstraints(cons1, cons2) {
 			var tryStream = function (){
 				if (pc !== null){
 					if ( pc.iceConnectionState === 'completed' || pc.iceConnectionState === 'connected'){
-						if (rtc.debug) console.log ('the connection was completed send the data');
+						if (rtc.debug) { console.log ('the connection was completed send the data'); }
 						rtc.fire('add remote stream', event.stream, id,mediatype);
 					}else{
 						setTimeout (function (){
-							if (rtc.debug) console.log ('Remote stream not added yet. Try : ' + tries);
+							if (rtc.debug) { console.log ('Remote stream not added yet. Try : ' + tries); }
 							tries +=1;
-							if (tries < 10) tryStream();
+							if (tries < 10) { tryStream(); }
 						},1500);
 					}
 				}
@@ -473,11 +476,11 @@ function mergeConstraints(cons1, cons2) {
 		};
 
 		pc.oniceconnectionstatechange = function (event){
-			if (rtc.debug) console.log ('User id: ' + id + ' changed : ' + pc.iceConnectionState +  ' mediatype' + mediatype);
+			if (rtc.debug) { console.log ('User id: ' + id + ' changed : ' + pc.iceConnectionState +  ' mediatype' + mediatype); }
 		};
 
 		pc.ondatachannel = function(evt) {
-			if (rtc.debug) console.log('data channel connecting ' + id);
+			if (rtc.debug) { console.log('data channel connecting ' + id); }
 			rtc.addDataChannel(id, evt.channel,requestId,mediatype);
 		};
 
@@ -529,13 +532,12 @@ function mergeConstraints(cons1, cons2) {
 					}
 				}));						 
 			},
-								   function (){
-									   if (rtc.debug) console.log ('Error setting the local description');
-								   }	
-								  );
+		    function (){
+			   if (rtc.debug) { console.log ('Error setting the local description'); }
+		    });
 
 		}, function (){
-			if (rtc.debug) console.log ('Error creating the offer');
+			if (rtc.debug) { console.log ('Error creating the offer'); }
 		}, sdpConstraints);
 	};
 
@@ -550,15 +552,15 @@ function mergeConstraints(cons1, cons2) {
 
 		//if it's a new peer but it alrready exist must be destroyed first
 		if (pc !== undefined){
-			if (rtc.debug) console.log ('Destroyed previous connection');
+			if (rtc.debug) { console.log ('Destroyed previous connection'); }
 			rtc.dropPeerConnection(socketId,mediatype,false);
 		}
 
-		if (rtc.debug) console.log ('Create a new one connection');
+		if (rtc.debug) { console.log ('Create a new one connection'); }
 
 		pc = rtc.createPeerConnection(socketId,mediatype,false,requestId);
 
-		if (rtc.debug) console.log ('Send a new annser');
+		if (rtc.debug) { console.log ('Send a new annser'); }
 		rtc.sendAnswer(socketId, sdp,mediatype);
 	};
 
@@ -570,8 +572,8 @@ function mergeConstraints(cons1, cons2) {
 			function (){
 				//Finaly look for already stored messages and flush them
 				if (rtc.receivedPeerConnections[socketId]['temp_'+mediatype]){
-					var sfn = function (){ if (rtc.debug) console.log ('ICE candidate added'); };
-					var ffn = function (error) { if (rtc.debug) console.log ('Error adding ICE candiate' + JSON.stringify (error)); };
+					var sfn = function (){ if (rtc.debug) { console.log ('ICE candidate added'); } };
+					var ffn = function (error) { if (rtc.debug) { console.log ('Error adding ICE candiate' + JSON.stringify (error)); } };
 					for (var i=0; i< rtc.receivedPeerConnections[socketId]['temp_'+mediatype].length; i+=1){
 						var storedIceCandidate = rtc.receivedPeerConnections[socketId]['temp_'+mediatype][i];
 						pc.addIceCandidate(storedIceCandidate,sfn,ffn);
@@ -588,15 +590,15 @@ function mergeConstraints(cons1, cons2) {
 							}
 						}));
 					},function (){
-						if (rtc.debug) console.log ('Error setting local description ');	
+						if (rtc.debug) { console.log ('Error setting local description '); }	
 					});
 					//TODO Unused variable!?
 					//var offer = pc.remoteDescription;
 				}, function (){
-					if (rtc.debug) console.log ('Error creating the anwer ');	
+					if (rtc.debug) { console.log ('Error creating the anwer '); }	
 				}, sdpConstraints);
 			}, function (){
-				if (rtc.debug) console.log ('Error setting retmote description ');	
+				if (rtc.debug) { console.log ('Error setting retmote description '); }	
 			});
 	};
 
@@ -605,9 +607,9 @@ function mergeConstraints(cons1, cons2) {
 		var pc = rtc.producedPeerConnections[socketId][mediatype];
 		pc.setRemoteDescription(new nativeRTCSessionDescription(sdp),function (){
 			setTimeout(function(){
-				if (rtc.debug) console.log('PCICE::::'+pc.iceConnectionState);
+				if (rtc.debug) { console.log('PCICE::::'+pc.iceConnectionState); }
 				if (pc.iceConnectionState === 'checking') {
-					if (rtc.debug) console.log('Seems that the state is stalled !!');
+					if (rtc.debug) { console.log('Seems that the state is stalled !!'); }
 
 					//Borramos la posible peer
 					rtc.dropPeerConnection(socketId,mediatype,true);
@@ -620,7 +622,7 @@ function mergeConstraints(cons1, cons2) {
 			},10000);
 
 		},function (){
-			if (rtc.debug) console.log ('Error setting remote description');
+			if (rtc.debug) { console.log ('Error setting remote description'); }
 		});
 
 	};
@@ -652,7 +654,7 @@ function mergeConstraints(cons1, cons2) {
 
 			if (mediatype === 'screen'){
 				getScreenId(rtc.chromeDesktopExtensionId,function (error, sourceId, screen_constraints) {
-					if (error) onFail (error);
+					if (error) { onFail (error); }
 					if (!error && sourceId) {
 						options.video.mandatory.chromeMediaSource = 'desktop';
 						options.video.mandatory.chromeMediaSourceId = sourceId;
@@ -704,9 +706,9 @@ function mergeConstraints(cons1, cons2) {
 		var queue = rtc.dataChannels[id][mediatypefile].queue;
 		var state = rtc.dataChannels[id][mediatypefile].state;
 
-		if (message)
+		if (message) {
 			queue.push (message);
-
+		}
 
 		if (state  === 'ready'){
 			var eventName = 'data stream open ' +  id  + ' ' + mediatypefile;
@@ -756,7 +758,7 @@ function mergeConstraints(cons1, cons2) {
 
 	rtc.createDataChannel = function(id,requestId,mediatypefile) {
 
-		if (!id) throw new Error('attempt to createDataChannel with unknown id');
+		if (!id) { throw new Error('attempt to createDataChannel with unknown id'); }
 
 
 		var userPeerList = rtc.producedPeerConnections[id];
@@ -777,10 +779,10 @@ function mergeConstraints(cons1, cons2) {
 
 		var channel;
 		try {
-			if (rtc.debug) console.log('createDataChannel ' + id + ' ' + mediatypefile); 
+			if (rtc.debug) { console.log('createDataChannel ' + id + ' ' + mediatypefile); } 
 			channel = pc.createDataChannel(label, options);
 		} catch (error) {
-			if (rtc.debug) console.log('seems that DataChannel is NOT actually supported!');
+			if (rtc.debug) { console.log('seems that DataChannel is NOT actually supported!'); }
 			throw error;
 		}
 
@@ -791,24 +793,24 @@ function mergeConstraints(cons1, cons2) {
 	rtc.addDataChannel = function(id, channel, requestId,mediatypefile) {
 
 		channel.onopen = function() {
-			if (rtc.debug) console.log('data stream open ' + mediatypefile);
+			if (rtc.debug) { console.log('data stream open ' + mediatypefile); }
 			// We will fire a different open event for each id or channel
 			rtc.fire('data stream open ' + id+ ' ' + mediatypefile, channel);
 		};
 
 		channel.onclose = function(event) {
 			delete rtc.dataChannels[id][mediatypefile];
-			if (rtc.debug) console.log('data stream close ');
+			if (rtc.debug) { console.log('data stream close '); }
 			rtc.fire('data stream close', channel);
 		};
 
 		channel.onmessage = function(event) {
-			if (rtc.debug) console.log('data stream message ' + id + ' ' + event.data);
+			if (rtc.debug) { console.log('data stream message ' + id + ' ' + event.data); }
 			rtc.fire('data stream data', channel,id, requestId, mediatypefile, event.data);
 		};
 
 		channel.onerror = function(err) {
-			if (rtc.debug) console.log('data stream error ' + id + ': ' + err);
+			if (rtc.debug) { console.log('data stream error ' + id + ': ' + err); }
 			rtc.fire('data stream error', channel, err);
 		};
 
@@ -875,10 +877,11 @@ function mergeConstraints(cons1, cons2) {
 
 
 	rtc.attachStream = function(stream, element) {
-		if (typeof(element) === 'string')
+		if (typeof(element) === 'string') {
 			element = document.getElementById(element);
+		}
 		if (navigator.mozGetUserMedia) {
-			if (rtc.debug) console.log('Attaching media stream');
+			if (rtc.debug) { console.log('Attaching media stream'); }
 			element.mozSrcObject = stream;
 			element.play();
 		} else {

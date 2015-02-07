@@ -13,14 +13,15 @@ var crypto = require('crypto');
 var makeId = function(){
     var text = '';
     var possible = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-    for( var i=0; i < 7; i+=1 )
+    for( var i=0; i < 7; i+=1 ) {
         text += possible.charAt(Math.floor(Math.random() * possible.length));
+    }
     return text;
 };
 
 var isReloading = function(room,id) {
 	for (var k=0; k<room.guests.length;k+=1) {
-		if (room.guests[k].sessionid === id && room.guests[k].status==='DISCONNECTED') return true;
+		if (room.guests[k].sessionid === id && room.guests[k].status==='DISCONNECTED') { return true; }
 	}
 	return false;
 };
@@ -143,7 +144,7 @@ exports.join = function (req, res, next){
 					source: []
 				});
 				var ind = room.valid.indexOf(req.sessionID);
-				if (ind>=0) room.valid.splice(ind, 1);
+				if (ind>=0) { room.valid.splice(ind, 1); }
 				room.save(function(err) {
 					if (err) {
 						next(err);
@@ -454,7 +455,7 @@ exports.disconnectOwnerOrGuess = function (connectionId,success){
 			if (room){
 				room.status = 'DISCONNECTED';
 				room.save(function(err) {
-					if (err) logger.error ('Error saving room status ' + err); 
+					if (err) { logger.error ('Error saving room status ' + err); } 
 					success(room,true);
 				});
 			} else {
@@ -471,7 +472,7 @@ exports.disconnectOwnerOrGuess = function (connectionId,success){
 							        // save the doc
 							        room2.markModified('guests');
 							        room2.save(function(err) {
-										if (err) logger.error ('Error saving room2 status ' + err); 
+										if (err) { logger.error ('Error saving room2 status ' + err); } 
 										success(room2,false);
 							        });
 							    }
@@ -508,7 +509,7 @@ exports.checkModerateOwnerFiles = function (id,destinationId,room,success,failur
 			if (room) {
 				success();
 			} else {
-				if (failure !== undefined) failure();
+				if (failure !== undefined) { failure(); }
 			}
 		});
 };
@@ -664,9 +665,11 @@ exports.realRoomId = function (aliasRoomId, sessionid, callback) {
 };
 
 Array.prototype.indexOfField = function (propertyName, value) {
-	for (var i = 0; i < this.length; i+=1)
-		if (this[i][propertyName] === value)
+	for (var i = 0; i < this.length; i+=1) {
+		if (this[i][propertyName] === value) {
 			return i;
+		}
+	}
 	return -1;
 };
 
