@@ -82,7 +82,7 @@ angular.module('mean.rooms').controller('RecordController', ['$scope', '$routePa
                 if (rdo.success) {
                     uiHandler.roomId = $scope.global.roomId = rdo.toRoomId;
                     $location.search('r',uiHandler.roomId);
-                    uiHandler.screenurl = $location.$$protocol+ '://'+ $location.$$host +  '/#!/r/' + $scope.global.roomId;
+                    uiHandler.screenurl = $scope.getScreenUrl();
                     rtc.moveRoom(uiHandler.roomId,rdo.fromRoomId,users);
                 }
             });
@@ -168,14 +168,18 @@ angular.module('mean.rooms').controller('RecordController', ['$scope', '$routePa
 	$scope.lastCharsUrl = function (url){
 		return url.substring (url.length -10);
 	};
-  
+
+	$scope.getScreenUrl = function() {
+		var po = ($location.$$port===80 || $location.$$port===443)?'':':'+$location.$$port;
+		return $location.$$protocol+ '://'+ $location.$$host + po + '/#!/r/' + $scope.global.roomId;
+	};
 
  	$scope.init = function (){
     	var rid = $location.search().r || $routeParams.roomId;
     	//if (!rid) rid = $scope.global.roomId?$scope.global.roomId:$routeParams.roomId;
 
     	uiHandler.roomId = $scope.global.roomId = rid;	
-    	uiHandler.screenurl = $location.$$protocol+ '://'+ $location.$$host +  '/#!/r/' + $scope.global.roomId;
+    	uiHandler.screenurl = $scope.getScreenUrl();
 
 		// Keep Session with auto request every 15 min
 		window.clearInterval($scope.global.keepInterval);

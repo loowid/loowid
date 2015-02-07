@@ -64,11 +64,11 @@ angular.module('mean.rooms').factory('Rooms', ['$resource','$http','$window','No
     	};
 
         this.getWebSocketUrl = function() {
-        	return 'wss://'+window.wsocket.host+window.wsocket.port;
+        	return 'ws'+(location.protocol.indexOf('s:')>0?'s':'')+'://'+window.wsocket.host+window.wsocket.port;
         };
 		
         this.getInitWebSocketUrl = function () {
-        	return (location.origin.indexOf('https://'+window.wsocket.host)<0)?'https://'+window.wsocket.host+'/rooms/hello':null;
+        	return (location.origin.indexOf(location.protocol+'//'+window.wsocket.host)<0)?location.protocol+'//'+window.wsocket.host+'/rooms/hello':null;
         };
 
 		this.create = function (name,success,ownerToken){

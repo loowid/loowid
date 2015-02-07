@@ -83,7 +83,8 @@ angular.module('mean.rooms').controller('RoomsController', ['$scope', '$routePar
    
    $scope.join = function() {
        var roomId = $scope.global.roomId;
-       uiHandler.screenurl = $location.$$protocol+ '://'+ $location.$$host +  '/#!/r/' + roomId;
+       var po = ($location.$$port===80 || $location.$$port===443)?'':':'+$location.$$port;
+       uiHandler.screenurl = $location.$$protocol+ '://'+ $location.$$host + po + '/#!/r/' + roomId;
        $location.path('r/' +roomId + '/join');
    };
 
