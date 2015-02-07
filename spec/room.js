@@ -227,6 +227,7 @@ module.exports = function(request,test,utils) {
 	            expect(response.statusCode).toBe(200);
 	            var st = JSON.parse(body);
 	            expect(st.length).toBe(1);
+	            expect(st[0].sessionId).toBeUndefined();
 	            done();
 	    	});
 	    });

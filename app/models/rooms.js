@@ -101,7 +101,7 @@ RoomSchema.statics = {
     },
     safe: function(guests) {
     	for (var i=0; i<guests.length; i+=1) {
-    		delete guests[i].sessionid;
+    		guests[i].sessionid = '';
     	}
     	return guests;
     },
