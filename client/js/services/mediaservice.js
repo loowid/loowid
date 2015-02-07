@@ -165,6 +165,8 @@ angular.module('mean.rooms').factory('MediaService',['Rooms','UIHandler',functio
     		mediasource.stream = null;
     	};
 
+		
+		
 
 	    this.init = function($scope,windowHandler){
 	    
@@ -211,7 +213,7 @@ angular.module('mean.rooms').factory('MediaService',['Rooms','UIHandler',functio
 		    };
 
 
-	    	$scope.changeToResolution  = function (index){
+			$scope.changeToResolution  = function (index){
 		        if (self.resolutions[index]){
 		        	uiHandler.currentResolution = index;
 		            var csource = self.screen_constraints.mandatory;
@@ -333,9 +335,15 @@ angular.module('mean.rooms').factory('MediaService',['Rooms','UIHandler',functio
 			         });
 		        }
 		    };
-       
 
-    		/*Declar media related events */
+			$scope.openVideoFromYoutube = function (vid){
+				var iframe = '<iframe src="//www.youtube.com/embed/' + vid + '" style= "position: absolute; top:30px; left: 0;width: 100%; height: 100%;" frameborder="0" allowfullscreen ></iframe>';
+				var iframeElement = angular.element (iframe);
+				
+				windowHandler.create ($scope,iframeElement,'',null,RATIO_16_9,0.5,true);
+			};
+			
+			/*Declar media related events */
     		rtc.uniqueon('add remote stream', function(stream,connectionId,mediatype){
 			
 				var mediasource = {};

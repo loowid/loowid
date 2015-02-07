@@ -43,25 +43,44 @@ angular.module('mean.rooms').factory('ChatService',['$timeout','UIHandler','Room
 	        return secs>15;
 	    };
 	    
-	    this.youtube = function(url,vid) {
-	    	return '<iframe src="//www.youtube.com/embed/' + vid + '" width="100%" height="100%" frameborder="0" allowfullscreen></iframe>';
-	    };
+	    
 	    
 	    this.link = function(url) {
 	    	return '<a href="' + url + '" target="_blank">' + url + '</a>';
 	    };
 	    
-	    this.parseUrls = function(txt) {
-	    	return txt.replace(/https?:\/\/www\.youtube\.com\/watch\?v=([^\s]+)/g, this.youtube)
-	    			  .replace(/https?:\/\/youtu\.be\/([^\s]+)/g, this.youtube)
+	    this.parseUrls = function($scope,txt) {
+	    	
+			var youtube = function(url,vid) {
+	    		var frame = '<iframe src="//www.youtube.com/embed/' + vid + '" width="100%" height="100%" frameborder="0" allowfullscreen></iframe><p><a href id="max_'+ vid +'"><i  class="fa fa-desktop"/></a></p>';
+	    
+				var openyoutube = function (event){
+					$scope.openVideoFromYoutube(vid);
+					event.preventDefault();
+				}
+
+				setTimeout (function (){
+					var element = document.getElementById ('max_' + vid);
+					element.addEventListener ('click',openyoutube);
+				},300);
+
+				return frame;
+
+			};
+			
+			
+			return txt.replace(/https?:\/\/www\.youtube\.com\/watch\?v=([^\s]+)/g, youtube)
+	    			  .replace(/https?:\/\/youtu\.be\/([^\s]+)/g, youtube)
 	    			  .replace(/(https?:\/\/[^\s]+)/g, this.link);
 	    };
 	    
+		
+		
 	    this.getHtml = function($scope,data) {
 	        if (data.id===$scope.global.bot) {
-	            return this.parseUrls(data.text);
+	            return this.parseUrls($scope,data.text);
 	        }
-	        return this.parseUrls(data.text.replace(/&/g,'&amp;').replace(/</g,'&lt;'));
+	        return this.parseUrls($scope,data.text.replace(/&/g,'&amp;').replace(/</g,'&lt;'));
 	    };
 	    
 	    this.addToQueue = function(data) {
