@@ -407,10 +407,12 @@ angular.module('mean.rooms').factory('FileService',['$sce','UIHandler',function(
 	                var confirmationStr = '<strong>' +(uiHandler.isowner ? uiHandler.name : $scope.getUserName(data.id)) + '</strong> ' + $scope.resourceBundle.wantstosharefiles  +'<br/>';
 
 	                for (var fileId in data.files){
-	                    var curFile = data.files[fileId];
-	                    //Set the first chunk
-	                    curFile.processedChunks = 0;
-	                    confirmationStr = confirmationStr + '<li>' + curFile.name + ' (' + self.bytesToSize(curFile.size) + ') </li>';
+						if (data.files.hasOwnProperty(fileId)) {
+							var curFile = data.files[fileId];
+							//Set the first chunk
+							curFile.processedChunks = 0;
+							confirmationStr = confirmationStr + '<li>' + curFile.name + ' (' + self.bytesToSize(curFile.size) + ') </li>';
+						}
 	                }
 
 	                if (!self.acceptedFileOffers[data.requestId]){
@@ -448,7 +450,9 @@ angular.module('mean.rooms').factory('FileService',['$sce','UIHandler',function(
 	                fileOffer.attended = true; // We try to avoid masive sent of files for duplicated answers
 	                fileOffer.token = data.token;
 	                for (var fileId in fileOffer.files){
-	                    self.sendFile ($scope,fileOffer.destinationId,fileOffer.files[fileId],data.requestId,data.token);
+						if (fileOffer.files.hasOwnProperty(fileId)) {
+							self.sendFile ($scope,fileOffer.destinationId,fileOffer.files[fileId],data.requestId,data.token);
+						}
 	                }
 	            }
 	         });
