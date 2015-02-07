@@ -23,7 +23,7 @@ describe('Main Server Tests', function() {
 		utils._events = utils._events || [];
 		utils._events[id] = utils._events[id] || [];
 		utils._events[id][eventName] = utils._events[id][eventName] || [];
-		utils._events[id][eventName].push(callback);
+		utils._events[id][eventName] = callback;
 	};
 	
 	utils.call = function(id,eventName, _) {
@@ -31,10 +31,14 @@ describe('Main Server Tests', function() {
 		var args = Array.prototype.slice.call(arguments, 2);
 		if (!events) {
 			return;
+		} else {
+			events.apply(null, args);
 		}
-		for (var i = 0, len = events.length; i < len; i+=1) {
-			events[i].apply(null, args);
-		}
+	};
+	
+	utils.multipleDone = function(fn) {
+    	utils.checkDone -= 1;
+    	if (utils.checkDone===0) { fn(); }
 	};
 	
 	utils.connect = function(id) {
@@ -54,7 +58,6 @@ describe('Main Server Tests', function() {
 			}
 		});
 		utils.ws[id].on('close', function(){
-			console.log('Close');
 		});
 	};
 	

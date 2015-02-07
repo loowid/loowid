@@ -133,7 +133,7 @@ module.exports = function(request,test,utils) {
 	    	request.post({
 	    		  headers: {'content-type':'application/x-www-form-urlencoded','x-csrf-token':utils.csrf},
 	    		  url:     utils.testDomain+'/rooms/'+utils.roomID+'/users',
-	    		  form:    {id: utils.roomID, pag: null}
+	    		  form:    {id: utils.roomID}
 	    	}, function(error, response, body){
 	            expect(error).toBeNull();
 	            expect(response.statusCode).toBe(200);
@@ -149,7 +149,7 @@ module.exports = function(request,test,utils) {
 	    	request.post({
 	    		  headers: {'content-type':'application/x-www-form-urlencoded','x-csrf-token':utils.csrf},
 	    		  url:     utils.testDomain+'/rooms/'+utils.roomID+'/isJoinable',
-	    		  form:    {id: utils.roomID, pag: null}
+	    		  form:    {id: utils.roomID}
 	    	}, function(error, response, body){
 	            expect(error).toBeNull();
 	            expect(response.statusCode).toBe(200);
@@ -210,6 +210,7 @@ module.exports = function(request,test,utils) {
 	            expect(st.roomId).toBe(utils.roomID);
 	            expect(st.guests.length).toBe(1);
 	            expect(st.guests[0].name).toBe('Client');
+	            expect(st.guests[0].sessionid).toBe('');
 	            expect(st.guests[0].status).toBe('CONNECTED');
 	            done();
 	    	});
@@ -221,13 +222,13 @@ module.exports = function(request,test,utils) {
 	    	request.post({
 	    		  headers: {'content-type':'application/x-www-form-urlencoded','x-csrf-token':utils.csrf},
 	    		  url:     utils.testDomain+'/rooms/'+utils.roomID+'/users',
-	    		  form:    {id: utils.roomID, pag: null}
+	    		  form:    {id: utils.roomID}
 	    	}, function(error, response, body){
 	            expect(error).toBeNull();
 	            expect(response.statusCode).toBe(200);
 	            var st = JSON.parse(body);
 	            expect(st.length).toBe(1);
-	            expect(st[0].sessionId).toBeUndefined();
+	            expect(st[0].sessionid).toBe('');
 	            done();
 	    	});
 	    });
@@ -272,6 +273,329 @@ module.exports = function(request,test,utils) {
 	            var st = JSON.parse(body);
 	            expect(st.chat.length).toBe(1);
 	            expect(st.page).toBe(0);
+	            done();
+	    	});
+	    });
+
+	    test('Another Viewer WebSocket connection done.',function(done) {
+	    	utils.addListener('viewer1','get_updated_config',function(ice){
+	    		expect(ice.iceServers.length).toBeGreaterThan(0);
+	    		done();
+	    	});
+        	// WebSocket Connect !!
+        	utils.connect('viewer1');
+	    });
+	    
+	    
+	    test('Another viewer joins the room.',function(done) {
+	    	utils.checkDone = 2;
+	    	utils.addListener('owner','new_peer_connected',function(peer){
+		    	utils.addListener('owner','peer_list_updated',function(peer){
+		    		expect(peer.socketId).toBe(utils.viewer1);
+		    		utils.multipleDone(done);
+		    	});
+	    	});
+	    	utils.addListener('viewer','new_peer_connected',function(peer){
+		    	utils.addListener('viewer','peer_list_updated',function(peer){
+		    		expect(peer.socketId).toBe(utils.viewer1);
+		    		utils.multipleDone(done);
+		    	});
+	    	});
+	    	utils.addListener('viewer1','get_peers',function(join){
+	    		expect(join.you.length).toBeGreaterThan(0);
+	    		utils.viewer1 = join.you;
+		    	utils.ws.viewer1.send(JSON.stringify({
+					'eventName': 'peer_list_updated',
+					'data': { 'room': utils.roomID }
+		    	}));
+	    	});
+	    	utils.ws.viewer1.send(JSON.stringify({
+				'eventName': 'join_room',
+				'data': {
+					'room': utils.roomID,
+					'pwd': '',
+					'reload': true
+				}
+	    	}));
+	    });
+
+	    test('Another Viewer joins the room to get info.', function(done) {
+	    	var requestDate = new Date();
+	    	requestDate.setTime(requestDate.getTime() - 1000);
+	    	request.post({
+	    		  headers: {'content-type':'application/x-www-form-urlencoded','x-csrf-token':utils.csrf},
+	    		  url:     utils.testDomain+'/rooms/'+utils.roomID+'/join',
+	    		  form:    {id: utils.roomID, avatar: 'img/hero.png', connectionId: utils.viewer1 , name: 'Client1'}
+	    	}, function(error, response, body){
+	            expect(error).toBeNull();
+	            expect(response.statusCode).toBe(200);
+	            var st = JSON.parse(body);
+	            expect(st.status).toBe('OPENED');
+	            expect(st.roomId).toBe(utils.roomID);
+	            expect(st.guests.length).toBe(2);
+	            expect(st.guests[1].name).toBe('Client1');
+	            expect(st.guests[1].sessionid).toBe('');
+	            expect(st.guests[1].status).toBe('CONNECTED');
+	            done();
+	    	});
+	    });
+	    
+	    test('The room has two guests.', function(done) {
+	    	var requestDate = new Date();
+	    	requestDate.setTime(requestDate.getTime() - 1000);
+	    	request.post({
+	    		  headers: {'content-type':'application/x-www-form-urlencoded','x-csrf-token':utils.csrf},
+	    		  url:     utils.testDomain+'/rooms/'+utils.roomID+'/users',
+	    		  form:    { id: utils.roomID }
+	    	}, function(error, response, body){
+	            expect(error).toBeNull();
+	            expect(response.statusCode).toBe(200);
+	            var st = JSON.parse(body);
+	            expect(st.length).toBe(2);
+	            expect(st[0].sessionid).toBe('');
+	            expect(st[0].connectionId).toBe(utils.viewer);
+	            expect(st[0].status).toBe('CONNECTED');
+	            expect(st[1].sessionid).toBe('');
+	            expect(st[1].connectionId).toBe(utils.viewer1);
+	            expect(st[1].status).toBe('CONNECTED');
+	            done();
+	    	});
+	    });
+
+	    test('Another Viewer send chat typing alert.', function(done) {
+	    	utils.checkDone = 2;
+	    	utils.addListener('owner','chat_typing',function(typing){
+	    		expect(typing.id).toBe(utils.viewer1);
+	    		utils.multipleDone(done);
+	    	});
+	    	utils.addListener('viewer','chat_typing',function(typing){
+	    		expect(typing.id).toBe(utils.viewer1);
+	    		utils.multipleDone(done);
+	    	});
+	    	utils.ws.viewer1.send(JSON.stringify({
+				'eventName': 'chat_typing',
+				'data': { 'room': utils.roomID }
+	    	}));
+	    });
+	    
+	    test('Another Viewer send chat message.', function(done) {
+	    	var testMsg = 'Hello owner this is client1!!';
+	    	utils.checkDone = 2;
+	    	utils.addListener('owner','chat_message',function(msg){
+	    		expect(msg.id).toBe(utils.viewer1);
+	    		expect(msg.text).toBe(testMsg);
+	    		utils.multipleDone(done);
+	    	});
+	    	utils.addListener('viewer','chat_message',function(msg){
+	    		expect(msg.id).toBe(utils.viewer1);
+	    		expect(msg.text).toBe(testMsg);
+	    		utils.multipleDone(done);
+	    	});
+	    	utils.ws.viewer1.send(JSON.stringify({
+				'eventName': 'chat_message',
+				'data': { 
+					'room': utils.roomID,
+					'text': testMsg
+				}
+	    	}));
+	    });
+	    
+	    test('The owner moves to another room.', function(done) {
+	    	var requestDate = new Date();
+	    	requestDate.setTime(requestDate.getTime() - 1000);
+	    	request.post({
+	    		  headers: {'content-type':'application/x-www-form-urlencoded','x-csrf-token':utils.csrf},
+	    		  url:     utils.testDomain+'/rooms/'+utils.roomID+'/move',
+	    		  form:    {id: utils.roomID, list:[utils.viewer1]}
+	    	}, function(error, response, body){
+	            expect(error).toBeNull();
+	            expect(response.statusCode).toBe(200);
+	            var st = JSON.parse(body);
+	            expect(st.success).toBe(true);
+	            expect(st.fromRoomId).toBe(utils.roomID);
+	            expect(st.toRoomId.length).toBe(7);
+	            utils.toRoomID = st.toRoomId; 
+	            done();
+	    	});
+	    });
+
+	    test('The owner send move signal to everybody.', function(done) {
+	    	utils.checkDone = 4;
+	    	utils.addListener('owner','peer_list_updated',function(peer){
+	    		expect(peer.socketId).toBe(utils.viewer1);
+	    		utils.multipleDone(done);
+	    	});
+	    	utils.addListener('viewer','peer_list_updated',function(peer){
+	    		expect(peer.socketId).toBe(utils.viewer1);
+	    		utils.multipleDone(done);
+	    	});
+	    	utils.addListener('viewer','room_moved',function(move){
+	    		expect(move.room).toBe(utils.toRoomID);
+	    		utils.multipleDone(done);
+	    	});
+	    	utils.addListener('viewer1','room_out',function(move){
+	    		expect(move.room).toBe(utils.roomID);
+	    		utils.disconnect('viewer1');
+	    		utils.multipleDone(done);
+	    	});
+	    	utils.ws.owner.send(JSON.stringify({
+				'eventName': 'move_room',
+				'data': { 
+					'toRoom': utils.toRoomID,
+					'fromRoom': utils.roomID,
+					'list': [utils.viewer1]
+				}
+	    	}));
+	    });
+
+	    test('The room has two guests one disconnected.', function(done) {
+	    	var requestDate = new Date();
+	    	requestDate.setTime(requestDate.getTime() - 1000);
+	    	request.post({
+	    		  headers: {'content-type':'application/x-www-form-urlencoded','x-csrf-token':utils.csrf},
+	    		  url:     utils.testDomain+'/rooms/'+utils.toRoomID+'/users',
+	    		  form:    {id: utils.toRoomID}
+	    	}, function(error, response, body){
+	            expect(error).toBeNull();
+	            expect(response.statusCode).toBe(200);
+	            var st = JSON.parse(body);
+	            expect(st.length).toBe(2);
+	            expect(st[0].sessionid).toBe('');
+	            expect(st[0].connectionId).toBe(utils.viewer);
+	            expect(st[0].status).toBe('CONNECTED');
+	            expect(st[1].sessionid).toBe('');
+	            expect(st[1].connectionId).toBe(utils.viewer1);
+	            expect(st[1].status).toBe('DISCONNECTED');
+	            done();
+	    	});
+	    });
+	    
+	    test('The old room is not available.', function(done) {
+	    	var requestDate = new Date();
+	    	requestDate.setTime(requestDate.getTime() - 1000);
+	    	request.post({
+	    		  headers: {'content-type':'application/x-www-form-urlencoded','x-csrf-token':utils.csrf},
+	    		  url:     utils.testDomain+'/rooms/'+utils.roomID+'/users',
+	    		  form:    {id: utils.toRoomID}
+	    	}, function(error, response, body){
+	            expect(error).toBeNull();
+	            expect(response.statusCode).toBe(404);
+	            var st = JSON.parse(body);
+	            expect(st.error).toBe('Failed to load the room: '+utils.roomID);
+	            done();
+	    	});
+	    });
+	    
+	    test('Owner leaves the room.', function(done) {
+	    	utils.checkDone = 2;
+	    	utils.addListener('viewer','remove_peer_connected',function(peer){
+	    		expect(peer.socketId).toBe(utils.owner);
+	    		utils.multipleDone(done);
+	    	});
+	    	utils.addListener('viewer','owner_data_updated',function(own){
+	    		expect(own.ownerCid).toBe(utils.owner);
+	    		expect(own.ownerName).toBe('Owner');
+	    		expect(own.status).toBe('DISCONNECTED');
+	    		utils.multipleDone(done);
+	    	});
+	    	utils.disconnect('owner');
+	    });
+	    
+	    test('Owner WebSocket re-connection done.',function(done) {
+	    	utils.addListener('owner','get_updated_config',function(ice){
+	    		expect(ice.iceServers.length).toBeGreaterThan(0);
+	    		done();
+	    	});
+        	// WebSocket Connect !!
+        	utils.connect('owner');
+	    });
+	    
+	    test('The owner re-joins the room.',function(done) {
+	    	utils.addListener('viewer','new_peer_connected',function(peer){
+	    		utils.owner = peer.socketId;
+		    	utils.addListener('owner','get_peers',function(join){
+		    		expect(join.you).toBe(utils.owner);
+		    		done();
+		    	});
+	    	});
+	    	utils.ws.owner.send(JSON.stringify({
+				'eventName': 'join_room',
+				'data': {
+					'room': utils.toRoomID,
+					'pwd': '',
+					'reload': true
+				}
+	    	}));
+	    });
+	    
+	    test('Owner re-joins the room to get info.', function(done) {
+	    	var requestDate = new Date();
+	    	requestDate.setTime(requestDate.getTime() - 1000);
+	    	request.post({
+	    		  headers: {'content-type':'application/x-www-form-urlencoded','x-csrf-token':utils.csrf},
+	    		  url:     utils.testDomain+'/rooms/'+utils.toRoomID+'/join',
+	    		  form:    {id: utils.toRoomID, avatar: 'img/hero.png', connectionId: utils.owner , name: 'REOwner'}
+	    	}, function(error, response, body){
+	            expect(error).toBeNull();
+	            expect(response.statusCode).toBe(200);
+	            var st = JSON.parse(body);
+	            expect(st.status).toBe('OPENED');
+	            expect(st.roomId).toBe(utils.toRoomID);
+	            expect(st.guests.length).toBe(2);
+	            expect(st.guests[0].name).toBe('Client');
+	            expect(st.guests[0].sessionid).toBe('');
+	            expect(st.guests[0].status).toBe('CONNECTED');
+	            expect(st.guests[1].name).toBe('Client1');
+	            expect(st.guests[1].sessionid).toBe('');
+	            expect(st.guests[1].status).toBe('DISCONNECTED');
+	            done();
+	    	});
+	    });
+
+	    test('The owner update his data.',function(done) {
+	    	utils.addListener('viewer','owner_data_updated',function(own){
+	    		expect(own.ownerCid).toBe(utils.owner);
+	    		expect(own.ownerName).toBe('Owner');
+	    		expect(own.status).toBe('OPENED');
+	    		done();
+	    	});
+	    	utils.ws.owner.send(JSON.stringify({
+				'eventName': 'update_owner_data',
+				'data': {
+					'room': utils.toRoomID,
+					'owner_name': 'Owner',
+					'owner_avatar': 'img/heroe.png',
+					'status': 'OPENED'
+				}
+	    	}));
+	    });
+	    
+	    test('Viewer leaves the room.', function(done) {
+	    	utils.addListener('owner','peer_list_updated',function(peer){
+	    		expect(peer.socketId).toBe(utils.viewer);
+	    		done();
+	    	});
+	    	utils.disconnect('viewer');
+	    });
+	    
+	    test('The room has two guests all disconnected.', function(done) {
+	    	var requestDate = new Date();
+	    	requestDate.setTime(requestDate.getTime() - 1000);
+	    	request.post({
+	    		  headers: {'content-type':'application/x-www-form-urlencoded','x-csrf-token':utils.csrf},
+	    		  url:     utils.testDomain+'/rooms/'+utils.toRoomID+'/users',
+	    		  form:    {id: utils.toRoomID}
+	    	}, function(error, response, body){
+	            expect(error).toBeNull();
+	            expect(response.statusCode).toBe(200);
+	            var st = JSON.parse(body);
+	            expect(st.length).toBe(2);
+	            expect(st[0].sessionid).toBe('');
+	            expect(st[0].connectionId).toBe(utils.viewer);
+	            expect(st[0].status).toBe('DISCONNECTED');
+	            expect(st[1].sessionid).toBe('');
+	            expect(st[1].connectionId).toBe(utils.viewer1);
+	            expect(st[1].status).toBe('DISCONNECTED');
 	            done();
 	    	});
 	    });

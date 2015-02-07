@@ -3,7 +3,7 @@
 window.app.config(['$routeProvider',
     function($routeProvider) {
         $routeProvider.
-        when ('/r/:roomId/join',{reloadOnSearch: true,
+        when ('/r/:roomId/join',{reloadOnSearch: false,
     		templateUrl: 'views/rooms/join.html'
     	}).when ('/r/:roomId/owner',{
             templateUrl: 'views/rooms/owner.html'
@@ -11,7 +11,7 @@ window.app.config(['$routeProvider',
             templateUrl: 'views/rooms/claim.html'
     	}).when ('/lti/error',{
             templateUrl: 'views/rooms/lti.html'
-        }).when ('/r/:roomId',{reloadOnSearch: true,
+        }).when ('/r/:roomId',{reloadOnSearch: false,
     		templateUrl: 'views/rooms/view.html'
     	}).when ('/about-desktop-sharing',{
             templateUrl: 'views/rooms/about-desktop-sharing.html'

@@ -386,7 +386,7 @@ app.param('roomId', rooms.room);
 app.param('connectionId', rooms.connection);
 
 app.use(function(err, req, res, next) {
-	console.error(err.message);
+	logger.error(err.message);
 	var code = err.http_code || 500;
 	res.send(code, {error:err.message});
 });
