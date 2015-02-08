@@ -112,7 +112,13 @@ describe('Main Server Tests', function() {
 	});
 	
 	require('./init')(request,test,utils);
-	require('./room')(request,test,utils);
-	
+	require('./new_room')(request,test,utils);
+	require('./join_room')(request,test,utils);
+	require('./chat_room')(request,test,utils);
+	require('./three_room')(request,test,utils);
+	require('./move_room')(request,test,utils);
+	require('./owner_leaves_room')(request,test,utils);
+	require('./viewer_leaves_room')(request,test,utils);
+	require('./blocked_room')(request,test,utils);
 	
 });
