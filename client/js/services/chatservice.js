@@ -52,7 +52,7 @@ angular.module('mean.rooms').factory('ChatService',['$timeout','UIHandler','Room
 	    this.parseUrls = function($scope,txt) {
 	    	
 			var youtube = function(url,vid) {
-	    		var frame = '<iframe src="//www.youtube.com/embed/' + vid + '" width="100%" height="100%" frameborder="0" allowfullscreen></iframe><p><a href id="max_'+ vid +'"><i  class="fa fa-desktop"/></a></p>';
+	    		var frame = '<a href id="max_'+ vid +'"><img src="//img.youtube.com/vi/' + vid + '/0.jpg" width="100%" height="100%" frameborder="0" allowfullscreen></img></a><p class="videoLabel">'+$scope.resourceBundle.youtubeVideo+'</p>';
 	    
 				var openyoutube = function (event){
 					$scope.openVideoFromYoutube(vid);
@@ -70,6 +70,7 @@ angular.module('mean.rooms').factory('ChatService',['$timeout','UIHandler','Room
 			
 			
 			return txt.replace(/https?:\/\/www\.youtube\.com\/watch\?v=([^\s]+)/g, youtube)
+					  .replace(/https?:\/\/m\.youtube\.com\/watch\?v=([^\s]+)/g, youtube)
 	    			  .replace(/https?:\/\/youtu\.be\/([^\s]+)/g, youtube)
 	    			  .replace(/(https?:\/\/[^\s]+)/g, this.link);
 	    };

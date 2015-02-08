@@ -200,5 +200,7 @@
    "joinroom":"{0} ha entrado en la sala",
    "uleaveroom":"{0} ha abandonado la sala",
    "onlinenews":"Los espectadores de la sala han cambiado",
-   "hideUrl":"Deja de compartir la pantalla para ver la URL privada"
+   "hideUrl":"Deja de compartir la pantalla para ver la URL privada",
+   "youtubeVideo": "YouTube - Haz click para abrir"
+	
 }

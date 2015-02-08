@@ -200,5 +200,6 @@
    "joinroom":"{0} verbinden den Raum",
    "uleaveroom":"{0} den Raum verlassen",
    "onlinenews":"Room Zuschauer hat sich geändert",
-   "hideUrl":"Stoppen Screen um private URL beobachten"
+   "hideUrl":"Stoppen Screen um private URL beobachten",
+   "youtubeVideo": "YouTube - Klick öffnet"
 }

@@ -200,5 +200,6 @@
    "joinroom":"{0} join the room",
    "uleaveroom":"{0} leave the room",
    "onlinenews":"Room viewers has changed",
-   "hideUrl":"Stop screencasting to watch your private URL"
+   "hideUrl":"Stop screencasting to watch your private URL",
+   "youtubeVideo": "YouTube - Click to open"
 }
