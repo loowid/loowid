@@ -11,12 +11,12 @@ angular.module('mean.rooms').factory('MediaService',['Rooms','UIHandler',functio
 		var self = this;
 		var room = new Rooms({});
 
-		this.screen_constraints = {
+		this.screenConstraints = {
 			mandatory: { chromeMediaSource: 'screen','maxHeight': 600, 'maxWidth': 800},
 			optional: []
 		};
 	    
-	    var constraints = { audio: false, video: this.screen_constraints };
+	    var constraints = { audio: false, video: this.screenConstraints };
 	    var cam_constraints = { audio: false, video: true };
 		var audio_constraints = { audio: true, video: false };
 
@@ -217,7 +217,7 @@ angular.module('mean.rooms').factory('MediaService',['Rooms','UIHandler',functio
 			$scope.changeToResolution  = function (index){
 		        if (self.resolutions[index]){
 		        	uiHandler.currentResolution = index;
-		            var csource = self.screen_constraints.mandatory;
+		            var csource = self.screenConstraints.mandatory;
 		            csource.maxWidth = self.resolutions[index].x;
 		            csource.maxHeight = self.resolutions[index].y;
 		        }

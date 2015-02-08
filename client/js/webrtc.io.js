@@ -651,7 +651,7 @@ function mergeConstraints(cons1, cons2) {
 			};
 
 			if (mediatype === 'screen'){
-				getScreenId(rtc.chromeDesktopExtensionId,function (error, sourceId, screen_constraints) {
+				getScreenId(rtc.chromeDesktopExtensionId,function (error, sourceId, screenConstraints) {
 					if (error) { onFail (error); }
 					if (!error && sourceId) {
 						options.video.mandatory.chromeMediaSource = 'desktop';

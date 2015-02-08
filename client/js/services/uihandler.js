@@ -68,7 +68,7 @@ angular.module('mean.rooms').factory('UIHandler',['$window','$timeout',function(
 				'\\':'|'
 			};
 			// Special Keys - and their codes
-			var special_keys = {
+			var specialKeys = {
 				'esc':27,'escape':27,'tab':9,'space':32,'return':13,'enter':13,'backspace':8,
 				'scrolllock':145,'scroll_lock':145,'scroll':145,'capslock':20,'caps_lock':20,
 				'caps':20,'numlock':144,'num_lock':144,'num':144,
@@ -114,7 +114,7 @@ angular.module('mean.rooms').factory('UIHandler',['$window','$timeout',function(
 				}
 
 				if (k.length > 1) { // If it is a special key
-					if(special_keys[k] === code) { kp+=1; }
+					if(specialKeys[k] === code) { kp+=1; }
 				} else if (opt.keyCode) { // If a specific key is set into the config
 					if (opt.keyCode === code) { kp+=1; }
 				} else { // The special keys did not match

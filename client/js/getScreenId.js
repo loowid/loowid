@@ -10,23 +10,9 @@
 // ______________
 // getScreenId.js
 
-/*
-getScreenId(function (error, sourceId, screen_constraints) {
-    // error    == null || 'permission-denied' || 'not-installed' || 'installed-disabled' || 'not-chrome'
-    // sourceId == null || 'string' || 'firefox'
-    
-    if(sourceId == 'firefox') {
-        navigator.mozGetUserMedia(screen_constraints, onSuccess, onFailure);
-    }
-    else navigator.webkitGetUserMedia(screen_constraints, onSuccess, onFailure);
-});
-*/
-
 (function() {
     window.getScreenId = function(extensionid,callback) {
-        // for Firefox:
-        // sourceId == 'firefox'
-        // screen_constraints = {...}
+       
 		this.extensionId = extensionid;
         
 		if (!!navigator.mozGetUserMedia) {
@@ -65,7 +51,7 @@ getScreenId(function (error, sourceId, screen_constraints) {
     };
 
     function getScreenConstraints(error, sourceId) {
-        var screen_constraints = {
+        var screenConstraints = {
             audio: false,
             video: {
                 mandatory: {
@@ -78,10 +64,10 @@ getScreenId(function (error, sourceId, screen_constraints) {
         };
 
         if (sourceId) {
-            screen_constraints.video.mandatory.chromeMediaSourceId = sourceId;
+            screenConstraints.video.mandatory.chromeMediaSourceId = sourceId;
         }
 
-        return screen_constraints;
+        return screenConstraints;
     }
 
     function postMessage() {

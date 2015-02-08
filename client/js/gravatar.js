@@ -75,8 +75,8 @@ var gravatarMd5 = function(str) {
   var convertToWordArray = function (str) {
     var lWordCount;
     var lMessageLength = str.length;
-    var lNumberOfWords_temp1 = lMessageLength + 8;
-    var lNumberOfWordsTemp2 = (lNumberOfWords_temp1 - (lNumberOfWords_temp1 % 64)) / 64;
+    var lNumberOfWordsTemp1 = lMessageLength + 8;
+    var lNumberOfWordsTemp2 = (lNumberOfWordsTemp1 - (lNumberOfWordsTemp1 % 64)) / 64;
     var lNumberOfWords = (lNumberOfWordsTemp2 + 1) * 16;
     var lWordArray = new Array(lNumberOfWords - 1);
     var lBytePosition = 0;
