@@ -897,8 +897,8 @@ function mergeConstraints(cons1, cons2) {
 			'eventName': 'update_owner_data',
 			'data': {
 				'room': roomId,
-				'owner_name':ownerName,
-				'owner_avatar':ownerAvatar,
+				'ownerName':ownerName,
+				'ownerAvatar':ownerAvatar,
 				'status':status,
 				'access':access
 			}

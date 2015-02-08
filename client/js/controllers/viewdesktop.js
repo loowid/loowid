@@ -12,7 +12,7 @@ angular.module('mean.rooms').controller('ViewDesktopController', ['$scope', '$ro
     uiHandler.remoteScreenClass ='';
     
     uiHandler.dashConn = '';
-    uiHandler.dash_chat = '';
+    uiHandler.dashChat = '';
 	uiHandler.isowner = false;
 
     document.getElementById('noscript').style.display = 'none';

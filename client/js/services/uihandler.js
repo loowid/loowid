@@ -61,7 +61,7 @@ angular.module('mean.rooms').factory('UIHandler',['$window','$timeout',function(
 			// Key Pressed - counts the number of valid keypresses - if it is same as the number of keys, the shortcut function is invoked
 			var kp = 0;
 			// Work around for stupid Shift key bug created by using lowercase - as a result the shift+num combination was broken
-			var shift_nums = {
+			var shiftNums = {
 				'`':'~','1':'!','2':'@','3':'#','4':'$','5':'%',
 				'6':'^','7':'&','8':'*','9':'(','0':')','-':'_',
 				'=':'+',';':':','\'':'\'',',':'<','.':'>','/':'?',
@@ -120,8 +120,8 @@ angular.module('mean.rooms').factory('UIHandler',['$window','$timeout',function(
 				} else { // The special keys did not match
 					if(character === k) { kp+=1; }
 					else {
-						if(shift_nums[character] && e.shiftKey) { // Stupid Shift key bug created by using lowercase
-							character = shift_nums[character];
+						if(shiftNums[character] && e.shiftKey) { // Stupid Shift key bug created by using lowercase
+							character = shiftNums[character];
 							if(character === k) { kp+=1; }
 						}
 					}

@@ -75,9 +75,9 @@ function getSessionId(headers,secret) {
     		list[parts.shift().trim()] = unescape(parts.join('='));
     	});
     }
-    var real_sid = (list.jsessionid)?list.jsessionid.replace( prefix, '' ):'';
-    real_sid = signature.unsign( real_sid, secret );
-    return real_sid;
+    var realSid = (list.jsessionid)?list.jsessionid.replace( prefix, '' ):'';
+    realSid = signature.unsign( realSid, secret );
+    return realSid;
 }
 
 //generate a 4 digit hex code randomly
@@ -385,8 +385,8 @@ function attachEvents(manager) {
 						soc.send(JSON.stringify({
 							'eventName' : 'owner_data_updated',
 							'data' : {
-								'ownerName' : data.owner_name,
-								'ownerAvatar' : data.owner_avatar,
+								'ownerName' : data.ownerName,
+								'ownerAvatar' : data.ownerAvatar,
 								'status' : data.status,
 								'ownerCid' : socket.id,
 								'access' : data.access
@@ -685,8 +685,8 @@ function attachEvents(manager) {
 			newsocket.id = socket; // bit tricky here
 			if (owner) {
 				rtc.fire('update_owner_data', {
-					owner_name : room.owner.name,
-					owner_avatar: room.owner.avatar,
+					ownerName : room.owner.name,
+					ownerAvatar: room.owner.avatar,
 					ownerCid: room.owner.connectionid,
 					status : 'DISCONNECTED',
 					room : room.roomId,

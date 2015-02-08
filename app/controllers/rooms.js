@@ -20,18 +20,18 @@ var makeId = function(){
 };
 
 var isReloading = function(room,id) {
-	var mysession_on = 0;
-	var mysession_off = 0;
+	var mySessionOn = 0;
+	var mySessionOff = 0;
 	for (var k=0; k<room.guests.length;k+=1) {
 		if (room.guests[k].sessionid === id) {
 			if (room.guests[k].status==='DISCONNECTED') {
-				mysession_off += 1;
+				mySessionOff += 1;
 			} else {
-				mysession_on += 1;
+				mySessionOn += 1;
 			}
 		}
 	}
-	return (mysession_off > 0 && ((mysession_off + mysession_on) <= room.guests.length)) || !room.access.locked;
+	return (mySessionOff > 0 && ((mySessionOff + mySessionOn) <= room.guests.length)) || !room.access.locked;
 };
 
 var isValid = function(room,id) {
@@ -263,12 +263,12 @@ exports.getGravatarImg = function(email) {
 	return (remail.trim()==='')?'img/hero.jpg':'//www.gravatar.com/avatar/'+crypto.createHash('md5').update(remail.trim().toLowerCase()).digest('hex');
 };
 
-exports.createOrFindLTI = function(req,lti,is_owner,success,fail) {
+exports.createOrFindLTI = function(req,lti,isOwner,success,fail) {
 	Room.openByContext(lti.context_id,req.sessionID,function(err,room){
 		if (room) {
 			success(room);
 		} else {
-			if (is_owner) {
+			if (isOwner) {
 				var wres = {
 					json: function(rid) {
 						req.lti = lti.context_id;

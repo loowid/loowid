@@ -143,8 +143,8 @@ angular.module('mean.rooms').factory('UserHandler',['Rooms','UIHandler','Notific
 			        		audio.load();
 			        		audio.play();
 		        		} else {
-	       					uiHandler.conn_new = 'connected_now';
-	       					setTimeout(function(){ uiHandler.conn_new = ''; uiHandler.safeApply($scope,function(){}); },3000);
+	       					uiHandler.connNew = 'connected_now';
+	       					setTimeout(function(){ uiHandler.connNew = ''; uiHandler.safeApply($scope,function(){}); },3000);
 	       				}
 		        	}
 		        }

@@ -159,7 +159,7 @@ angular.module('mean.rooms').factory('ChatService',['$timeout','UIHandler','Room
 	    	
 	        $scope.toggleChat = function() { 
 	        	uiHandler.chatClass=(uiHandler.chatClass==='collapsed')?'':'collapsed';
-	        	uiHandler.dash_chat=(uiHandler.chatClass==='collapsed')?'chat_collapsed':'';
+	        	uiHandler.dashChat=(uiHandler.chatClass==='collapsed')?'chat_collapsed':'';
 	        };
 
 	    	$scope.sendTyping = function() {

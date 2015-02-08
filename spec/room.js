@@ -565,8 +565,8 @@ module.exports = function(request,test,utils) {
 				'eventName': 'update_owner_data',
 				'data': {
 					'room': utils.toRoomID,
-					'owner_name': 'Owner',
-					'owner_avatar': 'img/heroe.png',
+					'ownerName': 'Owner',
+					'ownerAvatar': 'img/heroe.png',
 					'status': 'OPENED'
 				}
 	    	}));

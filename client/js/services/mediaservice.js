@@ -17,14 +17,14 @@ angular.module('mean.rooms').factory('MediaService',['Rooms','UIHandler',functio
 		};
 	    
 	    var constraints = { audio: false, video: this.screenConstraints };
-	    var cam_constraints = { audio: false, video: true };
-		var audio_constraints = { audio: true, video: false };
+	    var camConstraints = { audio: false, video: true };
+		var audioConstraints = { audio: true, video: false };
 
 
 		this.mediasources = {
 			'screen': 	{'recording': false, 'stream': undefined, 'constraints': constraints, 'playtype':'video','winratio':RATIO_4_3 ,'winscale':0.5},
-			'video': 	{'recording': false, 'stream': undefined, 'constraints': cam_constraints, 'playtype':'video','winratio':RATIO_16_9 ,'winscale':0.25},
-			'audio': 	{'recording': false, 'stream': undefined, 'constraints': audio_constraints, 'playtype':'audio'}
+			'video': 	{'recording': false, 'stream': undefined, 'constraints': camConstraints, 'playtype':'video','winratio':RATIO_16_9 ,'winscale':0.25},
+			'audio': 	{'recording': false, 'stream': undefined, 'constraints': audioConstraints, 'playtype':'audio'}
 		};
 
 		this.isAnythingRecording = function (){

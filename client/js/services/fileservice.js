@@ -470,7 +470,7 @@ angular.module('mean.rooms').factory('FileService',['$sce','UIHandler',function(
 	                delete rtc.dataChannels[data.id]['filedata_'+ data.requestId];
 	                rtc.dropPeerConnection (data.id,'filedata_' + data.requestId,true);
 
-	                var errMessage = $scope.getUserName(data.connectionId) +  $scope.resourceBundle.error_sharefiles;
+	                var errMessage = $scope.getUserName(data.connectionId) +  $scope.resourceBundle.errorShareFiles;
 	                $scope.global.showError($scope,errMessage);
 	        });
     	};

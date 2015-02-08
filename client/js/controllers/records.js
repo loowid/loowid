@@ -19,11 +19,11 @@ angular.module('mean.rooms').controller('RecordController', ['$scope', '$routePa
     
     //We had three objects stream to handle the diferent stream sources webcam/screen
 	
-	uiHandler.conn_new = '';
+	uiHandler.connNew = '';
 	uiHandler.connectedClass = '';
 	uiHandler.chatClass = '';
 	uiHandler.dashConn = '';
-	uiHandler.dash_chat = '';
+	uiHandler.dashChat = '';
 	
 	uiHandler.shareDesktopStatus='unknown';
 	
