@@ -20,10 +20,18 @@ var makeId = function(){
 };
 
 var isReloading = function(room,id) {
+	var mysession_on = 0;
+	var mysession_off = 0;
 	for (var k=0; k<room.guests.length;k+=1) {
-		if (room.guests[k].sessionid === id && room.guests[k].status==='DISCONNECTED') { return true; }
+		if (room.guests[k].sessionid === id) {
+			if (room.guests[k].status==='DISCONNECTED') {
+				mysession_off += 1;
+			} else {
+				mysession_on += 1;
+			}
+		}
 	}
-	return false;
+	return (mysession_off > 0 && ((mysession_off + mysession_on) <= room.guests.length)) || !room.access.locked;
 };
 
 var isValid = function(room,id) {
@@ -40,6 +48,14 @@ var isGuessConnected = function(room,id,cid) {
 		if (room.guests[k].sessionid === id && room.guests[k].status==='CONNECTED' && room.guests[k].connectionId === cid) { return true; }
 	}
 	return false;
+};
+
+var removeDisconnectedSession = function(room,id) {
+	for (var k=room.guests.length-1; k>=0; k-=1) {
+		if (room.guests[k].sessionid === id && room.guests[k].status==='DISCONNECTED') { 
+			room.guests.splice(k,1);
+		}
+	}
 };
 
 /**
@@ -94,7 +110,7 @@ exports.checkLockOrPassword = function(data,socket,success,error) {
 			if (room) {
 				// Open room, or owner and room disconnected or valid password
 				if (room.access.shared!=='PRIVATE' || room.access.passwd === data.pwd || (room.owner.sessionid === socket.sessionid && (room.status === 'DISCONNECTED' || room.status=== 'CREATED'))) {
-					// No locked room, or isReloading os is owner and room disconnected
+					// No locked room, or isReloading, or is owner and room disconnected
                     if (!room.access.locked || isReloading(room,socket.sessionid) || (room.owner.sessionid === socket.sessionid && (room.status === 'DISCONNECTED' || room.status=== 'CREATED'))) {
 						success(data,socket);
 					} else {
@@ -143,6 +159,7 @@ exports.join = function (req, res, next){
 			// No locked room or is reloading
 			if (!room.access.locked || isReloading(room,req.sessionID)) {
 				if (!isGuessConnected(room,req.sessionID,req.body.connectionId)) {
+					removeDisconnectedSession(room,req.sessionID);
 					room.guests.push ({
 						name: req.session.ltiname?req.session.ltiname:req.body.name, 
 						sessionid: req.sessionID, 

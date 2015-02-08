@@ -188,17 +188,29 @@ angular.module('mean.rooms').controller('ViewDesktopController', ['$scope', '$ro
 		        	uiHandler.sendingPwd = false;
 		        	uiHandler.passNeeded = true;
 		        	uiHandler.connectionError = true;
-		        	$scope.$apply();
+		        	uiHandler.safeApply($scope,function(){});
 		            // Close socket and listeners
-		            rtc._socket.close();
-		            delete rtc._events.get_peers;
-		            delete rtc._events.receive_ice_candidate;
-		            delete rtc._events.new_peer_connected;
-		            delete rtc._events.remove_peer_connected;
-		            delete rtc._events.receive_offer;
-		            delete rtc._events.receive_answer;
+		            if (rtc._me) { rtc.reset(); }
 		        });
 		
+		        rtc.on ('room_locked', function(data) {
+		        	uiHandler.sendingPwd = false;
+		        	uiHandler.passNeeded = false;
+		        	uiHandler.connectionError = false;
+		        	uiHandler.locked = true;
+		        	uiHandler.joinable = false;
+		        	uiHandler.safeApply($scope,function(){});
+		            // Close socket and listeners
+		            if (rtc._me) { rtc.reset(); }
+            		// If room is inactive or locked go out in 5 seconds.
+            		setTimeout(function(){
+	            		$scope.global.roomId ='';
+	                	uiHandler.joinable = false;
+	                	$location.search('r',null);
+	                    $location.path('/');
+	                    uiHandler.safeApply($scope,function(){});
+            		},5000);
+		        });
 		        
 		        //This function is a bit room bit user we declare it two times
 		        rtc.on ('owner_data_updated',function(data){
@@ -210,7 +222,7 @@ angular.module('mean.rooms').controller('ViewDesktopController', ['$scope', '$ro
 		            if (chatModified) {
 		                chatService.alertChatStatus($scope,data.access.chat?'disabled':'enabled');
 		            }
-		            $scope.$apply();
+		            uiHandler.safeApply($scope,function(){});
 		        });
 		
 		        rtc.on('room_moved',function(data){
@@ -283,6 +295,7 @@ angular.module('mean.rooms').controller('ViewDesktopController', ['$scope', '$ro
 	                	uiHandler.joinable = false;
 	                	$location.search('r',null);
 	                    $location.path('/');
+	                    uiHandler.safeApply($scope,function(){});
             		},5000);
             	}
             }
