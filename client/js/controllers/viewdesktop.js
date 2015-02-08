@@ -275,6 +275,16 @@ angular.module('mean.rooms').controller('ViewDesktopController', ['$scope', '$ro
                 	}
                 }
                 done();
+            } else {
+            	if (!result.permanent) {
+            		// If room is inactive or locked go out in 5 seconds.
+            		setTimeout(function(){
+	            		$scope.global.roomId ='';
+	                	uiHandler.joinable = false;
+	                	$location.search('r',null);
+	                    $location.path('/');
+            		},5000);
+            	}
             }
         },function (err){
         	$scope.global.hasfailed = true;
