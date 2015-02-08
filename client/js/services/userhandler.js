@@ -113,7 +113,7 @@ angular.module('mean.rooms').factory('UserHandler',['Rooms','UIHandler','Notific
 		        	uiHandler.newusers = result;
 		        	uiHandler.users = result;
 		        }
-		        if (uiHandler.connected_class!=='' || !uiHandler.focused) {
+		        if (uiHandler.connectedClass!=='' || !uiHandler.focused) {
 		        	if (uiHandler.notificationReady) {
 			        	var bd = '';
 			        	for (var u=0; u<uiHandler.newusers.length; u+=1) {
@@ -127,7 +127,7 @@ angular.module('mean.rooms').factory('UserHandler',['Rooms','UIHandler','Notific
 			       		    });
 			       	        notification.$on('click', function () {
 			       	        	if (!uiHandler.focused) { window.focus(); }
-			       	        	if (uiHandler.connected_class!=='') { $scope.toggleConnected(); }
+			       	        	if (uiHandler.connectedClass!=='') { $scope.toggleConnected(); }
 			       	        });
 			        	}
 		        	} else {
@@ -170,8 +170,8 @@ angular.module('mean.rooms').factory('UserHandler',['Rooms','UIHandler','Notific
 	  	 	};
 	  		
 	  		$scope.toggleConnected = function() { 
-	  			uiHandler.connected_class=(uiHandler.connected_class==='collapsed')?'':'collapsed'; 
-	  			uiHandler.dash_conn=(uiHandler.connected_class==='collapsed')?'connected_collapsed':'';
+	  			uiHandler.connectedClass=(uiHandler.connectedClass==='collapsed')?'':'collapsed'; 
+	  			uiHandler.dashConn=(uiHandler.connectedClass==='collapsed')?'connected_collapsed':'';
 	  		};
 
 	    	$scope.getUserName = function (connectionId){

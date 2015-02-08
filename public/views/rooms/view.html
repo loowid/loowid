@@ -101,7 +101,7 @@
 		<p class="user_title">{{resourceBundle.usertypeviewer}}</p>
 	</div>
 </div>
-<aside id="connected" ng-class="ui.connected_class">
+<aside id="connected" ng-class="ui.connectedClass">
 	<span class="toggler" ng-click="toggleConnected()"><i class="fa fa-angle-double-left"></i></span>
 	<h1>{{resourceBundle.peopleconnected}}</h1>
 	<div class="owner connected">
@@ -157,7 +157,7 @@
 		</li>
 	</ul>
 </aside>
-<section id="dashboard" ng-class="[ui.dash_conn,ui.dash_chat]">
+<section id="dashboard" ng-class="[ui.dashConn,ui.dash_chat]">
 
 		<div id="remoteAudios" ></div>
 		<div id="remoteVideos" >
@@ -189,8 +189,8 @@
 			</div>
 		</article>
 </section>
-<div id="error" ng-class="error_class" ng-click="hideError()"><div class="error"><h3<h3 ng-bind-html="error_message"></h3></div></div>
-<aside id="chat" ng-class="ui.chat_class">
+<div id="error" ng-class="errorClass" ng-click="hideError()"><div class="error"><h3<h3 ng-bind-html="errorMessage"></h3></div></div>
+<aside id="chat" ng-class="ui.chatClass">
 	<span class="toggler" ng-click="toggleChat()"><i class="fa fa-angle-double-right"></i></span>
 	<form data-ng-submit="sendMessage()">
 	<fieldset id="chat_form">

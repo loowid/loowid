@@ -7,19 +7,19 @@ angular.module('mean.rooms').controller('ViewDesktopController', ['$scope', '$ro
 
     uiHandler.userType = 'remote';
     
-    uiHandler.connected_class = '';
-    uiHandler.chat_class = '';
-    uiHandler.remote_screen_class ='';
+    uiHandler.connectedClass = '';
+    uiHandler.chatClass = '';
+    uiHandler.remoteScreenClass ='';
     
-    uiHandler.dash_conn = '';
+    uiHandler.dashConn = '';
     uiHandler.dash_chat = '';
 	uiHandler.isowner = false;
 
     document.getElementById('noscript').style.display = 'none';
     
     // Handle error
-    uiHandler.error_class = '';
-    uiHandler.error_message = '';
+    uiHandler.errorClass = '';
+    uiHandler.errorMessage = '';
     
     var room = new Rooms({});
 

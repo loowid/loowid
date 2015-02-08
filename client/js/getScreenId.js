@@ -50,7 +50,7 @@
         
     };
 
-    function getScreenConstraints(error, sourceId) {
+    var getScreenConstraints = function(error, sourceId) {
         var screenConstraints = {
             audio: false,
             video: {
@@ -68,9 +68,9 @@
         }
 
         return screenConstraints;
-    }
+    };
 
-    function postMessage() {
+    var postMessage = function() {
         if (!iframe.isLoaded) {
             setTimeout(postMessage, 100);
             return;
@@ -79,7 +79,7 @@
         iframe.contentWindow.postMessage({/*jshint validthis:true */
             captureSourceId: this.extensionId
         }, '*');
-    }
+    };
 
     var iframe = document.createElement('iframe');
     iframe.onload = function() {

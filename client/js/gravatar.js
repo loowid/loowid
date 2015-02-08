@@ -97,12 +97,12 @@ var gravatarMd5 = function(str) {
 
   var wordToHex = function (lValue) {
     var wordToHexValue = '',
-      wordToHexValue_temp = '',
+      wordToHexValueTemp = '',
       lByte, lCount;
     for (lCount = 0; lCount <= 3; lCount+=1) {
       lByte = (lValue >>> (lCount * 8)) & 255;
-      wordToHexValue_temp = '0' + lByte.toString(16);
-      wordToHexValue = wordToHexValue + wordToHexValue_temp.substr(wordToHexValue_temp.length - 2, 2);
+      wordToHexValueTemp = '0' + lByte.toString(16);
+      wordToHexValue = wordToHexValue + wordToHexValueTemp.substr(wordToHexValueTemp.length - 2, 2);
     }
     return wordToHexValue;
   };

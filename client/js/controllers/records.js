@@ -20,16 +20,16 @@ angular.module('mean.rooms').controller('RecordController', ['$scope', '$routePa
     //We had three objects stream to handle the diferent stream sources webcam/screen
 	
 	uiHandler.conn_new = '';
-	uiHandler.connected_class = '';
-	uiHandler.chat_class = '';
-	uiHandler.dash_conn = '';
+	uiHandler.connectedClass = '';
+	uiHandler.chatClass = '';
+	uiHandler.dashConn = '';
 	uiHandler.dash_chat = '';
 	
 	uiHandler.shareDesktopStatus='unknown';
 	
 	// Handle error
-	uiHandler.eror_class = '';
-	uiHandler.error_message = '';
+	uiHandler.errorClass = '';
+	uiHandler.errorMessage = '';
 
 	uiHandler.supportedLocales = ngI18nConfig.supportedLocales;
 	uiHandler.defaultLocale = ngI18nConfig.defaultLocale;

@@ -29,14 +29,14 @@ angular.module('mean.system').factory('Global', [function() {
         bot: '||@@||',
         own: '||##||',
         showError: function(scope,err) {
-            scope.error_class = 'error_now';
-            scope.error_message = err;
+            scope.errorClass = 'error_now';
+            scope.errorMessage = err;
             scope.ui.safeApply(scope,function(){});
-            setTimeout(function(){scope.error_class='';scope.error_message='';scope.ui.safeApply(scope,function(){});},10000);
+            setTimeout(function(){scope.errorClass='';scope.errorMessage='';scope.ui.safeApply(scope,function(){});},10000);
         },
         hideError: function(scope) {
-            scope.error_class = '';
-            scope.error_message = '';
+            scope.errorClass = '';
+            scope.errorMessage = '';
         },
         _: function() {
         	if (arguments.length>0) {

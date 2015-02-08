@@ -158,8 +158,8 @@ angular.module('mean.rooms').factory('ChatService',['$timeout','UIHandler','Room
     		};
 	    	
 	        $scope.toggleChat = function() { 
-	        	uiHandler.chat_class=(uiHandler.chat_class==='collapsed')?'':'collapsed';
-	        	uiHandler.dash_chat=(uiHandler.chat_class==='collapsed')?'chat_collapsed':'';
+	        	uiHandler.chatClass=(uiHandler.chatClass==='collapsed')?'':'collapsed';
+	        	uiHandler.dash_chat=(uiHandler.chatClass==='collapsed')?'chat_collapsed':'';
 	        };
 
 	    	$scope.sendTyping = function() {
@@ -214,7 +214,7 @@ angular.module('mean.rooms').factory('ChatService',['$timeout','UIHandler','Room
 					self.addToQueue(data);
 					return;
 				}
-	       		if ((uiHandler.chat_class!=='' || !uiHandler.focused) && data.id!==rtc._me) {
+	       		if ((uiHandler.chatClass!=='' || !uiHandler.focused) && data.id!==rtc._me) {
 	       			if (uiHandler.notificationReady) {
 		       		    var notification = new Notification($scope.getUser(data.id).name, {
 		       		            body: data.text.length>50?data.text.substring(0,50)+'...':data.text,
@@ -223,7 +223,7 @@ angular.module('mean.rooms').factory('ChatService',['$timeout','UIHandler','Room
 		       		    });
 		       	        notification.$on('click', function () {
 		       	        	if (!uiHandler.focused) { window.focus(); }
-		       	        	if (uiHandler.chat_class!=='') { $scope.toggleChat(); }
+		       	        	if (uiHandler.chatClass!=='') { $scope.toggleChat(); }
 		       	        });
 	       			} else if (uiHandler.audible) {
 		        		var readText = ($scope.connectedUsers()>1)?$scope.getUser(data.id).name+', '+data.text:data.text;
