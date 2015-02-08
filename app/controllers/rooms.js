@@ -35,6 +35,13 @@ var isValid = function(room,id) {
 	return false;
 };
 
+var isGuessConnected = function(room,id,cid) {
+	for (var k=0; k<room.guests.length; k+=1) {
+		if (room.guests[k].sessionid === id && room.guests[k].status==='CONNECTED' && room.guests[k].connectionId === cid) { return true; }
+	}
+	return false;
+};
+
 /**
 * Find a room by id
 */
@@ -132,17 +139,19 @@ exports.join = function (req, res, next){
 		});
 	} else {
 		// Open room or is in valid list of users
-		if (room.access.shared!=='PRIVATE' || isValid(room,req.sessionID)) {
+		if (room.access.shared!=='PRIVATE' || isValid(room,req.sessionID) || isGuessConnected(room,req.sessionID,req.body.connectionId)) {
 			// No locked room or is reloading
 			if (!room.access.locked || isReloading(room,req.sessionID)) {
-				room.guests.push ({
-					name: req.session.ltiname?req.session.ltiname:req.body.name, 
-					sessionid: req.sessionID, 
-					connectionId: req.body.connectionId, 
-					status: 'CONNECTED', 
-					avatar: req.session.ltiavtr?req.session.ltiavtr:req.body.avatar, 
-					source: []
-				});
+				if (!isGuessConnected(room,req.sessionID,req.body.connectionId)) {
+					room.guests.push ({
+						name: req.session.ltiname?req.session.ltiname:req.body.name, 
+						sessionid: req.sessionID, 
+						connectionId: req.body.connectionId, 
+						status: 'CONNECTED', 
+						avatar: req.session.ltiavtr?req.session.ltiavtr:req.body.avatar, 
+						source: []
+					});
+				}
 				var ind = room.valid.indexOf(req.sessionID);
 				if (ind>=0) { room.valid.splice(ind, 1); }
 				room.save(function(err) {

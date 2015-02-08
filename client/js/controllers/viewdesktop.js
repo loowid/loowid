@@ -54,17 +54,11 @@ angular.module('mean.rooms').controller('ViewDesktopController', ['$scope', '$ro
     	uiHandler.focused = false;
     };
 
-    $scope.$on('$locationChangeStart', function(obj, next, current) { 
-    	if (next.indexOf('/join')>0) {
-    		rtc.reset();
-    	}
-    });
-
     $scope.changeOwnerConnectionId = function (id) {
     	uiHandler.ownerConnectionId = id;
     };
   
-    $scope.roomLeave = function (){
+    $scope.roomLeave = function (clean){
         
         var leaveFn = function (){
             if (!uiHandler.passNeeded && uiHandler.joinable) { rtc.reset(); }
@@ -73,7 +67,7 @@ angular.module('mean.rooms').controller('ViewDesktopController', ['$scope', '$ro
             $location.path('/');
         };
 
-        if (uiHandler.status==='DISCONNECTED' || !uiHandler.joinable){
+        if (uiHandler.status==='DISCONNECTED'){
             leaveFn ();
         }else {
             uiHandler.safeApply ($scope,function (){
@@ -91,7 +85,10 @@ angular.module('mean.rooms').controller('ViewDesktopController', ['$scope', '$ro
                         uiHandler.safeApply ($scope,function(){
                             uiHandler.modals.splice(index,1);
                         });
-                            
+                        if (clean) {
+                  			$location.search('r',$scope.global.previousSearch);
+                  			$location.path($scope.global.previousPath);
+                        }
                     },
                     'class':'modalform editable',
                     'done':false
@@ -120,13 +117,14 @@ angular.module('mean.rooms').controller('ViewDesktopController', ['$scope', '$ro
     	uiHandler.status = results.status;
     	uiHandler.ownerAvatar = results.owner.avatar;
     	uiHandler.users = results.guests;
-    	uiHandler.currentConnectionId = rtc._me;
-        //Be aware when a remote stream is added
-        rtc.peerListUpdated($scope.global.roomId);
         uiHandler.passNeeded = false;
         uiHandler.connectionError = false;
         uiHandler.access = results.access;
-        room.notifyIn($scope);
+        if (!uiHandler.currentConnectionId || uiHandler.currentConnectionId !== rtc._me) {
+        	room.notifyIn($scope);
+        	rtc.peerListUpdated($scope.global.roomId);
+        }
+        uiHandler.currentConnectionId = rtc._me;
 		room.chat($scope.global.roomId,function(resu){
 			uiHandler.chatPage = resu.page;
 			chatService.init ($scope,resu.chat);
@@ -147,23 +145,10 @@ angular.module('mean.rooms').controller('ViewDesktopController', ['$scope', '$ro
    
     
     $scope.init = function (){
-        if ($routeParams.accessKey){
-            uiHandler.roomPassword=$routeParams.accessKey;
-            uiHandler.passNeeded = false;
-            uiHandler.connectionError = false;
-            uiHandler.sendingPwd = false;
-            room.joinPass($scope.global.roomId,uiHandler.roomPassword,true);
-        }
-        
-        if (!uiHandler.roomPassword) { rtc.reset(); }
     	var rid = $location.search().r||$routeParams.roomId;
-    	//if (!rid) rid = $scope.global.roomId?$scope.global.roomId:$routeParams.roomId;
-        var roomId = $scope.global.roomId = rid;
-        
-        $scope.global.roomId = uiHandler.roomId = roomId;
+    	uiHandler.roomId = $scope.global.roomId = rid;
         $scope.isowner = false;
-        $scope.isRoomJoinable();
-
+        
         // Keep Session with auto request every 15 min
 		window.clearInterval($scope.global.keepInterval);
 		$scope.global.keepInterval = window.setInterval(function(){
@@ -178,97 +163,95 @@ angular.module('mean.rooms').controller('ViewDesktopController', ['$scope', '$ro
 			}
 		},30000);
 
-        if ($scope.isValidBrowser()) { 
-            //When this method is triggered is possible that we didn't know anything about the room 
-            //We must wait until data is ready
-            userHandler.init ($scope);
-           	windowHandler.init ($scope);
-			mediaService.init($scope,windowHandler);
+        $scope.isRoomJoinable(function(){
 
-            if (window.innerWidth <= 800 ){
-                $scope.toggleConnected();
-            }
+	        if ($scope.isValidBrowser()) { 
+	            //When this method is triggered is possible that we didn't know anything about the room 
+	            //We must wait until data is ready
+	            userHandler.init ($scope);
+	           	windowHandler.init ($scope);
+				mediaService.init($scope,windowHandler);
+		        fileService.init ($scope);
 
-        }else{
-        	$location.search('r',null);
-            $location.path('/');
-        }
+	            if (window.innerWidth <= 800 ){
+	                $scope.toggleConnected();
+	            }
+	
+	        }else{
+	        	$location.search('r',null);
+	            $location.path('/');
+	        }
+	
+	        if (!rtc._me) {
 
-        rtc.on ('password_failed', function(data) {
-        	uiHandler.sendingPwd = false;
-        	uiHandler.passNeeded = true;
-        	uiHandler.connectionError = true;
-        	$scope.$apply();
-            // Close socket and listeners
-            rtc._socket.close();
-            delete rtc._events.get_peers;
-            delete rtc._events.receive_ice_candidate;
-            delete rtc._events.new_peer_connected;
-            delete rtc._events.remove_peer_connected;
-            delete rtc._events.receive_offer;
-            delete rtc._events.receive_answer;
+		        rtc.on ('password_failed', function(data) {
+		        	uiHandler.sendingPwd = false;
+		        	uiHandler.passNeeded = true;
+		        	uiHandler.connectionError = true;
+		        	$scope.$apply();
+		            // Close socket and listeners
+		            rtc._socket.close();
+		            delete rtc._events.get_peers;
+		            delete rtc._events.receive_ice_candidate;
+		            delete rtc._events.new_peer_connected;
+		            delete rtc._events.remove_peer_connected;
+		            delete rtc._events.receive_offer;
+		            delete rtc._events.receive_answer;
+		        });
+		
+		        
+		        //This function is a bit room bit user we declare it two times
+		        rtc.on ('owner_data_updated',function(data){
+		       		uiHandler.status = data.status;
+		    		uiHandler.access = data.access;
+		            var chatModified = (uiHandler.chatstatus !== undefined && uiHandler.chatstatus !== data.access.chat); 
+		            uiHandler.chatstatus = data.access.chat;
+		            
+		            if (chatModified) {
+		                chatService.alertChatStatus($scope,data.access.chat?'disabled':'enabled');
+		            }
+		            $scope.$apply();
+		        });
+		
+		        rtc.on('room_moved',function(data){
+		        	rtc.room = uiHandler.roomId =$scope.global.roomId = data.room;
+		           $location.search('r',data.room);
+		        });
+		
+		        rtc.on('room_out',function(data){
+		        	
+		            uiHandler.safeApply ($scope,function (){
+		                if (!uiHandler.modals) { uiHandler.modals = []; }
+		
+		                uiHandler.modals.push({'text': $scope.resourceBundle.youarefired,
+		                    'ok': function (index){
+		                        uiHandler.safeApply ($scope,function(){
+		                            uiHandler.modals.splice(index,1);
+		                        });
+		                        
+		                       uiHandler.status = 'DISCONNECTED';
+		                      $scope.roomLeave();
+		                    },
+		                    'class':'modalform editable',
+		                    'done':false
+		                }); 
+		            });
+		        });
+		        
+	        }
+
+		    var joinUsr = room.join($scope.global.roomId,$scope.joinResult);
+		    
+		    uiHandler.name = joinUsr.name;
+		    uiHandler.avatar = joinUsr.avatar;
+		    uiHandler.gravatar = joinUsr.gravatar;
+		    uiHandler.access = joinUsr.access;
+		
+		    
+		    $scope.global.name = uiHandler.name;
+		    $scope.global.gravatar = uiHandler.gravatar;
+			    
         });
-
-        
-        //This function is a bit room bit user we declare it two times
-        rtc.on ('owner_data_updated',function(data){
-       		uiHandler.status = data.status;
-    		uiHandler.access = data.access;
-            var chatModified = (uiHandler.chatstatus !== undefined && uiHandler.chatstatus !== data.access.chat); 
-            uiHandler.chatstatus = data.access.chat;
-            
-            if (chatModified) {
-                chatService.alertChatStatus($scope,data.access.chat?'disabled':'enabled');
-            }
-            $scope.$apply();
-        });
-
-        fileService.init ($scope);
-
-        rtc.on('room_moved',function(data){
-        	rtc.room = uiHandler.roomId =$scope.global.roomId = data.room;
-           $location.search('r',data.room);
-        });
-
-        rtc.on('room_out',function(data){
-        	
-            uiHandler.safeApply ($scope,function (){
-                if (!uiHandler.modals) { uiHandler.modals = []; }
-
-                uiHandler.modals.push({'text': $scope.resourceBundle.youarefired,
-                    'ok': function (index){
-                        uiHandler.safeApply ($scope,function(){
-                            uiHandler.modals.splice(index,1);
-                        });
-                        
-                       uiHandler.status = 'DISCONNECTED';
-                      $scope.roomLeave();
-                    },
-                    'class':'modalform editable',
-                    'done':false
-                }); 
-            });
-        });
-    
-          if ($scope.isValidBrowser()) { 
-            //When this method is triggered is possible that we didn't know anything about the room 
-          
-            var joinUsr = room.join(roomId,$scope.joinResult);
-            
-            uiHandler.name = joinUsr.name;
-            uiHandler.avatar = joinUsr.avatar;
-            uiHandler.gravatar = joinUsr.gravatar;
-            uiHandler.access = joinUsr.access;
-
-            
-            $scope.global.name = uiHandler.name;
-            $scope.global.gravatar = uiHandler.gravatar;
-          
-
-        }else{
-        	$location.search('r',null);
-            $location.path('/');
-        }
 
     };
 
@@ -277,27 +260,53 @@ angular.module('mean.rooms').controller('ViewDesktopController', ['$scope', '$ro
     };
 
 
-    $scope.isRoomJoinable = function (){
+    $scope.isRoomJoinable = function (done){
         room.isRoomJoinable ($scope.global.roomId,function(result){
+        	if (!$scope.global.hasfailed) { rtc.reset(); }
+        	$scope.global.hasfailed = false;
         	uiHandler.joinable = result.joinable;
         	uiHandler.locked = result.locked;
         	uiHandler.permanent = result.permanent;
             if (result.joinable) {
             	uiHandler.passNeeded = result.private;
                 if (!result.private) {
-                	room.joinPass($scope.global.roomId,'',true);
+                	if (!rtc._me) {
+                		room.joinPass($scope.global.roomId,'',true);
+                	}
                 }
+                done();
             }
         },function (err){
-        	if (rtc._me) { rtc.reset(); }
-        	$scope.global.roomId ='';
-        	uiHandler.joinable = false;
-        	$location.search('r',null);
-            $location.path('/');
+        	$scope.global.hasfailed = true;
+        	if (rtc._me) { $scope.roomLeave(true); }
+        	else {
+        		$scope.global.roomId ='';
+            	uiHandler.joinable = false;
+            	$location.search('r',null);
+                $location.path('/');
+        	}
         });
     };
 
-
+    $scope.$on('$routeUpdate', function(a,b,c){
+    	if (($location.search().r || $routeParams.roomId) !== $scope.global.roomId) {
+    		// Do not touch the url
+    		$scope.roomLeave(true);
+    	}
+    });
+    
+    $scope.$on('$locationChangeStart',function(evt, absNewUrl, absOldUrl) {
+    	var ind = absOldUrl.indexOf('?');
+    	var last = ind>0?ind:absOldUrl.length;
+    	$scope.global.previousSearch = null;
+    	if (ind>0) {
+    		var sch = absOldUrl.substring(ind+1).split('=');
+    		if (sch[0]==='r') {
+    			$scope.global.previousSearch = sch[1];
+    		}
+    	}
+    	$scope.global.previousPath = absOldUrl.substring(absOldUrl.indexOf('/#!/')+4,last);
+   	});
     
 }]).config(function($sceProvider) {
     $sceProvider.enabled(true);

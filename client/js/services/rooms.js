@@ -122,9 +122,13 @@ angular.module('mean.rooms').factory('Rooms', ['$resource','$http','$window','No
 			var userName = this.rememberUser();
 			var gravatar = this.getGravatar();
             //Connections event is fired just when you perform all the connection process
-            rtc.on('connections',function(conns){
-           		room.join ({id: roomId, name: userName, connectionId: rtc._me, avatar: $window.getGravatarImg(gravatar)},success);
-            });
+			if (!rtc._me) {
+	            rtc.on('connections',function(conns){
+	           		room.join ({id: roomId, name: userName, connectionId: rtc._me, avatar: $window.getGravatarImg(gravatar)},success);
+	            });
+			} else {
+				room.join ({id: roomId, name: userName, connectionId: rtc._me, avatar: $window.getGravatarImg(gravatar)},success);
+			}
 			return {name:userName,avatar:$window.getGravatarImg(gravatar),gravatar:gravatar};
 		};
 

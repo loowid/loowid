@@ -212,10 +212,11 @@ module.exports = function(request,test,utils) {
 	            expect(st.guests[0].name).toBe('Client');
 	            expect(st.guests[0].sessionid).toBe('');
 	            expect(st.guests[0].status).toBe('CONNECTED');
+	            expect(st.guests[0].connectionId).toBe(utils.viewer);
 	            done();
 	    	});
 	    });
-	    
+    
 	    test('The users is not empty.', function(done) {
 	    	var requestDate = new Date();
 	    	requestDate.setTime(requestDate.getTime() - 1000);
@@ -336,10 +337,11 @@ module.exports = function(request,test,utils) {
 	            expect(st.guests[1].name).toBe('Client1');
 	            expect(st.guests[1].sessionid).toBe('');
 	            expect(st.guests[1].status).toBe('CONNECTED');
+	            expect(st.guests[1].connectionId).toBe(utils.viewer1);
 	            done();
 	    	});
 	    });
-	    
+
 	    test('The room has two guests.', function(done) {
 	    	var requestDate = new Date();
 	    	requestDate.setTime(requestDate.getTime() - 1000);

@@ -57,6 +57,8 @@ if (!process.env.OPENSHIFT_NODEJS_PORT && !process.env.OPENSHIFT_INTERNAL_PORT &
 var ipaddr = process.env.OPENSHIFT_NODEJS_IP || process.env.OPENSHIFT_INTERNAL_IP ||'0.0.0.0';
 var wserver = sserver?sserver:server;
 
+var sessionSecret = crypto.randomBytes(16).toString('hex');
+
 // load webrtc module
 var webRTC = require('./webrtc.io.js').listen(wserver,ipaddr);
 
@@ -65,6 +67,7 @@ var serverId = (Math.random()/+new Date()).toString(36).replace(/[^a-z]+/g,'').s
 webRTC.wsevents = wsevents;
 webRTC.rooms = rooms;
 webRTC.serverId = serverId;
+webRTC.sessionSecret = sessionSecret;
  
 // Socket Messages on Mongo
 var serverCluster = serverId;
@@ -203,7 +206,7 @@ app.configure(function() {
 		store:new MongoStore({mongoose_connection:mongoose.connection},function(){logger.info('Session store connected !!');}),
 		cookie: { maxAge : 3600000 }, // 1 hour
 		key:'jsessionid', 
-		secret:crypto.randomBytes(16).toString('hex')}));
+		secret:sessionSecret}));
 	app.use(express.bodyParser());
 	var csrf = express.csrf();
 	app.use(function(req,res,next){

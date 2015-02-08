@@ -128,7 +128,7 @@ angular.module('mean.rooms').controller('RecordController', ['$scope', '$routePa
         return false;
     };
 
-    $scope.roomLeave = function (){
+    $scope.roomLeave = function (clean){
         var leaveFn = function (){
             rtc.reset();
             $scope.global.roomId ='';
@@ -154,7 +154,10 @@ angular.module('mean.rooms').controller('RecordController', ['$scope', '$routePa
                         uiHandler.safeApply ($scope,function(){
                             uiHandler.modals.splice(index,1);
                         });
-                            
+                        if (clean) {
+                  			$location.search('r',$scope.global.previousSearch);
+                  			$location.path($scope.global.previousPath);
+                        }
                     },
                     'class':'modalform editable',
                     'done':false
@@ -176,7 +179,6 @@ angular.module('mean.rooms').controller('RecordController', ['$scope', '$routePa
 
  	$scope.init = function (){
     	var rid = $location.search().r || $routeParams.roomId;
-    	//if (!rid) rid = $scope.global.roomId?$scope.global.roomId:$routeParams.roomId;
 
     	uiHandler.roomId = $scope.global.roomId = rid;	
     	uiHandler.screenurl = $scope.getScreenUrl();
@@ -270,12 +272,14 @@ angular.module('mean.rooms').controller('RecordController', ['$scope', '$routePa
    			}
 
 		},function (error){
-			if (rtc._me) { rtc.reset(); }
-			uiHandler.roomStatus = 'inactive';
-			$scope.global.roomId ='';
-			$scope.global.sessionclosed =true;
-			$location.search('r',null);
-	 		$location.path('/');
+			if (rtc._me) { $scope.roomLeave(true); }
+			else {
+				uiHandler.roomStatus = 'inactive';
+				$scope.global.roomId ='';
+				$scope.global.sessionclosed =true;
+				$location.search('r',null);
+		 		$location.path('/');
+			}
 		});
 
       
@@ -285,7 +289,27 @@ angular.module('mean.rooms').controller('RecordController', ['$scope', '$routePa
   
 		
     };
-
+    
+    $scope.$on('$routeUpdate', function(a,b,c){
+    	if (($location.search().r || $routeParams.roomId) !== $scope.global.roomId) {
+    		// Do not touch the url
+    		$scope.roomLeave(true);
+    	}
+    });
+    
+    $scope.$on('$locationChangeStart',function(evt, absNewUrl, absOldUrl) {
+    	var ind = absOldUrl.indexOf('?');
+    	var last = ind>0?ind:absOldUrl.length;
+    	$scope.global.previousSearch = null;
+    	if (ind>0) {
+    		var sch = absOldUrl.substring(ind+1).split('=');
+    		if (sch[0]==='r') {
+    			$scope.global.previousSearch = sch[1];
+    		}
+    	}
+    	$scope.global.previousPath = absOldUrl.substring(absOldUrl.indexOf('/#!/')+4,last);
+   	});
+    
 }]).config(function($sceProvider) {
 	$sceProvider.enabled(true);
 }).directive('ngEscape', function () {

@@ -31,7 +31,7 @@ rtc.on = function(eventName, callback) {
   rtc._events[eventName].push(callback);
 };
 
- rtc.iceSERVERS = function() {
+rtc.iceSERVERS = function() {
     return {
       'iceServers': [{
         'url': 'stun:stun.l.google.com:19302'
@@ -50,7 +50,7 @@ rtc.on = function(eventName, callback) {
 		}    
       ]
     };
-  };
+};
 
 
 
@@ -67,7 +67,7 @@ rtc.fire = function(eventName, _) {
   }
 };
 
-function getSessionId(headers) {
+function getSessionId(headers,secret) {
     var list = {}, rc = headers.cookie;
     if (rc) { 
     	rc.split(';').forEach(function( cookie ) {
@@ -76,7 +76,7 @@ function getSessionId(headers) {
     	});
     }
     var real_sid = (list.jsessionid)?list.jsessionid.replace( prefix, '' ):'';
-    real_sid = signature.unsign( real_sid, 'your-secret' );
+    real_sid = signature.unsign( real_sid, secret );
     return real_sid;
 }
 
@@ -97,7 +97,7 @@ function attachEvents(manager) {
   manager.on('connection', function(socket) {
     logger.debug('connect');
 
-	socket.sessionid = getSessionId(socket.upgradeReq.headers);
+	socket.sessionid = getSessionId(socket.upgradeReq.headers,manager.sessionSecret);
     socket.id = id();
     logger.debug('new socket got id: ' + socket.id);
 

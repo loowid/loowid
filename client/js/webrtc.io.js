@@ -193,10 +193,9 @@ function mergeConstraints(cons1, cons2) {
 	rtc.connect = function(server, room, password, reload) {
 		room = room || ''; // by default, join a room called the blank string
 		rtc._socket = new WebSocket(server);
-		rtc.room = room;
+		rtc.room = room;		
 		rtc._socket.onopen = function() {
-
-
+			//var sckt = this;
 			rtc.askForUpdateConfig = function (room){
 				rtc._socket.send(JSON.stringify({
 					'eventName': 'update_server_config',
@@ -265,7 +264,7 @@ function mergeConstraints(cons1, cons2) {
 				rtc.connections = {};
 				rtc.receivedPeerConnections = {};
 				rtc.producedPeerConnections = {};
-				rtc._socket = null;
+				//rtc._socket = null;
 			};
 
 			rtc.on('ready', function(mediatype,maxBitrate) {
@@ -274,10 +273,6 @@ function mergeConstraints(cons1, cons2) {
 				rtc.addStreams(mediatype);
 				rtc.sendOffers(mediatype,maxBitrate);
 			});
-
-
-
-
 
 			rtc.on('get_peers', function(data) {
 				rtc.connections = data.connections;
