@@ -119,15 +119,17 @@ angular.module('mean.rooms').factory('UserHandler',['Rooms','UIHandler','Notific
 			        	for (var u=0; u<uiHandler.newusers.length; u+=1) {
 			        		bd = uiHandler.newusers[u].name + ' ' + (uiHandler.newusers[u].status === 'CONNECTED'?'(+)':'(-)');
 			        	}
-		       		    var notification = new Notification($scope.resourceBundle.usertypeviewer, {
-	       		            body: bd,
-	       		            icon: uiHandler.newusers.length>1?'img/icons/favicon.ico':uiHandler.newusers[0].avatar,
-	       		            delay: 3000
-		       		    });
-		       	        notification.$on('click', function () {
-		       	        	if (!uiHandler.focused) { window.focus(); }
-		       	        	if (uiHandler.connected_class!=='') { $scope.toggleConnected(); }
-		       	        });
+			        	if (bd !== '') {
+			       		    var notification = new Notification($scope.resourceBundle.usertypeviewer, {
+		       		            body: bd,
+		       		            icon: uiHandler.newusers.length>1?'img/icons/favicon.ico':uiHandler.newusers[0].avatar,
+		       		            delay: 3000
+			       		    });
+			       	        notification.$on('click', function () {
+			       	        	if (!uiHandler.focused) { window.focus(); }
+			       	        	if (uiHandler.connected_class!=='') { $scope.toggleConnected(); }
+			       	        });
+			        	}
 		        	} else {
 	       				// Doit traditional
 		        		if (!uiHandler.focused && uiHandler.audible) {
