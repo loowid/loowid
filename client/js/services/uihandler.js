@@ -15,10 +15,9 @@ angular.module('mean.rooms').factory('UIHandler',['$window','$timeout',function(
 	};
 
 	_this._data.debug = false;
-	_this._data.version = 'v'+window.loowid_version;
-	_this._data.node = window.loowid_node;
-	
-	var keyboardManagerService = {};
+	_this._data.version = 'v'+window.loowidVersion;
+	_this._data.node = window.loowidNode;
+		var keyboardManagerService = {};
 
 	var defaultOpt = {
 		'type':             'keydown',

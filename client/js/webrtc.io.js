@@ -160,7 +160,7 @@ function mergeConstraints(cons1, cons2) {
 		'filedata':{'mandatory':{'OfferToReceiveAudio': false,'OfferToReceiveVideo': false}}
 	};
 
-	rtc.pc_constraints = {
+	rtc.pcConstraints = {
 		'optional': [{
 			'DtlsSrtpKeyAgreement': true
 		}]
@@ -411,7 +411,7 @@ function mergeConstraints(cons1, cons2) {
 
 		var peerConnections = produced ? rtc.producedPeerConnections : rtc.receivedPeerConnections;
 
-		var config = rtc.pc_constraints;
+		var config = rtc.pcConstraints;
 
 		if (!peerConnections[id]){
 			peerConnections[id] = {};
@@ -510,18 +510,19 @@ function mergeConstraints(cons1, cons2) {
 
 		constraints = mergeConstraints(constraints, sdpConstraints);
 
-		pc.createOffer(function(session_description) {
-			//session_description.sdp = preferOpus(session_description.sdp);
+		pc.createOffer(function(sessionDescription) {
+			//sessionDescription.sdp = preferOpus(sessionDescription.sdp);
+			
 			if (maxBitrate){
-				session_description.sdp = changeBitrate(session_description.sdp,maxBitrate); 
-				pc.tempSession_description = session_description;
+				sessionDescription.sdp = changeBitrate(sessionDescription.sdp,maxBitrate); 
 			}
-			pc.setLocalDescription(session_description, function (){
+
+			pc.setLocalDescription(sessionDescription, function (){
 				rtc._socket.send(JSON.stringify({
 					'eventName': 'send_offer',
 					'data': {
 						'socketId': socketId,
-						'sdp': session_description,
+						'sdp': sessionDescription,
 						'mediatype': mediatype,
 						'room': rtc.room,
 						'requestId': requestId,
@@ -576,13 +577,13 @@ function mergeConstraints(cons1, cons2) {
 						pc.addIceCandidate(storedIceCandidate,sfn,ffn);
 					}
 				}
-				pc.createAnswer(function(session_description) {
-					pc.setLocalDescription(session_description, function (){
+				pc.createAnswer(function(sessionDescription) {
+					pc.setLocalDescription(sessionDescription, function (){
 						rtc._socket.send(JSON.stringify({
 							'eventName': 'send_answer',
 							'data': {
 								'socketId': socketId,
-								'sdp': session_description,
+								'sdp': sessionDescription,
 								'mediatype': mediatype
 							}
 						}));

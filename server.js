@@ -174,14 +174,14 @@ var strategy = new LTIStrategy({
 }, function(req, lti, done) {
 	// LTI launch parameters
 	var definedRole = (process.env.LTI_OWNER_ROLES || 'Instructor').split(',');
-	var is_owner = false;
-	for (var k=0; k<definedRole.length && !is_owner; k+=1) {
-		is_owner = (lti.roles.indexOf(definedRole[k]) > -1);
+	var isOwner = false;
+	for (var k=0; k<definedRole.length && !isOwner; k+=1) {
+		isOwner = (lti.roles.indexOf(definedRole[k]) > -1);
 	}
-	rooms.createOrFindLTI(req,lti,is_owner,function(r){
+	rooms.createOrFindLTI(req,lti,isOwner,function(r){
 		req.session.ltiname = lti.lis_person_name_full;
 		req.session.ltiavtr = rooms.getGravatarImg(lti.lis_person_contact_email_primary);
-		return done(null,{url:'/#!/r/'+r.roomId+(is_owner?'/join':'')});
+		return done(null,{url:'/#!/r/'+r.roomId+(isOwner?'/join':'')});
 	},function(){
 		return done(null,{url:'/#!/lti/error'});
 	});

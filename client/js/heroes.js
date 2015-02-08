@@ -23,8 +23,8 @@ var animals = [ 'adder', 'ant', 'anteater', 'antelope', 'badger', 'bat',
 		'turtle', 'viper', 'vixen', 'vulture', 'walrus', 'wasp', 'weasel',
 		'whale', 'wolf', 'worm', 'zebra' ];
 
-var begin_heroes = ['captain','super','ultra','wonder','mega','lord','black','white'];
-var end_heroes = ['man','woman','boy','girl','diamond','shadow','rider'];
+var beginHeroes = ['captain','super','ultra','wonder','mega','lord','black','white'];
+var endHeroes = ['man','woman','boy','girl','diamond','shadow','rider'];
 
 var getCapitalize = function(list) {
 	var string = list[Math.round(Math.random()*(list.length-1))];
@@ -33,7 +33,7 @@ var getCapitalize = function(list) {
 
 var getSuperHero = function() {
 	var animal = getCapitalize(animals);
-	var hero_beg = getCapitalize(begin_heroes);
-	var hero_end = getCapitalize(end_heroes);
-	return (Math.random()*10 > 4) ? animal + hero_end : hero_beg + animal;
+	var heroBeg = getCapitalize(beginHeroes);
+	var heroEnd = getCapitalize(endHeroes);
+	return (Math.random()*10 > 4) ? animal + heroEnd : heroBeg + animal;
 };
