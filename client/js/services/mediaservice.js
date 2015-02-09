@@ -435,6 +435,27 @@ angular.module('mean.rooms').factory('MediaService',['Rooms','UIHandler',functio
 	            }
 	        });
 
+			var removeReceivedStreams = function(connectionId) {
+				for (var j = 0 ; j < self.receivedStreams.length ; j+=1){
+					var mediasource = self.receivedStreams [j];
+
+					if (mediasource.connectionId === connectionId){
+						var streamId = mediasource.connectionId + '_' + mediasource.type;
+						rtc.dropPeerConnection(connectionId,mediasource.type,false);
+
+						if (mediasource.playtype ==='video'){
+							mediasource.window.winHandler.close();
+						}else{
+							var el2 = document.getElementById('remote_'+streamId);
+							el2.parentNode.removeChild(el2);
+						}
+
+					 self.receivedStreams.splice (j,1);
+					 j-=1;
+					}
+				}
+			};
+			
 			rtc.uniqueon('disconnect stream',function(connectionId){
         	
         		//If any body disconnects we try to remove possible streams windows
@@ -444,25 +465,7 @@ angular.module('mean.rooms').factory('MediaService',['Rooms','UIHandler',functio
 					for (var i = 0; i< uiHandler.users.length; i+=1){
 
 							if (connectionId === uiHandler.users[i].connectionId || connectionId === uiHandler.ownerConnectionId){
-
-								for (var j = 0 ; j < self.receivedStreams.length ; j+=1){
-									var mediasource = self.receivedStreams [j];
-
-									if (mediasource.connectionId === connectionId){
-										var streamId = mediasource.connectionId + '_' + mediasource.type;
-										rtc.dropPeerConnection(connectionId,mediasource.type,false);
-
-										if (mediasource.playtype ==='video'){
-											mediasource.window.winHandler.close();
-										}else{
-											var el2 = document.getElementById('remote_'+streamId);
-											el2.parentNode.removeChild(el2);
-										}
-
-									 self.receivedStreams.splice (j,1);
-									 j-=1;
-									}
-								}
+								removeReceivedStreams(connectionId);
 								break;
 							}   
 						}

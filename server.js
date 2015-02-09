@@ -301,6 +301,11 @@ var getClusterNode = function (req) {
 	return node.substring(node.lastIndexOf(':')+1);
 };
 
+var getReqWSPort = function(req) {
+	var ind = req.headers.host.indexOf(':');
+	return (ind>0?req.headers.host.substring(ind+1):(req.protocol==='http'?'80':'443'));
+};
+
 if (process.env.OPENSHIFT_NODEJS_PORT || process.env.OPENSHIFT_INTERNAL_PORT) {
 	// OpenShift Deployment
 	/* At the top, with other redirect methods before other routes */
@@ -330,8 +335,7 @@ if (process.env.OPENSHIFT_NODEJS_PORT || process.env.OPENSHIFT_INTERNAL_PORT) {
 	logger.info('Running non-openshift environment !!');
 	// Local redirect
 	app.get('/', function(req, res) {
-		var ind = req.headers.host.indexOf(':');
-		var wsport = (ind>0?req.headers.host.substring(ind+1):(req.protocol==='http'?'80':'443'));
+		var wsport = getReqWSPort(req);
 		if ((req.headers['x-forwarded-proto'] && req.headers['x-forwarded-proto'] !== 'https') || (req.protocol === 'http' && defaultPort)) {
 			res.setHeader('X-FRAME-OPTIONS','DENY');
 			res.redirect('https://' + req.host + (sport!==443?':'+sport:'') + req.url);

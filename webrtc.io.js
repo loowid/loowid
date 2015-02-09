@@ -92,6 +92,30 @@ function id() {
 
 var errorFn = function(error) { if (error) { logger.error(error); } };
 
+var sendNewPeerConnected = function(socket,roomList) {
+	var connectionsId = [];
+	for (var i = 0; i < roomList.length; i+=1) {
+	  var id = roomList[i];
+
+	  if (id === socket.id) {
+	    continue;
+	  } else {
+	    connectionsId.push(id);
+	    var soc = rtc.getSocket(id);
+	    // inform the peers that they have a new peer
+	    if (soc) {
+	      soc.send(JSON.stringify({
+	        'eventName': 'new_peer_connected',
+	        'data':{
+	          'socketId': socket.id
+	        }
+	      }), errorFn);
+	    }
+	  }
+	}
+	return connectionsId;
+};
+
 function attachEvents(manager) {
 
   manager.on('connection', function(socket) {
@@ -160,7 +184,6 @@ function attachEvents(manager) {
   // manages the built-in room functionality
   rtc.on('join_room', function(dataa, socketa) {
 	manager.rooms.checkLockOrPassword(dataa, socketa, function(data,socket) {
-		var connectionsId = [];
 		var roomList = rtc.rooms[data.room] || [];
 		roomList.push(socket.id);
 		if (socket._events) {
@@ -168,26 +191,9 @@ function attachEvents(manager) {
 			// Mark as valid
 			manager.rooms.markValid(data.room,socket.sessionid);
 		}
-		
-		for (var i = 0; i < roomList.length; i+=1) {
-		  var id = roomList[i];
 
-		  if (id === socket.id) {
-		    continue;
-		  } else {
-		    connectionsId.push(id);
-		    var soc = rtc.getSocket(id);
-		    // inform the peers that they have a new peer
-		    if (soc) {
-		      soc.send(JSON.stringify({
-		        'eventName': 'new_peer_connected',
-		        'data':{
-		          'socketId': socket.id
-		        }
-		      }), errorFn);
-		    }
-		  }
-		}
+		var connectionsId = sendNewPeerConnected(socket,roomList);
+		
 		if (socket._events) {
 			// send new peer a list of all prior peers
 			socket.send(JSON.stringify({

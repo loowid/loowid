@@ -691,8 +691,39 @@ function mergeConstraints(cons1, cons2) {
 		}
 	};
 
-	rtc.sendMessage = function (id,mediatype,message,requestId,token){
+	var pushMessage = function(id,mediatype,mediatypefile,requestId,token,channel,queue) {
+		var eventName = 'data stream open ' +  id  + ' ' + mediatypefile;
+		if (channel.readyState === 'open' ){
+			var tfn = function (){
+				rtc.dataChannels[id][mediatypefile].state = 'ready';
+				rtc.sendMessage (id,mediatype,undefined,requestId,token); //Fire the send message for this queue
+			};
+			while (queue.length > 0){
+				try {
+					var object = queue [0];
+					channel.send (JSON.stringify(object));  
+					queue.shift();
+				}catch (event){
+					//We got a network problem, maybe the buffer is full, lets try it later
+					rtc.dataChannels[id][mediatypefile].state = 'paused';
+					setTimeout(tfn,50);
+				}
 
+			}  
+
+		}else if (!rtc._events[eventName]){ //If we didn't register a on open method
+
+			//Just register one method to execute for id and mediatype
+			rtc.on(eventName, function (openedchannel){
+				//We can have multiple channels to open, we only send 
+				rtc.deleteEvent (eventName);
+				rtc.dataChannels[id][mediatypefile].state =  'ready';
+				rtc.sendMessage (id,mediatype,undefined,requestId,token);
+			});
+		}
+	};
+	
+	rtc.sendMessage = function (id,mediatype,message,requestId,token){
 
 		var mediatypefile = mediatype+'_'+requestId;
 
@@ -709,52 +740,11 @@ function mergeConstraints(cons1, cons2) {
 		if (message) {
 			queue.push (message);
 		}
-
-		if (state  === 'ready'){
-			var eventName = 'data stream open ' +  id  + ' ' + mediatypefile;
-
-			if (channel.readyState === 'open' ){
-				var tfn = function (){
-					rtc.dataChannels[id][mediatypefile].state = 'ready';
-					rtc.sendMessage (id,mediatype,undefined,requestId,token); //Fire the send message for this queue
-				};
-				while (queue.length > 0){
-					try {
-						var object = queue [0];
-						channel.send (JSON.stringify(object));  
-						queue.shift();
-					}catch (event){
-						//We got a network problem, maybe the buffer is full, lets try it later
-						rtc.dataChannels[id][mediatypefile].state = 'paused';
-						setTimeout(tfn,50);
-					}
-
-				}  
-
-			}else if (!rtc._events[eventName]){ //If we didn't register a on open method
-
-				//Just register one method to execute for id and mediatype
-				rtc.on(eventName, function (openedchannel){
-					//We can have multiple channels to open, we only send 
-					rtc.deleteEvent (eventName);
-					rtc.dataChannels[id][mediatypefile].state =  'ready';
-					rtc.sendMessage (id,mediatype,undefined,requestId,token);
-				});
-			}
+		if (state  === 'ready') {
+			pushMessage(id,mediatype,mediatypefile,requestId,token,channel);
 		}
+		
 	};
-
-	/*  rtc.removeStreams = function (){
-
-    for (var i = 0; i < rtc.streams.length; i+=1) {
-      var stream = rtc.streams[i];
-      stream.mediastream.stop();
-    }
-
-    rtc.streams = [];
-    rtc.numStreams = 0;
-    rtc.initializedStreams = 0;
-  };*/
 
 	rtc.createDataChannel = function(id,requestId,mediatypefile) {
 

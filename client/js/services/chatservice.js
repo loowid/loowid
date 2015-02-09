@@ -210,6 +210,27 @@ angular.module('mean.rooms').factory('ChatService',['$timeout','UIHandler','Room
 		    	}
 		    });
 
+		    var sendHtml5Notification = function(data) {
+       		    var notification = new Notification($scope.getUser(data.id).name, {
+   		            body: data.text.length>50?data.text.substring(0,50)+'...':data.text,
+   		            icon: $scope.getUser(data.id).avatar,
+   		            delay: 3000
+	   		    });
+	   	        notification.$on('click', function () {
+	   	        	if (!uiHandler.focused) { window.focus(); }
+	   	        	if (uiHandler.chatClass!=='') { $scope.toggleChat(); }
+	   	        });
+		    };
+		    
+		    var sendAudioNotification = function(data) {
+        		var readText = ($scope.connectedUsers()>1)?$scope.getUser(data.id).name+', '+data.text:data.text;
+        		var audio = document.getElementById('audiotts')?document.getElementById('audiotts'):document.createElement('audio');
+        		audio.setAttribute('id', 'audiotts');
+        		audio.setAttribute('src', '/chat/talk?text=' + encodeURIComponent(readText));
+        		audio.load();
+        		audio.play();
+		    };
+		    
 			rtc.uniqueon('chat_message',function(data){
 				if (uiHandler.chatLoading) {
 					self.addToQueue(data);
@@ -217,22 +238,9 @@ angular.module('mean.rooms').factory('ChatService',['$timeout','UIHandler','Room
 				}
 	       		if ((uiHandler.chatClass!=='' || !uiHandler.focused) && data.id!==rtc._me) {
 	       			if (uiHandler.notificationReady) {
-		       		    var notification = new Notification($scope.getUser(data.id).name, {
-		       		            body: data.text.length>50?data.text.substring(0,50)+'...':data.text,
-		       		            icon: $scope.getUser(data.id).avatar,
-		       		            delay: 3000
-		       		    });
-		       	        notification.$on('click', function () {
-		       	        	if (!uiHandler.focused) { window.focus(); }
-		       	        	if (uiHandler.chatClass!=='') { $scope.toggleChat(); }
-		       	        });
+	       				sendHtml5Notification(data);
 	       			} else if (uiHandler.audible) {
-		        		var readText = ($scope.connectedUsers()>1)?$scope.getUser(data.id).name+', '+data.text:data.text;
-		        		var audio = document.getElementById('audiotts')?document.getElementById('audiotts'):document.createElement('audio');
-		        		audio.setAttribute('id', 'audiotts');
-		        		audio.setAttribute('src', '/chat/talk?text=' + encodeURIComponent(readText));
-		        		audio.load();
-		        		audio.play();
+	       				sendAudioNotification(data);
 	       			}
 	       		}
 	        	self.addNewMessage($scope,data);

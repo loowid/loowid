@@ -74,40 +74,84 @@ angular.module('mean.rooms').factory('UserHandler',['Rooms','UIHandler','Notific
 		        return cnt;
 	    	};
 
+	    	var getNewUsersFromResult = function(result) {
+	            for (var i=0; i<result.length; i+=1) {
+	                var exists = false;
+	                for (var j=0; j<uiHandler.users.length; j+=1) {
+	                    if (uiHandler.users[j].connectionId === result[i].connectionId) {
+	                        exists = true;
+	                        uiHandler.users[j].name = result[i].name;
+	                        uiHandler.users[j].avatar = result[i].avatar;
+	                        if (uiHandler.users[j].status !== result[i].status) {
+	                        	uiHandler.newusers.unshift(result[i]);
+	                        }
+	                        uiHandler.users[j].status = result[i].status;
+	                        $scope.changeWindowName(result[i].connectionId,result[i].name);
+	                    }
+	                }
+	                if (!exists) {
+	                	uiHandler.users.push(result[i]);
+	                	uiHandler.newusers.unshift(result[i]);
+	                    $scope.changeWindowName(result[i].connectionId,result[i].name);
+	                }
+	            }
+	    	};
+	    	
+	    	var removeOldUsers = function(result) {
+	            for (var j2=0; j2<uiHandler.users.length; j2+=1) {
+	            	var exists2 = false;
+	            	for (var i2=0; i2<result.length; i2+=1) {
+	            		if (uiHandler.users[j2].connectionId === result[i2].connectionId) {
+	            			exists2 = true;
+	            		}
+	            	}
+	            	if (!exists2) {
+	            		uiHandler.users.slice(j2,1);
+	            	}
+	            }
+	    	};
+	    	
+	    	var raiseHtml5Notification = function() {
+	        	var bd = '';
+	        	for (var u=0; u<uiHandler.newusers.length; u+=1) {
+	        		bd = uiHandler.newusers[u].name + ' ' + (uiHandler.newusers[u].status === 'CONNECTED'?'(+)':'(-)');
+	        	}
+	        	if (bd !== '') {
+	       		    var notification = new Notification($scope.resourceBundle.usertypeviewer, {
+       		            body: bd,
+       		            icon: uiHandler.newusers.length>1?'img/icons/favicon.ico':uiHandler.newusers[0].avatar,
+       		            delay: 3000
+	       		    });
+	       	        notification.$on('click', function () {
+	       	        	if (!uiHandler.focused) { window.focus(); }
+	       	        	if (uiHandler.connectedClass!=='') { $scope.toggleConnected(); }
+	       	        });
+	        	}
+	    	};
+	    	
+	    	var raiseAudioNotification = function() {
+   				// Doit traditional
+        		if (!uiHandler.focused && uiHandler.audible) {
+	        		var readText = $scope.resourceBundle.onlinenews;
+	        		if (uiHandler.newusers.length===1) {
+	        			readText = (uiHandler.newusers[0].status === 'CONNECTED')?$scope.resourceBundle._('joinroom',uiHandler.newusers[0].name):$scope.resourceBundle._('uleaveroom',uiHandler.newusers[0].name);
+	        		}
+	        		var audio = document.getElementById('audiotts')?document.getElementById('audiotts'):document.createElement('audio');
+	        		audio.setAttribute('id', 'audiotts');
+	        		audio.setAttribute('src', '/chat/talk?text=' + encodeURIComponent(readText));
+	        		audio.load();
+	        		audio.play();
+        		} else {
+   					uiHandler.connNew = 'connected_now';
+   					setTimeout(function(){ uiHandler.connNew = ''; uiHandler.safeApply($scope,function(){}); },3000);
+   				}
+	    	};
+	    	
 	    	$scope.updateUsers = function(result) {
 	    		uiHandler.newusers = [];
 		        if (uiHandler.users) {
-		            for (var i=0; i<result.length; i+=1) {
-		                var exists = false;
-		                for (var j=0; j<uiHandler.users.length; j+=1) {
-		                    if (uiHandler.users[j].connectionId === result[i].connectionId) {
-		                        exists = true;
-		                        uiHandler.users[j].name = result[i].name;
-		                        uiHandler.users[j].avatar = result[i].avatar;
-		                        if (uiHandler.users[j].status !== result[i].status) {
-		                        	uiHandler.newusers.unshift(result[i]);
-		                        }
-		                        uiHandler.users[j].status = result[i].status;
-		                        $scope.changeWindowName(result[i].connectionId,result[i].name);
-		                    }
-		                }
-		                if (!exists) {
-		                	uiHandler.users.push(result[i]);
-		                	uiHandler.newusers.unshift(result[i]);
-		                    $scope.changeWindowName(result[i].connectionId,result[i].name);
-		                }
-		            }
-		            for (var j2=0; j2<uiHandler.users.length; j2+=1) {
-		            	var exists2 = false;
-		            	for (var i2=0; i2<result.length; i2+=1) {
-		            		if (uiHandler.users[j2].connectionId === result[i2].connectionId) {
-		            			exists2 = true;
-		            		}
-		            	}
-		            	if (!exists2) {
-		            		uiHandler.users.slice(j2,1);
-		            	}
-		            }
+		        	getNewUsersFromResult(result);
+		        	removeOldUsers(result);
 		        } else {
 		            // If no users no windows
 		        	uiHandler.newusers = result;
@@ -115,37 +159,9 @@ angular.module('mean.rooms').factory('UserHandler',['Rooms','UIHandler','Notific
 		        }
 		        if (uiHandler.connectedClass!=='' || !uiHandler.focused) {
 		        	if (uiHandler.notificationReady) {
-			        	var bd = '';
-			        	for (var u=0; u<uiHandler.newusers.length; u+=1) {
-			        		bd = uiHandler.newusers[u].name + ' ' + (uiHandler.newusers[u].status === 'CONNECTED'?'(+)':'(-)');
-			        	}
-			        	if (bd !== '') {
-			       		    var notification = new Notification($scope.resourceBundle.usertypeviewer, {
-		       		            body: bd,
-		       		            icon: uiHandler.newusers.length>1?'img/icons/favicon.ico':uiHandler.newusers[0].avatar,
-		       		            delay: 3000
-			       		    });
-			       	        notification.$on('click', function () {
-			       	        	if (!uiHandler.focused) { window.focus(); }
-			       	        	if (uiHandler.connectedClass!=='') { $scope.toggleConnected(); }
-			       	        });
-			        	}
+		        		raiseHtml5Notification();
 		        	} else {
-	       				// Doit traditional
-		        		if (!uiHandler.focused && uiHandler.audible) {
-			        		var readText = $scope.resourceBundle.onlinenews;
-			        		if (uiHandler.newusers.length===1) {
-			        			readText = (uiHandler.newusers[0].status === 'CONNECTED')?$scope.resourceBundle._('joinroom',uiHandler.newusers[0].name):$scope.resourceBundle._('uleaveroom',uiHandler.newusers[0].name);
-			        		}
-			        		var audio = document.getElementById('audiotts')?document.getElementById('audiotts'):document.createElement('audio');
-			        		audio.setAttribute('id', 'audiotts');
-			        		audio.setAttribute('src', '/chat/talk?text=' + encodeURIComponent(readText));
-			        		audio.load();
-			        		audio.play();
-		        		} else {
-	       					uiHandler.connNew = 'connected_now';
-	       					setTimeout(function(){ uiHandler.connNew = ''; uiHandler.safeApply($scope,function(){}); },3000);
-	       				}
+		        		raiseAudioNotification();
 		        	}
 		        }
 		        //uiHandler.users = result;
@@ -154,11 +170,8 @@ angular.module('mean.rooms').factory('UserHandler',['Rooms','UIHandler','Notific
 		    $scope.isOwner = function (id) {
     			return (id === uiHandler.ownerConnectionId) || ($scope.global.own === id);
     		};
-
-    		$scope.getUser = function (connectionId){
-		        if (connectionId === $scope.global.bot) { return {name:'loowid',avatar:'img/icons/favicon.ico'}; }
-		        if (rtc._me === connectionId || (connectionId === $scope.global.own && uiHandler.isowner)) { return $scope.ui; } 
-		        if (!uiHandler.isowner && $scope.isOwner(connectionId)) { return {avatar:uiHandler.ownerAvatar,name:uiHandler.ownerName}; }
+    
+    		var findUser = function(connectionId) {
 		        if (uiHandler.users) {
 		            for (var i = 0; i < uiHandler.users.length; i+=1){
 		                if (uiHandler.users[i].connectionId === connectionId){
@@ -166,7 +179,14 @@ angular.module('mean.rooms').factory('UserHandler',['Rooms','UIHandler','Notific
 		                }
 		            }
 		        }
-	        	return null;
+		        return null;
+    		};
+    		
+    		$scope.getUser = function (connectionId) {
+		        if (connectionId === $scope.global.bot) { return {name:'loowid',avatar:'img/icons/favicon.ico'}; }
+		        if (rtc._me === connectionId || (connectionId === $scope.global.own && uiHandler.isowner)) { return $scope.ui; } 
+		        if (!uiHandler.isowner && $scope.isOwner(connectionId)) { return {avatar:uiHandler.ownerAvatar,name:uiHandler.ownerName}; }
+	        	return findUser(connectionId);
 	  	 	};
 	  		
 	  		$scope.toggleConnected = function() { 

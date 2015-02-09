@@ -25,6 +25,16 @@ module.exports = function(grunt) {
         };		
 	};
 	
+	var checkMongoOff = function() {
+	    var mongodb = grunt.option('mongodb') || 'on';
+	    // Do not run mongo in openshift environment
+	    if (process.env.OPENSHIFT_NODEJS_PORT || mongodb==='off') {
+	    	grunt.config.data.concurrent.prod.tasks.splice(0,1);
+	    	grunt.config.data.concurrent.default.tasks.splice(0,1);
+	    	grunt.config.data.concurrent.cluster.tasks.splice(0,1);
+	    } 
+	};
+	
     // Project Configuration
     grunt.initConfig({
         pkg: grunt.file.readJSON('package.json'),
@@ -203,20 +213,14 @@ module.exports = function(grunt) {
     //Default task(s).
     grunt.registerTask('default', ['minicheck','concurrent:default']);
 
-    var mongodb = grunt.option('mongodb') || 'on';
-
-    // Do not run mongo in openshift environment
-    if (process.env.OPENSHIFT_NODEJS_PORT || mongodb==='off') {
-    	grunt.config.data.concurrent.prod.tasks.splice(0,1);
-    	grunt.config.data.concurrent.default.tasks.splice(0,1);
-    	grunt.config.data.concurrent.cluster.tasks.splice(0,1);
-    } 
+    checkMongoOff();
+    
     if (!process.env.OPENSHIFT_NODEJS_PORT) {
         process.env.LOOWID_HTTP_PORT = grunt.option('port') || 80;
         process.env.LOOWID_HTTPS_PORT = grunt.option('sport') || 443;
         process.env.LOOWID_BASE_PORT = grunt.option('bport') || 8000;
     }
-
+    
     //Cluster local configuration N nodes BasePort + 1, BasePort + 2,...
     // grunt cluster --nodes=N
     var nodes = grunt.option('nodes') || 2;
