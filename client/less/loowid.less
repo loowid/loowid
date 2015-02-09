@@ -7,9 +7,9 @@
 @bgcolor:   #F8F8F8;
 //@maincolor: #1abc9c;
 //@maincolor: #3c8190;
-@maincolor: #E74C3C;
-//@secondarycolor: #2980b9;
-@textcolor: #3c3c3c;
+@maincolor: #BF360C;
+@secondarycolor: #412714;
+@textcolor: #393939;
 @linkcolor: #2980b9;
 
 @font-face {
@@ -33,8 +33,8 @@ p{ margin: 0 0 0.8em 0; }
 a{ color: @linkcolor; }
 
 body{
-    font-family: Optima, Segoe, "Segoe UI", Candara, Calibri, Arial, sans-serif;
-    font-size: 14px;
+    font-family: "Noto Sans", sans-serif;
+    font-size: 13px;
     background: @bgcolor;
     color: @textcolor;
     line-height: 1.55;
@@ -44,7 +44,7 @@ body{
 h1, h2, h3, h4, h5, h6{
 	line-height: 1.1;
 	font-weight: 300;
-	font-family: "Open Sans", Optima, Segoe, "Segoe UI", Candara, Calibri, Arial, sans-serif;
+	font-family: "Source Sans Pro", sans-serif;
 	&.pwd {
 		.transition(all 1s ease );
 		text-align: center;
@@ -136,6 +136,11 @@ h1, h2, h3, h4, h5, h6{
 	line-height: 1;
 }
 
+.leave{
+	float: right;
+	margin: 0.45em 0.55em 0 0;
+}
+
 .btn{
 	.border-radius(3px);
 	background: rgba(255, 255, 255, 0.2);
@@ -146,11 +151,6 @@ h1, h2, h3, h4, h5, h6{
 	vertical-align: middle;
 	display: inline-block;
 	cursor: pointer;
-	&.leave{
-		float: right;
-		background: @linkcolor;
-		margin: 0.25em 0.35em 0 0;
-	}
 	&.btn-icon{
 		width: auto;
 		height: 16px;
@@ -713,11 +713,15 @@ header{
 	position: absolute;
 	top: 0px;
 	z-index: 20000;
+	#dropdown{
+		margin:0;
+		padding: 0em 0.7em;
+	}
 	.resolutionlist{
 		width : auto;
 		height: auto;
 		padding: 10px;
-		background: @textcolor;
+		background: @secondarycolor;
 		color: @bgcolor;
 		color: #fff;
 		z-index: 200001;
@@ -791,7 +795,7 @@ header{
 			font-size: 16px;
 		}
 		height: 27px;
-		background: @textcolor;
+		background: @secondarycolor;
 		color: @bgcolor;
 		ul{
 			list-style: none;
@@ -1041,6 +1045,8 @@ header{
 	}
 	.user_title{
 		color: @maincolor;
+		line-height: 1.15;
+		margin: 0.4em 0 0 0;
 	}
 	.toolbar{
 		font-size: 1.2em;
@@ -1297,21 +1303,44 @@ header{
 	}
 	fieldset {
 		background: lighten(@bgcolor, 20%);
-		border: 4px solid @maincolor;
-		.box-shadow(0 0 2px rgba(0,0,0,.15) );
-		padding: 20px 26px;
+		border: 1px solid @maincolor;
+		.box-shadow( 0 0 10px rgba(0,0,0,0.45) );
+		padding: 20px 20px 50px 20px;
 		position: relative;
 		.toolbar {
 			float: right;
 		}
 		p {
-			color: @maincolor;
+			color: @textcolor;
 			label{
 				font-size: 1.2em;
+				color: @maincolor;
+			}
+			&.toolbar{
+				position: absolute;
+				bottom: 0.5em;
+				right: 1.3em;
+				a{
+					background: @linkcolor;
+					font-size: 0.9em;
+					color: @bgcolor;
+					text-decoration: none;
+					text-align: center;
+					padding: 0.5em 0.8em;
+					margin: 0 0 0 0.8em;
+					display: inline-block;
+					-webkit-border-radius: 3px;
+					   -moz-border-radius: 3px;
+							border-radius: 3px;
+				}
 			}
 		}
 		p:last-child {
 			margin-bottom: 0;
+		}
+		input[type="checkbox"],input[type="radio"] {
+			vertical-align: middle;
+			margin: 0 0.8em 0 0;
 		}
 		input[type="text"],input[type="email"],input[type="password"] {
 			border: none;
@@ -1370,8 +1399,8 @@ header{
 	&::before {
 		border-color: rgba(194, 225, 245, 0);
 		border-right-color: @maincolor;
-		border-width: 16px;
-		margin-top: -16px;
+		border-width: 12px;
+		margin-top: -12px;
 	}
 }
 
