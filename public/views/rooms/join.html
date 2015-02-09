@@ -99,12 +99,12 @@
 				<div ng-show="modal.avatar" class="avatar"><img ng-src="{{modal.avatar}}" /></div>
 				<p ng-bind-html="modal.text"></p>	
 			
-				<h4>
+				<p class="toolbar">
 					<a href="" ng-show="modal.ok" ng-click="modal.ok($index);">{{resourceBundle.modalok}}</a> 
 					<a href="" ng-show="modal.cancel" ng-click="modal.cancel($index);">{{resourceBundle.modal.cancel}}</a>
 					<a href="" ng-show="modal.yes" ng-click="modal.yes($index);">{{resourceBundle.modalyes}}</a>
 					<a href="" ng-show="modal.no" ng-click="modal.no($index);">{{resourceBundle.modalno}}</a>
-				</h4>
+				</p>
 			</fieldset>
 		</li>
 	</ul>
