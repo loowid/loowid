@@ -66,7 +66,8 @@ exports.room = function(req, res, next, id) {
 	Room.load(id, req.sessionID, function(err, room) {
 		if (!room) {
 			var error = new Error('Failed to load the room: ' + id);
-			error.http_code = 404;
+			var errorCode = 'http_code';
+			error[errorCode] = 404;
 			next(error);
 		} else {
 			if (id !== room.roomId && !Room.alias(room,req.sessionID,id)) {
@@ -252,8 +253,9 @@ exports.create = function(req, res, next) {
 			}
 		});
 	} else {
-		var error = new Error('Failed to create the room: ' + req.body.roomId); 
-		error.http_code = 500;
+		var error = new Error('Failed to create the room: ' + req.body.roomId);
+		var errorCode = 'http_code';
+		error[errorCode] = 500;
 		next(error);
 	}
 };
@@ -263,21 +265,28 @@ exports.getGravatarImg = function(email) {
 	return (remail.trim()==='')?'img/hero.jpg':'//www.gravatar.com/avatar/'+crypto.createHash('md5').update(remail.trim().toLowerCase()).digest('hex');
 };
 
+var ltiFields = {
+	contextId: 'context_id',
+	contextTitle: 'context_title',
+	email: 'lis_person_contact_email_primary',
+	name: 'lis_person_name_full'
+};
+
 exports.createOrFindLTI = function(req,lti,isOwner,success,fail) {
-	Room.openByContext(lti.context_id,req.sessionID,function(err,room){
+	Room.openByContext(lti[ltiFields.contextId],req.sessionID,function(err,room){
 		if (room) {
 			success(room);
 		} else {
 			if (isOwner) {
 				var wres = {
 					json: function(rid) {
-						req.lti = lti.context_id;
+						req.lti = lti[ltiFields.contextId];
 						req.body = {
-							avatar: exports.getGravatarImg(lti.lis_person_contact_email_primary),
+							avatar: exports.getGravatarImg(lti[ltiFields.email]),
 							connectionId: '',
-							name: lti.lis_person_name_full,
+							name: lti[ltiFields.name],
 							roomId: rid.id,
-							title: lti.context_title
+							title: lti[ltiFields.contextTitle]
 						};
 						var wcres = {
 							json: function(nroom) {

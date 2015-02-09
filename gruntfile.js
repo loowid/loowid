@@ -121,7 +121,7 @@ module.exports = function(grunt) {
 	                logConcurrentOutput: true
 	            }
         	},
-        	travis_test: {
+        	'travis_test': {
 	            tasks: ['jasmine_node'], 
 	            options: {
 	                logConcurrentOutput: true
@@ -159,7 +159,7 @@ module.exports = function(grunt) {
             	}
         	}
         },
-        jasmine_node: {
+        'jasmine_node': {
             options: {
               forceExit: true,
               matchall: false,

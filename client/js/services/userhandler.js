@@ -200,8 +200,8 @@ angular.module('mean.rooms').factory('UserHandler',['Rooms','UIHandler','Notific
                 uiHandler.safeApply($scope,function(){});
             });
 
-
-	    	if (rtc._events.peer_list_updated) {
+	    	var peerListUpdated = 'peer_list_updated';
+	    	if (rtc._events[peerListUpdated]) {
 				setTimeout(function(){ rtc.fire('peer_list_updated'); },100);
 			}
 			

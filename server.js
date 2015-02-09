@@ -136,7 +136,7 @@ db.on('connected',function() {
 db.on('error',function(err) {
 	logger.error('ERROR connecting to: ' + safeUriString + '. ' + err);
 });
-mongoose.connect(uristring,{server:{auto_reconnect:true}});
+mongoose.connect(uristring,{server:{'auto_reconnect':true}});
 
 /*function isMobile(req) {
 	return (/mobile/i.test(req.headers['user-agent']));
@@ -179,8 +179,9 @@ var strategy = new LTIStrategy({
 		isOwner = (lti.roles.indexOf(definedRole[k]) > -1);
 	}
 	rooms.createOrFindLTI(req,lti,isOwner,function(r){
-		req.session.ltiname = lti.lis_person_name_full;
-		req.session.ltiavtr = rooms.getGravatarImg(lti.lis_person_contact_email_primary);
+		var ltiFields = { name: 'lis_person_name_full', email: 'lis_person_contact_email_primary' };
+		req.session.ltiname = lti[ltiFields.name];
+		req.session.ltiavtr = rooms.getGravatarImg(lti[ltiFields.email]);
 		return done(null,{url:'/#!/r/'+r.roomId+(isOwner?'/join':'')});
 	},function(){
 		return done(null,{url:'/#!/lti/error'});
@@ -203,7 +204,7 @@ app.configure(function() {
 	app.use(express.cookieParser());
 	//app.use(express.session({secret:'Secret'}));	
 	app.use(express.session({
-		store:new MongoStore({mongoose_connection:mongoose.connection},function(){logger.info('Session store connected !!');}),
+		store:new MongoStore({'mongoose_connection':mongoose.connection},function(){logger.info('Session store connected !!');}),
 		cookie: { maxAge : 3600000 }, // 1 hour
 		key:'jsessionid', 
 		secret:sessionSecret}));
@@ -390,7 +391,8 @@ app.param('connectionId', rooms.connection);
 
 app.use(function(err, req, res, next) {
 	logger.error(err.message);
-	var code = err.http_code || 500;
+	var errorCode = 'http_code';
+	var code = err[errorCode] || 500;
 	res.send(code, {error:err.message});
 });
 
