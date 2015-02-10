@@ -103,29 +103,69 @@ exports.connection = function (req,res,next,id){
 	next();
 };
 
+var checkRoomReloading = function(room,data,socket,success,error) {
+	// No locked room, or isReloading, or is owner and room disconnected
+    if (!room.access.locked || isReloading(room,socket.sessionid) || (room.owner.sessionid === socket.sessionid && (room.status === 'DISCONNECTED' || room.status=== 'CREATED'))) {
+		success(data,socket);
+	} else {
+		error(true);
+	}
+};
+
+var analyzeRoom = function(room,data,socket,success,error) {
+	// Open room, or owner and room disconnected or valid password
+	if (room.access.shared!=='PRIVATE' || room.access.passwd === data.pwd || (room.owner.sessionid === socket.sessionid && (room.status === 'DISCONNECTED' || room.status=== 'CREATED'))) {
+		checkRoomReloading(room,data,socket,success,error);
+	} else {
+		error(false);
+	}
+};
+
 exports.checkLockOrPassword = function(data,socket,success,error) {
 	Room.load(data.room,socket.sessionid,function(err, room) {
 		if (err) {
 			error(false);
 		} else {
 			if (room) {
-				// Open room, or owner and room disconnected or valid password
-				if (room.access.shared!=='PRIVATE' || room.access.passwd === data.pwd || (room.owner.sessionid === socket.sessionid && (room.status === 'DISCONNECTED' || room.status=== 'CREATED'))) {
-					// No locked room, or isReloading, or is owner and room disconnected
-                    if (!room.access.locked || isReloading(room,socket.sessionid) || (room.owner.sessionid === socket.sessionid && (room.status === 'DISCONNECTED' || room.status=== 'CREATED'))) {
-						success(data,socket);
-					} else {
-						error(true);
-					}
-				} else {
-					error(false);
-				}
+				analyzeRoom(room,data,socket,success,error);
 			} else {
 				// Owner join after create
 				success(data,socket);
 			}
 		}
 	});
+};
+
+var doGuestJoin = function(room,req,res,next) {
+	// No locked room or is reloading
+	if (!room.access.locked || isReloading(room,req.sessionID)) {
+		if (!isGuessConnected(room,req.sessionID,req.body.connectionId)) {
+			removeDisconnectedSession(room,req.sessionID);
+			room.guests.push ({
+				name: req.session.ltiname?req.session.ltiname:req.body.name, 
+				sessionid: req.sessionID, 
+				connectionId: req.body.connectionId, 
+				status: 'CONNECTED', 
+				avatar: req.session.ltiavtr?req.session.ltiavtr:req.body.avatar, 
+				source: []
+			});
+		}
+		var ind = room.valid.indexOf(req.sessionID);
+		if (ind>=0) { room.valid.splice(ind, 1); }
+		room.save(function(err) {
+			if (err) {
+				next(err);
+			} else {
+				room.access.passwd = '';
+				room.access.permanentkey = '';
+				room.owner.sessionid = '';
+				room.guests = Room.safe(room.guests);
+				res.json(room);
+			}
+		});
+	} else {
+		res.json({locked:true});
+	}
 };
 
 /**
@@ -155,37 +195,9 @@ exports.join = function (req, res, next){
 			}
 		});
 	} else {
-		// Open room or is in valid list of users
+		// Open room or is in valid list of users or is reloading
 		if (room.access.shared!=='PRIVATE' || isValid(room,req.sessionID) || isGuessConnected(room,req.sessionID,req.body.connectionId)) {
-			// No locked room or is reloading
-			if (!room.access.locked || isReloading(room,req.sessionID)) {
-				if (!isGuessConnected(room,req.sessionID,req.body.connectionId)) {
-					removeDisconnectedSession(room,req.sessionID);
-					room.guests.push ({
-						name: req.session.ltiname?req.session.ltiname:req.body.name, 
-						sessionid: req.sessionID, 
-						connectionId: req.body.connectionId, 
-						status: 'CONNECTED', 
-						avatar: req.session.ltiavtr?req.session.ltiavtr:req.body.avatar, 
-						source: []
-					});
-				}
-				var ind = room.valid.indexOf(req.sessionID);
-				if (ind>=0) { room.valid.splice(ind, 1); }
-				room.save(function(err) {
-					if (err) {
-						next(err);
-					} else {
-						room.access.passwd = '';
-						room.access.permanentkey = '';
-						room.owner.sessionid = '';
-						room.guests = Room.safe(room.guests);
-						res.json(room);
-					}
-				});
-			} else {
-				res.json({locked:true});
-			}
+			doGuestJoin(room,req,res,next);
 		} else {
 			res.json({passfail:true});
 		}
@@ -442,8 +454,19 @@ exports.claimForRoom = function (req,res,next){
 
 };
 
+var isActiveAlias = function(room,req,res) {
+	var aliasRoom = Room.alias(room,req.sessionID);
+	var isOwner = aliasRoom?aliasRoom.owner:false;
+	if (room.owner.sessionid === req.sessionID || isOwner){
+		return res.json({status: (room.status==='DISCONNECTED' || room.status==='CREATED')?'inactive':'active',owner:true});
+	} else {
+		return res.json({status: 'inactive'});
+	}
+};
+
 exports.isActive = function(req,res,next){
 	var room = req.room;
+	// If is owner return room status
 	if (req.connectionId && room.owner.connectionId === req.connectionId){
 		if (room.owner.sessionid === req.sessionID){
 			if (room.status==='OPENED') {
@@ -453,13 +476,7 @@ exports.isActive = function(req,res,next){
 			}
 		}
 	}
-	var aliasRoom = Room.alias(room,req.sessionID);
-	var isOwner = aliasRoom?aliasRoom.owner:false;
-	if (room.owner.sessionid === req.sessionID || isOwner){
-		return res.json({status: (room.status==='DISCONNECTED' || room.status==='CREATED')?'inactive':'active',owner:true});
-	} else {
-		return res.json({status: 'inactive'});
-	}
+	return isActiveAlias(room,req,res);
 };
 
 exports.markValid = function (roomId,sessionId) {

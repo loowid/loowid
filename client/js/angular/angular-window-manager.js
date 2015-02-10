@@ -39,7 +39,6 @@ angular.module('ngWindowManager',[])
 		},
 		link: function (scope, element) {
 			var parentWindow = element[0].parentElement;
-			var windowArea = parentWindow;
 			
 			var titleBarElement = element[0].children[0].children[0];
 			var contentButtonElement = element[0].children[0].children[1];
@@ -63,14 +62,10 @@ angular.module('ngWindowManager',[])
 	
 			//If it's defined a windowContainer zone we will use it to bind 
 			//all the listeners, that way we can fit windows under an element but move in other 
-			if (options.windowContainer){
-				windowArea = document.getElementById(options.windowContainer);
-			}
+			var windowArea = options.windowContainer ? parentWindow : document.getElementById(options.windowContainer);
 		
 			//Set some tricky controls to handle the layering
-			if (parentWindow.topZ === undefined){
-				parentWindow.topZ = options.initialZIndex || parentWindow.css('z-index') || 100000;
-			}		
+			parentWindow.topZ = parentWindow.topZ || options.initialZIndex || parentWindow.css('z-index') || 100000;
 			
 			//This function is executed when close button is pushed
 			winHandler.close = function (){
@@ -240,6 +235,14 @@ angular.module('ngWindowManager',[])
 				if (scope.selectwindow) { scope.selectwindow(winHandler); }
 			};
 			
+			winHandler.getMaximizeToElement = function() {
+				if (options.maximizeTo!=='window'){
+					var elementToMaximize = document.getElementById (options.maximizeTo) || document.getElementsByTagName (options.maximizeTo);
+					return options.maximizeTo ? (elementToMaximize) : windowArea;
+				}
+				return window;
+			};
+			
 			//This functions is executed when maximize is executed
 			winHandler.maximize = function (){
 				
@@ -253,13 +256,8 @@ angular.module('ngWindowManager',[])
 				};
 			
 				//Select the element where to maximize
-				var maximizeToElement  = window;
+				var maximizeToElement = winHandler.getMaximizeToElement();
 			
-				if (options.maximizeTo!=='window'){
-					var elementToMaximize = document.getElementById (options.maximizeTo) || document.getElementsByTagName (options.maximizeTo);
-					maximizeToElement = options.maximizeTo ? (elementToMaximize) : windowArea;
-				}
-				
 				var maximizeCoords = {
 					x: parseInt(maximizeToElement.offsetLeft || 0, 10) ,
 					y: parseInt(maximizeToElement.offsetTop ||0, 10),
@@ -365,15 +363,19 @@ angular.module('ngWindowManager',[])
 			maximizeButton.addEventListener ('touchstart',winHandler.maximize);
 			if (scope.maximizable) {titleBarElement.addEventListener ('dblclick', winHandler.maximize);}
 			
+			var applyWindowOptions = function(wh,opt) {
+				if (opt.position){
+					var position = opt.position;
+					wh.move (position.x,position.y);	
+				}
+				if (opt.size){
+					var size = opt.size;
+					wh.resize (size.width,size.height);
+				}
+			};
+			
 			// apply the options for the window
-			if (options.position){
-				var position = options.position;
-				winHandler.move (position.x,position.y);	
-			}
-			if (options.size){
-				var size = options.size;
-				winHandler.resize (size.width,size.height);
-			}
+			applyWindowOptions(winHandler,options);
 			
 			//To avoid adding transition listeners we remove tha clas after some time
 			setTimeout (function (){

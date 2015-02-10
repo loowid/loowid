@@ -1,4 +1,4 @@
-'use strict';
+	'use strict';
 /*global rtc: true */
 angular.module('mean.rooms').factory('FileService',['$sce','UIHandler',function($sce,UIHandler){
 	return function (){
@@ -76,10 +76,25 @@ angular.module('mean.rooms').factory('FileService',['$sce','UIHandler',function(
             };
 	    };
 
+	    this.getRemainingChunks = function(text,chunkLength) {
+	        if (text.length > chunkLength) {
+	            return (Math.floor(text.length / chunkLength)) + (text.length % chunkLength > 0 ? 1 : 0);
+	        } else {
+	            return 1;
+	        }
+	    };
+
+	    this.getDataMessage = function(text,chunkLength) {
+	        if (text.length > chunkLength) {
+	            return text.slice(0, chunkLength); // getting chunk using predefined chunk length
+	        } else {
+	            return text;
+	        }
+	    };
+
 		this.onReadAsDataURL = function ($scope,event,id, text,chunks,connectionId,requestId,token) {
-            
+			var chunkLength = 10000;
 	        var data = {}; // data object to transmit over data channel
-	        var chunkLength = 10000;
 	        var orinalChunks = chunks;
 	        var remainigChunks = 0;
 
@@ -89,13 +104,8 @@ angular.module('mean.rooms').factory('FileService',['$sce','UIHandler',function(
 	            return;
 	        }
 
-	        if (text.length > chunkLength) {
-	            remainigChunks = (Math.floor(text.length / chunkLength)) + (text.length % chunkLength > 0 ? 1 : 0);
-	            data.message = text.slice(0, chunkLength); // getting chunk using predefined chunk length
-	        } else {
-	            remainigChunks = 1;
-	            data.message = text;
-	        }
+	        remainigChunks = this.getRemainingChunks(text,chunkLength);
+	        data.message = this.getDataMessage(text,chunkLength);
 	        
 	        if (!orinalChunks) { orinalChunks = remainigChunks; }
 	        data.fileid = id;
@@ -211,6 +221,44 @@ angular.module('mean.rooms').factory('FileService',['$sce','UIHandler',function(
 	            
 	        });
 
+			var cancelUpload = function(data,files) {
+                if (data.token && data.requestId && self.acceptedFileOffers[data.requestId]){
+                    if (self.acceptedFileOffers[data.requestId].token === data.token && self.acceptedFileOffers[data.requestId].connectionId === data.id){
+                           //If the file exist and is not completed
+                        if (self.acceptedFileOffers[data.requestId].files[data.fileid] ){
+                            var fileToCancel = self.acceptedFileOffers[data.requestId].files[data.fileid];
+                            if(!fileToCancel.completed){
+                                //We don't delete the file, we just mark as canceled and completed
+                                fileToCancel.canceled = true;
+                                fileToCancel.completed = true;
+                                self.acceptedFileOffers[data.requestId].filesCompleted+=1;
+
+                                //if all files are completed send the signal
+                                if (self.acceptedFileOffers[data.requestId].filesCompleted === Object.keys(self.acceptedFileOffers[data.requestId].files).length){
+                                    // All files were completed, we should drop the conection
+                                    rtc.dataChannels[data.id]['filedata_' +data.requestId].channel.close();
+                                     //Drop the accepted files token. User can't use it anymore
+                                    delete self.acceptedFileOffers [data.requestId];
+                                    rtc.dropPeerConnection (data.id,'filedata_' +data.requestId,false); 
+                                    rtc.allRequestCompleted ($scope.global.roomId,data.id,data.requestId);
+                                } 
+
+                                var renderedIndex = self.arrayToStoreChunks[data.id]['filedata_' +data.requestId][data.fileid].renderedFile;
+                                files[renderedIndex].completed = 101;
+                                files[renderedIndex].canceled = true;  
+                            }
+                        }
+                    }
+                }    
+			};
+			
+			var cancelDownload = function(data,files) {
+                self.sentFileOffers[data.requestId].files[data.fileid].canceled = true;
+                var fileToCancel2 = $scope.getFile(files,data.fileid);
+                fileToCancel2.completed = 101;
+                fileToCancel2.canceled = true;
+			};
+			
 	        rtc.uniqueon ('file canceled',function (data){
 	            // Check the 
 
@@ -229,39 +277,9 @@ angular.module('mean.rooms').factory('FileService',['$sce','UIHandler',function(
 	           }
 
 	            if (data.direction === 'upload'){
-	                if (data.token && data.requestId && self.acceptedFileOffers[data.requestId]){
-	                    if (self.acceptedFileOffers[data.requestId].token === data.token && self.acceptedFileOffers[data.requestId].connectionId === data.id){
-	                           //If the file exist and is not completed
-	                        if (self.acceptedFileOffers[data.requestId].files[data.fileid] ){
-	                            var fileToCancel = self.acceptedFileOffers[data.requestId].files[data.fileid];
-	                            if(!fileToCancel.completed){
-	                                //We don't delete the file, we just mark as canceled and completed
-	                                fileToCancel.canceled = true;
-	                                fileToCancel.completed = true;
-	                                self.acceptedFileOffers[data.requestId].filesCompleted+=1;
-
-	                                //if all files are completed send the signal
-	                                if (self.acceptedFileOffers[data.requestId].filesCompleted === Object.keys(self.acceptedFileOffers[data.requestId].files).length){
-	                                    // All files were completed, we should drop the conection
-	                                    rtc.dataChannels[data.id]['filedata_' +data.requestId].channel.close();
-	                                     //Drop the accepted files token. User can't use it anymore
-	                                    delete self.acceptedFileOffers [data.requestId];
-	                                    rtc.dropPeerConnection (data.id,'filedata_' +data.requestId,false); 
-	                                    rtc.allRequestCompleted ($scope.global.roomId,data.id,data.requestId);
-	                                } 
-
-	                                var renderedIndex = self.arrayToStoreChunks[data.id]['filedata_' +data.requestId][data.fileid].renderedFile;
-	                                files[renderedIndex].completed = 101;
-	                                files[renderedIndex].canceled = true;  
-	                            }
-	                        }
-	                    }
-	                }    
+	            	cancelUpload(data,files);
 	            } else if (data.direction === 'download'){
-	                self.sentFileOffers[data.requestId].files[data.fileid].canceled = true;
-	                var fileToCancel2 = $scope.getFile(files,data.fileid);
-	                fileToCancel2.completed = 101;
-	                fileToCancel2.canceled = true;
+	            	cancelDownload(data,files);
 	            }
 
 	            uiHandler.safeApply($scope,function(){});  
@@ -287,13 +305,8 @@ angular.module('mean.rooms').factory('FileService',['$sce','UIHandler',function(
 		 			files =  user.files; 
 	            }
 
-	            if (!self.arrayToStoreChunks [connectionId]) {
-	                self.arrayToStoreChunks[connectionId] ={};
-	            }
-	            
-	            if (!self.arrayToStoreChunks[connectionId][mediatype]) {
-	                self.arrayToStoreChunks[connectionId][mediatype] = {};                
-	            }
+	            self.arrayToStoreChunks[connectionId] = self.arrayToStoreChunks[connectionId] || {};
+	            self.arrayToStoreChunks[connectionId][mediatype] = self.arrayToStoreChunks[connectionId][mediatype] || {};                
 
 	            //Check if it's a valid fileid  
 	            if (!self.acceptedFileOffers[requestId].files[data.fileid]){
