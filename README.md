@@ -38,11 +38,13 @@ Wiki Documentation | Vote us !! | Bitnami Contest
   
 ## Development
 
-  Follow the same steps but chage steps 5 and 6:
+  Follow the same steps but chage steps 5 and following:
   
-  5. `npm install`
+  5. `npm install -g grunt-cli`
+ 
+  6. `npm install`
   
-  6. `grunt` (Default development server)
+  7. `grunt` (Default development server)
   
 	 * `grunt cluster`	: Run cluster server with 2 nodes (--nodes=N change default value)
 	 * `grunt prod`		: Run production environment do not watch for code changes
