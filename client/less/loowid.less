@@ -151,6 +151,9 @@ h1, h2, h3, h4, h5, h6{
 	vertical-align: middle;
 	display: inline-block;
 	cursor: pointer;
+	@media all and (max-width:800px) {
+		background: transparent;
+	}
 	&.btn-icon{
 		width: auto;
 		height: 16px;
@@ -160,6 +163,9 @@ h1, h2, h3, h4, h5, h6{
 		position: relative;
 		top: 3px;
 		.transition(  width .5s ease-in-out );
+		@media all and (max-width:800px) {
+			.transition(  width 0s linear );
+		}
 		i{
 			top:4px;
 		    left: 4px;
@@ -169,13 +175,20 @@ h1, h2, h3, h4, h5, h6{
 		    height: 16px;
 		    .transition(all .5s ease-in-out);
 			text-align: center;
+			@media all and (max-width:800px) {
+				.transition( all 0s linear );
+				font-size: 1.3em;
+			}
 		}
 		&:hover{
 			background: rgba(255, 255, 255, 0.5);
-			width: auto;
+			width: 16px;
 			.inner_label{
 				max-width: 100%;
 				color: darken(@maincolor, 20%);
+				@media all and (max-width:800px) {
+					display: none;
+				}
 			}
 			i{
 				color: darken(@maincolor, 20%);
@@ -194,6 +207,9 @@ h1, h2, h3, h4, h5, h6{
     		overflow:hidden;
     		vertical-align: middle;
     		line-height: 16px;
+    		@media all and (max-width:800px) {
+				.transition( all 0s linear );
+			}
 		}
 	}
 }
@@ -1049,6 +1065,12 @@ header{
 		color: @maincolor;
 		line-height: 1.15;
 		margin: 0.4em 0 0 0;
+		&.room_owner{
+			color: @textcolor;
+			padding: 0 0 0.55em 0;
+			font-size: 1.4em;
+			font-family: "Source Sans Pro",sans-serif;
+		}
 	}
 	.toolbar{
 		font-size: 1.2em;
@@ -1283,9 +1305,6 @@ header{
   }
 }
 
-
-	
-
 #editName, #editAccess, #editResolution, #modalforms .modalform, #tutorialforms .tutorialform {
 	position: absolute;
 	.transition(all 1s ease );
@@ -1312,6 +1331,13 @@ header{
 		.toolbar {
 			float: right;
 		}
+		h3{
+			font-size: 1.7em;
+			padding: 0.2em 0 0.8em 0;
+		}
+		.avatar{
+			float: left;
+		}
 		p {
 			color: @textcolor;
 			label{
@@ -1331,6 +1357,7 @@ header{
 					padding: 0.5em 0.8em;
 					margin: 0 0 0 0.8em;
 					display: inline-block;
+					min-width: 3.5em;
 					-webkit-border-radius: 3px;
 					   -moz-border-radius: 3px;
 							border-radius: 3px;
@@ -1381,29 +1408,6 @@ header{
 	&.editable{
 		top: 10px;
 	}
-	&::after, &::before {
-		right: 99%;
-		top: 50%;
-		border: solid transparent;
-		content: " ";
-		height: 0;
-		width: 0;
-		position: absolute;
-		pointer-events: none;
-	}
-
-	&::after {
-		border-color: rgba(136, 183, 213, 0);
-		border-right-color: @bgcolor;
-		border-width: 10px;
-		margin-top: -10px;
-	}
-	&::before {
-		border-color: rgba(194, 225, 245, 0);
-		border-right-color: @maincolor;
-		border-width: 12px;
-		margin-top: -12px;
-	}
 }
 
 
@@ -1422,29 +1426,6 @@ header{
 	&.editable{
 		top: 80px !important;
 	}
-/*	&::after, &::before {
-		right: 99%;
-		top: 50%;
-		border: solid transparent;
-		content: " ";
-		height: 0;
-		width: 0;
-		position: absolute;
-		pointer-events: none;
-	}
-
-	&::after {
-		border-color: rgba(136, 183, 213, 0);
-		border-right-color: @bgcolor;
-		border-width: 10px;
-		margin-top: -10px;
-	}
-	&::before {
-		border-color: rgba(194, 225, 245, 0);
-		border-right-color: @maincolor;
-		border-width: 16px;
-		margin-top: -16px;
-	}*/
 }
 
 
@@ -1465,29 +1446,6 @@ header{
 	&.editable{
 		top: -8px;
 	}
-/*	&:after, &:before {
-		bottom: 96%;
-		left: 80%;
-		border: solid transparent;
-		content: " ";
-		height: 0;
-		width: 0;
-		position: absolute;
-		pointer-events: none;
-	}
-
-	&:after {
-		border-color: rgba(136, 183, 213, 0);
-		border-bottom-color: @bgcolor;
-		border-width: 10px;
-		margin-left: -10px;
-	}
-	&:before {
-		border-color: rgba(194, 225, 245, 0);
-		border-bottom-color: @maincolor	;
-		border-width: 16px;
-		margin-left: -16px;
-	}*/
 }
 
 .file_name{

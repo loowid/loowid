@@ -47,7 +47,10 @@
 <div id="editName" ng-class="ui.editNameClass">
 	<form novalidate data-ng-submit="changeName()">
 		<fieldset>
-			<h4><a href="" ng-click="changeName()">{{resourceBundle.accesssave}}</a> <a href="" ng-click="enableEditName()">{{resourceBundle.gravatarclose}}</a></h4>
+			<p class="toolbar">
+				<a href="" ng-click="changeName()">{{resourceBundle.accesssave}}</a>
+				<a href="" ng-click="enableEditName()">{{resourceBundle.gravatarclose}}</a>
+			</p>
 			<p><label for="chgname">{{resourceBundle.gravatarname}}</label></p>
 			<p><input id="chgname" type="text" data-ng-model="ui.name" ng-pattern="global.namePattern" required class="input-lg" size="15"></p>
 			<p><label for="chgavatar">{{resourceBundle.gravataremail}}</label></p>
@@ -61,14 +64,14 @@
 	<ul>
 		<li ng-repeat="modal in ui.modals" ng-class="modal.class">
 			<fieldset>
-				<div ng-show="modal.avatar" class="avatar"><img ng-src="{{modal.avatar}}" /></div>
-				<p ng-bind-html="modal.text"></p>	
 				<p class="toolbar">
 					<a href="" ng-show="modal.ok" ng-click="modal.ok($index);">{{resourceBundle.modalok}}</a> 
 					<a href="" ng-show="modal.cancel" ng-click="modal.cancel($index);">{{resourceBundle.modal.cancel}}</a>
 					<a href="" ng-show="modal.yes" ng-click="modal.yes($index);">{{resourceBundle.modalyes}}</a>
 					<a href="" ng-show="modal.no" ng-click="modal.no($index);">{{resourceBundle.modalno}}</a>
 				</p>
+				<div ng-show="modal.avatar" class="avatar"><img ng-src="{{modal.avatar}}" /></div>
+				<h3 ng-bind-html="modal.text"></h3>					
 			</fieldset>
 		</li>
 	</ul>
@@ -105,13 +108,13 @@
 	<span class="toggler" ng-click="toggleConnected()"><i class="fa fa-angle-double-left"></i></span>
 	<h1>{{resourceBundle.peopleconnected}}</h1>
 	<div class="owner connected">
+		<p class="user_title room_owner">{{resourceBundle.roomowner}}</p>
 		<img ng-src="{{ui.ownerAvatar}}"/>
 		<h3>{{ui.ownerName}}</h3>
 		<p class="user_title" data-ng-show="ui.status=='OPENED'">{{resourceBundle.statusopen}}</p>
 		<p class="user_title" data-ng-show="ui.status=='BROADCASTING'">{{resourceBundle.statusbroadcasting}}</p>
 		<p class="user_title" data-ng-show="ui.status=='STOPPED'">{{resourceBundle.statusstopped}}</p>
 		<p class="user_title" data-ng-show="ui.status=='DISCONNECTED'">{{resourceBundle.statusdisconnected}}</p>
-		<p class="user_title">{{resourceBundle.roomowner}}</p>
 		<a href="" ng-show="ui.status && ui.status!='DISCONNECTED' && !ui.access.moderated" ng-click="openFileDialog('owner');">
 		<i class="fa fa-cloud-upload"></i></a>	
 		<ul>
