@@ -266,7 +266,6 @@ angular.module('mean.rooms').factory('ChatService',['$timeout','UIHandler','Room
 				//Publish the messages
 			    $timeout(function(){
 			        self.addNewMessage($scope,{id:$scope.global.bot,text:$scope.resourceBundle.welcomechatmess,time:new Date()});
-			        self.addNewMessage($scope,{id:$scope.global.bot,text:$scope.resourceBundle.helpuschatmess,time:new Date()});
 			        self.welcomePublished =true;
 			    },1000);
 			    $timeout(function(){ self.checkTypingIcons(); },2000);

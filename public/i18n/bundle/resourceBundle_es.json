@@ -60,7 +60,6 @@
    "dateformat":"dd/mm/yyyy",
    "timeformat":"hh:mi",
    "welcomechatmess":"Bienvenido a LooWID!!",
-   "helpuschatmess":"por favor, rellena esta <a href='/views/survey_es.html' target='_blank'>pequeña encuesta</a> para ayudarnos a mejorar loowid",
    "copythislink":"Copiar el enlace (Ctrl+C)",
    "welcome":"Bienvenido/a",
    "easy":"Fácil",
