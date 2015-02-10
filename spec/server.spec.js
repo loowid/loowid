@@ -111,14 +111,15 @@ describe('Main Server Tests', function() {
 		done();
 	});
 	
-	require('./init')(request,test,utils);
-	require('./new_room')(request,test,utils);
-	require('./join_room')(request,test,utils);
-	require('./chat_room')(request,test,utils);
-	require('./three_room')(request,test,utils);
-	require('./move_room')(request,test,utils);
-	require('./owner_leaves_room')(request,test,utils);
-	require('./viewer_leaves_room')(request,test,utils);
-	require('./blocked_room')(request,test,utils);
+	require('./tests/init')(request,test,utils);
+	require('./tests/new_room')(request,test,utils);
+	require('./tests/join_room')(request,test,utils);
+	require('./tests/chat_room')(request,test,utils);
+	require('./tests/three_room')(request,test,utils);
+	require('./tests/move_room')(request,test,utils);
+	require('./tests/owner_leaves_room')(request,test,utils);
+	require('./tests/viewer_leaves_room')(request,test,utils);
+	require('./tests/blocked_room')(request,test,utils);
+	require('./tests/blocked_chat')(request,test,utils);
 	
 });

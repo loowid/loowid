@@ -16,7 +16,7 @@ module.exports = function(request,test,utils) {
 	    	});
 	    });
 		
-	    require('./utils/create_room')(request,test,utils);
+	    require('../utils/create_room')(request,test,utils);
 	    
 	});	
 	

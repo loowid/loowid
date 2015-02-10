@@ -120,6 +120,7 @@ angular.module('mean.rooms').controller('ViewDesktopController', ['$scope', '$ro
         uiHandler.passNeeded = false;
         uiHandler.connectionError = false;
         uiHandler.access = results.access;
+        uiHandler.chatstatus = results.access.chat;
         if (!uiHandler.currentConnectionId || uiHandler.currentConnectionId !== rtc._me) {
         	room.notifyIn($scope);
         	rtc.peerListUpdated($scope.global.roomId);

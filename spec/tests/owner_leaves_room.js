@@ -3,9 +3,9 @@ module.exports = function(request,test,utils) {
 
 	describe('Owner leaves room', function() {
 		
-		require('./utils/create_room')(request,test,utils);
+		require('../utils/create_room')(request,test,utils);
 		
-		require('./utils/join_room')(request,test,utils,['viewer0']);
+		require('../utils/join_room')(request,test,utils,['viewer0']);
 	    
 	    test('Owner leaves the room.', function(done) {
 	    	utils.checkDone = 2;
