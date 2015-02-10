@@ -276,13 +276,44 @@ h1, h2, h3, h4, h5, h6{
 
 #home,#noscript{
 	font-size: 1.3em;
+	background: @textcolor;
+	color: @bgcolor;
+	height: 100%;
+	position: fixed;
+	top: 0px;
+	left: 0px;
+	width: 100%;
+	z-index: 1; 
 	.version{
 		margin: 0 0 0 6em;
 	}
+	#cf{
+		position: relative;
+		display: inline-block;
+		vertical-align: middle;
+		width: 100px;
+		height: 120px;
+		top: 4px;
+	}
 	form{
+		margin: 5em auto;
+		width: 90%;
+		.alert{
+			display: block;
+			width: 80%;
+			margin: 0 auto;
+			text-align: center;
+			padding: 0.25em 0.5em;
+			background: #fdebad;
+			border: 1px solid darken(#fdebad, 10%);
+			color: @textcolor;
+		}
 		p{
 			font-size: 0.85em;
 			margin: 0 0 0 0;
+		}
+		.terms{
+			margin: 12px 0 0 14%;
 		}
 		input[type="text"]
 		{
@@ -290,10 +321,11 @@ h1, h2, h3, h4, h5, h6{
 			border: 1px solid @bgcolor;
 			display: inline-block;
 			margin: 0 2.4% 0.5em 0;
-			font-size: 1em;
+			padding: 0.85em 0.25em;
+			font-size: 1.4em;
 			letter-spacing: 0.1em;
 			font-family: "komika_display_tightregular", sans-serif;
-			width: 36%;
+			width: 70%;
 			text-rendering: optimizeLegibility;
 			&.ng-invalid {
 				border: 2px solid #b52715;
@@ -306,12 +338,14 @@ h1, h2, h3, h4, h5, h6{
 			background-color: @linkcolor;
 			border: 1px solid lighten(@linkcolor, 10%);
 			color: @bgcolor;
-			font-size: 0.8em;
+			font-size: 0.9em;
 			.border-radius( 6px );
 			padding: 0.7em 0.7em;
 			text-align: center;
 			cursor: pointer;
+			float: right;
 			.text-shadow(0 1px 1px rgba(0,0,0,.65));
+			margin: 0 14% 0 0;
 			&:hover{
 				.gradient-overlay( @linkcolor, lighten( @linkcolor, 10% ) );
 			}
@@ -323,403 +357,22 @@ h1, h2, h3, h4, h5, h6{
 	}
 	.home_nav{
 		background: @maincolor;
-		height: 0.3em;
+		height: 0.8em;
 		color: @bgcolor;
-		#search{
-			float: right;
-			i{
-				font-size: 1.1em;
-				cursor: pointer;
-				padding: 0.8em;
-			}
-			&.active, &:hover{
-				background: lighten(@maincolor, 10%);
-			}
-		}
-		#logo{
-			color: @bgcolor;
-			text-decoration: none;
-			position: absolute;
-			h2{
-				font-size: 2.1em;
-				margin: 0.12em 0;
-			}
-		}
-		#roomResults, #search-result{
-			display: none;
-			&.active{
-				display: block;
-			}
-		}
-		#roomResults{
-			position: absolute;
-			width: 40%;
-			margin-top:2.6em;
-			margin-left: ~"calc(1100px - 40% - 4em)";
-			padding: 2em;
-			background: lighten(@maincolor, 10%);
-			.box-shadow( 0 4px 2px 1px rgba(30,30,30,.15) );
-			h2{
-				margin: 0 0 0.5em 0;
-			}
-		}
-		#search-result{
-			display: block;
-			&:before,&:after{
-				display: table;
-			}
-			h2{
-				margin: 0.8em 0 0.5em 0;
-			}
-			ul{
-				list-style: none;
-				padding: 0 0 0 0;
-				li{
-					background: @maincolor;
-					display: inline-block;
-					vertical-align: top;
-					padding: 0.8em;
-					margin: 0 0 1.8em 0;
-					width: ~"calc(100% - 1.6em)";
-					&:last-child{
-						margin: 0 0 0 0;
-					}
-					img{
-						float: left;
-						margin: 0 0.5em 0 0;
-						width: 35%;
-						border: 2px solid lighten(@maincolor, 10%);
-					}
-					h4{
-						font-size: 1.5em;
-						margin: 0 0 0 0;
-						a.roomname{
-							font-size: 1.4em;
-							text-decoration: underline;
-							color: lighten(@linkcolor, 30%);
-						}
-					}
-				}
-			}
-		}
+		border-bottom: 15px solid @secondarycolor;
 	}
 	#starred{
 		padding: 5em 0 4em 0;
 		display: block;
-		background: url("../img/gradienthome.jpg") no-repeat top left;
-		background-size: 100%;
-		&:before,&:after{
-			display: table;
-		}
+		max-width: 1100px;
+		margin: 0 auto;
 		h1.slogan{
 			margin: 0 0 0.5em 0;
 			font-size: 3em;
 		}
 		h2{
 			font-size: 1.5em;
-			margin: 0 0 0.8em 0;
-		}
-		#sharingroom{
-			float: left;
-			max-width: 45%;
-			h3{
-				font-size: 1.3em;
-				margin: 0 0 1em 0;
-			}
-			.mainimageshell {
-			    color: #000;
-			    float:left;
-			    width:200px;
-			    padding:5px;
-			    margin: 1.4em 0 0 0;
-			    position: absolute;
-			    background: @bgcolor;
-			    z-index: 9999;
-			}.halftext{
-				max-width: 500px;
-			}
-
-			.viewwindow {
-			    width:200px;
-			    height:140px;
-			    overflow: hidden;
-			    position:relative;
-			}
-			.fullsizelist{
-			    padding:0;
-			    margin:0;
-			    white-space:nowrap;
-			    position:absolute;
-			    top:0;
-			    left:0;
-			    .transition(left 1s ease );
-				li {
-				    list-style:none;
-				    display:inline-block;
-				}
-				img.large {
-					width: 200px;
-					height: 125px;
-				}
-			}
-			.roomdetail {
-				position: relative;
-				top: -30px;
-				background-color:@maincolor;
-				color: @bgcolor;
-				font-size: 1em;
-				opacity: 0.7;
-				width: 200px;
-				overflow: hidden;
-			}
-			.authordetail {
-				margin-left: 5px;
-			}
-			.roomlink {
-				margin-left: 5px;
-				font-size: 0.9em;
-				margin-bottom: -1px;
-			}
-			.hmsg {
-				margin-bottom: 5px;
-			}
-
-			#cf{
-				top: 15px;
-				position:relative;
-				float:left;
-				width: 100%;
-				margin: -1.2em 1.2em 0 0;
-				img{
-					vertical-align: bottom;
-					cursor: pointer;
-					position:absolute;
-					left:0;
-					top:0;
-					width: 100%;
-					opacity: 0;
-					.transition( opacity 0.5s ease-in-out );
-					&.fadein{
-						opacity: 1;
-					}
-				}
-			}
-		}
-		#formroom{
-			background: @maincolor;
-			margin: 0.6em 0 0 47%;
-			padding: 0.8em;
-			color: @bgcolor;
-			form{
-				padding: 1.5em 0 0 0;
-				.mission{
-					font-size: 1em;
-					margin: 0.35em 0 0 0;
-				}
-				.termscontainer{
-					width: 100%;
-					text-align: right;
-				}
-			}
-		}
-	}
-	#texts{
-		clear: both;
-		padding: 2em 0 0 0;
-		.inner{
-			position: relative;
-			margin: 0 auto;
-			background: @bgcolor;
-			max-width: 1100px;
-		}
-		h1{
-			font-size: 2.5em;
-			margin: 1em 0 0.6em 0;
-		}
-		h2{
-			font-size: 2.2em;
-			margin: 0.3em 0 0.8em 0;
-		}
-		&.standalone{
-			.inner{
-				padding: 2em 2em 2em 2em;
-				position: relative;
-				margin: 2.8em auto 0 auto;
-				max-width: ~"calc(1100px - 4em)";
-			}
-		}
-		.esquema{
-			width: 48%;
-			margin: 0 1% 2em 0;
-			display: inline-block;
-			.mainschema{
-				height: 8em;
-				padding: 7em 0;
-				width: 22em;
-				margin: 0 auto;
-				.border-radius(100%);
-				.box-shadow( inset 0 0 10px rgba(0,0,0,0.25) );
-				
-				
-				li{
-					
-					.border-radius(100%);
-					background: @maincolor;
-					float: left;
-					margin: 0 0 0 0;
-					width: 7em;
-					height: 2.8em;
-					padding: 2.6em .5em;
-					text-align: center;
-					color: @bgcolor;
-					position: relative;
-					
-					&.firstball{
-						margin: 0 3em 0 -4em;
-					}
-					
-					&.lastball{
-						background: @linkcolor;
-						margin: 0 1em 0 18em;
-						float: right;
-						position: absolute;
-					}
-					
-					@media all and (max-width:800px){ 
-						&.middleball{
-							display: none;	
-						}&.firstball{
-							margin: -10em 0 0 5em;	
-						}&.lastball{
-							float: left;
-							position: relative;
-							margin: 0 1em 0 5em;
-						}
-						
-					}		
-				}
-				@media all and (max-width:800px){ 
-					width: 18em;
-					height: 7em;
-					margin: 6em auto 0 auto;
-					.border-radius(100%);
-					.box-shadow( none );
-				}
-				
-				
-				
-			}
-
-			
-			.register{
-				width: 7em;
-				height: 2.8em;
-				padding: 2.6em .5em;
-				.border-radius(100%);
-				text-align: center;
-				margin:-4em auto 0 auto;
-				.box-shadow( inset 0 0 10px rgba(0,0,0,0.25) );
-				background: darken(@bgcolor, 5%);
-				cursor: help;
-				&:hover{
-					em.hoverinfo{
-						display: block;
-					}
-				}
-				em.hoverinfo{
-					position: absolute;
-					display: none;
-					background: @maincolor;
-					width: 11em;
-					margin: -3.5em 0 0 8.5em;
-					padding: 0.5em;
-					color: @bgcolor;
-					.border-radius(5px);
-					&:after {
-						right: 100%;
-						top: 50%;
-						border: solid transparent;
-						content: " ";
-						height: 0;
-						width: 0;
-						position: absolute;
-						pointer-events: none;
-						border-color: transparent;
-						border-right-color: @maincolor;
-						border-width: 6px;
-						margin-top: -6px;
-					}
-				}
-			}
-		}
-		.homeinfo{
-			width: 48%;
-			margin: 5em 0 0 1%;
-			display: inline-block;	
-			vertical-align: top;
-			ul{
-				list-style: square;
-				padding: 0 0 0.8em 1em;
-			}
-		}
-	}
-	footer{
-		position: relative;
-		margin: 2.5em 0 0 0;
-		padding: 0.8em 0 1.3em 0;
-		border-top: 1px solid @maincolor;
-		font-size: 0.8em;
-	}
-	@media all and (max-width:800px) {
-		.home_nav #roomResults {
-			position: inherit;
-			width: 100%;
-			margin-top: 0;
-			margin-left: 0;
-			padding: 1.3em 1em;
-			border-top: 2.9em solid @maincolor;
-		}
-		#logo{
-			margin: 0.7em 0 0 1em;
-		}
-		#sharingroom{
-			.mainimageshell{
-				position: relative !important;
-			}
-		}
-		#starred{
-			padding: 1em 1em 3em 1em;
-			background: @maincolor;
-			color: @bgcolor;
-			#sharingroom{
-				max-width: 90%;
-			}
-			h1.slogan {
-				margin: 0.8em 0;
-				font-size: 2.6em;
-			}
-			#formroom {
-				.twitterLink{
-					position: inherit;
-					margin: 0 0 0 0;
-				}
-			}
-		}
-		#texts{
-			.homeinfo{
-				width: 98%;
-			}
-			.esquema{
-				width: 98%;
-			}
-		}
-		#formroom{
-			margin:0em 0em 0em 0em !important;
-			padding: 1em 0em .5em 0em !important;
-			clear: both;
-		}
-		footer.inner{
-			margin: 0 1em;
+			margin: 0.8em 0 1.5em 0;
 		}
 	}
 }

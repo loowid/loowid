@@ -1,23 +1,15 @@
-<a href="https://github.com/loowid/loowid"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://camo.githubusercontent.com/a6677b08c955af8400f44c6298f40e7d19cc5b2d/68747470733a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f677261795f3664366436642e706e67" alt="Fork me on GitHub" data-canonical-src="https://s3.amazonaws.com/github/ribbons/forkme_right_gray_6d6d6d.png"></a>
+<a href="https://github.com/loowid/loowid" style="z-index:9999;"><img style="position: fixed; top: 26px; right: 0; border: 0; z-index: 10" src="https://camo.githubusercontent.com/a6677b08c955af8400f44c6298f40e7d19cc5b2d/68747470733a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f677261795f3664366436642e706e67" alt="Fork me on GitHub" data-canonical-src="https://s3.amazonaws.com/github/ribbons/forkme_right_gray_6d6d6d.png"></a>
 <div id="home" data-ng-controller="RoomsController" data-ng-init="init()">
-	<header class="home_nav">
-		<!--div class="inner">
-			<a id="logo" href="" ng-click="ui.question='none'">
-				<h2>L<span id="eyeslogo"></span>WID</h2>
-			</a>
-			<span class="version">&alpha;</span>
-		</div-->
-	</header>
+	<header class="home_nav"></header>
 	<section id="starred">
 		<div class="inner">
 			<aside id="sharingroom">
 				<h1 class="slogan">{{resourceBundle.loowid}}</h1>
-				<p>{{resourceBundle.starredText}}</p>
-				<iframe allowTransparency="true" frameborder="0" scrolling="no" src="https://bitnami.com/product/loowid/widget" style="border:none;width:230px; height:100px;"></iframe>
+				<!--p>{{resourceBundle.starredText}}</p-->
 			</aside>
 			<article id="formroom">
-				<h2>{{resourceBundle.startsharing}}:</h2>
 				<form name="createForm" class="navbar-left navbar-form" data-ng-submit="create()" novalidate>
+					<h2>{{resourceBundle.startsharing}}:</h2>
 					 <div id="cf" ng-click="resetName()" >
 						<img class="bottom" src="img/hero.png" title="{{resourceBundle.shhh}}" >
 						<img class="top" src="img/person.png" title="{{resourceBundle.shhh}}" >
@@ -26,9 +18,11 @@
 					<button id="main_button" type="submit" data-ng-show="isValidBrowser() && !isRoomAvailable()">{{resourceBundle.loowidnow}}</button>
 					<button id="goroom_button" type="submit" data-ng-show="isValidBrowser() && isRoomAvailable()">{{resourceBundle.gototheroom}}</button>
 	  				<div class="termscontainer">
-						 <p ng-show="termsnotaccepted" class="alert">{{resourceBundle.youmustacceptterms}}</p>
-						<input ng-model="termsaccepted" data-ng-show="isValidBrowser() && !isRoomAvailable()" type="checkbox" id="terms" ng-click="clickterms($event)" />
-						<label for="terms" ng-bind-html="resourceBundle.acceptterms" data-ng-show="!isRoomAvailable()"></label>
+						<p ng-show="termsnotaccepted" class="alert">{{resourceBundle.youmustacceptterms}}</p>
+						<p class="terms">
+							<input ng-model="termsaccepted" data-ng-show="isValidBrowser() && !isRoomAvailable()" type="checkbox" id="terms" ng-click="clickterms($event)" />
+							<label for="terms" ng-bind-html="resourceBundle.acceptterms" data-ng-show="!isRoomAvailable()"></label>
+						</p>
 					</div>
 					<img src="img/ajax-loader-bar.gif" ng-show="creating"/>
 					<div data-ng-show="!isValidBrowser()">
@@ -36,12 +30,20 @@
 					</div>
 					<p class="mission" data-ng-hide="isValidBrowser()">{{resourceBundle.selectsecretinvalid}}</p>
 				</form>			
+				<iframe allowTransparency="true" frameborder="0" scrolling="no" src="https://bitnami.com/product/loowid/widget" style="border:none;width:230px; height:100px;"></iframe>
 		        <!-- a class="twitterLink" href="http://twitter.com/LoowidCOM" target="_blank"><img src="img/twitter.png" ></a -->
 			</article>
 		</div>
 	</section>
-	<section id="texts">
+	<!--section id="texts">
 		<article class="inner">
+			<code>
+				<pre>
+git clone 
+npm install
+grunt
+				</pre>
+			</code>
 			<div class="esquema">
 				<h2>{{resourceBundle.qwhatcanido}}</h2>
 				<ul class="mainschema">
@@ -61,7 +63,7 @@
 				<p>{{resourceBundle.textslink}}</p>
 			</div>
 		</article>
-	</section>
+	</section-->
 	<footer class="inner">
 		&copy; {{resourceBundle.footerText}} {{ui.version}} ({{ui.node}})
 	</footer>
