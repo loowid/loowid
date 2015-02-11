@@ -259,22 +259,22 @@ angular.module('mean.rooms').factory('FileService',['$sce','UIHandler',function(
                 fileToCancel2.canceled = true;
 			};
 			
+			var getFilesFromUser = function (connectionId){
+				if (!uiHandler.isowner){
+	               return uiHandler.ownerFiles;
+	            }else{
+					var user = $scope.getUser(connectionId);
+					if (!user.files){
+		               user.files =[];
+		 			}
+		 			return user.files; 
+	            }	
+			};
+			
 	        rtc.uniqueon ('file canceled',function (data){
 	            // Check the 
 
-	           var files = [];
-
-	           if (uiHandler.isowner){
-		           var user = $scope.getUser(data.id); 
-		    
-		           if (!user.files){
-		                user.files =[];
-		            }
-
-		           files =  user.files;
-	           }else{
-	           		files = uiHandler.ownerFiles;
-	           }
+	        	var files = getFilesFromUser(data.id);
 
 	            if (data.direction === 'upload'){
 	            	cancelUpload(data,files);
@@ -283,75 +283,21 @@ angular.module('mean.rooms').factory('FileService',['$sce','UIHandler',function(
 	            }
 
 	            uiHandler.safeApply($scope,function(){});  
-	            
 	        });
-
-	        rtc.uniqueon ('data stream data', function (channel,connectionId,requestId,mediatype,message){
-
-				var data = JSON.parse(message);
-	    
-	            //files array for rendering
-	            var files = [];
-
-
-	            if (!uiHandler.isowner){
-	                files = uiHandler.ownerFiles;
-	            }else{
-	               
-					var user = $scope.getUser(connectionId); 
-		   			if (!user.files){
-		               user.files =[];
-		 			}
-		 			files =  user.files; 
-	            }
-
-	            self.arrayToStoreChunks[connectionId] = self.arrayToStoreChunks[connectionId] || {};
-	            self.arrayToStoreChunks[connectionId][mediatype] = self.arrayToStoreChunks[connectionId][mediatype] || {};                
-
-	            //Check if it's a valid fileid  
-	            if (!self.acceptedFileOffers[requestId].files[data.fileid]){
-	                //This file was not permitted
-
-	                //We close the dataChannel and peer connection
-	                rtc.fileRequestFailed ($scope.global.roomId,connectionId,requestId,'sent file is not allowed');
-	                channel.close();
-	                rtc.dropPeerConnection (connectionId,mediatype,false); 
-	                //Drop the accepted files token. User can't use it anymore
-	                delete self.acceptedFileOffers [requestId];
-	                return;
-	            }
-
-	          
-	            if (!self.arrayToStoreChunks[connectionId][mediatype][data.fileid]){
-	                self.arrayToStoreChunks[connectionId][mediatype][data.fileid] = [];                
-	                self.arrayToStoreChunks[connectionId][mediatype][data.fileid].renderedFile = files.length;
-	                //add the new file in the array
-	                var filename = self.acceptedFileOffers[requestId].files[data.fileid].name;
-	                files.push ({'id':data.fileid,'name': filename, 'completed': 0,'direction':'download','requestId':requestId});                
-	            }
-
-	            
-	            self.arrayToStoreChunks[connectionId][mediatype][data.fileid].push(data.message); // pushing chunks in array
-	            var renderedIndex = self.arrayToStoreChunks[connectionId][mediatype][data.fileid].renderedFile;
-	            
-	            if (self.acceptedFileOffers[requestId].files[data.fileid].processedChunks === 0){
-	                self.acceptedFileOffers[requestId].files[data.fileid].totalChunks = data.chunks;
-	            }
-	            
-	            self.acceptedFileOffers[requestId].files[data.fileid].processedChunks+=1;
-
-	            //Control flow chunk
-	            if((data.chunks !== self.acceptedFileOffers[requestId].files[data.fileid].totalChunks) ||
-	              ((data.chunks - data.remainigChunks) !== self.acceptedFileOffers[requestId].files[data.fileid].processedChunks)){
-	                rtc.fileRequestFailed ($scope.global.roomId,connectionId,requestId,'data sequence not valid');
-	                channel.close();
-	                 rtc.dropPeerConnection (connectionId,mediatype,false); 
-	                //Drop the accepted files token. User can't use it anymore
-	                delete self.acceptedFileOffers [requestId];
-	                return;
-	            }
-
-	            if (data.remainigChunks === 0) {
+			
+			var closeIfCompleted = function (channel,connectionId,requestId,mediatype){
+				if (self.acceptedFileOffers[requestId].filesCompleted === Object.keys(self.acceptedFileOffers[requestId].files).length){
+					// All files were completed, we should drop the conection
+					channel.close();
+					//Drop the accepted files token. User can't use it anymore
+					delete self.acceptedFileOffers [requestId];
+					rtc.dropPeerConnection (connectionId,mediatype,false); 
+					rtc.allRequestCompleted ($scope.global.roomId,connectionId,requestId);
+				} 
+			};
+			
+			var proccesChunkStates = function(files,data,connectionId,requestId,mediatype,renderedIndex,channel) {
+	            	if (data.remainigChunks === 0) {
 	                //Re-join: Take care using join method couls explode on a memory leak
 	                
 	                var dataUrl = '';
@@ -372,15 +318,9 @@ angular.module('mean.rooms').factory('FileService',['$sce','UIHandler',function(
 
 	                var filename2 = self.acceptedFileOffers[requestId].files[data.fileid].name;
 
-	                if (self.acceptedFileOffers[requestId].filesCompleted === Object.keys(self.acceptedFileOffers[requestId].files).length){
-	                    // All files were completed, we should drop the conection
-	                    channel.close();
-	                     //Drop the accepted files token. User can't use it anymore
-	                    delete self.acceptedFileOffers [requestId];
-	                    rtc.dropPeerConnection (connectionId,mediatype,false); 
-	                    rtc.allRequestCompleted ($scope.global.roomId,connectionId,requestId);
-	                } 
-
+					closeIfCompleted (channel,connectionId,requestId,mediatype);
+					
+	                
 	                uiHandler.safeApply($scope,function (){
 	                	files[renderedIndex].completed = 101; //data is composed
 	                });
@@ -395,12 +335,79 @@ angular.module('mean.rooms').factory('FileService',['$sce','UIHandler',function(
 
 	                files[renderedIndex].name = $sce.trustAsHtml('<a target="_blank" download="'+filename2+'" href="'+virtualURL+'" >' + filename2 +'</a>');
 	                self.arrayToStoreChunks[connectionId][mediatype][data.fileid] = []; // resetting array
-	                self.hasToRefresh=true;
+	                
+					//Mark that a percentage of refresh is needed
+					self.hasToRefresh=true;
 	            }else{
 	                files[renderedIndex].completed = Math.floor((1 - (data.remainigChunks / data.chunks)) * 100);
 	            }
+	
+			};
 
+			var processMessageData = function (files,data,connectionId,requestId,mediatype) {
+				if (!self.arrayToStoreChunks[connectionId][mediatype][data.fileid]){
+	                self.arrayToStoreChunks[connectionId][mediatype][data.fileid] = [];                
+	                self.arrayToStoreChunks[connectionId][mediatype][data.fileid].renderedFile = files.length;
+	                //add the new file in the array
+	                var filename = self.acceptedFileOffers[requestId].files[data.fileid].name;
+	                files.push ({'id':data.fileid,'name': filename, 'completed': 0,'direction':'download','requestId':requestId});                
+	            }
 
+	            
+	            self.arrayToStoreChunks[connectionId][mediatype][data.fileid].push(data.message); // pushing chunks in array
+	            var renderedIndex = self.arrayToStoreChunks[connectionId][mediatype][data.fileid].renderedFile;
+	            
+	            if (self.acceptedFileOffers[requestId].files[data.fileid].processedChunks === 0){
+	                self.acceptedFileOffers[requestId].files[data.fileid].totalChunks = data.chunks;
+	            }
+	            
+	            self.acceptedFileOffers[requestId].files[data.fileid].processedChunks+=1;
+				
+				return renderedIndex;
+			};
+
+			rtc.uniqueon ('data stream data', function (channel,connectionId,requestId,mediatype,message){
+
+				var data = JSON.parse(message);
+	    
+	            //files array for rendering
+	            var files = getFilesFromUser(connectionId);
+
+	            self.arrayToStoreChunks[connectionId] = self.arrayToStoreChunks[connectionId] || {};
+	            self.arrayToStoreChunks[connectionId][mediatype] = self.arrayToStoreChunks[connectionId][mediatype] || {};                
+
+	            //Controls to avoid undesired downloads 
+	            if (!self.acceptedFileOffers[requestId].files[data.fileid]){
+	                //This file was not permitted
+
+	                //We close the dataChannel and peer connection
+	                rtc.fileRequestFailed ($scope.global.roomId,connectionId,requestId,'sent file is not allowed');
+	                channel.close();
+	                rtc.dropPeerConnection (connectionId,mediatype,false); 
+	                //Drop the accepted files token. User can't use it anymore
+	                delete self.acceptedFileOffers [requestId];
+	                return;
+	            }
+
+				var renderedIndex = processMessageData (files,data,connectionId,requestId,mediatype);
+
+	            //Control flow chunk
+	            if((data.chunks !== self.acceptedFileOffers[requestId].files[data.fileid].totalChunks) ||
+	              ((data.chunks - data.remainigChunks) !== self.acceptedFileOffers[requestId].files[data.fileid].processedChunks)){
+	                rtc.fileRequestFailed ($scope.global.roomId,connectionId,requestId,'data sequence not valid');
+	                channel.close();
+	                 rtc.dropPeerConnection (connectionId,mediatype,false); 
+	                //Drop the accepted files token. User can't use it anymore
+	                delete self.acceptedFileOffers [requestId];
+	                return;
+	            }
+
+				proccesChunkStates(files,data,connectionId,requestId,mediatype,renderedIndex,channel);
+				checkRefresh();
+
+	        });
+
+			var checkRefresh = function (){
 	            if (self.hasToRefresh){
 	            	//Just refresh each second not in each packet
 	            	self.hasToRefresh= false;
@@ -410,11 +417,8 @@ angular.module('mean.rooms').factory('FileService',['$sce','UIHandler',function(
 	            		self.hasToRefresh = true;
 	            	},2000);
 	            }
-                
-
-
-	        });
-
+			};
+		
 	        rtc.uniqueon ('request_for_accept_files', function(data){
 	            if (data.files && data.requestId){
 	                var confirmationStr = '<strong>' +(uiHandler.isowner ? uiHandler.name : $scope.getUserName(data.id)) + '</strong> ' + $scope.resourceBundle.wantstosharefiles  +'<br/>';
@@ -445,7 +449,7 @@ angular.module('mean.rooms').factory('FileService',['$sce','UIHandler',function(
 			    				},
 			    				'no': function (index){
 									uiHandler.modals.splice(index,1);
-			 		                rtc.reportErrorToUser($scope.global.roomId,data.id,data.source);
+			 		                rtc.fileRequestFailed($scope.global.roomId,data.id,data.requestId,'files are not accepted');
 								},
 			    				'class':'modalform editable',
 			    				'done':false
@@ -458,7 +462,7 @@ angular.module('mean.rooms').factory('FileService',['$sce','UIHandler',function(
 
 	        rtc.uniqueon ('files accepted',function(data){
 	            var fileOffer = self.sentFileOffers[data.requestId];
-
+				
 	            if (fileOffer && fileOffer.attended===false && fileOffer.destinationId === data.id){
 	                fileOffer.attended = true; // We try to avoid masive sent of files for duplicated answers
 	                fileOffer.token = data.token;

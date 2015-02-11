@@ -741,7 +741,7 @@ function mergeConstraints(cons1, cons2) {
 			queue.push (message);
 		}
 		if (state  === 'ready') {
-			pushMessage(id,mediatype,mediatypefile,requestId,token,channel);
+			pushMessage(id,mediatype,mediatypefile,requestId,token,channel,queue);
 		}
 		
 	};
@@ -1008,7 +1008,8 @@ function mergeConstraints(cons1, cons2) {
 			'data': {
 				'connectionId': connectionId,
 				'room': room,
-				'requestId':requestId
+				'requestId':requestId,
+				'error': error
 			}
 		}));
 	};

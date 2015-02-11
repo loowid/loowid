@@ -606,8 +606,7 @@ function attachEvents(manager) {
 	        'data' : {
 	          'requestId': data.requestId,
 	          'token' : data.token,
-	          'id' : socket.id,
-	          'error' : data.error
+	          'id' : socket.id
 	        }
 	      }), errorFn);
 	    }
