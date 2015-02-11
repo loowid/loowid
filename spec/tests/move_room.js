@@ -3,9 +3,9 @@ module.exports = function(request,test,utils) {
 
 	describe('Move room', function() {
 		
-		require('./utils/create_room')(request,test,utils);
+		require('../utils/create_room')(request,test,utils);
 		
-		require('./utils/join_room')(request,test,utils,['viewer0','viewer1']);
+		require('../utils/join_room')(request,test,utils,['viewer0','viewer1']);
 	    
 	    test('The owner moves to another room.', function(done) {
 	    	var requestDate = new Date();

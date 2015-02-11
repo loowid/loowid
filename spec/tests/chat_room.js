@@ -3,9 +3,9 @@ module.exports = function(request,test,utils) {
 
 	describe('Chat room', function() {
 		
-		require('./utils/create_room')(request,test,utils);
+		require('../utils/create_room')(request,test,utils);
 		
-		require('./utils/join_room')(request,test,utils,['viewer0']);
+		require('../utils/join_room')(request,test,utils,['viewer0']);
 	    
 	    test('Viewer send chat typing alert.', function(done) {
 	    	utils.addListener('owner','chat_typing',function(typing){
