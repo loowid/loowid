@@ -62,7 +62,7 @@ angular.module('ngWindowManager',[])
 	
 			//If it's defined a windowContainer zone we will use it to bind 
 			//all the listeners, that way we can fit windows under an element but move in other 
-			var windowArea = options.windowContainer ? parentWindow : document.getElementById(options.windowContainer);
+			var windowArea = options.windowContainer===undefined ? parentWindow : document.getElementById(options.windowContainer);
 		
 			//Set some tricky controls to handle the layering
 			parentWindow.topZ = parentWindow.topZ || options.initialZIndex || parentWindow.css('z-index') || 100000;
