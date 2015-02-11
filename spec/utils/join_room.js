@@ -14,7 +14,6 @@ module.exports = function(request,test,utils,vid) {
 	
 	var nws = function(done) {
 		var match = getRegExp().exec(jasmine.getEnv().currentSpec.description);
-		//console.log(match);
     	utils.addListener(match[1],'get_updated_config',function(ice){
     		expect(ice.iceServers.length).toBeGreaterThan(0);
     		done();
@@ -25,7 +24,6 @@ module.exports = function(request,test,utils,vid) {
 	
     var njr = function(done) {
     	var match = getRegExp().exec(jasmine.getEnv().currentSpec.description);
-    	//console.log(match);
     	var x = (match[2]-0);
     	utils.checkDone = x+1;
     	utils.addListener('owner','new_peer_connected',function(peer){
@@ -49,7 +47,7 @@ module.exports = function(request,test,utils,vid) {
 			'eventName': 'join_room',
 			'data': {
 				'room': utils.roomID,
-				'pwd': '',
+				'pwd': utils.room.access.passwd,
 				'reload': true
 			}
     	}));

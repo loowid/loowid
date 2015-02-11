@@ -6,11 +6,15 @@ module.exports = function(request,test,utils) {
 		
 	    test('Index loads loowid.min.js.', function(done) {
 	        request(utils.testDomain+'/', function(error, response, body){
+	        	utils.resHead = response.headers;
 	            expect(error).toBeNull();
 	            expect(response.statusCode).toBe(200);
 	            expect(body.indexOf('loowid.min.js')>0).toBeTruthy();
-	            var text = body.substring(body.indexOf('window.csrf'),body.indexOf(';',body.indexOf('window.csrf'))+1).replace('window.','');
-	            eval('utils.'+text);
+	            var textCsrf = body.substring(body.indexOf('window.csrf'),body.indexOf(';',body.indexOf('window.csrf'))+1).replace('window.','');
+	            eval('utils.'+textCsrf);
+	            var textUsrid = body.substring(body.indexOf('window.usrid'),body.indexOf(';',body.indexOf('window.usrid'))+1).replace('window.','');
+	            eval('utils.'+textUsrid);
+	            expect(utils.usrid.length).toBe(16);
 	            done();
 	        });
 	        

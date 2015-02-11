@@ -8,17 +8,19 @@ module.exports = function(request,test,utils) {
 		require('../utils/join_room')(request,test,utils,['viewer0']);
 	    
 	    test('Owner block the chat.', function(done) {
+	    	var acc = utils.room.access;
+	    	acc.chat = true;
 	    	request.post({
 	    		  headers: {'content-type':'application/x-www-form-urlencoded','x-csrf-token':utils.csrf},
 	    		  url:     utils.testDomain+'/rooms/'+utils.roomID+'/editShared',
-	    		  form:    { id: utils.roomID, access: { shared: 'LINK', chat: true, passwd: 'pwd', moderated: false, locked: true, permanent: false, permanentkey: 'pkey', keywords: [] } }
+	    		  form:    { id: utils.roomID, access: acc }
 	    	}, function(error, response, body){
 	            expect(error).toBeNull();
 	            expect(response.statusCode).toBe(200);
 	            var st = JSON.parse(body);
 	            expect(st.roomId).toBe(utils.roomID);
 	            expect(st.guests.length).toBe(1);
-	            expect(st.access.locked).toBe(true);
+	            expect(st.access.chat).toBe(true);
 	            expect(st.guests[0].sessionid).toBe('');
 	            expect(st.guests[0].connectionId).toBe(utils.viewer0);
 	            expect(st.guests[0].status).toBe('CONNECTED');

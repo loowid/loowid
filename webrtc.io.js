@@ -67,17 +67,20 @@ rtc.fire = function(eventName, _) {
   }
 };
 
-function getSessionId(headers,secret) {
-    var list = {}, rc = headers.cookie;
+function getSocketUrl(req) {
+	var u = req.url.replace(/^\s+|\s+$/g, '');
+	return (u==='' || u.length===1)?null:u.substring(1);
+}
+
+function getSessionId(req,secret) {
+    var list = {}, rc = req.headers.cookie;
     if (rc) { 
     	rc.split(';').forEach(function( cookie ) {
     		var parts = cookie.split('=');
     		list[parts.shift().trim()] = unescape(parts.join('='));
     	});
     }
-    var realSid = (list.jsessionid)?list.jsessionid.replace( prefix, '' ):'';
-    realSid = signature.unsign( realSid, secret );
-    return realSid;
+    return (list.jsessionid && secret)?signature.unsign(list.jsessionid.replace(prefix,''),secret):getSocketUrl(req);
 }
 
 //generate a 4 digit hex code randomly
@@ -121,7 +124,7 @@ function attachEvents(manager) {
   manager.on('connection', function(socket) {
     logger.debug('connect');
 
-	socket.sessionid = getSessionId(socket.upgradeReq.headers,manager.sessionSecret);
+	socket.sessionid = getSessionId(socket.upgradeReq,manager.sessionSecret);
     socket.id = id();
     logger.debug('new socket got id: ' + socket.id);
 
