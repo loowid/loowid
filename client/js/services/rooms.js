@@ -63,17 +63,17 @@ angular.module('mean.rooms').factory('Rooms', ['$resource','$http','$window','No
     		if (typeof(Storage)!=='undefined') { localStorage.loowidUserName = ''; }
     	};
 
-        this.getWebSocketUrl = function() {
-        	return 'ws'+(location.protocol.indexOf('s:')>0?'s':'')+'://'+window.wsocket.host+window.wsocket.port;
-        };
-		
         this.getInitWebSocketUrl = function () {
         	return (location.origin.indexOf(location.protocol+'//'+window.wsocket.host)<0)?location.protocol+'//'+window.wsocket.host+'/rooms/hello':null;
         };
 
+        this.getWebSocketUrl = function(usrid) {
+        	return 'ws'+(location.protocol.indexOf('s:')>0?'s':'')+'://'+window.wsocket.host+window.wsocket.port+(window.usrid?'/'+window.usrid:'');
+        };
+		
 		this.create = function (name,success,ownerToken){
             var gravatar = this.getGravatar();
-            var host = this.getWebSocketUrl();
+            var self = this;
 			this.saveName(name);
 			
 			//Go to the ws host and ask for a rest service in order to set the cookie
@@ -87,7 +87,7 @@ angular.module('mean.rooms').factory('Rooms', ['$resource','$http','$window','No
 							success(newRoom.roomId,gravatar,$window.getGravatarImg(gravatar),newRoom.access,newRoom.dueDate);
 						}); 
 					});
-					rtc.connect(host, newId);
+					rtc.connect(self.getWebSocketUrl(), newId);
 					
 				});
 				return 200;	
@@ -100,7 +100,7 @@ angular.module('mean.rooms').factory('Rooms', ['$resource','$http','$window','No
 					hello: {method: 'JSONP', params:{callback: 'JSON_CALLBACK'}, isArray: false}
 				});
 				wsproxyinit.hello ({},function (){
-					connectFunction();	
+					connectFunction();
 				},function (erro){
 					return 504;
 				});
@@ -133,9 +133,9 @@ angular.module('mean.rooms').factory('Rooms', ['$resource','$http','$window','No
 		};
 
 		this.joinPass = function(roomId,passwdVal,reload) {
-            var host = this.getWebSocketUrl();
+            var self = this;
             var connectFunction = function (){
-				rtc.connect(host, roomId, passwdVal, reload);
+				rtc.connect(self.getWebSocketUrl(), roomId, passwdVal, reload);
 			};
 			
 			// Initialize session before connect to web socket

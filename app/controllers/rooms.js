@@ -10,13 +10,17 @@ var Room = mongoose.model('Room');
 //_ = require('underscore');
 var crypto = require('crypto');
 
-var makeId = function(){
+var makeId = function(n){
     var text = '';
     var possible = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-    for( var i=0; i < 7; i+=1 ) {
+    for( var i=0; i < (n||7); i+=1 ) {
         text += possible.charAt(Math.floor(Math.random() * possible.length));
     }
     return text;
+};
+
+exports.getUsrId = function(enabled) {
+	return enabled?makeId(16):'';
 };
 
 var isReloading = function(room,id) {
@@ -34,9 +38,9 @@ var isReloading = function(room,id) {
 	return (mySessionOff > 0 && ((mySessionOff + mySessionOn) <= room.guests.length)) || !room.access.locked;
 };
 
-var isValid = function(room,id) {
+var isValid = function(room,id,usrid) {
 	for (var k=0; k<room.valid.length;k+=1) {
-		if (room.valid[k] === id) {
+		if (room.valid[k] === id || room.valid[k] === usrid) {
 			return true;
 		}
 	}
@@ -196,7 +200,7 @@ exports.join = function (req, res, next){
 		});
 	} else {
 		// Open room or is in valid list of users or is reloading
-		if (room.access.shared!=='PRIVATE' || isValid(room,req.sessionID) || isGuessConnected(room,req.sessionID,req.body.connectionId)) {
+		if (room.access.shared!=='PRIVATE' || isValid(room,req.sessionID,req.session._usrid) || isGuessConnected(room,req.sessionID,req.body.connectionId)) {
 			doGuestJoin(room,req,res,next);
 		} else {
 			res.json({passfail:true});
@@ -209,8 +213,10 @@ exports.join = function (req, res, next){
 // Session is regenerated for every room you create
 exports.createid = function(req, res, next) {
 	var _csrfSecret = req.session._csrfSecret;
+	var _usrId = req.session._usrid;
 	req.session.regenerate(function(){
-		req.session._csrfSecret = _csrfSecret; 
+		req.session._csrfSecret = _csrfSecret;
+		req.session._usrid = _usrId;
 		req.session.roomId = makeId();
 		var result = function(err,room){
 			if (!room) {

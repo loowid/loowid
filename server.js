@@ -11,11 +11,20 @@ var logger = log4js.getLog('server');
 var crypto = require('crypto') ;
 var i18n = require('i18next');
 var express = require('express');//, jade = require('jade');
-var defaultPort = isNaN(process.argv[2]) && process.argv[2]!=='jasmine_node';
+
+var isRunningTests = function() {
+	return process.argv[2]==='jasmine_node';
+};
+
+var defaultPort = isNaN(process.argv[2]) && !isRunningTests();
 var portvalue = process.env.LOOWID_HTTP_PORT || 80;
-if (!isNaN(process.argv[2]) || !defaultPort) {
+if (!defaultPort) {
 	portvalue = !isNaN(process.argv[2])?(process.argv[2]-0):8080;
 }
+
+var isOpenShift = function() {
+	return process.env.OPENSHIFT_NODEJS_PORT || process.env.OPENSHIFT_INTERNAL_PORT;
+};
 
 var port = process.env.OPENSHIFT_NODEJS_PORT ||  process.env.OPENSHIFT_INTERNAL_PORT || portvalue;
 var sport = process.env.LOOWID_HTTPS_PORT || 443;
@@ -37,7 +46,7 @@ var rooms = require('./app/controllers/rooms');
 var wsevents = require('./app/controllers/events');
 var logs = require('./app/controllers/log');
 
-if (!process.env.OPENSHIFT_NODEJS_PORT && !process.env.OPENSHIFT_INTERNAL_PORT && defaultPort) {
+if (!isOpenShift() && defaultPort) {
 	try {
 		var fs = require('fs');
 		// Certificado de pruebas para local
@@ -64,11 +73,15 @@ var webRTC = require('./webrtc.io.js').listen(wserver,ipaddr);
 
 var serverId = (Math.random()/+new Date()).toString(36).replace(/[^a-z]+/g,'').substring(0,9);
 
+var useUrl = function() {
+	return isOpenShift() || isRunningTests();
+};
+
 webRTC.wsevents = wsevents;
 webRTC.rooms = rooms;
 webRTC.serverId = serverId;
-webRTC.sessionSecret = sessionSecret;
- 
+webRTC.sessionSecret = !useUrl()?sessionSecret:null;
+
 // Socket Messages on Mongo
 var serverCluster = serverId;
 var isClustered = false;
@@ -303,10 +316,10 @@ var getClusterNode = function (req) {
 
 var getReqWSPort = function(req) {
 	var ind = req.headers.host.indexOf(':');
-	return (ind>0?req.headers.host.substring(ind+1):(req.protocol==='http'?'80':'443'));
+	return (ind>0?req.headers.host.substring(ind+1):(req.protocol==='http' && !defaultPort && !isClustered?'80':'443'));
 };
 
-if (process.env.OPENSHIFT_NODEJS_PORT || process.env.OPENSHIFT_INTERNAL_PORT) {
+if (isOpenShift()) {
 	// OpenShift Deployment
 	/* At the top, with other redirect methods before other routes */
 	logger.info('Running openshift environment !!');
@@ -319,6 +332,7 @@ if (process.env.OPENSHIFT_NODEJS_PORT || process.env.OPENSHIFT_INTERNAL_PORT) {
 				res.setHeader('X-FRAME-OPTIONS','DENY');
 				res.sendfile(__dirname + '/public/landing.html');
 			} else {
+				req.session._usrid = rooms.getUsrId(useUrl());
 				res.setHeader('X-FRAME-OPTIONS','SAMEORIGIN');
 				res.render('index.jade', {
 					title : 'Look what I\'m doing!',
@@ -326,7 +340,8 @@ if (process.env.OPENSHIFT_NODEJS_PORT || process.env.OPENSHIFT_INTERNAL_PORT) {
 					version: pck.version,
 					node: getClusterNode(req),
 					host: process.env.WS_HOST || req.host,
-					port: ':' + (process.env.WS_PORT || '8443')
+					port: ':' + (process.env.WS_PORT || '8443'),
+					usrid: req.session._usrid
 				});
 			}
 		}
@@ -344,6 +359,7 @@ if (process.env.OPENSHIFT_NODEJS_PORT || process.env.OPENSHIFT_INTERNAL_PORT) {
 				res.setHeader('X-FRAME-OPTIONS','DENY');
 				res.sendfile(__dirname + '/public/landing.html');
 			} else {
+				req.session._usrid = rooms.getUsrId(useUrl());
 				res.setHeader('X-FRAME-OPTIONS','SAMEORIGIN');
 				res.render('index.jade', {
 					title : 'Look what I\'m doing!',
@@ -351,7 +367,8 @@ if (process.env.OPENSHIFT_NODEJS_PORT || process.env.OPENSHIFT_INTERNAL_PORT) {
 					version: pck.version,
 					node: getClusterNode(req),
 					host: process.env.WS_HOST || req.host,
-					port: ':' + (process.env.WS_PORT || wsport)
+					port: ':' + (process.env.WS_PORT || wsport),
+					usrid: req.session._usrid
 				});
 			}
 		}

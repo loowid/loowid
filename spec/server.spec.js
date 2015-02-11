@@ -44,7 +44,7 @@ describe('Main Server Tests', function() {
 	utils.connect = function(id) {
 		//utils.ws = new WebSocket('ws://localhost/',null,utils.options);
 		utils.ws = utils.ws || [];
-		utils.ws[id] = new WebSocket('ws://localhost:8080/');
+		utils.ws[id] = new WebSocket('ws://localhost:8080/'+utils.usrid);
 		utils.ws[id].on('open', function(){
 			// Initial call in open
 			utils.ws[id].send(JSON.stringify({'eventName': 'update_server_config','data': {	'room': utils.room	}}));
@@ -121,5 +121,6 @@ describe('Main Server Tests', function() {
 	require('./tests/viewer_leaves_room')(request,test,utils);
 	require('./tests/blocked_room')(request,test,utils);
 	require('./tests/blocked_chat')(request,test,utils);
+	require('./tests/private_room')(request,test,utils);
 	
 });

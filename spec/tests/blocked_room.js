@@ -8,10 +8,12 @@ module.exports = function(request,test,utils) {
 		require('../utils/join_room')(request,test,utils,['viewer0','viewer1']);
 	    
 	    test('Owner block the room.', function(done) {
+	    	var acc = utils.room.access;
+	    	acc.locked = true;
 	    	request.post({
 	    		  headers: {'content-type':'application/x-www-form-urlencoded','x-csrf-token':utils.csrf},
 	    		  url:     utils.testDomain+'/rooms/'+utils.roomID+'/editShared',
-	    		  form:    { id: utils.roomID, access: { shared: 'LINK', passwd: 'pwd', moderated: false, locked: true, permanent: false, permanentkey: 'pkey', keywords: [] } }
+	    		  form:    { id: utils.roomID, access: acc }
 	    	}, function(error, response, body){
 	            expect(error).toBeNull();
 	            expect(response.statusCode).toBe(200);
