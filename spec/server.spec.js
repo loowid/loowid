@@ -122,5 +122,7 @@ describe('Main Server Tests', function() {
 	require('./tests/blocked_room')(request,test,utils);
 	require('./tests/blocked_chat')(request,test,utils);
 	require('./tests/private_room')(request,test,utils);
+	require('./tests/permanent_room')(request,test,utils);
+	require('./tests/editName_room')(request,test,utils);
 	
 });

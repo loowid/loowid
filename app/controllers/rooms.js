@@ -435,6 +435,8 @@ exports.editGuestName = function (req,res,next) {
 					res.json({guests:Room.safe(room.guests)});
 				}
 			});
+		} else {
+			next({'http_code':403,message:'Invalid session.'});
 		}
 	}
 };
