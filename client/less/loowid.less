@@ -229,6 +229,9 @@ h1, h2, h3, h4, h5, h6{
 	width: 100px;
 	height:120px;
 	margin: -1.2em 1.2em 0 0;
+	@media all and (max-width:800px) {
+		margin: 0em 0em 0 0;
+	}
 	img{
 		vertical-align: bottom;
 		cursor: pointer;
@@ -264,9 +267,6 @@ h1, h2, h3, h4, h5, h6{
 	p{
 		font-size: 0.85em;
 		margin: 0 0 0 0;
-	}
-	.terms{
-		
 	}
 	input[type="text"]
 	{
@@ -342,6 +342,22 @@ footer{
 	border-top: 1px solid lighten(@textcolor, 10%);
 }
 
+.twitterLink{
+	position: fixed;
+	bottom: 10px;
+	right: 20px;
+}
+
+#whatarewedoing{
+	position: absolute;
+	top: 270px;
+	right: 50px;
+	@media all and (max-width:800px) {
+		position: inherit;
+		text-align: center;
+	}
+}
+
 #home,#noscript{
 	font-size: 1.3em;
 	background: @textcolor;
@@ -356,12 +372,16 @@ footer{
 		margin: 0.2em 0 0.8em 0;
 		max-width: 600px;
 	}
-	form{
-		
-	}
 	.inner{
 		max-width: 1100px;
 		margin: 0 auto;
+	}
+	#formroom{
+		form{
+			@media all and (max-width:800px) {
+				text-align: center;
+			}
+		}
 	}
 	.home_nav{
 		background: @maincolor;
@@ -369,7 +389,7 @@ footer{
 		color: @bgcolor;
 	}
 	#starred{
-		padding: 5em 0.8em 4em 0.8em;
+		padding: 5em 0.8em 0em 0.8em;
 		display: block;
 		max-width: 1100px;
 		margin: 0 auto;
@@ -380,6 +400,44 @@ footer{
 		h2{
 			font-size: 1.5em;
 			margin: 0.8em 0 1.5em 0;
+		}
+	}
+	.homeinfo{
+		line-height: 1.55;
+		font-size: 0.8em;
+		padding: 0 0.8em 0 0.8em;
+		margin: 0 0 8em 0;
+		h2{
+			font-size: 2.4em;
+			margin: 1em 0 0.5em 0;
+			color: lighten(@maincolor, 10%);
+		}
+		ul{
+			list-style: square;
+			margin: 0 0 0.8em 1.4em;
+			li{
+				margin: 0 0 0.25em 0em;
+			}
+		}
+		code{
+			pre{
+				background: darken(@textcolor, 10%);
+				.box-shadow( inset 0 0 5px 0 rgba(0, 0, 0, 0.5) );
+				padding: 0.8em;
+				width: 600px;
+				max-width: 90%;
+				overflow: auto;
+				margin: 0 0 2em 0;
+				.repo{
+					color: #FFD659;
+				}
+				.codeok{
+					color: #67E667;
+				}
+				.codeinstall{
+					color: darken(@bgcolor, 40%);
+				}
+			}
 		}
 	}
 }
