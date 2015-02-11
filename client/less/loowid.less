@@ -242,6 +242,68 @@ h1, h2, h3, h4, h5, h6{
 	}
 }
 
+.form_data{
+	display: inline-block;	
+	vertical-align: middle;
+	font-size: 1.05em;
+	margin: 3em 0;
+	width: 600px;
+	max-width: 90%;
+	.alert{
+		display: block;
+		width: 49%;
+		margin: -1.1em 0 0.7em 0;
+		font-size: 0.7em;
+		text-align: center;
+		padding: 0.25em 0.5em;
+		background: #fdebad;
+		border: 1px solid darken(#fdebad, 10%);
+		color: @textcolor;
+		.border-radius( 6px );
+	}
+	p{
+		font-size: 0.85em;
+		margin: 0 0 0 0;
+	}
+	.terms{
+		
+	}
+	input[type="text"]
+	{
+		border: 1px solid @linkcolor;
+		display: inline-block;
+		margin: 0 2% 0.5em 0;
+		padding: 0.45em 0.25em;
+		font-size: 1.1em;
+		letter-spacing: 0.1em;
+		font-family: "komika_display_tightregular", sans-serif;
+		width: 50%;
+		text-rendering: optimizeLegibility;
+		&.ng-invalid {
+			border: 2px solid #b52715;
+		}
+	}
+	button{
+		margin: 0 0 0 0;
+		font-family: "Noto Sans",sans-serif;
+		font-size: 0.8em;
+		padding: .7em 1.2em;
+		background-color: @linkcolor;
+		border: 1px solid @linkcolor;
+		color: @bgcolor;
+		text-align: center;
+		cursor: pointer;
+		display: inline-block;
+		.border-radius( 6px );
+		&:hover{
+			.gradient-overlay( @linkcolor, lighten( @linkcolor, 10% ) );
+		}
+	}
+	.termscontainer{
+		margin: 0.6em 0;
+	}
+}
+
 #landing{
 	background: @maincolor;
 	color: @bgcolor;
@@ -274,82 +336,28 @@ h1, h2, h3, h4, h5, h6{
 	}
 }
 
+footer{
+	font-size: 0.75em;
+	padding: 0.5em 0 0.5em 0;
+	border-top: 1px solid lighten(@textcolor, 10%);
+}
+
 #home,#noscript{
 	font-size: 1.3em;
 	background: @textcolor;
 	color: @bgcolor;
-	height: 100%;
-	position: fixed;
-	top: 0px;
-	left: 0px;
-	width: 100%;
 	z-index: 1; 
 	.version{
 		margin: 0 0 0 6em;
 	}
-	#cf{
-		position: relative;
-		display: inline-block;
-		vertical-align: middle;
-		width: 100px;
-		height: 120px;
-		top: 4px;
+	.welcome{
+		font-family: "Source Sans Pro", sans-serif;
+		font-size: 1.1em;
+		margin: 0.2em 0 0.8em 0;
+		max-width: 600px;
 	}
 	form{
-		margin: 5em auto;
-		width: 90%;
-		.alert{
-			display: block;
-			width: 80%;
-			margin: 0 auto;
-			text-align: center;
-			padding: 0.25em 0.5em;
-			background: #fdebad;
-			border: 1px solid darken(#fdebad, 10%);
-			color: @textcolor;
-		}
-		p{
-			font-size: 0.85em;
-			margin: 0 0 0 0;
-		}
-		.terms{
-			margin: 12px 0 0 14%;
-		}
-		input[type="text"]
-		{
-			padding: 0.45em 0.5em;
-			border: 1px solid @bgcolor;
-			display: inline-block;
-			margin: 0 2.4% 0.5em 0;
-			padding: 0.85em 0.25em;
-			font-size: 1.4em;
-			letter-spacing: 0.1em;
-			font-family: "komika_display_tightregular", sans-serif;
-			width: 70%;
-			text-rendering: optimizeLegibility;
-			&.ng-invalid {
-				border: 2px solid #b52715;
-			}
-		}
-		button{
-			width: 165px;
-			margin: 0 0 0.5em 2.4%;
-			font-family: "Open Sans", sans-serif;
-			background-color: @linkcolor;
-			border: 1px solid lighten(@linkcolor, 10%);
-			color: @bgcolor;
-			font-size: 0.9em;
-			.border-radius( 6px );
-			padding: 0.7em 0.7em;
-			text-align: center;
-			cursor: pointer;
-			float: right;
-			.text-shadow(0 1px 1px rgba(0,0,0,.65));
-			margin: 0 14% 0 0;
-			&:hover{
-				.gradient-overlay( @linkcolor, lighten( @linkcolor, 10% ) );
-			}
-		}
+		
 	}
 	.inner{
 		max-width: 1100px;
@@ -359,16 +367,15 @@ h1, h2, h3, h4, h5, h6{
 		background: @maincolor;
 		height: 0.8em;
 		color: @bgcolor;
-		border-bottom: 15px solid @secondarycolor;
 	}
 	#starred{
-		padding: 5em 0 4em 0;
+		padding: 5em 0.8em 4em 0.8em;
 		display: block;
 		max-width: 1100px;
 		margin: 0 auto;
 		h1.slogan{
-			margin: 0 0 0.5em 0;
-			font-size: 3em;
+			margin: 0 0 0.1em 0;
+			font-size: 2.8em;
 		}
 		h2{
 			font-size: 1.5em;
