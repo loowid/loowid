@@ -72,7 +72,16 @@ angular.module('mean.rooms').factory('FileService',['$sce','UIHandler',function(
             reader.readAsDataURL(ofile.file);
             
             reader.onload = function (event){
-                self.onReadAsDataURL ($scope,event,ofile.id, undefined, undefined,connectionId,requestId,token);
+				var fileInfo = {
+					'id': ofile.id,
+					'text': undefined, 
+					'chunks': undefined,
+					'connectionId': connectionId,
+					'requestId': requestId,
+					'token': token	
+				};
+				
+                self.onReadAsDataURL ($scope,event,fileInfo);
             };
 	    };
 
@@ -92,29 +101,31 @@ angular.module('mean.rooms').factory('FileService',['$sce','UIHandler',function(
 	        }
 	    };
 
-		this.onReadAsDataURL = function ($scope,event,id, text,chunks,connectionId,requestId,token) {
+		this.onReadAsDataURL = function ($scope,event,fileInfo) {
+
 			var chunkLength = 10000;
 	        var data = {}; // data object to transmit over data channel
-	        var orinalChunks = chunks;
-	        var remainigChunks = 0;
+	    	
+			var orinalChunks = fileInfo.chunks;
+		    var remainigChunks = 0;
 
-	        if (event) { text = event.target.result; }// on first invocation
+	        if (event) { fileInfo.text = event.target.result; }// on first invocation
 	        
-	        if (self.sentFileOffers[requestId].files[id].canceled){
+	        if (self.sentFileOffers[fileInfo.requestId].files[fileInfo.id].canceled){
 	            return;
 	        }
 
-	        remainigChunks = this.getRemainingChunks(text,chunkLength);
-	        data.message = this.getDataMessage(text,chunkLength);
+	        remainigChunks = this.getRemainingChunks(fileInfo.text,chunkLength);
+	        data.message = this.getDataMessage(fileInfo.text,chunkLength);
 	        
 	        if (!orinalChunks) { orinalChunks = remainigChunks; }
-	        data.fileid = id;
+	        data.fileid = fileInfo.id;
 	        data.remainigChunks = remainigChunks-1;
 	        data.chunks = orinalChunks;
 
-	        rtc.sendMessage(connectionId,'filedata',data,requestId,token);
+	        rtc.sendMessage(fileInfo.connectionId,'filedata',data,fileInfo.requestId,fileInfo.token);
 	        
-	        $scope.getFile((uiHandler.isowner ? $scope.getUser(connectionId).files : uiHandler.ownerFiles ),id).completed = Math.floor((1 - (data.remainigChunks / data.chunks)) * 100);
+	        $scope.getFile((uiHandler.isowner ? $scope.getUser(fileInfo.connectionId).files : uiHandler.ownerFiles ),fileInfo.id).completed = Math.floor((1 - (data.remainigChunks / data.chunks)) * 100);
 
             if (self.hasToRefresh){
 	            	//Just refresh each second not in each packet
@@ -126,12 +137,21 @@ angular.module('mean.rooms').factory('FileService',['$sce','UIHandler',function(
 	            	},2000);
             }
             
-	        var remainingDataURL = text.slice(data.message.length);
+	        var remainingDataURL = fileInfo.text.slice(data.message.length);
 	        
 	        // we try to do it semiasync
 	        if (remainingDataURL.length) {
 	        	setTimeout(function () {
-	        		self.onReadAsDataURL($scope,null,id,remainingDataURL,orinalChunks,connectionId,requestId,token); // continue transmitting
+					var remainFileInfo = {
+						'id' : fileInfo.id,	
+						'text' : remainingDataURL,
+						'chunks': orinalChunks,
+						'connectionId': fileInfo.connectionId,
+						'requestId': fileInfo.requestId,
+						'token': fileInfo.token
+					};
+					
+	        		self.onReadAsDataURL($scope,null,remainFileInfo); // continue transmitting
 	        	}, 50);
 	        }
     	};
