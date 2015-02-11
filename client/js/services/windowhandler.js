@@ -26,8 +26,15 @@ angular.module('mean.rooms').factory('WindowHandler',[function(){
 			return 80 + (20*winCount);
 		};
 
-		this.create = function ($scope,mediaElement,winTitle,source,winratio,winscale,closeable,onopen,onclose){
-		
+		this.create = function ($scope,windowOptions){
+			
+			var mediaElement = windowOptions.mediaElement;
+			var winTitle = windowOptions.title;
+			var winratio = windowOptions.ratio;
+			var winscale = windowOptions.scale;
+			var closeable = windowOptions.closeable;
+			var onopen = windowOptions.onopen;
+			var onclose = windowOptions.onclose;
 			var winWidth = this.getDefaultWidth(winscale);
 			var winHeight = this.getDefaultHeight(winratio,winscale);
 			
