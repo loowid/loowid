@@ -228,7 +228,7 @@ app.configure(function() {
 			res.cookie('stickyid', req.headers.stickyid, { maxAge: 3600000, httpOnly: true });
 		}
 		// Skip CSRF Check for LTI Initial Route, and forces https
-		if ((req.protocol === 'http') && (req.url === LTI_PATH)) {
+		if ((req.protocol === 'http') && (req.url === LTI_PATH) && isOpenShift()) {
 			Object.defineProperty(req, 'protocol', { value: 'https', writable: false });
 			req.headers.host = process.env.LTI_DOMAIN || req.headers.host;
 			logger.debug(req.protocol+'://'+req.headers.host+(req.port?':'+req.port:'')+'/'+req.url);

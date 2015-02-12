@@ -64,6 +64,7 @@ module.exports = function(request,test,utils) {
 	            expect(response.statusCode).toBe(200);
 	            utils.room = JSON.parse(body);
 	            expect(utils.room.roomId).toBe(utils.roomID);
+	            expect(utils.room.access.moderated).toBe(false);
 	            // Check DB Objects
 	            utils.Log.count({'url':'/rooms/create',
 	            		  'date':{'$gte':requestDate},
