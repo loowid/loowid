@@ -112,6 +112,8 @@ describe('Main Server Tests', function() {
 	});
 	
 	require('./tests/init')(request,test,utils);
+	require('./tests/chat_talk')(request,test,utils);
+	require('./tests/change_log_level')(request,test,utils);
 	require('./tests/new_room')(request,test,utils);
 	require('./tests/join_room')(request,test,utils);
 	require('./tests/chat_room')(request,test,utils);
@@ -126,5 +128,6 @@ describe('Main Server Tests', function() {
 	require('./tests/edit_name_room')(request,test,utils);
 	require('./tests/status_room')(request,test,utils);
 	require('./tests/moderated_room')(request,test,utils);
+	require('./tests/room_stats')(request,test,utils);
 	
 });
