@@ -202,5 +202,6 @@
    "hideUrl":"Deixa de compartir la pantalla per veure la URL privada",
    "youtubeVideo": "YouTube - Fes clic per obrir",
    "ownServer": "O pots usar la nostra APP al teu propi servidor",
-   "installMongo": "Només has d'instal·lar MongoDB i..."
+   "installMongo": "Només has d'instal·lar MongoDB i...",
+   "canceledFile": "ha refusat l'enviament de fitxers"
 }

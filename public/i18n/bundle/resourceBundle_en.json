@@ -202,5 +202,6 @@
    "hideUrl":"Stop screencasting to watch your private URL",
    "youtubeVideo": "YouTube - Click to open",
    "ownServer": "Or you can use our APP in your own server",
-   "installMongo": "You will need to install MongoDB and just..."
+   "installMongo": "You will need to install MongoDB and just...",
+   "canceledFile": "refused the file"
 }

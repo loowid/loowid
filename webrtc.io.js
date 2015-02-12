@@ -605,11 +605,12 @@ function attachEvents(manager) {
 	    // inform the user you ask to screen share
 	    if (soc) {
 	      soc.send(JSON.stringify({
-	        'eventName' : 'files request completed', 
+	        'eventName' : 'files request error', 
 	        'data' : {
 	          'requestId': data.requestId,
 	          'token' : data.token,
-	          'id' : socket.id
+	          'id' : socket.id,
+			  'error': data.error
 	        }
 	      }), errorFn);
 	    }

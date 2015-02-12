@@ -202,6 +202,7 @@
    "hideUrl":"Deja de compartir la pantalla para ver la URL privada",
    "youtubeVideo": "YouTube - Haz click para abrir",
    "ownServer": "O puedes usar nuestra APP en tu propio servidor",
-   "installMongo": "Solo tienes que instalar MongoDB y..."
+   "installMongo": "Solo tienes que instalar MongoDB y...",
+	"canceledFile": "ha reusado el envio de ficheros"
 	
 }

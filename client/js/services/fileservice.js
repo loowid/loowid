@@ -504,11 +504,24 @@ angular.module('mean.rooms').factory('FileService',['$sce','UIHandler',function(
 	        });
 
 	        rtc.uniqueon ('files request error',function (data){
-	                delete rtc.dataChannels[data.id]['filedata_'+ data.requestId];
-	                rtc.dropPeerConnection (data.id,'filedata_' + data.requestId,true);
-
-	                var errMessage = $scope.getUserName(data.connectionId) +  $scope.resourceBundle.errorShareFiles;
+	                var errMessage = $scope.getUserName(data.id) + ' ' + $scope.resourceBundle.canceledFile;
 	                $scope.global.showError($scope,errMessage);
+				
+					var fileOffer = self.sentFileOffers[data.requestId];
+					var files = getFilesFromUser(data.id);
+
+	                for (var fileId in fileOffer.files){
+						if (fileOffer.files.hasOwnProperty(fileId)) {
+							for (var userFileId in files){
+								if (files[userFileId].id === fileId){
+									files[userFileId].canceled = true;
+									files[userFileId].completed = 101;
+								}
+							}
+						}
+					}
+
+				
 	        });
     	};
 

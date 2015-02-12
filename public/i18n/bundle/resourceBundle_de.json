@@ -202,5 +202,7 @@
    "hideUrl":"Stoppen Screen um private URL beobachten",
    "youtubeVideo": "YouTube - Klick öffnet",
    "ownServer": "Oder Sie können unser APP in Ihrem eigenen Server verwenden",
-   "installMongo": "Sie müssen MongoDB und einfach zu installieren..."
+   "installMongo": "Sie müssen MongoDB und einfach zu installieren...",
+	"canceledFile": "wieder verwendet, um die Daten-Dateien senden"
+	
 }
