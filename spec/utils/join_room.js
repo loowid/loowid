@@ -79,8 +79,8 @@ module.exports = function(request,test,utils,vid) {
     };
     
 	for (var x=0; x<vid.length; x+=1) {
-	    test('New ['+vid[x]+'] WebSocket connection done.',nws);
-	    test('New ['+vid[x]+'] joins the room.',njr);
+	    test('New ['+vid[x]+'] websocket connection done.',nws);
+	    test('New ['+vid[x]+'] peer connected the room.',njr);
 	    test('New ['+vid[x]+'] joins the room to get info.', njri);
 	}
 	

@@ -1,7 +1,7 @@
 'use strict';
 module.exports = function(request,test,utils) {
 
-	describe('Join room', function() {
+	describe('Change status room', function() {
 
 		require('../utils/create_room')(request,test,utils);
 		

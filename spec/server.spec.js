@@ -125,5 +125,6 @@ describe('Main Server Tests', function() {
 	require('./tests/permanent_room')(request,test,utils);
 	require('./tests/edit_name_room')(request,test,utils);
 	require('./tests/status_room')(request,test,utils);
+	require('./tests/moderated_room')(request,test,utils);
 	
 });

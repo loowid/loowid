@@ -50,9 +50,10 @@ module.exports = function(request,test,utils) {
 	    	}));
 	    });
 
-	    test('Viewer send chat typing alert.', function(done) {
+	    test('Viewer cannot send chat typing alert.', function(done) {
 	    	utils.addListener('viewer0','chat_message',function(typing){
 	    		expect(typing.id).toBe('||@@||');
+	    		expect(typing.text).toBe('The chat is closed.');
 	    		done();
 	    	});
 	    	utils.ws.viewer0.send(JSON.stringify({
@@ -61,10 +62,11 @@ module.exports = function(request,test,utils) {
 	    	}));
 	    });
 	    
-	    test('Viewer send chat message.', function(done) {
+	    test('Viewer cannot send chat message.', function(done) {
 	    	var testMsg = 'Hello owner this is client!!';
 	    	utils.addListener('viewer0','chat_message',function(msg){
 	    		expect(msg.id).toBe('||@@||');
+	    		expect(msg.text).toBe('The chat is closed.');
 	    		done();
 	    	});
 	    	utils.ws.viewer0.send(JSON.stringify({

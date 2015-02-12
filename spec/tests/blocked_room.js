@@ -1,7 +1,7 @@
 'use strict';
 module.exports = function(request,test,utils) {
 
-	describe('BLocked room', function() {
+	describe('Blocked room', function() {
 		
 		require('../utils/create_room')(request,test,utils);
 		
