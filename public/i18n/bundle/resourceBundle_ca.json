@@ -173,7 +173,7 @@
    "textsitemshare":"Compartir el teu escriptori, càmera web i àudio en sales públiques o privades",
    "textsitemcreate":"Crear aquestes sales moderades de forma anònima i gratuïta",
    "textsitemsharefile":"Enviar fitxers als teus convidats sense que aquests es registrin",
-   "textslink":"Pots accedir a molta més informació des d'aquí, la nostra pàgina principal",
+   "textslink":"Pots accedir a molta més informació des <a href='https://github.com/loowid/loowid/wiki'>d'aquí</a>, la nostra <a href='https://github.com/loowid/loowid/wiki'>wiki</a>",
    "justchrome":"En aquests moments <strong>Chrome</strong> per Mac, Linux i Windows és l'unic navegador que permet la captura de l'escriptori",
    "startconversation":"Comença la conversa",
    "conversationdevices":"Podeu compartir la càmera, l'àudio i l'escriptori tots alhora",
@@ -200,5 +200,7 @@
    "uleaveroom":"{0} ha abandonat la sala",
    "onlinenews":"Els espectadors de la sala han canviat",
    "hideUrl":"Deixa de compartir la pantalla per veure la URL privada",
-   "youtubeVideo": "YouTube - Fes clic per obrir"
+   "youtubeVideo": "YouTube - Fes clic per obrir",
+   "ownServer": "O pots usar la nostra APP al teu propi servidor",
+   "installMongo": "Només has d'instal·lar MongoDB i..."
 }

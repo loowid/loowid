@@ -173,7 +173,7 @@
    "textsitemshare":"Compartir tu escritorio, webcam y audio en salas públicas o privadas",
    "textsitemcreate":"Crear estas salas moderadas de forma anónima y gratuíta",
    "textsitemsharefile":"Enviar ficheros con tus invitados sin que queden registrados",
-   "textslink":"Puedes acceder a mucha más información desde aquí, nuestra página principal",
+   "textslink":"Puedes acceder a mucha más información <a href='https://github.com/loowid/loowid/wiki'>desde aquí</a>, nuestra <a href='https://github.com/loowid/loowid/wiki'>wiki</a>",
    "justchrome":"En estos momentos <strong>Chrome</strong> para Mac, Linux y Windows es el único navegador que soporta la captura de escritorio",
    "startconversation":"Empieza la convesación",
    "conversationdevices":"Podéis compartir vuestra cámara, audio y escritorio, todo",
@@ -200,6 +200,8 @@
    "uleaveroom":"{0} ha abandonado la sala",
    "onlinenews":"Los espectadores de la sala han cambiado",
    "hideUrl":"Deja de compartir la pantalla para ver la URL privada",
-   "youtubeVideo": "YouTube - Haz click para abrir"
+   "youtubeVideo": "YouTube - Haz click para abrir",
+   "ownServer": "O puedes usar nuestra APP en tu propio servidor",
+   "installMongo": "Solo tienes que instalar MongoDB y..."
 	
 }

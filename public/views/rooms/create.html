@@ -49,9 +49,9 @@
 					<li>{{resourceBundle.textsitemcreate}}</li>
 					<li>{{resourceBundle.textsitemsharefile}}</li>
 				</ul>
-				<p>{{resourceBundle.textslink}}</p>
-				<h2>Or you can use our APP in your own server</h2>
-				<p>You will need to install MongoDB and just...</p>
+				<p ng-bind-html="resourceBundle.textslink"></p>
+				<h2>{{resourceBundle.ownServer}}</h2>
+				<p>{{resourceBundle.installMongo}}</p>
 			<code>
 				<pre>
 git clone <span class="repo">git@github.com:loowid/loowid.git</span>

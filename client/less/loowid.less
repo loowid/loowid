@@ -226,8 +226,10 @@ h1, h2, h3, h4, h5, h6{
 	position:relative;
  	display: inline-block;	
 	vertical-align: middle;
-	width: 100px;
-	height:120px;
+	width: 150px;
+	height:150px;
+	.border-radius(150px);
+	border: 2px solid rgba(255,255,255,0.1);
 	margin: -1.2em 1.2em 0 0;
 	@media all and (max-width:800px) {
 		margin: 0em 0em 0 0;
@@ -236,12 +238,17 @@ h1, h2, h3, h4, h5, h6{
 		vertical-align: bottom;
 		cursor: pointer;
 		position:absolute;
-		left:0;
-		top:0;
+		left:25px;
+		top:15px;
+		.border-radius(15px);
 		.transition( opacity 0.5s ease-in-out );
 		&:hover{
 			opacity: 0;
 		}
+	}
+	&:hover{
+		border: 2px solid @linkcolor;
+		.box-shadow( inset 0 0 10px 0 rgba(0,0,0,0.8) );
 	}
 }
 
@@ -383,6 +390,10 @@ footer{
 
 #home{
 	color: @bgcolor;
+}
+
+#explain_texts{
+	padding: 0 0.8em 0 0.8em;
 }
 
 #home,#noscript{
