@@ -112,6 +112,7 @@ describe('Main Server Tests', function() {
 	});
 	
 	require('./tests/init')(request,test,utils);
+	require('./tests/lti_room')(request,test,utils);
 	require('./tests/chat_talk')(request,test,utils);
 	require('./tests/change_log_level')(request,test,utils);
 	require('./tests/new_room')(request,test,utils);
