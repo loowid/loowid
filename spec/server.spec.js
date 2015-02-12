@@ -123,6 +123,7 @@ describe('Main Server Tests', function() {
 	require('./tests/blocked_chat')(request,test,utils);
 	require('./tests/private_room')(request,test,utils);
 	require('./tests/permanent_room')(request,test,utils);
-	require('./tests/editName_room')(request,test,utils);
+	require('./tests/edit_name_room')(request,test,utils);
+	require('./tests/status_room')(request,test,utils);
 	
 });
