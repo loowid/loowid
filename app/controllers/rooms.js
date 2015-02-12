@@ -377,6 +377,8 @@ exports.editShared = function (req,res,next) {
 				res.json(room);
 			}
 		});
+	} else {
+		next({'http_code':403,message:'Invalid session.'});
 	}
 };
 
@@ -395,6 +397,8 @@ exports.editOwnerName = function (req,res,next) {
 				res.json(room);
 			}
 		});
+	} else {
+		next({'http_code':403,message:'Invalid session.'});
 	}
 };
 
@@ -411,6 +415,8 @@ exports.changeRoomStatus = function (req,res,next){
 				res.json(room);
 			}
 		});
+	} else {
+		next({'http_code':403,message:'Invalid session.'});
 	}
 };
 
@@ -421,23 +427,20 @@ exports.editGuestName = function (req,res,next) {
 	//var sessions = room.sessions;
 	var idx = guests ? guests.indexOfField('connectionId',req.connectionId) : -1;
 	// is it valid?
-	if (idx !== -1) {
-		// Only the guest can change his name
-		if (guests[idx].sessionid === req.sessionID) {
-			guests[idx].name=req.body.name;
-			guests[idx].avatar=req.body.avatar;
-	        // save the doc
-	        room.markModified('guests');
-			room.save(function(err) {
-				if (err) {
-					next(err);
-				} else {
-					res.json({guests:Room.safe(room.guests)});
-				}
-			});
-		} else {
-			next({'http_code':403,message:'Invalid session.'});
-		}
+	if (idx !== -1 && guests[idx].sessionid === req.sessionID) {
+		guests[idx].name=req.body.name;
+		guests[idx].avatar=req.body.avatar;
+        // save the doc
+        room.markModified('guests');
+		room.save(function(err) {
+			if (err) {
+				next(err);
+			} else {
+				res.json({guests:Room.safe(room.guests)});
+			}
+		});
+	} else {
+		next({'http_code':403,message:'Invalid session.'});
 	}
 };
 
@@ -628,20 +631,19 @@ exports.askForSharing = function (req,res,next) {
 	//var sessions = room.sessions;
 	var idx = guests ? guests.indexOfField('connectionId',req.connectionId) : -1;
 	// is it valid?
-	if (idx !== -1) {
-		// Only the guest can share owner and itself
-		if (room.owner.sessionid === req.sessionID || guests[idx].sessionid === req.sessionID) {
-			guests[idx].source.push(req.body.source);
-	        // save the doc
-	        room.markModified('guests');
-			room.save(function(err) {
-				if (err) {
-					next(err);
-				} else {
-					res.json({'success':true});
-				}
-			});
-		}
+	if (idx !== -1 && (room.owner.sessionid === req.sessionID || guests[idx].sessionid === req.sessionID)) {
+		guests[idx].source.push(req.body.source);
+        // save the doc
+        room.markModified('guests');
+		room.save(function(err) {
+			if (err) {
+				next(err);
+			} else {
+				res.json({'success':true});
+			}
+		});
+	} else {
+		next({'http_code':403,message:'Invalid session.'});
 	}
 };
 
@@ -651,23 +653,24 @@ exports.askForStopSharing = function (req,res,next) {
 	//var sessions = room.sessions;
 	var idx = guests ? guests.indexOfField('connectionId',req.connectionId) : -1;
 	// is it valid?
-	if (idx !== -1) {
-		// Only the guest can share owner and itself
-		if (room.owner.sessionid === req.sessionID || guests[idx].sessionid === req.sessionID) {
-			var i = guests[idx].source.indexOf(req.body.source);
-			if (i>=0) {
-				guests[idx].source.splice(i,1);
-		        // save the doc
-		        room.markModified('guests');
-				room.save(function(err) {
-					if (err) {
-						next(err);
-					} else {
-						res.json({'success':true});
-					}
-				});
-			}
+	if (idx !== -1 && (room.owner.sessionid === req.sessionID || guests[idx].sessionid === req.sessionID)) {
+		var i = guests[idx].source.indexOf(req.body.source);
+		if (i>=0) {
+			guests[idx].source.splice(i,1);
+	        // save the doc
+	        room.markModified('guests');
+			room.save(function(err) {
+				if (err) {
+					next(err);
+				} else {
+					res.json({'success':true});
+				}
+			});
+		} else {
+			next({'http_code':404,message:'Not found.'});
 		}
+	} else {
+		next({'http_code':403,message:'Invalid session.'});
 	}
 };
 
@@ -693,6 +696,8 @@ exports.moveRoom = function (req,res,next) {
 				res.json({success:true,fromRoomId:oldRoomId,toRoomId:newid});
 			}
 		});
+	} else {
+		next({'http_code':403,message:'Invalid session.'});
 	}
 };
 
