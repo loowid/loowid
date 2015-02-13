@@ -1,5 +1,5 @@
 # Loowid [![Build Status](https://travis-ci.org/loowid/loowid.svg?branch=master)](https://travis-ci.org/loowid/loowid) [![Build Status](https://api.shippable.com/projects/54d253435ab6cc13528acebb/badge?branchName=master)](https://app.shippable.com/projects/54d253435ab6cc13528acebb/builds/latest) [![Coverage Status](https://coveralls.io/repos/loowid/loowid/badge.svg?branch=master)](https://coveralls.io/r/loowid/loowid?branch=master) [![Codacy Badge](https://www.codacy.com/project/badge/8cdf09fa132041568dab928453fa2885)](https://www.codacy.com/public/jjmerono/loowid_3)
-
+[![Translated] (https://hosted.weblate.org/widgets/loowid/-/svg-badge.svg)](https://hosted.weblate.org/widgets/loowid/-/svg-badge.svg)
 
 *LOOk What I'm Doing* is a web application that allows you to connect with other users and share audio, video, screen and files without any plugin using WebRTC technology.
 
@@ -131,3 +131,8 @@ Wiki Documentation | Vote us !! | Bitnami Contest
   MONGOLAB_URI=<MongoDB URI>
   MONGOHQ_URL=<MongoDB URL>
   ```
+  
+  # Translate
+  If you are interested in add a translation or improve the existing ones you can use weblate platform at: 
+  https://hosted.weblate.org/engage/loowid/ 
+
