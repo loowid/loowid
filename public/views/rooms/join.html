@@ -56,7 +56,7 @@
 		<fieldset>
 			<p class="toolbar">
 				<a href="" ng-click="configureRoom(false)">{{resourceBundle.accesssave}}</a>
-				<a href="" ng-click="enableEditAccess()" class="close">{{resourceBundle.accessclose}}</a>
+				<a href="" ng-click="enableEditAccess()" class="close warnedbtn">{{resourceBundle.accessclose}}</a>
 			</p>
 			
 			<p><label for="chgacctitle">{{resourceBundle.accesstitle}}</label></p>
@@ -82,7 +82,7 @@
 <div id="editName" ng-class="ui.editNameClass">
 	<form data-ng-submit="changeName()" novalidate>
 		<fieldset>
-			<p class="toolbar"><a href="" ng-click="changeName()">{{resourceBundle.accesssave}}</a> <a href="" ng-click="enableEditName()">{{resourceBundle.gravatarclose}}</a></p>
+			<p class="toolbar"><a href="" ng-click="changeName()">{{resourceBundle.accesssave}}</a> <a href="" ng-click="enableEditName()" class="warnedbtn">{{resourceBundle.gravatarclose}}</a></p>
 			<p><label for="chgname">{{resourceBundle.gravatarname}}</label></p>
 			<p><input id="chgname" type="text" data-ng-model="ui.name" ng-pattern="global.namePattern" required class="input-lg" size="15"></p>
 			<p><label for="chgavatar">{{resourceBundle.gravataremail}}</label></p>
@@ -98,9 +98,9 @@
 			<fieldset>
 				<p class="toolbar">
 					<a href="" ng-show="modal.ok" ng-click="modal.ok($index);">{{resourceBundle.modalok}}</a> 
-					<a href="" ng-show="modal.cancel" ng-click="modal.cancel($index);">{{resourceBundle.modal.cancel}}</a>
+					<a href="" ng-show="modal.cancel" ng-click="modal.cancel($index);" class="warnedbtn">{{resourceBundle.modal.cancel}}</a>
 					<a href="" ng-show="modal.yes" ng-click="modal.yes($index);">{{resourceBundle.modalyes}}</a>
-					<a href="" ng-show="modal.no" ng-click="modal.no($index);">{{resourceBundle.modalno}}</a>
+					<a href="" ng-show="modal.no" ng-click="modal.no($index);" class="warnedbtn">{{resourceBundle.modalno}}</a>
 				</p>
 				<div ng-show="modal.avatar" class="avatar"><img ng-src="{{modal.avatar}}" /></div>
 				<h3 ng-bind-html="modal.text"></h3>
@@ -172,7 +172,7 @@
 			</p>
 			<p class="toolbar" ng-hide="global.access.moderated">
 				<a  href="" ng-click="openFileDialog($index);"><i class="fa fa-cloud-upload"></i></a>
-				<a  href="" ng-click="fireUser($index)"><i class="fa fa-sign-out"> </i></a>
+				<a  href="" ng-click="fireUser($index)" class="warnedbtn"><i class="fa fa-sign-out"> </i></a>
 			</p>
 			<input ng-show="false" type="file" id="userfiles_{{$index}}" name="{{$index}}files[]" multiple />
 			
