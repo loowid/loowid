@@ -187,5 +187,7 @@
    "youtubeVideo": "YouTube - Click to open",
    "ownServer": "Or you can use our APP in your own server",
    "installMongo": "You will need to install MongoDB and just...",
-   "canceledFile": "refused the file"
+   "canceledFile": "refused the file",
+   "wikihelp": "Do you need any help? Try watching our wiki",
+   "wikilink": "https://github.com/loowid/loowid/wiki"
 }

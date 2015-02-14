@@ -695,6 +695,35 @@ header{
 	.box-shadow(0 0 5px rgba(0,0,0,.25) );
 	overflow: auto;
 	
+	.wikihelp{
+		position: absolute;
+		bottom: 0px;
+		width: 32px;
+		height: 32px;
+		background: @linkcolor;
+		.border-radius( 64px );
+		a{
+			text-decoration: none;
+			color: @bgcolor;
+			font-size: 1.6em;
+			text-align: center;
+			display: block;
+		}
+		.titled{
+			display: none;
+			position: absolute;
+			.box-shadow(0 0 5px 0 rgba( 0, 0, 0, 0.5 ));
+			font-size: .85em;
+			width: 150px;
+			bottom: 39px;
+			padding: 0.8em;
+		}
+		&:hover{
+			.titled{
+				display: block;
+			}
+		}
+	}
 
 	h1 {
 		font-size: 1.6em;

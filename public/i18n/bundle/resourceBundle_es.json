@@ -187,6 +187,7 @@
    "youtubeVideo": "YouTube - Haz click para abrir",
    "ownServer": "O puedes usar nuestra APP en tu propio servidor",
    "installMongo": "Solo tienes que instalar MongoDB y...",
-	"canceledFile": "ha reusado el envio de ficheros"
-	
+	"canceledFile": "ha reusado el envio de ficheros",
+   "wikihelp": "¿Necesitas ayuda? Echa un vistazo a nuestra wiki",
+   "wikilink": "https://github.com/loowid/loowid/wiki"
 }
