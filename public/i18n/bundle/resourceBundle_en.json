@@ -157,7 +157,7 @@
    "textsitemshare":"Share your desktop webcam, and audio in public and private rooms",
    "textsitemcreate":"Anonymous creation of moderated rooms",
    "textsitemsharefile":"Send files to your guests without being registered anywhere",
-   "textslink":"You can access all the information you need from <a href='https://github.com/loowid/loowid/wiki'>here</a>, in our public <a href='https://github.com/loowid/loowid/wiki'>wiki</a>",
+   "textslink":"You can access all the information you need from <a href='https://github.com/loowid/loowid/wiki/How-to-use-it/How-to-use-it'>here</a>, in our public <a href='https://github.com/loowid/loowid/wiki'>wiki</a>",
    "justchrome":"Today <strong>Chrome</strong> for Mac, Linux and Windows is the only brower that supports desktop sharing",
    "startconversation":"Start the conversation",
    "conversationdevices":"You can share your cam, audio and your desktop at the same time",
@@ -189,5 +189,5 @@
    "installMongo": "You will need to install MongoDB and just...",
    "canceledFile": "refused the file",
    "wikihelp": "Do you need any help? Try watching our wiki",
-   "wikilink": "https://github.com/loowid/loowid/wiki"
+   "wikilink": "https://github.com/loowid/loowid/wiki/How-to-use-it"
 }

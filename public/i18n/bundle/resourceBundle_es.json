@@ -156,7 +156,7 @@
     "textsitemcreate": "Crear estas salas moderadas de forma anónima y gratuíta", 
     "textsitemshare": "Compartir tu escritorio, webcam y audio en salas públicas o privadas", 
     "textsitemsharefile": "Enviar ficheros con tus invitados sin que queden registrados", 
-    "textslink": "Puedes acceder a mucha más información <a href='https://github.com/loowid/loowid/wiki'>desde aquí</a>, nuestra <a href='https://github.com/loowid/loowid/wiki'>wiki</a>", 
+    "textslink": "Puedes acceder a mucha más información <a href='https://github.com/loowid/loowid/wiki/How-to-use-it'>desde aquí</a>, nuestra <a href='https://github.com/loowid/loowid/wiki'>wiki</a>", 
     "timeformat": "hh:mi", 
     "timeprep": "hace {0} min(s)", 
     "tutorialnext": "Siguiente", 
