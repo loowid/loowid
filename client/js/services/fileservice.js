@@ -208,10 +208,12 @@ angular.module('mean.rooms').factory('FileService',['$sce','UIHandler',function(
 
     	    $scope.openFileDialog = function(index){
        
-		        document.getElementById('userfiles_'+index).addEventListener('change',function (){
-		            self.uploadFiles($scope,this.id);
-		        });
-		        
+				var initiateUploadRequest = function (){
+					self.uploadFiles($scope,this.id);
+					document.getElementById('userfiles_'+index).removeEventListener('change',initiateUploadRequest);
+				};	
+		    
+				document.getElementById('userfiles_'+index).addEventListener('change',initiateUploadRequest);
 	    	    document.getElementById('userfiles_'+index).click();
 		    };
 
