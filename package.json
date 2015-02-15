@@ -22,6 +22,7 @@
     "grunt-contrib-watch": "0.6.1",
     "grunt-jasmine-node": "^0.2.1",
     "grunt-jasmine-node-istanbul": "0.0.5",
+    "http-proxy": "^1.8.1",
     "mockgoose": "^1.10.7"
   },
   "dependencies": {
