@@ -1,4 +1,4 @@
-# Loowid [![Build Status](https://travis-ci.org/loowid/loowid.svg?branch=master)](https://travis-ci.org/loowid/loowid) [![Build Status](https://api.shippable.com/projects/54d253435ab6cc13528acebb/badge?branchName=master)](https://app.shippable.com/projects/54d253435ab6cc13528acebb/builds/latest) [![Coverage Status](https://coveralls.io/repos/loowid/loowid/badge.svg?branch=master)](https://coveralls.io/r/loowid/loowid?branch=master) [![Codacy Badge](https://www.codacy.com/project/badge/ac8effa59d594bb0aa4c344da6a92527)](https://www.codacy.com/public/alexballeste/loowid) [![Translated](https://hosted.weblate.org/widgets/loowid/-/svg-badge.svg)](https://hosted.weblate.org/widgets/loowid/-/svg-badge.svg)
+# LooWID [![Build Status](https://travis-ci.org/loowid/loowid.svg?branch=master)](https://travis-ci.org/loowid/loowid) [![Build Status](https://api.shippable.com/projects/54d253435ab6cc13528acebb/badge?branchName=master)](https://app.shippable.com/projects/54d253435ab6cc13528acebb/builds/latest) [![Coverage Status](https://coveralls.io/repos/loowid/loowid/badge.svg?branch=master)](https://coveralls.io/r/loowid/loowid?branch=master) [![Codacy Badge](https://www.codacy.com/project/badge/ac8effa59d594bb0aa4c344da6a92527)](https://www.codacy.com/public/alexballeste/loowid) [![Translated](https://hosted.weblate.org/widgets/loowid/-/svg-badge.svg)](https://hosted.weblate.org/widgets/loowid/-/svg-badge.svg)
 
 *LOOk What I'm Doing* is a web application that allows you to connect with other users and share audio, video, screen and files without any plugin using WebRTC technology.
 
@@ -6,12 +6,12 @@ https://www.loowid.com
 
 Wiki Documentation | Vote us !! | Bitnami Contest
 :---:|:---:|:---:
-[![Wiki Documentation](https://raw.githubusercontent.com/loowid/loowid-doc/master/images/howtouse/6-user-buttons.png)](https://github.com/loowid/loowid/wiki)|[![Loowid Bitnami Contest](https://d33np9n32j53g7.cloudfront.net/assets/stacks/loowid/img/loowid-module-20caa0b9cc4fc99d7b5929ab83f8418f.png)](https://bitnami.com/stack/loowid?utm_source=bitnami&utm_medium=badge&utm_term=loowid&utm_campaign=Application%2BContest)|[![Bitnami](https://pbs.twimg.com/profile_images/378800000732241585/9e00ada9691f6aab16668cfb9dfa2f1c_normal.png)](https://bitnami.com/contest?page=4&product=loowid&utm_campaign=Application%2BContest&utm_medium=badge&utm_source=bitnami&utm_term=loowid)
+[![Wiki Documentation](https://raw.githubusercontent.com/loowid/loowid-doc/master/images/howtouse/6-user-buttons.png)](https://github.com/loowid/loowid/wiki)|[![LooWID Bitnami Contest](https://d33np9n32j53g7.cloudfront.net/assets/stacks/loowid/img/loowid-module-20caa0b9cc4fc99d7b5929ab83f8418f.png)](https://bitnami.com/stack/loowid?utm_source=bitnami&utm_medium=badge&utm_term=loowid&utm_campaign=Application%2BContest)|[![Bitnami](https://pbs.twimg.com/profile_images/378800000732241585/9e00ada9691f6aab16668cfb9dfa2f1c_normal.png)](https://bitnami.com/contest?page=4&product=loowid&utm_campaign=Application%2BContest&utm_medium=badge&utm_source=bitnami&utm_term=loowid)
 
   
 ## Install
 
-  1. You need to install nodejs, mongo and git before run loowid.
+  1. You need to install nodejs, mongo and git before run LooWID.
   2. Download source code.`
       git clone https://github.com/loowid/loowid /install/dir
 `
@@ -19,7 +19,7 @@ Wiki Documentation | Vote us !! | Bitnami Contest
 
       ```
       http://www.cert-depot.com/
-      If no certificate available loowid startup in http port. 
+      If no certificate available LooWID startup in http port. 
       When https port is running, http port is used only to redirect to https port.
       ```
       
@@ -31,7 +31,7 @@ Wiki Documentation | Vote us !! | Bitnami Contest
 
 ## Docker
 
-  Too many steps to install? Don't worry loowid is also dockerized !!
+  Too many steps to install? Don't worry LooWID is also dockerized !!
   
   https://github.com/loowid/loowid-docker
   
@@ -71,7 +71,7 @@ Wiki Documentation | Vote us !! | Bitnami Contest
 ## Configuration
 
 
-  There are some environment variables you may set to configure your loowid deployment. 
+  There are some environment variables you may set to configure your LooWID deployment. 
   Check your hosting provider documentation in order to know how to set this values, for example, with openshift you can type:
   ```
   	rhc env set VARIABLE=VALUE -a app
@@ -106,8 +106,8 @@ Wiki Documentation | Vote us !! | Bitnami Contest
   PRIVATE_KEY=<path-to-your-privatekey.pem>
   ```
 
-  6. LTI Producer Configuration. The consumer connects with multiple loowid rooms depends on LTI context, the first user with OWNER_ROLE will be the room owner. 
-  The loowid producer entrypoint is configured with LTI_PATH (/lti). Set LTI_DOMAIN if your host is behind a proxy with other domain than req.headers.host. 
+  6. LTI Producer Configuration. The consumer connects with multiple LooWID rooms depends on LTI context, the first user with OWNER_ROLE will be the room owner. 
+  The LooWID producer entrypoint is configured with LTI_PATH (/lti). Set LTI_DOMAIN if your host is behind a proxy with other domain than req.headers.host. 
 
   ```
   LTI_KEY=<lti-key>
@@ -124,7 +124,7 @@ Wiki Documentation | Vote us !! | Bitnami Contest
   WS_PORT=<websocket-port-server>
   ```
 
-  8. MongoDB URL. By Default loowid uses localhost to connect with mongodb, set one of this variables to connect to another URL. 
+  8. MongoDB URL. By Default LooWID uses localhost to connect with mongodb, set one of this variables to connect to another URL. 
 
   ```
   MONGOLAB_URI=<MongoDB URI>
@@ -134,4 +134,6 @@ Wiki Documentation | Vote us !! | Bitnami Contest
   ## Translate
   If you are interested in add a translation or improve the existing ones you can use weblate platform at: 
   https://hosted.weblate.org/engage/loowid/ . We'll incorporate your translations as soon as possible.
-
+  
+  ##License
+  LooWID is licenced under [The MIT License (MIT)](https://github.com/loowid/loowid/blob/master/LICENSE) 
