@@ -16,6 +16,10 @@ var sport = process.env.LOOWID_HTTPS_PORT || 443;
 var port = process.env.LOOWID_HTTP_PORT || 80;
 var basePort = Number(process.env.LOOWID_BASE_PORT || 8000);
 
+var isRunningTests = function() {
+	return (process.argv[2] && process.argv[2].indexOf('jasmine_node:')===0) || process.argv[3]==='test';
+};
+
 //
 //Create the HTTPS proxy server in front of a HTTP server
 //
@@ -74,7 +78,7 @@ var validateBackend = function(h,p) {
 	});
 };
 
-var backends = isNaN(process.argv[2])?2:(process.argv[2]-0);
+var backends = isNaN(process.argv[2])?Number(process.env.JASMINE_NODES || 2):(process.argv[2]-0);
 
 var checkServers = function() {
 	for (var j=1; j<=backends; j+=1) {
@@ -84,13 +88,20 @@ var checkServers = function() {
 	setTimeout(checkServers,5000);
 };
 
+var proxy = null;
+var httpServer = null;
+
 try {
 	
 	var prvf = process.env.PRIVATE_KEY || 'private.pem';
 	var pubf = process.env.PUBLIC_KEY || 'public.pem';	
 
-	var proxy = httpProxy.createProxyServer({
-		target: 'http://localhost:8080',
+	if (isRunningTests()) {
+		throw new Error('Tests always run in http.');
+	}
+	
+	proxy = httpProxy.createProxyServer({
+		target: 'http://localhost',
 		ssl: {
 		 key: fs.readFileSync(prvf, 'utf8'),
 		 cert: fs.readFileSync(pubf, 'utf8')
@@ -99,16 +110,7 @@ try {
 		secure:true
 	});
 	
-	process.on('uncaughtException', function (err) {
-		if (err.errno === 'ECONNRESET') {
-			// Backend server fail !!
-			checkServers();
-		} else {
-			logger.error(err);
-		}
-	});
-	
-	var httpServer = https.createServer({
+	httpServer = https.createServer({
 		key: fs.readFileSync(prvf, 'utf8'),
 		cert: fs.readFileSync(pubf, 'utf8')
 	}, function(req, res){
@@ -117,18 +119,6 @@ try {
 			removeBackend(tg);
 		});
 	}).listen(sport, '0.0.0.0');
-	
-	httpServer.on('upgrade', function (req, socket, head) {
-		var tg = findStickyServer(req);
-	    proxy.ws(req, socket, head, {target:tg}, function(){
-			removeBackend(tg);
-		});
-	});
-	
-	logger.info('Running load balancer in port '+sport);
-
-	// Look for backends !!
-	setTimeout(checkServers,100);
 
 	var server = http.createServer(function (req, res) {
 	  // optional, for HSTS
@@ -149,4 +139,40 @@ try {
 	
 	logger.warn(ex.message);
 	
+	proxy = httpProxy.createProxyServer({
+		target: 'http://localhost',
+		ws:true
+	});
+	
+	httpServer = http.createServer(function(req, res){
+		var tg = findStickyServer(req);
+		proxy.web(req, res, {target:tg}, function(){
+			removeBackend(tg);
+		});
+	}).listen(sport, '0.0.0.0');
+		
 }
+	
+process.on('uncaughtException', function (err) {
+	if (err.errno === 'ECONNRESET') {
+		// Backend server fail !!
+		checkServers();
+	} else {
+		logger.error(err);
+	}
+});
+
+httpServer.on('upgrade', function (req, socket, head) {
+	var tg = findStickyServer(req);
+    proxy.ws(req, socket, head, {target:tg}, function(){
+		removeBackend(tg);
+	});
+});
+
+logger.info('Running load balancer in port '+sport);
+// Look for backends !!
+setTimeout(checkServers,5000);
+
+exports.isReady = function() {
+	return targets.length===backends;
+};

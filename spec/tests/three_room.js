@@ -1,17 +1,15 @@
 'use strict';
-module.exports = function(request,test,utils) {
+module.exports = function(utils) {
 
 	describe('Three room', function() {
 		
-		require('../utils/create_room')(request,test,utils);
+		require('../utils/create_room')(utils);
 		
-		require('../utils/join_room')(request,test,utils,['viewer0','viewer1']);
+		require('../utils/join_room')(utils,['viewer0','viewer1']);
 	    
-	    test('The room has two guests.', function(done) {
-	    	var requestDate = new Date();
-	    	requestDate.setTime(requestDate.getTime() - 1000);
-	    	request.post({
-	    		  headers: {'content-type':'application/x-www-form-urlencoded','x-csrf-token':utils.csrf},
+	    utils.test('The room has two guests.', function(done) {
+	    	utils.browsers.owner.request.post({
+	    		  headers: {'content-type':'application/x-www-form-urlencoded','x-csrf-token':utils.browsers.owner.csrf},
 	    		  url:     utils.testDomain+'/rooms/'+utils.roomID+'/users',
 	    		  form:    { id: utils.roomID }
 	    	}, function(error, response, body){
@@ -29,7 +27,7 @@ module.exports = function(request,test,utils) {
 	    	});
 	    });
 
-	    test('Another Viewer send chat typing alert.', function(done) {
+	    utils.test('Another Viewer send chat typing alert.', function(done) {
 	    	utils.checkDone = 2;
 	    	utils.addListener('owner','chat_typing',function(typing){
 	    		expect(typing.id).toBe(utils.viewer1);
@@ -45,7 +43,7 @@ module.exports = function(request,test,utils) {
 	    	}));
 	    });
 	    
-	    test('Another Viewer send chat message.', function(done) {
+	    utils.test('Another Viewer send chat message.', function(done) {
 	    	var testMsg = 'Hello owner this is client1!!';
 	    	utils.checkDone = 2;
 	    	utils.addListener('owner','chat_message',function(msg){

@@ -1,27 +1,29 @@
 'use strict';
-module.exports = function(request,test,utils) {
+module.exports = function(utils) {
 
 	describe('LTI access room', function() {
 
-	    test('Cannot access LTI room without secret.', function(done) {
-	    	request.post({
-	    		  headers: {'content-type':'application/x-www-form-urlencoded'},
-	    		  url:     utils.testDomain+'/lti',
-	    		  form:    {  }
-	    	}, function(error, response, body){
-	            expect(error).toBeNull();
-	            expect(response.statusCode).toBe(302);
-	            expect(response.headers.location).toBe('/#!/lti/error');
-	            done();
-	    	});
+		utils.test('Cannot access LTI room without secret.', function(done) {
+			utils.getBrowser('instructor',function(browser){
+		    	browser.request.post({
+		    		  headers: {'content-type':'application/x-www-form-urlencoded'},
+		    		  url:     utils.testDomain+'/lti',
+		    		  form:    {  }
+		    	}, function(error, response, body){
+		            expect(error).toBeNull();
+		            expect(response.statusCode).toBe(302);
+		            expect(response.headers.location).toBe('/#!/lti/error');
+		            done();
+		    	});
+			});
 	    });
 
 	    var regexp = /<input type="hidden" name="([^"]*)" value="([^"]*)"\/>/g;
 	    var joinexp = /\/#!\/r\/([a-zA-Z0-9]{7})\/join/g;
 	    
-	    test('Can access LTI room using secret.', function(done) {
+	    utils.test('Can access LTI room using secret.', function(done) {
 	    	var form = {};
-	    	request.post({
+	    	utils.browsers.instructor.request.post({
 	    		  headers: {'content-type':'application/x-www-form-urlencoded'},
 	    		  url:  'http://www.imsglobal.org/developers/LTI/test/v1p1/lms.php',
 	    		  form: { 
@@ -54,7 +56,7 @@ module.exports = function(request,test,utils) {
 	                form[att] = value;
 	            });
 	            setTimeout(function(){
-	    	    	request.post({
+	            	utils.browsers.instructor.request.post({
 	  	    		  headers: {'content-type':'application/x-www-form-urlencoded'},
 	  	    		  url:     utils.testDomain+'/lti',
 	  	    		  form:    form
@@ -72,16 +74,16 @@ module.exports = function(request,test,utils) {
 	    });
 
 	    
-	    test('Owner WebSocket connection done.',function(done) {
+	    utils.test('Owner WebSocket connection done.',function(done) {
+        	// WebSocket Connect !!
+        	utils.connect('owner');
 	    	utils.addListener('owner','get_updated_config',function(ice){
 	    		expect(ice.iceServers.length).toBeGreaterThan(0);
 	    		done();
 	    	});
-        	// WebSocket Connect !!
-        	utils.connect('owner');
 	    });
 
-	    test('The owner joins the room.',function(done) {
+	    utils.test('The owner joins the room.',function(done) {
 	    	utils.addListener('owner','get_peers',function(join){
 	    		expect(join.you.length).toBeGreaterThan(0);
 	    		utils.owner = join.you;
@@ -97,9 +99,9 @@ module.exports = function(request,test,utils) {
 	    	}));
 	    });
 	    
-	    test('The owner joins the room.', function(done) {
-	    	request.post({
-	    		  headers: {'content-type':'application/x-www-form-urlencoded','x-csrf-token':utils.csrf},
+	    utils.test('The owner joins the room to get info.', function(done) {
+	    	utils.browsers.instructor.request.post({
+	    		  headers: {'content-type':'application/x-www-form-urlencoded','x-csrf-token':utils.browsers.instructor.csrf},
 	    		  url:     utils.testDomain+'/rooms/'+utils.ltiRoom+'/join',
 	    		  form:    {id: utils.ltiRoom, avatar: 'img/hero.png', connectionId: utils.owner , name: 'Owner'}
 	    	}, function(error, response, body){
@@ -114,11 +116,9 @@ module.exports = function(request,test,utils) {
 	    	});
 	    });
 	    
-	    test('The LTI room is active.', function(done) {
-	    	var requestDate = new Date();
-	    	requestDate.setTime(requestDate.getTime() - 1000);
-	    	request.post({
-	    		  headers: {'content-type':'application/x-www-form-urlencoded','x-csrf-token':utils.csrf},
+	    utils.test('The LTI room is active.', function(done) {
+	    	utils.browsers.instructor.request.post({
+	    		  headers: {'content-type':'application/x-www-form-urlencoded','x-csrf-token':utils.browsers.instructor.csrf},
 	    		  url:     utils.testDomain+'/rooms/'+utils.ltiRoom+'/'+utils.owner+'/isActive',
 	    		  form:    {id: utils.ltiRoom, cid: utils.owner}
 	    	}, function(error, response, body){

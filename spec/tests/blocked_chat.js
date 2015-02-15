@@ -1,17 +1,17 @@
 'use strict';
-module.exports = function(request,test,utils) {
+module.exports = function(utils) {
 
 	describe('Blocked chat', function() {
 		
-		require('../utils/create_room')(request,test,utils);
+		require('../utils/create_room')(utils);
 		
-		require('../utils/join_room')(request,test,utils,['viewer0']);
+		require('../utils/join_room')(utils,['viewer0']);
 	    
-	    test('Owner block the chat.', function(done) {
+		utils.test('Owner blocks the chat.', function(done) {
 	    	var acc = utils.room.access;
 	    	acc.chat = true;
-	    	request.post({
-	    		  headers: {'content-type':'application/x-www-form-urlencoded','x-csrf-token':utils.csrf},
+	    	utils.browsers.owner.request.post({
+	    		  headers: {'content-type':'application/x-www-form-urlencoded','x-csrf-token':utils.browsers.owner.csrf},
 	    		  url:     utils.testDomain+'/rooms/'+utils.roomID+'/editShared',
 	    		  form:    { id: utils.roomID, access: acc }
 	    	}, function(error, response, body){
@@ -28,7 +28,7 @@ module.exports = function(request,test,utils) {
 	    	});
 	    });
 
-	    test('Owner update the room.', function(done) {
+		utils.test('Owner update the room.', function(done) {
 	    	utils.addListener('viewer0','owner_data_updated',function(own){
 	    		expect(own.ownerCid).toBe(utils.owner);
 	    		expect(own.ownerName).toBe('Owner');
@@ -50,7 +50,7 @@ module.exports = function(request,test,utils) {
 	    	}));
 	    });
 
-	    test('Viewer cannot send chat typing alert.', function(done) {
+		utils.test('Viewer cannot send chat typing alert.', function(done) {
 	    	utils.addListener('viewer0','chat_message',function(typing){
 	    		expect(typing.id).toBe('||@@||');
 	    		expect(typing.text).toBe('The chat is closed.');
@@ -62,7 +62,7 @@ module.exports = function(request,test,utils) {
 	    	}));
 	    });
 	    
-	    test('Viewer cannot send chat message.', function(done) {
+		utils.test('Viewer cannot send chat message.', function(done) {
 	    	var testMsg = 'Hello owner this is client!!';
 	    	utils.addListener('viewer0','chat_message',function(msg){
 	    		expect(msg.id).toBe('||@@||');
@@ -78,11 +78,9 @@ module.exports = function(request,test,utils) {
 	    	}));
 	    });
 	    
-	    test('The chat is empty.', function(done) {
-	    	var requestDate = new Date();
-	    	requestDate.setTime(requestDate.getTime() - 1000);
-	    	request.post({
-	    		  headers: {'content-type':'application/x-www-form-urlencoded','x-csrf-token':utils.csrf},
+		utils.test('The chat is empty.', function(done) {
+	    	utils.browsers.viewer0.request.post({
+	    		  headers: {'content-type':'application/x-www-form-urlencoded','x-csrf-token':utils.browsers.viewer0.csrf},
 	    		  url:     utils.testDomain+'/rooms/'+utils.roomID+'/chat',
 	    		  form:    {id: utils.roomID, pag: null}
 	    	}, function(error, response, body){

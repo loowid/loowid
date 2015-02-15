@@ -13,13 +13,13 @@ var i18n = require('i18next');
 var express = require('express');//, jade = require('jade');
 
 var isRunningTests = function() {
-	return process.argv[2]==='jasmine_node';
+	return (process.argv[2] && process.argv[2].indexOf('jasmine_node:')===0) || process.argv[3]==='test';
 };
 
 var defaultPort = isNaN(process.argv[2]) && !isRunningTests();
 var portvalue = process.env.LOOWID_HTTP_PORT || 80;
 if (!defaultPort) {
-	portvalue = !isNaN(process.argv[2])?(process.argv[2]-0):8080;
+	portvalue = !isNaN(process.argv[2])?(process.argv[2]-0):process.env.JASMINE_PORT;
 }
 
 var isOpenShift = function() {
@@ -91,13 +91,16 @@ webRTC.rtc.fire = function(eventName,_) {
 	args.unshift(eventName);
 	logs.addSocketLog(serverId,eventName,args);
 	fireOrig.apply(null,args);
-	if (args.length===3 && isClustered && eventName!=='ping') {
+	if (args.length===3 && isClustered && eventName!=='ping' && eventName!=='update_server_config') {
 		logger.debug('Distributing['+args[2].id+']: '+eventName);
 		wsevents.addEvent(serverId,eventName,args[1],args[2]);  
+	} else {
+		logger.debug('Non distributed: '+eventName);
 	}
 };
 wsevents.initListener(serverId,function(event) {
 	if (event.eventName==='startup') {
+		if (event.eventServer===serverId && !isClustered) { logger.debug('Startup node '+serverId); }
 		isClustered = isClustered || event.eventServer!==serverId;
 		if (isClustered && serverCluster.indexOf(event.eventServer)<0) {
 			serverCluster += ','+event.eventServer;
@@ -124,7 +127,7 @@ wsevents.initListener(serverId,function(event) {
 // Load mongoose modules
 var mongoose = require('mongoose');
 
-var uristring = process.env.MONGOLAB_URI || process.env.MONGOHQ_URL	|| 'mongodb://localhost/loowid';
+var uristring = process.env.MONGOLAB_URI || process.env.MONGOHQ_URL	|| 'mongodb://localhost/loowid'+(isRunningTests()?'-test':'');
 var safeUriString = uristring;
 // if OPENSHIFT env variables are present, use the available connection info:
 if (process.env.OPENSHIFT_MONGODB_DB_PASSWORD) {
@@ -146,8 +149,13 @@ db.on('connected',function() {
 	logger.info('Succeeded connected to: ' + safeUriString);
 	exports.dbReady = true;
 });
+var errorCounts = 0;
 db.on('error',function(err) {
+	errorCounts += 1;
 	logger.error('ERROR connecting to: ' + safeUriString + '. ' + err);
+	if (isRunningTests() || errorCounts > 10) {
+		process.exit(0);
+	}
 });
 mongoose.connect(uristring,{server:{'auto_reconnect':true}});
 

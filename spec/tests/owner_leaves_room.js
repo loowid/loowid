@@ -1,43 +1,49 @@
 'use strict';
-module.exports = function(request,test,utils) {
+module.exports = function(utils) {
 
 	describe('Owner leaves room', function() {
 		
-		require('../utils/create_room')(request,test,utils);
+		require('../utils/create_room')(utils);
 		
-		require('../utils/join_room')(request,test,utils,['viewer0']);
+		require('../utils/join_room')(utils,['viewer0']);
 	    
-	    test('Owner leaves the room.', function(done) {
-	    	utils.checkDone = 2;
+	    utils.test('Owner leaves the room.', function(done) {
+	    	/*utils.checkDone = 2;
+	    	 * This event only fire if you are in the same node
 	    	utils.addListener('viewer0','remove_peer_connected',function(peer){
 	    		expect(peer.socketId).toBe(utils.owner);
 	    		utils.multipleDone(done);
-	    	});
+	    	});*/
 	    	utils.addListener('viewer0','owner_data_updated',function(own){
 	    		expect(own.ownerCid).toBe(utils.owner);
 	    		expect(own.ownerName).toBe('Owner');
 	    		expect(own.status).toBe('DISCONNECTED');
-	    		utils.multipleDone(done);
+	    		//utils.multipleDone(done);
+	    		done();
 	    	});
 	    	utils.disconnect('owner');
 	    });
 	    
-	    test('Owner WebSocket re-connection done.',function(done) {
+	    utils.test('Owner WebSocket re-connection done.',function(done) {
+        	// WebSocket Connect !!
+        	utils.connect('owner');
 	    	utils.addListener('owner','get_updated_config',function(ice){
 	    		expect(ice.iceServers.length).toBeGreaterThan(0);
 	    		done();
 	    	});
-        	// WebSocket Connect !!
-        	utils.connect('owner');
 	    });
+    	
+	    var conditions = [];
 	    
-	    test('The owner re-joins the room.',function(done) {
+	    utils.test('The owner re-joins the room.',function(done) {
+	    	utils.checkDone = 2;
 	    	utils.addListener('viewer0','new_peer_connected',function(peer){
-	    		utils.owner = peer.socketId;
-		    	utils.addListener('owner','get_peers',function(join){
-		    		expect(join.you).toBe(utils.owner);
-		    		done();
-		    	});
+	    		conditions.push({received:peer.socketId,id:'owner'});
+	    		utils.multipleDone(done);
+	    	});
+	    	utils.addListener('owner','get_peers',function(join){
+	    		utils.owner = join.you;
+	    		utils.multipleDone(done);
 	    	});
 	    	utils.ws.owner.send(JSON.stringify({
 				'eventName': 'join_room',
@@ -49,11 +55,15 @@ module.exports = function(request,test,utils) {
 	    	}));
 	    });
 	    
-	    test('Owner re-joins the room to get info.', function(done) {
-	    	var requestDate = new Date();
-	    	requestDate.setTime(requestDate.getTime() - 1000);
-	    	request.post({
-	    		  headers: {'content-type':'application/x-www-form-urlencoded','x-csrf-token':utils.csrf},
+	    utils.test('Check owner peer.',function(done){
+	    	expect(conditions.length).toBe(1);
+	    	expect(conditions[0].received).toBe(utils[conditions[0].id]);
+	    	done();
+	    });
+	    
+	    utils.test('Owner re-joins the room to get info.', function(done) {
+	    	utils.browsers.owner.request.post({
+	    		  headers: {'content-type':'application/x-www-form-urlencoded','x-csrf-token':utils.browsers.owner.csrf},
 	    		  url:     utils.testDomain+'/rooms/'+utils.roomID+'/join',
 	    		  form:    {id: utils.roomID, avatar: 'img/hero.png', connectionId: utils.owner , name: 'REOwner'}
 	    	}, function(error, response, body){
@@ -70,7 +80,7 @@ module.exports = function(request,test,utils) {
 	    	});
 	    });
 	    
-	    test('The owner update his data.',function(done) {
+	    utils.test('The owner update his data.',function(done) {
 	    	utils.addListener('viewer0','owner_data_updated',function(own){
 	    		expect(own.ownerCid).toBe(utils.owner);
 	    		expect(own.ownerName).toBe('Owner');

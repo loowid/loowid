@@ -1,17 +1,17 @@
 'use strict';
-module.exports = function(request,test,utils) {
+module.exports = function(utils) {
 
 	describe('Moderated room', function() {
 
-		require('../utils/create_room')(request,test,utils);
+		require('../utils/create_room')(utils);
 
-		require('../utils/join_room')(request,test,utils,['viewer0','viewer1']);
+		require('../utils/join_room')(utils,['viewer0','viewer1']);
 
-	    test('Owner made the room moderated.', function(done) {
+	    utils.test('Owner made the room moderated.', function(done) {
 	    	var acc = utils.room.access;
 	    	acc.moderated = true;
-	    	request.post({
-	    		  headers: {'content-type':'application/x-www-form-urlencoded','x-csrf-token':utils.csrf},
+	    	utils.browsers.owner.request.post({
+	    		  headers: {'content-type':'application/x-www-form-urlencoded','x-csrf-token':utils.browsers.owner.csrf},
 	    		  url:     utils.testDomain+'/rooms/'+utils.roomID+'/editShared',
 	    		  form:    { id: utils.roomID, access: acc }
 	    	}, function(error, response, body){
@@ -27,7 +27,7 @@ module.exports = function(request,test,utils) {
 	    	});
 	    });
 	    
-	    test('Viewer cannot send offers.', function(done) {
+	    utils.test('Viewer cannot send offers.', function(done) {
 	    	utils.addListener('owner','receive_offer',function(off){
 	    		expect(true).toBe(false);
 	    	});
@@ -56,7 +56,7 @@ module.exports = function(request,test,utils) {
 	    	setTimeout(done,500);
 	    });
 
-	    test('Owner can send offers.', function(done) {
+	    utils.test('Owner can send offers.', function(done) {
 	    	utils.checkDone = 2;
 	    	utils.addListener('viewer0','receive_offer',function(off){
 	    		expect(off.sdp.type).toBe('offer');
