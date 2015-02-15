@@ -32,7 +32,48 @@ module.exports = function(grunt) {
 	    	grunt.config.data.concurrent.prod.tasks.splice(0,1);
 	    	grunt.config.data.concurrent.default.tasks.splice(0,1);
 	    	grunt.config.data.concurrent.cluster.tasks.splice(0,1);
+	    	grunt.config.data.concurrent.test.tasks.splice(0,1);
 	    } 
+	};
+	
+	var generateNodeShell = function(port) {
+		return { 
+			command: 'node server.js '+port+' test', 
+			options: { 
+				async: true, 
+				stdout: true, 
+				stderr: true 
+			} 
+		};
+	};
+	
+	var getClusterNodes = function() {
+		if (isRunningTests()) {
+			// Returning random cluster nodes between 1 and 4
+			return (Math.floor(Math.random()*4)+1);
+		} else {
+			var match = (/shell:node([0-9])/g).exec(process.argv[2]);
+			return match?Number(match[1])+1:2;
+		}
+		
+	};
+	
+	var addClusterNodesToTasks = function(nodes) {
+	    // Create nodemon tasks for cluster
+	    for (var k=0; k<nodes; k+=1) {
+	    	grunt.config.data.nodemon['dev'+k] = { script: 'server.js', options: generateOptions([Number(process.env.LOOWID_BASE_PORT)+k+1]) };
+	    	grunt.config.data.concurrent.cluster.tasks.push('nodemon:dev'+k);
+	    	if (k>0) {
+	    		// In test one server is running with jasmine
+	    		grunt.config.data.shell['node'+k] = generateNodeShell(Number(process.env.LOOWID_BASE_PORT)+k+1);
+	    		grunt.config.data.concurrent.test.tasks.push('shell:node'+k);
+	    	}
+	    }
+	    grunt.config.data.concurrent.test.tasks.push('jasmine_node:'+k);
+	};
+	
+	var isRunningTests = function() {
+		return process.argv[2]==='test';
 	};
 	
     // Project Configuration
@@ -108,31 +149,25 @@ module.exports = function(grunt) {
         },
         concurrent: {
         	default: {
-	            tasks: ['shell','nodemon:dev', 'watch'], 
+	            tasks: ['shell:mongo','nodemon:dev', 'watch'], 
 	            options: {
 	                logConcurrentOutput: true
 	            }
         	},
         	prod: {
-	            tasks: ['shell','nodemon:prod'], 
+	            tasks: ['shell:mongo','nodemon:prod'], 
 	            options: {
 	                logConcurrentOutput: true
 	            }
         	},
         	cluster: {
-	            tasks: ['shell', 'nodemon:proxy', 'watch'], 
+	            tasks: ['shell:mongo', 'nodemon:proxy', 'watch'], 
 	            options: {
 	                logConcurrentOutput: true
 	            }
         	},
         	test: {
-	            tasks: ['shell', 'jasmine_node'], 
-	            options: {
-	                logConcurrentOutput: true
-	            }
-        	},
-        	'travis_test': {
-	            tasks: ['jasmine_node'], 
+	            tasks: ['shell:mongo'], 
 	            options: {
 	                logConcurrentOutput: true
 	            }
@@ -210,9 +245,6 @@ module.exports = function(grunt) {
     //Making grunt default to force in order not to break the project.
     grunt.option('force', true);
 
-    //Default task(s).
-    grunt.registerTask('default', ['minicheck','concurrent:default']);
-
     checkMongoOff();
     
     if (!process.env.OPENSHIFT_NODEJS_PORT) {
@@ -221,20 +253,20 @@ module.exports = function(grunt) {
         process.env.LOOWID_BASE_PORT = grunt.option('bport') || 8000;
     }
     
-    //Cluster local configuration N nodes BasePort + 1, BasePort + 2,...
+    // Cluster local configuration N nodes BasePort + 1, BasePort + 2,...
     // grunt cluster --nodes=N
-    var nodes = grunt.option('nodes') || 2;
-    // Create nodemon tasks for cluster
-    for (var k=0; k<nodes; k+=1) {
-    	grunt.config.data.nodemon['dev'+k] = { script: 'server.js', options: generateOptions([Number(process.env.LOOWID_BASE_PORT)+k+1]) };
-    	grunt.config.data.concurrent.cluster.tasks.push('nodemon:dev'+k);
-    }
+    // Random case for tests between 1 and 3 cluster nodes
+    var nodes = grunt.option('nodes') || getClusterNodes();
+    addClusterNodesToTasks(nodes);
 
     // Setting number of cluster nodes
     grunt.config.data.nodemon.proxy.options = generateOptions([nodes]);
     grunt.config.data.nodemon.dev.options = generateOptions([]);
+    
+    //Default task(s).
+    grunt.registerTask('default', ['minicheck','concurrent:default']);
+    
     grunt.registerTask('cluster', ['minicheck','concurrent:cluster']);
-
     grunt.registerTask('prod', ['mini','concurrent:prod']);
     
     // Minify tasks (generate min files)
@@ -247,6 +279,4 @@ module.exports = function(grunt) {
     // Run tests
     grunt.registerTask('test', ['jshint','concurrent:test']);
     
-    grunt.registerTask('travis_test', ['jshint','concurrent:travis_test']);
-
 };

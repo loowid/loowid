@@ -122,7 +122,7 @@ var sendNewPeerConnected = function(socket,roomList) {
 function attachEvents(manager) {
 
   manager.on('connection', function(socket) {
-    logger.debug('connect');
+    logger.debug('connect.'+manager.serverId);
 
 	socket.sessionid = getSessionId(socket.upgradeReq,manager.sessionSecret);
     socket.id = id();
@@ -155,7 +155,7 @@ function attachEvents(manager) {
       for (var key in rtc.rooms) {
 		  if (rtc.rooms.hasOwnProperty(key)) {
 			room = rtc.rooms[key];
-			var exist = room.indexOf(socket.id);
+			var exist = room?room.indexOf(socket.id):-1;
 			if (exist !== -1) {
 			  room.splice(room.indexOf(socket.id), 1);
 			  for (var j = 0; j < room.length; j+=1) {
@@ -175,7 +175,7 @@ function attachEvents(manager) {
 		  }  
       }
       // we are leaved the room so lets notify about that
-	  rtc.fire('room_leave', room, socket.id);
+	  rtc.fire('room_leave', room, socket);
       // call the disconnect callback
 	  rtc.fire('disconnect', rtc);
 
@@ -188,8 +188,8 @@ function attachEvents(manager) {
   rtc.on('join_room', function(dataa, socketa) {
 	manager.rooms.checkLockOrPassword(dataa, socketa, function(data,socket) {
 		var roomList = rtc.rooms[data.room] || [];
-		roomList.push(socket.id);
 		if (socket._events) {
+			roomList.push(socket.id);
 			rtc.rooms[data.room] = roomList;
 			// Mark as valid
 			manager.rooms.markValid(data.room,socket.sessionid);
@@ -206,10 +206,10 @@ function attachEvents(manager) {
 			    'you': socket.id
 			  }
 			}), errorFn);
-		} else {
+		/*} else {
 			if (connectionsId.length>0) {
 				manager.wsevents.addEvent(manager.serverId,'add_peers',{'room':data.room,'connections':connectionsId},socket);
-			}
+			}*/
 		}
 	},function(lock) {
 		socketa.send(JSON.stringify({
@@ -358,7 +358,7 @@ function attachEvents(manager) {
   		}
   	}
   });
-  
+  /*
   rtc.on('add_peers', function(data, socket) {
 		var roomList = rtc.rooms[data.room] || [];
 		for (var i = 0; i < roomList.length; i+=1) {
@@ -368,18 +368,18 @@ function attachEvents(manager) {
 		    // inform the peers that they have a new peer
 		    if (soc) {
 		    	for (var j=0; j<data.connections.length; j+=1) {
-			      soc.send(JSON.stringify({
+		    		soc.send(JSON.stringify({
 				        'eventName': 'new_peer_connected',
 				        'data':{
 				          'socketId': data.connections[j]
 				        }
-				      }), errorFn);
+				    }), errorFn);
 		    	}
 		    }
 		  }
 		}
 	});
-
+*/
 	rtc.on('update_owner_data', function(data, socket) {
 		var roomList = rtc.rooms[data.room] || [];
 		manager.rooms.checkOwner(socket.id, data.room, function() {
@@ -689,9 +689,8 @@ function attachEvents(manager) {
 	});
 
 	rtc.on('room_leave', function(roomid, socket) {
-		manager.rooms.disconnectOwnerOrGuess(socket, function(room,owner) {
-			var newsocket = {};
-			newsocket.id = socket; // bit tricky here
+		manager.rooms.disconnectOwnerOrGuess(socket.id, function(room,owner) {
+			var newsocket = socket;
 			if (owner) {
 				rtc.fire('update_owner_data', {
 					ownerName : room.owner.name,
@@ -716,6 +715,16 @@ function attachEvents(manager) {
 		});
 	});
 
+	var sendRoomOut = function(soc,from) {
+		soc.send(JSON.stringify({
+			'eventName' : 'room_out',
+			'data' : {
+				'room' : from
+			}
+		}), errorFn);
+		soc.close();
+	};
+	
 	rtc.on('move_room', function(data, socket){
 		var roomList = rtc.rooms[data.fromRoom];
 		manager.rooms.checkOwner(socket.id, data.toRoom, function() {
@@ -733,14 +742,6 @@ function attachEvents(manager) {
 					if (soc) {
 						if (data.list.indexOf(id)!==-1) {
 							toClose.push(soc);
-							soc.send(JSON.stringify({
-								'eventName' : 'room_out',
-								'data' : {
-									'room' : data.fromRoom
-								}
-							}), errorFn);
-
-
 						} else {
 							soc.send(JSON.stringify({
 								'eventName' : 'room_moved',
@@ -752,9 +753,12 @@ function attachEvents(manager) {
 					}
 				}
 			}
-			for (var j=0; j<toClose.length; j+=1) {
-				toClose[j].close();
-			}
+			// Time for server to change to the new room
+			setTimeout(function(){
+				for (var j=0; j<toClose.length; j+=1) {
+					sendRoomOut(toClose[j],data.fromRoom);
+				}
+			},500);
 		}, function() {
 			logger.error('Alert: a non owner is trying to move room');
 		});

@@ -1,13 +1,13 @@
 'use strict';
-module.exports = function(request,test,utils) {
+module.exports = function(utils) {
 
 	describe('Viewer leaves room', function() {
 		
-		require('../utils/create_room')(request,test,utils);
+		require('../utils/create_room')(utils);
 		
-		require('../utils/join_room')(request,test,utils,['viewer0','viewer1']);
+		require('../utils/join_room')(utils,['viewer0','viewer1']);
 	    
-	    test('Viewer leaves the room.', function(done) {
+	    utils.test('Viewer leaves the room.', function(done) {
 	    	utils.checkDone = 2;
 	    	utils.addListener('owner','peer_list_updated',function(peer){
 	    		expect(peer.socketId).toBe(utils.viewer0);
@@ -20,11 +20,9 @@ module.exports = function(request,test,utils) {
 	    	utils.disconnect('viewer0');
 	    });
 	    
-	    test('The room has two guests one disconnected.', function(done) {
-	    	var requestDate = new Date();
-	    	requestDate.setTime(requestDate.getTime() - 1000);
-	    	request.post({
-	    		  headers: {'content-type':'application/x-www-form-urlencoded','x-csrf-token':utils.csrf},
+	    utils.test('The room has two guests one disconnected.', function(done) {
+	    	utils.browsers.owner.request.post({
+	    		  headers: {'content-type':'application/x-www-form-urlencoded','x-csrf-token':utils.browsers.owner.csrf},
 	    		  url:     utils.testDomain+'/rooms/'+utils.roomID+'/users',
 	    		  form:    {id: utils.roomID}
 	    	}, function(error, response, body){

@@ -1,17 +1,17 @@
 'use strict';
-module.exports = function(request,test,utils) {
+module.exports = function(utils) {
 
 	describe('Blocked room', function() {
 		
-		require('../utils/create_room')(request,test,utils);
+		require('../utils/create_room')(utils);
 		
-		require('../utils/join_room')(request,test,utils,['viewer0','viewer1']);
+		require('../utils/join_room')(utils,['viewer0','viewer1']);
 	    
-	    test('Owner block the room.', function(done) {
+		utils.test('Owner block the room.', function(done) {
 	    	var acc = utils.room.access;
 	    	acc.locked = true;
-	    	request.post({
-	    		  headers: {'content-type':'application/x-www-form-urlencoded','x-csrf-token':utils.csrf},
+	    	utils.browsers.owner.request.post({
+	    		  headers: {'content-type':'application/x-www-form-urlencoded','x-csrf-token':utils.browsers.owner.csrf},
 	    		  url:     utils.testDomain+'/rooms/'+utils.roomID+'/editShared',
 	    		  form:    { id: utils.roomID, access: acc }
 	    	}, function(error, response, body){
@@ -31,7 +31,7 @@ module.exports = function(request,test,utils) {
 	    	});
 	    });
 
-	    test('Owner update the room.', function(done) {
+	    utils.test('Owner update the room.', function(done) {
 	    	utils.checkDone = 2;
 	    	utils.addListener('viewer0','owner_data_updated',function(own){
 	    		expect(own.ownerCid).toBe(utils.owner);
@@ -61,9 +61,9 @@ module.exports = function(request,test,utils) {
 	    	}));
 	    });
 	    
-	    test('The room is not joinable.', function(done) {
-	    	request.post({
-	    		  headers: {'content-type':'application/x-www-form-urlencoded','x-csrf-token':utils.csrf},
+	    utils.test('The room is not joinable.', function(done) {
+	    	utils.browsers.owner.request.post({
+	    		  headers: {'content-type':'application/x-www-form-urlencoded','x-csrf-token':utils.browsers.owner.csrf},
 	    		  url:     utils.testDomain+'/rooms/'+utils.roomID+'/isJoinable',
 	    		  form:    {id: utils.roomID}
 	    	}, function(error, response, body){

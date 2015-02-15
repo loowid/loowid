@@ -1,22 +1,24 @@
 'use strict';
 describe('Main Server Tests', function() {
 
-	process.env.MONGOLAB_URI = 'mongodb://localhost/loowid-test';
-	
+	process.env.LOOWID_HTTPS_PORT = 8080;
+	process.env.JASMINE_PORT = 8001;
+	process.env.JASMINE_NODES = Number(process.argv[2].substring(process.argv[2].indexOf(':')+1));
+	//jasmine.getEnv().defaultTimeoutInterval = 5000;
+	var proxy = null;
 	var mongoose = require('mongoose');
+	var log4js = require('../log.js');
+	var logger = log4js.getLog('test');
+
 	var server = require('../server.js');
-	var req = require('request');
+	proxy = require('../proxy.js');
+
 	var WebSocket = require('ws');
 	
 	var utils = {};
-	utils.options = { strictSSL: false, rejectUnauthorized: false, jar:true };
-	var request = req.defaults(utils.options);
 	
-	utils.Log = mongoose.model('Log');
-	utils.WSEvent = mongoose.model('WSEvent');
-	utils.Room = mongoose.model('Room');
-	utils.testDomain = 'http://localhost:8080';
-
+	utils.testDomain = 'http://localhost:'+process.env.LOOWID_HTTPS_PORT;
+	utils.logger = logger;
 	utils._events = {};
 	
 	utils.addListener = function(id,eventName, callback) {
@@ -40,21 +42,38 @@ describe('Main Server Tests', function() {
     	utils.checkDone -= 1;
     	if (utils.checkDone===0) { fn(); }
 	};
-	
-	utils.connect = function(id) {
-		//utils.ws = new WebSocket('ws://localhost/',null,utils.options);
+	var temp = 1; // Allow to force different nodes for owner and viewer
+	var maxNodes = Number(process.env.JASMINE_NODES)+1;
+	var getNextPort = function() {
+		var p = 8000+(temp%maxNodes);
+		temp += 1;
+		if ((temp%maxNodes)===0) { temp = 1; }
+		return p;
+	};
+	var force = Math.floor(Math.random()*2);
+	logger.info(force?'Forcing alternative cluster nodes on each socket.':'Calling proxy on each socket.');
+	var getWebSocketUrl = function(usrid) {
+		if (force) {
+			return 'ws://localhost:'+getNextPort()+'/'+(usrid?usrid:'');
+		} else {
+			return 'ws://localhost:'+process.env.LOOWID_HTTPS_PORT+'/'+(usrid?usrid:'');
+		}
+	};
+	utils.connect = function(id,usrid) {
 		utils.ws = utils.ws || [];
-		utils.ws[id] = new WebSocket('ws://localhost:8080/'+utils.usrid);
+		delete utils[id]; // Delete socket id
+		delete utils._events[id]; // Delete socket events
+		utils.ws[id] = new WebSocket(getWebSocketUrl(usrid));
 		utils.ws[id].on('open', function(){
 			// Initial call in open
-			utils.ws[id].send(JSON.stringify({'eventName': 'update_server_config','data': {	'room': utils.room	}}));
+			utils.ws[id].send(JSON.stringify({'eventName': 'update_server_config','data': {	'room': utils.roomID	}}));
 		});
 		utils.ws[id].on('message', function(msg){
 			try {
 				var json = JSON.parse(msg);
 				utils.call(id,json.eventName,json.data);
 			} catch (err) {
-				console.log(err);
+				logger.error(err);
 			}
 		});
 		utils.ws[id].on('close', function(){
@@ -65,23 +84,55 @@ describe('Main Server Tests', function() {
 		utils.ws[id].close();
 	};
 	
+	var dropRequestFromCache = function() {
+		for (var i in require.cache) {
+			if (i.indexOf('/request/')) {
+				delete require.cache[i];
+			}
+		}
+	};
+	
+	utils.getBrowser = function(id,callback) {
+		utils.browsers = utils.browsers || [];
+		var req = require('request');
+		var browser = utils.browsers[id] = {request:req.defaults({ strictSSL: false, rejectUnauthorized: false, jar: true })}; 
+		dropRequestFromCache();
+		// Get the session ID !!
+        browser.request(utils.testDomain+'/', function(error, response, body){
+            expect(error).toBeNull();
+            expect(response.statusCode).toBe(200);
+            expect(body.indexOf('loowid.min.js')>0).toBeTruthy();
+            var textCsrf = body.substring(body.indexOf('window.csrf'),body.indexOf(';',body.indexOf('window.csrf'))).replace('window.csrf = ','');
+            var textUsrid = body.substring(body.indexOf('window.usrid'),body.indexOf(';',body.indexOf('window.usrid'))).replace('window.usrid = ','');
+            browser.csrf = textCsrf.replace(/'/g,'');
+            browser.usrid = textUsrid.replace(/'/g,'');
+            browser.node = response.headers['loowid-node'];
+            expect(browser.usrid.length).toBe(16);
+            callback(browser);
+        });
+	};
+	
 	beforeEach(function(done){
 		// Wait for DB Connection
 		var fn = function(){
-			if (server.dbReady) {
+			if (proxy && proxy.isReady() && server.dbReady) {
+				if (!utils.Log) {
+					utils.Log = mongoose.model('Log');
+					utils.WSEvent = mongoose.model('WSEvent');
+					utils.Room = mongoose.model('Room');
+				}
 				// Removing collections before start
 				if (count===0) {
 					// WSEvent can't be removed (is capped)
 					utils.Log.remove().exec(function(err){
-						if (err) { console.log('Log: Error removing collection!!'); }
+						if (err) { logger.error('Log: Error removing collection!!'); }
 						utils.Room.remove().exec(function(err){
-							if (err) { console.log('Room: Error removing collection!!'); }
+							if (err) { logger.error('Room: Error removing collection!!'); }
 							done();
 						});
 					});
-				} else {
-					done();
 				}
+				done();
 			} else {
 				setTimeout(fn,500);
 			}
@@ -98,9 +149,12 @@ describe('Main Server Tests', function() {
     
 	var total = 0;
     // Wrapper of it function to count number of tests
-	var test = function(name,fn) {
+	utils.test = function(name,fn) {
 		total+=1;
-		it(name,fn);
+		it(name,function(done){
+			//logger.info('Starting ['+jasmine.getEnv().currentSpec.suite.description+']['+name+']');
+			fn(done);
+		});
 	};
 	
 	var count = 0;
@@ -111,24 +165,25 @@ describe('Main Server Tests', function() {
 		done();
 	});
 	
-	require('./tests/init')(request,test,utils);
-	require('./tests/lti_room')(request,test,utils);
-	require('./tests/chat_talk')(request,test,utils);
-	require('./tests/change_log_level')(request,test,utils);
-	require('./tests/new_room')(request,test,utils);
-	require('./tests/join_room')(request,test,utils);
-	require('./tests/chat_room')(request,test,utils);
-	require('./tests/three_room')(request,test,utils);
-	require('./tests/move_room')(request,test,utils);
-	require('./tests/owner_leaves_room')(request,test,utils);
-	require('./tests/viewer_leaves_room')(request,test,utils);
-	require('./tests/blocked_room')(request,test,utils);
-	require('./tests/blocked_chat')(request,test,utils);
-	require('./tests/private_room')(request,test,utils);
-	require('./tests/permanent_room')(request,test,utils);
-	require('./tests/edit_name_room')(request,test,utils);
-	require('./tests/status_room')(request,test,utils);
-	require('./tests/moderated_room')(request,test,utils);
-	require('./tests/room_stats')(request,test,utils);
-	
+	require('./tests/init')(utils);
+	require('./tests/lti_room')(utils);
+	require('./tests/chat_talk')(utils);
+	require('./tests/change_log_level')(utils);
+	require('./tests/new_room')(utils);
+	require('./tests/join_room')(utils);
+	require('./tests/chat_room')(utils);
+	require('./tests/three_room')(utils);
+	require('./tests/multi_join_room')(utils);
+	require('./tests/move_room')(utils);
+	require('./tests/owner_leaves_room')(utils);
+	require('./tests/viewer_leaves_room')(utils);
+	require('./tests/blocked_room')(utils);
+	require('./tests/blocked_chat')(utils);
+	require('./tests/private_room')(utils);
+	require('./tests/permanent_room')(utils);
+	require('./tests/edit_name_room')(utils);
+	require('./tests/status_room')(utils);
+	require('./tests/moderated_room')(utils);
+	require('./tests/room_stats')(utils);
+
 });

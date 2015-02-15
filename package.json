@@ -14,7 +14,7 @@
   },
   "scripts": {
     "start": "node node_modules/grunt-cli/bin/grunt prod",
-    "test": "node node_modules/grunt-cli/bin/grunt travis_test"
+    "test": "node node_modules/grunt-cli/bin/grunt test --mongodb=off"
   },
   "devDependencies": {
     "coveralls": "^2.11.2",
