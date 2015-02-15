@@ -22,8 +22,8 @@ angular.module('mean.rooms').factory('MediaService',['Rooms','UIHandler',functio
 
 
 		this.mediasources = {
-			'screen': 	{'recording': false, 'stream': undefined, 'constraints': constraints, 'playtype':'video','winratio':RATIO_4_3 ,'winscale':0.5},
-			'video': 	{'recording': false, 'stream': undefined, 'constraints': camConstraints, 'playtype':'video','winratio':RATIO_16_9 ,'winscale':0.25},
+			'screen': 	{'recording': false, 'stream': undefined, 'constraints': constraints, 'playtype':'video','winratio':RATIO_16_9 ,'winscale':0.5},
+			'video': 	{'recording': false, 'stream': undefined, 'constraints': camConstraints, 'playtype':'video','winratio':RATIO_4_3 ,'winscale':0.25},
 			'audio': 	{'recording': false, 'stream': undefined, 'constraints': audioConstraints, 'playtype':'audio'}
 		};
 
@@ -64,6 +64,10 @@ angular.module('mean.rooms').factory('MediaService',['Rooms','UIHandler',functio
 						mediaElement.style.display = 'none';
 						mediaElement.setAttribute('autoplay','');
 						mediaElement.setAttribute('muted','');
+						
+						//Wait to start until 
+						rtc.attachStream (mediasource.stream,mediaElement);
+										
 						var windowOptions =
 							{
 								'mediaElement':mediaElement,
@@ -74,12 +78,8 @@ angular.module('mean.rooms').factory('MediaService',['Rooms','UIHandler',functio
 								'onopen': 	function (win){
 									//Attach the window reference to the media source
 									mediasource.window = win;
-									rtc.attachStream (mediasource.stream,'my_'+source);
 									mediaElement.style.display = '';
-
-									//Just delay it to take time to get the window opened effect and inherit the video size
-									//setTimeout(function (){win.height = mediaElement.getAttribute('height') + 20;},500);
-
+									win.winHandler.resize (mediaElement.offsetWidth);
 									if (typeof onrecord !== 'undefined' && onrecord !== null) {onrecord.call (self);}
 									uiHandler.safeApply($scope,function(){});
 
@@ -90,7 +90,9 @@ angular.module('mean.rooms').factory('MediaService',['Rooms','UIHandler',functio
 									});
 								}
 							};
-						windowHandler.create ($scope,windowOptions);
+							
+							self.createVideoWindow($scope,windowHandler,windowOptions);
+						
 					}else if (mediasource.playtype === 'audio'){
 						if (onrecord) {onrecord.call (self);}
 						uiHandler.safeApply($scope,function(){});
@@ -145,6 +147,17 @@ angular.module('mean.rooms').factory('MediaService',['Rooms','UIHandler',functio
 
 		};
 
+		self.createVideoWindow = function ($scope,windowHandler,windowOptions){
+			if (windowOptions.mediaElement.currentTime < 0.01 || windowOptions.mediaElement.ended){
+					setTimeout (function (){
+						self.createVideoWindow ($scope,windowHandler,windowOptions);
+					},300);
+			}else{
+				windowHandler.create ($scope,windowOptions);
+			}
+				
+		};
+		
 		self.stopRecording = function($scope,source){
 			var mediasource = this.mediasources[source];
 			if (mediasource.recording){
@@ -380,40 +393,35 @@ angular.module('mean.rooms').factory('MediaService',['Rooms','UIHandler',functio
 					mediaElement.setAttribute('muted','');
 					rtc.attachStream (mediasource.stream,mediaElement);
 
+					var windowOptions = {
+						'mediaElement' :mediaElement,
+						'title': $scope.getUserName(connectionId),
+						'ratio': mediasource.winratio,
+						'scale': mediasource.winscale, 
+						'closeable': (uiHandler.isowner && uiHandler.access.moderated) ,
+						'onopen': function (win){
+							//Attach the window reference to the media source
+							mediasource.window = win;
 
-					//The rest of code it by async thread to keep webrtc sync stream close quick. Bit tricky here
-					setTimeout( function (){
-						var windowOptions = {
-							'mediaElement' :mediaElement,
-							'title': $scope.getUserName(connectionId),
-							'ratio': mediasource.winratio,
-							'scale': mediasource.winscale, 
-							'closeable': (uiHandler.isowner && uiHandler.access.moderated) ,
-							'onopen': function (win){
-								//Attach the window reference to the media source
-								mediasource.window = win;
+							mediaElement.style.display = '';
+							win.winHandler.resize (mediaElement.offsetWidth);
 
-								mediaElement.style.display = '';
+							//Press play again for firefox
+							mediaElement.play();
 
-								//Press play again for firefox
-								mediaElement.play();
-
-								//Just delay it to take time to get the window opened effect and inherit the video size
-								setTimeout(function (){win.height = mediaElement.getAttribute('height') + 20;},400);
-
-								uiHandler.safeApply($scope,function(){});
-							},
-							'onclose': function (win){
-								if (uiHandler.isowner){
-									uiHandler.safeApply ($scope,function(){
-										$scope.askForStopSharing (connectionId,mediasource.type);
-									});	
-								}
+							uiHandler.safeApply($scope,function(){});
+						},
+						'onclose': function (win){
+							if (uiHandler.isowner){
+								uiHandler.safeApply ($scope,function(){
+									$scope.askForStopSharing (connectionId,mediasource.type);
+								});	
 							}
-						};
-					
-						windowHandler.create($scope,windowOptions);
-					},1000);
+						}
+					};
+
+					self.createVideoWindow($scope,windowHandler,windowOptions);
+
 			}else{ 
 						 var mediaElement2 = document.createElement('audio');
 			mediaElement2.setAttribute('id','remote_'+ streamId);
