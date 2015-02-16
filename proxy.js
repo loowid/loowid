@@ -96,61 +96,63 @@ try {
 	var prvf = process.env.PRIVATE_KEY || 'private.pem';
 	var pubf = process.env.PUBLIC_KEY || 'public.pem';	
 
-	if (isRunningTests()) {
-		throw new Error('Tests always run in http.');
-	}
+	if (!isRunningTests()) {
 	
-	proxy = httpProxy.createProxyServer({
-		target: 'http://localhost',
-		ssl: {
-		 key: fs.readFileSync(prvf, 'utf8'),
-		 cert: fs.readFileSync(pubf, 'utf8')
-		},
-		ws:true,
-		secure:true
-	});
-	
-	httpServer = https.createServer({
-		key: fs.readFileSync(prvf, 'utf8'),
-		cert: fs.readFileSync(pubf, 'utf8')
-	}, function(req, res){
-		var tg = findStickyServer(req);
-		proxy.web(req, res, {target:tg}, function(){
-			removeBackend(tg);
+		proxy = httpProxy.createProxyServer({
+			target: 'http://localhost',
+			ssl: {
+			 key: fs.readFileSync(prvf, 'utf8'),
+			 cert: fs.readFileSync(pubf, 'utf8')
+			},
+			ws:true,
+			secure:true
 		});
-	}).listen(sport, '0.0.0.0');
-
-	var server = http.createServer(function (req, res) {
-	  // optional, for HSTS
-	  // see https://en.wikipedia.org/wiki/HTTP_Strict_Transport_Security
-	  res.setHeader('Strict-Transport-Security', 'max-age=8640000; includeSubDomains');
-
-	  if (req.headers['x-forwarded-proto'] !== 'https') {
-	    var url = 'https://' + req.headers.host + (sport!==443?':'+sport:'') + '/';
-	    res.writeHead(301, {'location': url});
-	    return res.end('Redirecting to <a href="' + url + '">' + url + '</a>.');
-	  }
-	});
-
-	server.listen(port);
-	logger.info('Listen for redirect on port ' + port);
+		
+		httpServer = https.createServer({
+			key: fs.readFileSync(prvf, 'utf8'),
+			cert: fs.readFileSync(pubf, 'utf8')
+		}, function(req, res){
+			var tg = findStickyServer(req);
+			proxy.web(req, res, {target:tg}, function(){
+				removeBackend(tg);
+			});
+		}).listen(sport, '0.0.0.0');
+	
+		var server = http.createServer(function (req, res) {
+		  // optional, for HSTS
+		  // see https://en.wikipedia.org/wiki/HTTP_Strict_Transport_Security
+		  res.setHeader('Strict-Transport-Security', 'max-age=8640000; includeSubDomains');
+	
+		  if (req.headers['x-forwarded-proto'] !== 'https') {
+		    var url = 'https://' + req.headers.host + (sport!==443?':'+sport:'') + '/';
+		    res.writeHead(301, {'location': url});
+		    return res.end('Redirecting to <a href="' + url + '">' + url + '</a>.');
+		  }
+		});
+	
+		server.listen(port);
+		logger.info('Listen for redirect on port ' + port);
+		
+	} else {
+		// Test is always running under http
+		proxy = httpProxy.createProxyServer({
+			target: 'http://localhost',
+			ws:true
+		});
+		
+		httpServer = http.createServer(function(req, res){
+			var tg = findStickyServer(req);
+			proxy.web(req, res, {target:tg}, function(){
+				removeBackend(tg);
+			});
+		}).listen(sport, '0.0.0.0');
+			
+	}
 
 } catch (ex) {
 	
 	logger.warn(ex.message);
 	
-	proxy = httpProxy.createProxyServer({
-		target: 'http://localhost',
-		ws:true
-	});
-	
-	httpServer = http.createServer(function(req, res){
-		var tg = findStickyServer(req);
-		proxy.web(req, res, {target:tg}, function(){
-			removeBackend(tg);
-		});
-	}).listen(sport, '0.0.0.0');
-		
 }
 	
 process.on('uncaughtException', function (err) {
