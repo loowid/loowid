@@ -131,9 +131,9 @@ Wiki Documentation | Vote us !! | Bitnami Contest
   MONGOHQ_URL=<MongoDB URL>
   ```
   
-  ## Translate
+## Translate
   If you are interested in add a translation or improve the existing ones you can use weblate platform at: 
   https://hosted.weblate.org/engage/loowid/ . We'll incorporate your translations as soon as possible.
   
-  ##License
+##License
   LooWID is licenced under [The MIT License (MIT)](https://github.com/loowid/loowid/blob/master/LICENSE) 
