@@ -47,12 +47,12 @@ module.exports = function(grunt) {
 	};
 	
 	var generateTestNode = function(nodes) {
-		var taskName = 'travis_node';
+		var taskName = 't';
 		var tasks = [];
 		var mongodb = grunt.option('mongodb') || 'on';
 		if (!process.env.OPENSHIFT_NODEJS_PORT && mongodb!=='off') {
 			tasks.push('shell:mongo');
-			taskName = 'jasmine_node';
+			taskName = 'n';
 		}
 		for (var j=1; j<nodes; j+=1) {
 			// In test one server is running with jasmine
@@ -61,7 +61,7 @@ module.exports = function(grunt) {
 			}
 			tasks.push('shell:node'+j);
 		}
-	    tasks.push(taskName+':'+nodes);
+	    tasks.push('jasmine_node:'+taskName+nodes);
 		return {
             tasks: tasks, 
             options: {

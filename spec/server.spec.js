@@ -3,7 +3,7 @@ describe('Main Server Tests', function() {
 
 	process.env.LOOWID_HTTPS_PORT = 8080;
 	process.env.JASMINE_PORT = 8001;
-	process.env.JASMINE_NODES = Number(process.argv[2].substring(process.argv[2].indexOf(':')+1));
+	process.env.JASMINE_NODES = Number(process.argv[2].substring(process.argv[2].indexOf(':')+2));
 	//jasmine.getEnv().defaultTimeoutInterval = 5000;
 	var proxy = null;
 	var mongoose = require('mongoose');
@@ -149,7 +149,8 @@ describe('Main Server Tests', function() {
 				done();
 			} else {
 				// Travis run mongo by itself
-				if (process.argv[2].indexOf('jasmine_node')===0) {
+				var isTravis = process.argv[2].substring(process.argv[2].indexOf(':')+1,process.argv[2].indexOf(':')+2)==='t';
+				if (!isTravis) {
 					// Wait 2 seconds to propagate shutdown signal
 					setTimeout(function(){
 						var exec = require('child_process').exec;
