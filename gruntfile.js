@@ -32,7 +32,6 @@ module.exports = function(grunt) {
 	    	grunt.config.data.concurrent.prod.tasks.splice(0,1);
 	    	grunt.config.data.concurrent.default.tasks.splice(0,1);
 	    	grunt.config.data.concurrent.cluster.tasks.splice(0,1);
-	    	grunt.config.data.concurrent.test.tasks.splice(0,1);
 	    } 
 	};
 	
@@ -47,15 +46,35 @@ module.exports = function(grunt) {
 		};
 	};
 	
-	var getClusterNodes = function() {
-		if (isRunningTests()) {
-			// Returning random cluster nodes between 1 and 4
-			return (Math.floor(Math.random()*4)+1);
-		} else {
-			var match = (/shell:node([0-9])/g).exec(process.argv[2]);
-			return match?Number(match[1])+1:2;
+	var generateTestNode = function(nodes) {
+		var taskName = 'travis_node';
+		var tasks = [];
+		var mongodb = grunt.option('mongodb') || 'on';
+		if (!process.env.OPENSHIFT_NODEJS_PORT && mongodb!=='off') {
+			tasks.push('shell:mongo');
+			taskName = 'jasmine_node';
 		}
-		
+		for (var j=1; j<nodes; j+=1) {
+			// In test one server is running with jasmine
+			if (!grunt.config.data.shell['node'+j]) {
+				grunt.config.data.shell['node'+j] = generateNodeShell(Number(process.env.LOOWID_BASE_PORT)+j+1);
+			}
+			tasks.push('shell:node'+j);
+		}
+	    tasks.push(taskName+':'+nodes);
+		return {
+            tasks: tasks, 
+            options: {
+                logConcurrentOutput: true
+            }
+    	};
+	};
+	
+	var addTestNodesToTasks = function(tasks,tests) {
+		for (var x=0; x<tests.length; x+=1) {
+			grunt.config.data.concurrent['test'+x] = generateTestNode(tests[x]);
+			tasks.push('concurrent:test'+x);
+		}
 	};
 	
 	var addClusterNodesToTasks = function(nodes) {
@@ -63,17 +82,7 @@ module.exports = function(grunt) {
 	    for (var k=0; k<nodes; k+=1) {
 	    	grunt.config.data.nodemon['dev'+k] = { script: 'server.js', options: generateOptions([Number(process.env.LOOWID_BASE_PORT)+k+1]) };
 	    	grunt.config.data.concurrent.cluster.tasks.push('nodemon:dev'+k);
-	    	if (k>0) {
-	    		// In test one server is running with jasmine
-	    		grunt.config.data.shell['node'+k] = generateNodeShell(Number(process.env.LOOWID_BASE_PORT)+k+1);
-	    		grunt.config.data.concurrent.test.tasks.push('shell:node'+k);
-	    	}
 	    }
-	    grunt.config.data.concurrent.test.tasks.push('jasmine_node:'+k);
-	};
-	
-	var isRunningTests = function() {
-		return process.argv[2]==='test';
 	};
 	
     // Project Configuration
@@ -165,12 +174,6 @@ module.exports = function(grunt) {
 	            options: {
 	                logConcurrentOutput: true
 	            }
-        	},
-        	test: {
-	            tasks: ['shell:mongo'], 
-	            options: {
-	                logConcurrentOutput: true
-	            }
         	}
         },
         uglify: {
@@ -255,8 +258,7 @@ module.exports = function(grunt) {
     
     // Cluster local configuration N nodes BasePort + 1, BasePort + 2,...
     // grunt cluster --nodes=N
-    // Random case for tests between 1 and 3 cluster nodes
-    var nodes = grunt.option('nodes') || getClusterNodes();
+    var nodes = grunt.option('nodes') || 2;
     addClusterNodesToTasks(nodes);
 
     // Setting number of cluster nodes
@@ -276,7 +278,12 @@ module.exports = function(grunt) {
     grunt.registerTask('mini', ['minijs','less']);
     grunt.registerTask('minicheck', ['jshint','minijs','less']);
     
+    var testingTasks = ['jshint'];
+    // By default add 3 cluster tests with 3, 2 and 1 nodes. End with single node test to get max coberture report last
+    var testNodes = (grunt.option('nodes')?[Number(grunt.option('nodes'))]:[3,2,1]);
+    addTestNodesToTasks(testingTasks,testNodes);
+
     // Run tests
-    grunt.registerTask('test', ['jshint','concurrent:test']);
+    grunt.registerTask('test', testingTasks);
     
 };

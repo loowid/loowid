@@ -96,12 +96,31 @@ module.exports = function(utils,vid) {
 	    utils.test('New ['+vid[x]+'] joins the room to get info.', njri);
 	}
 	
+	var isMemberOfTheRoom = function(id,uid,name) {
+		var ismember = utils.owner === id;
+		var fid = 'owner';
+		for (var x=0; x<vid.length && !ismember; x+=1) {
+			if (utils[vid[x]]===id) {
+				fid = vid[x];
+				ismember = true;
+			}
+		}
+		if (ismember && uid!==fid) {
+			console.log('Soy '+name+', me llega el ID de '+fid+' pero esperaba el id de '+uid);
+		}
+		return ismember;
+	};
+	
     utils.test('Check all peers.',function(done){
     	// Peer messages will be 2+4+6+8+10...
-    	expect(conditions.length).toBe(vid.length*(vid.length+1));
+    	var checked = 0;
     	for (var k=0; k<conditions.length; k+=1) {
-    		expect(conditions[k].received).toBe(utils[conditions[k].id]);
+    		if (isMemberOfTheRoom(conditions[k].received,conditions[k].id,conditions[k].name)) {
+        		checked += 1;
+    			expect(conditions[k].received).toBe(utils[conditions[k].id]);
+    		}
     	}
+    	expect(checked).toBe(vid.length*(vid.length+1));
     	done();
     });
 	

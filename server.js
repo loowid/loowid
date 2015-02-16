@@ -72,6 +72,7 @@ var sessionSecret = crypto.randomBytes(16).toString('hex');
 var webRTC = require('./webrtc.io.js').listen(wserver,ipaddr);
 
 var serverId = (Math.random()/+new Date()).toString(36).replace(/[^a-z]+/g,'').substring(0,9);
+exports.serverId = serverId;
 
 var useUrl = function() {
 	return isOpenShift() || isRunningTests();
@@ -98,14 +99,26 @@ webRTC.rtc.fire = function(eventName,_) {
 		logger.debug('Non distributed: '+eventName);
 	}
 };
-wsevents.initListener(serverId,function(event) {
+
+var setupServer = function(event) {
 	if (event.eventName==='startup') {
-		if (event.eventServer===serverId && !isClustered) { logger.debug('Startup node '+serverId); }
+		if (event.eventServer===serverId && !isClustered) { logger.info('Startup node '+serverId); }
 		isClustered = isClustered || event.eventServer!==serverId;
 		if (isClustered && serverCluster.indexOf(event.eventServer)<0) {
 			serverCluster += ','+event.eventServer;
 			wsevents.sendAck(serverId);
 		}
+	} else {
+		if (event.eventServer!==serverId) {
+			logger.info('Shutdown node '+serverId);
+			process.exit(0);
+		}
+	}
+};
+
+wsevents.initListener(serverId,function(event) {
+	if (event.eventName==='startup' || event.eventName==='shutdown') {
+		setupServer(event);
 	} else {
 		// Fire if it is from another server 
 		if (event.eventServer!==serverId) {
@@ -149,13 +162,8 @@ db.on('connected',function() {
 	logger.info('Succeeded connected to: ' + safeUriString);
 	exports.dbReady = true;
 });
-var errorCounts = 0;
 db.on('error',function(err) {
-	errorCounts += 1;
 	logger.error('ERROR connecting to: ' + safeUriString + '. ' + err);
-	if (isRunningTests() || errorCounts > 10) {
-		process.exit(0);
-	}
 });
 mongoose.connect(uristring,{server:{'auto_reconnect':true}});
 

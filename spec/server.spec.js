@@ -141,28 +141,44 @@ describe('Main Server Tests', function() {
 	});
 	
 	// Close Test DB
-	var fin = function(){
-    	var exec = require('child_process').exec;
-    	exec('mongo --eval "db.getSiblingDB(\'admin\').shutdownServer()"', function (error, stdout, stderr) {
-    	});
+	var fin = function(done){
+		var wsevt = new utils.WSEvent({eventName:'shutdown',eventServer:server.serverId,eventDate:new Date(),data:null,socket:null});
+		wsevt.save(function(err,obj){ 
+			if (err) { 
+				logger.error('Error shuting down server: '+err);
+				done();
+			} else {
+				// Travis run mongo by itself
+				if (process.argv[2].indexOf('jasmine_node')===0) {
+					// Wait 2 seconds to propagate shutdown signal
+					setTimeout(function(){
+						var exec = require('child_process').exec;
+						exec('mongo --eval "db.getSiblingDB(\'admin\').shutdownServer()"', function (error, stdout, stderr) { });
+						done();
+					},2000);
+				} else {
+					done();
+				}
+			} 
+		});
 	};
     
 	var total = 0;
     // Wrapper of it function to count number of tests
 	utils.test = function(name,fn) {
 		total+=1;
-		it(name,function(done){
-			//logger.info('Starting ['+jasmine.getEnv().currentSpec.suite.description+']['+name+']');
-			fn(done);
-		});
+		it(name,fn);
 	};
 	
 	var count = 0;
 	
 	afterEach(function(done){
 		count+=1;
-		if (count===total) { fin(); }
-		done();
+		if (count===total) { 
+			fin(done); 
+		} else {
+			done();
+		}
 	});
 	
 	require('./tests/init')(utils);
