@@ -87,7 +87,7 @@ Wiki Documentation | Vote us !! | Bitnami Contest
   ```
   CEXTID=<generic-domain-plugin-id>
   ```
-  3. Xyrsys configuration, to configure access to xyrsys (https://xirsys.com/).
+  3. XirSys configuration, to enable [STUN/TURN service](https://github.com/loowid/loowid/wiki/LooWID's-communication-stack) on [XirSys](https://xirsys.com/)
   
   ```
   XIRSYS_DOMAIN=<xyrsis domain>
