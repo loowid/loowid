@@ -107,7 +107,7 @@ Wiki Documentation | Vote us !! | Bitnami Contest
   ```
 
   6. LTI Producer Configuration. The consumer connects with multiple LooWID rooms depends on LTI context, the first user with OWNER_ROLE will be the room owner. 
-  The LooWID producer entrypoint is configured with LTI_PATH (/lti). Set LTI_DOMAIN if your host is behind a proxy with other domain than req.headers.host. 
+  The LooWID producer entrypoint is configured with LTI_PATH (/lti). Set LTI_DOMAIN if your host is behind a proxy with other domain than req.headers.host. [More about LTI](https://github.com/loowid/loowid/wiki/Setting-up-IMS-LTI-connection)
 
   ```
   LTI_KEY=<lti-key>
