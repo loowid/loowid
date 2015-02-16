@@ -106,7 +106,7 @@ angular.module('mean.rooms').factory('UserHandler',['Rooms','UIHandler','Notific
 	            		}
 	            	}
 	            	if (!exists2) {
-	            		uiHandler.users.slice(j2,1);
+	            		uiHandler.users.splice(j2,1);
 	            	}
 	            }
 	    	};
