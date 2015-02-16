@@ -161,12 +161,11 @@
 	</ul>
 	
 </aside>
-<p class="wikihelp">
-		<a href="{{resourceBundle.wikilink}}" target="_blank">?</a>
-		<span class="titled">{{resourceBundle.wikihelp}}</span>
-</p>
 <section id="dashboard" ng-class="[ui.dashConn,ui.dashChat]">
-
+		<p class="wikihelp">
+				<a href="{{resourceBundle.wikilink}}" target="_blank">?</a>
+				<span class="titled">{{resourceBundle.wikihelp}}</span>
+		</p>
 		<div id="remoteAudios" ></div>
 		<div id="remoteVideos" >
 			<wmwindow title="{{window.title}}" open="window.open"  close="window.close" selectwindow="window.selectwindow" closeable="{{window.closeable}}" options="{{window.options}}" data-ng-repeat="window in windows" >
