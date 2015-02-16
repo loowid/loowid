@@ -1,15 +1,15 @@
 'use strict';
-module.exports = function(request,test,utils) {
+module.exports = function(utils) {
 
 	describe('Private room', function() {
 
-		require('../utils/create_room')(request,test,utils);
+		require('../utils/create_room')(utils);
 
-	    test('Owner made the room private.', function(done) {
+	    utils.test('Owner made the room private.', function(done) {
 	    	var acc = utils.room.access;
 	    	acc.shared = 'PRIVATE';
-	    	request.post({
-	    		  headers: {'content-type':'application/x-www-form-urlencoded','x-csrf-token':utils.csrf},
+	    	utils.browsers.owner.request.post({
+	    		  headers: {'content-type':'application/x-www-form-urlencoded','x-csrf-token':utils.browsers.owner.csrf},
 	    		  url:     utils.testDomain+'/rooms/'+utils.roomID+'/editShared',
 	    		  form:    { id: utils.roomID, access: acc }
 	    	}, function(error, response, body){
@@ -23,9 +23,9 @@ module.exports = function(request,test,utils) {
 	    	});
 	    });
 
-	    test('The room is private.', function(done) {
-	    	request.post({
-	    		  headers: {'content-type':'application/x-www-form-urlencoded','x-csrf-token':utils.csrf},
+	    utils.test('The room is private.', function(done) {
+	    	utils.browsers.owner.request.post({
+	    		  headers: {'content-type':'application/x-www-form-urlencoded','x-csrf-token':utils.browsers.owner.csrf},
 	    		  url:     utils.testDomain+'/rooms/'+utils.roomID+'/isJoinable',
 	    		  form:    {id: utils.roomID}
 	    	}, function(error, response, body){
@@ -39,13 +39,11 @@ module.exports = function(request,test,utils) {
 	    	});
 	    });		
 
-		require('../utils/join_room')(request,test,utils,['viewer0']);
+		require('../utils/join_room')(utils,['viewer0']);
 		
-	    test('The users is not empty.', function(done) {
-	    	var requestDate = new Date();
-	    	requestDate.setTime(requestDate.getTime() - 1000);
-	    	request.post({
-	    		  headers: {'content-type':'application/x-www-form-urlencoded','x-csrf-token':utils.csrf},
+		utils.test('The users is not empty.', function(done) {
+			utils.browsers.owner.request.post({
+	    		  headers: {'content-type':'application/x-www-form-urlencoded','x-csrf-token':utils.browsers.owner.csrf},
 	    		  url:     utils.testDomain+'/rooms/'+utils.roomID+'/users',
 	    		  form:    {id: utils.roomID}
 	    	}, function(error, response, body){

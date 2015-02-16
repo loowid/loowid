@@ -182,7 +182,9 @@ h1, h2, h3, h4, h5, h6{
 		}
 		&:hover{
 			background: rgba(255, 255, 255, 0.5);
-			width: 16px;
+			@media all and (max-width:800px) {
+				width: 16px;
+			}
 			.inner_label{
 				max-width: 100%;
 				color: darken(@maincolor, 20%);
@@ -694,6 +696,7 @@ header{
 	overflow: auto;
 	
 
+
 	h1 {
 		font-size: 1.6em;
 		margin: 0.5em 0;
@@ -722,6 +725,40 @@ header{
 
 	}
 }
+
+.wikihelp{
+		position: absolute;
+		left:10px;
+		bottom: 0px;
+		width: 32px;
+		height: 32px;
+		z-index: 10010;
+		background: @linkcolor;
+		.border-radius( 64px );
+		a{
+			text-decoration: none;
+			color: @bgcolor;
+			font-size: 1.6em;
+			text-align: center;
+			display: block;
+		}
+		.titled{
+			display: none;
+			position: absolute;
+			.box-shadow(0 0 5px 0 rgba( 0, 0, 0, 0.5 ));
+			font-size: .85em;
+			width: 150px;
+			bottom: 39px;
+			padding: 0.8em;
+			background-color: #fff;
+		}
+		&:hover{
+			.titled{
+				display: block;
+			}
+		}
+	}
+
 #helper_name_connected_collapsed{ 
 	display: none; 
 	position: absolute;
@@ -1098,6 +1135,8 @@ header{
 		}
 		.avatar{
 			float: left;
+			position: relative;
+			left: -12px;
 		}
 		p {
 			color: @textcolor;
@@ -1122,6 +1161,9 @@ header{
 					-webkit-border-radius: 3px;
 					   -moz-border-radius: 3px;
 							border-radius: 3px;
+					&.warnedbtn{
+						background: @maincolor;
+					}
 				}
 			}
 		}

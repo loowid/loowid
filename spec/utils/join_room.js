@@ -1,47 +1,60 @@
 'use strict';
-module.exports = function(request,test,utils,vid) {
+module.exports = function(utils,vid) {
 
 	var getRegExp = function() { return /.*\[([a-z]+([0-9]*))\].*/g; };
 	
-	var getListener = function(id,id2,done) {
+	var conditions = [];
+	var joins = [];
+	
+	var getListener = function(name,id,done) {
 		return function(peer){
-	    	utils.addListener(id,'peer_list_updated',function(peer){
-	    		expect(peer.socketId).toBe(utils[id2]);
-	    		utils.multipleDone(done);
-	    	});
+			conditions.push({name:name,received:peer.socketId,id:id});
+			utils.multipleDone(done);
     	};
+	};
+	
+	var nob = function(done) {
+		var match = getRegExp().exec(jasmine.getEnv().currentSpec.description);
+		utils.getBrowser(match[1],function(browser){
+			done();
+		});
 	};
 	
 	var nws = function(done) {
 		var match = getRegExp().exec(jasmine.getEnv().currentSpec.description);
+    	// WebSocket Connect !!
+    	utils.connect(match[1],utils.browsers[match[1]].usrid);
     	utils.addListener(match[1],'get_updated_config',function(ice){
     		expect(ice.iceServers.length).toBeGreaterThan(0);
     		done();
     	});
-    	// WebSocket Connect !!
-    	utils.connect(match[1]);
     };
-	
+    
     var njr = function(done) {
     	var match = getRegExp().exec(jasmine.getEnv().currentSpec.description);
-    	var x = (match[2]-0);
-    	utils.checkDone = x+1;
+    	var x = Number(match[2]-0);
+    	utils.checkDone = (2*x)+3;
     	utils.addListener('owner','new_peer_connected',function(peer){
-	    	utils.addListener('owner','peer_list_updated',function(peer){
-	    		expect(peer.socketId).toBe(utils[match[1]]);
-	    		utils.multipleDone(done);
-	    	});
+    		conditions.push({name:'owner.npc',received:peer.socketId,id:match[1]});
+    		utils.multipleDone(done);
+    	});
+    	utils.addListener('owner','peer_list_updated',function(peer){
+    		conditions.push({name:'owner.plu',received:peer.socketId,id:match[1]});
+    		utils.multipleDone(done);
     	});
     	for (var h=0; h<x; h+=1) {
-	    	utils.addListener(vid[h],'new_peer_connected',getListener(vid[h],match[1],done));
+	    	utils.addListener(vid[h],'new_peer_connected',getListener(vid[h]+'.npc',match[1],done));
+	    	utils.addListener(vid[h],'peer_list_updated',getListener(vid[h]+'.plu',match[1],done));
     	}
     	utils.addListener(match[1],'get_peers',function(join){
     		expect(join.you.length).toBeGreaterThan(0);
     		utils[match[1]] = join.you;
+    		joins.push({id:match[1],value:join.you});
 	    	utils.ws[match[1]].send(JSON.stringify({
 				'eventName': 'peer_list_updated',
 				'data': { 'room': utils.roomID }
 	    	}));
+	    	utils.multipleDone(done);
     	});
     	utils.ws[match[1]].send(JSON.stringify({
 			'eventName': 'join_room',
@@ -55,33 +68,41 @@ module.exports = function(request,test,utils,vid) {
     
     var njri = function(done) {
     	var match = getRegExp().exec(jasmine.getEnv().currentSpec.description);
-    	var requestDate = new Date();
-    	requestDate.setTime(requestDate.getTime() - 1000);
-    	request.post({
-    		  headers: {'content-type':'application/x-www-form-urlencoded','x-csrf-token':utils.csrf},
-    		  url:     utils.testDomain+'/rooms/'+utils.roomID+'/join',
-    		  form:    {id: utils.roomID, avatar: 'img/hero.png', connectionId: utils[match[1]] , name: match[1]}
-    	}, function(error, response, body){
-            expect(error).toBeNull();
-            expect(response.statusCode).toBe(200);
-            var st = JSON.parse(body);
-            expect(st.status).toBe('OPENED');
-            expect(st.roomId).toBe(utils.roomID);
-            expect(st.guests.length).toBe(Number(match[2])+1);
-            for (var t=0; t<=Number(match[2]); t+=1) {
-	            expect(st.guests[t].name).toBe('viewer'+t);
-	            expect(st.guests[t].sessionid).toBe('');
-	            expect(st.guests[t].status).toBe('CONNECTED');
-	            expect(st.guests[t].connectionId).toBe(utils['viewer'+t]);
-            }
-            done();
-    	});
+    	utils.browsers[match[1]].request.post({
+  		  headers: {'content-type':'application/x-www-form-urlencoded','x-csrf-token':utils.browsers[match[1]].csrf},
+  		  url:     utils.testDomain+'/rooms/'+utils.roomID+'/join',
+  		  form:    {id: utils.roomID, avatar: 'img/hero.png', connectionId: utils[match[1]] , name: match[1]}
+      	}, function(error, response, body){
+              expect(error).toBeNull();
+              expect(response.statusCode).toBe(200);
+              var st = JSON.parse(body);
+              expect(st.status).toBe('OPENED');
+              expect(st.roomId).toBe(utils.roomID);
+              expect(st.guests.length).toBe(Number(match[2])+1);
+              for (var t=0; t<=Number(match[2]); t+=1) {
+  	            expect(st.guests[t].name).toBe('viewer'+t);
+  	            expect(st.guests[t].sessionid).toBe('');
+  	            expect(st.guests[t].status).toBe('CONNECTED');
+  	            expect(st.guests[t].connectionId).toBe(utils['viewer'+t]);
+              }
+              done();
+      	});
     };
     
 	for (var x=0; x<vid.length; x+=1) {
-	    test('New ['+vid[x]+'] websocket connection done.',nws);
-	    test('New ['+vid[x]+'] peer connected the room.',njr);
-	    test('New ['+vid[x]+'] joins the room to get info.', njri);
+		utils.test('New ['+vid[x]+'] open the browser.',nob);
+	    utils.test('New ['+vid[x]+'] websocket connection done.',nws);
+	    utils.test('New ['+vid[x]+'] peer connected the room.',njr);
+	    utils.test('New ['+vid[x]+'] joins the room to get info.', njri);
 	}
+	
+    utils.test('Check all peers.',function(done){
+    	// Peer messages will be 2+4+6+8+10...
+    	expect(conditions.length).toBe(vid.length*(vid.length+1));
+    	for (var k=0; k<conditions.length; k+=1) {
+    		expect(conditions[k].received).toBe(utils[conditions[k].id]);
+    	}
+    	done();
+    });
 	
 };

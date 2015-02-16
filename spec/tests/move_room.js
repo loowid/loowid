@@ -1,17 +1,15 @@
 'use strict';
-module.exports = function(request,test,utils) {
+module.exports = function(utils) {
 
 	describe('Move room', function() {
 		
-		require('../utils/create_room')(request,test,utils);
+		require('../utils/create_room')(utils);
 		
-		require('../utils/join_room')(request,test,utils,['viewer0','viewer1']);
+		require('../utils/join_room')(utils,['viewer0','viewer1']);
 	    
-	    test('The owner moves to another room.', function(done) {
-	    	var requestDate = new Date();
-	    	requestDate.setTime(requestDate.getTime() - 1000);
-	    	request.post({
-	    		  headers: {'content-type':'application/x-www-form-urlencoded','x-csrf-token':utils.csrf},
+	    utils.test('The owner moves to another room.', function(done) {
+	    	utils.browsers.owner.request.post({
+	    		  headers: {'content-type':'application/x-www-form-urlencoded','x-csrf-token':utils.browsers.owner.csrf},
 	    		  url:     utils.testDomain+'/rooms/'+utils.roomID+'/move',
 	    		  form:    {id: utils.roomID, list:[utils.viewer1]}
 	    	}, function(error, response, body){
@@ -26,7 +24,7 @@ module.exports = function(request,test,utils) {
 	    	});
 	    });
 
-	    test('The owner send move signal to everybody.', function(done) {
+	    utils.test('The owner send move signal to everybody.', function(done) {
 	    	utils.checkDone = 4;
 	    	utils.addListener('owner','peer_list_updated',function(peer){
 	    		expect(peer.socketId).toBe(utils.viewer1);
@@ -55,11 +53,9 @@ module.exports = function(request,test,utils) {
 	    	}));
 	    });
 
-	    test('The room has two guests one disconnected.', function(done) {
-	    	var requestDate = new Date();
-	    	requestDate.setTime(requestDate.getTime() - 1000);
-	    	request.post({
-	    		  headers: {'content-type':'application/x-www-form-urlencoded','x-csrf-token':utils.csrf},
+	    utils.test('The room has two guests one disconnected.', function(done) {
+	    	utils.browsers.owner.request.post({
+	    		  headers: {'content-type':'application/x-www-form-urlencoded','x-csrf-token':utils.browsers.owner.csrf},
 	    		  url:     utils.testDomain+'/rooms/'+utils.toRoomID+'/users',
 	    		  form:    {id: utils.toRoomID}
 	    	}, function(error, response, body){
@@ -77,11 +73,9 @@ module.exports = function(request,test,utils) {
 	    	});
 	    });
 	    
-	    test('The old room is not available.', function(done) {
-	    	var requestDate = new Date();
-	    	requestDate.setTime(requestDate.getTime() - 1000);
-	    	request.post({
-	    		  headers: {'content-type':'application/x-www-form-urlencoded','x-csrf-token':utils.csrf},
+	    utils.test('The old room is not available.', function(done) {
+	    	utils.browsers.owner.request.post({
+	    		  headers: {'content-type':'application/x-www-form-urlencoded','x-csrf-token':utils.browsers.owner.csrf},
 	    		  url:     utils.testDomain+'/rooms/'+utils.roomID+'/users',
 	    		  form:    {id: utils.toRoomID}
 	    	}, function(error, response, body){

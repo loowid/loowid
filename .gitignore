@@ -27,8 +27,7 @@ node_modules
 # Users Environment Variables
 .lock-wscript
 /.project
-/private.pem
-/public.pem
+/*.pem
 /.DS_Store
 /bower_components/
 /reports/

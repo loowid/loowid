@@ -217,15 +217,15 @@ angular.module('ngWindowManager',[])
 
 			//set the element in the specified position
 			winHandler.move = function(x, y) {
-				element.css('left',x +'px');
-				element.css('top',y + 'px');
+				if (x) {element.css('left',x +'px');}
+				if(y) {element.css('top',y + 'px');}
 
 			};
 
 			//set the new size of the element
 			winHandler.resize = function (width,height) {
-				element.css ('width', width + 'px');
-				element.css ('height', height + 'px');
+				if (width) {element.css ('width', width + 'px');}
+				if (height) {element.css ('height', height + 'px');}
 			};
 
 			//Move the current window to the highest position

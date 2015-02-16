@@ -14,7 +14,7 @@
   },
   "scripts": {
     "start": "node node_modules/grunt-cli/bin/grunt prod",
-    "test": "node node_modules/grunt-cli/bin/grunt travis_test"
+    "test": "node node_modules/grunt-cli/bin/grunt test --mongodb=off"
   },
   "devDependencies": {
     "coveralls": "^2.11.2",
@@ -49,6 +49,7 @@
     "request": "2.34.0",
     "socket.io": "0.9.6",
     "underscore": "1.5.2",
+    "http-proxy": "^1.8.1",
     "ws": "0.4.31"
   }
 }
