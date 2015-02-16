@@ -206,10 +206,10 @@ function attachEvents(manager) {
 			    'you': socket.id
 			  }
 			}), errorFn);
-		/*} else {
+		} else {
 			if (connectionsId.length>0) {
 				manager.wsevents.addEvent(manager.serverId,'add_peers',{'room':data.room,'connections':connectionsId},socket);
-			}*/
+			}
 		}
 	},function(lock) {
 		socketa.send(JSON.stringify({
@@ -358,7 +358,7 @@ function attachEvents(manager) {
   		}
   	}
   });
-  /*
+
   rtc.on('add_peers', function(data, socket) {
 		var roomList = rtc.rooms[data.room] || [];
 		for (var i = 0; i < roomList.length; i+=1) {
@@ -379,7 +379,7 @@ function attachEvents(manager) {
 		  }
 		}
 	});
-*/
+
 	rtc.on('update_owner_data', function(data, socket) {
 		var roomList = rtc.rooms[data.room] || [];
 		manager.rooms.checkOwner(socket.id, data.room, function() {
