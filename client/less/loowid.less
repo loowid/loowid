@@ -861,6 +861,11 @@ header{
 	p{
 		margin: 0 0 0 0;
 	}
+	h3{
+		max-width: ~"calc(100% - 70px)";
+		overflow: hidden;
+		text-overflow: ellipsis;
+	}
 	.user_title{
 		color: @maincolor;
 		line-height: 1.15;
@@ -870,7 +875,7 @@ header{
 			padding: 0 0 0.55em 0;
 			font-size: 1.3em;
 			font-family: "Source Sans Pro",sans-serif;
-		}
+		}		
 	}
 	.toolbar{
 		font-size: 1.2em;
@@ -881,6 +886,13 @@ header{
 	li{
 		margin: 0 0 0.8em 0;
 		clear: both;
+	}
+	&.myself{
+		font-weight: bold;
+		h3{
+			font-weight: bold;
+			color: @linkcolor;
+		}		
 	}
 }
 #connected{
@@ -909,8 +921,12 @@ header{
 	.sharers, .watchers{
 		max-height: ~"calc(100% - 220px)";
 		overflow-y: auto;
+		width: 100%;
 		img{
 			margin: 0.4em 0.5em 0 0;
+		}
+		h3{
+			padding: 5px 0 0 0;
 		}
 	}
 	.watchers{
