@@ -124,7 +124,7 @@ Wiki Documentation | Vote us !! | Bitnami Contest
   WS_PORT=<websocket-port-server>
   ```
 
-  8. MongoDB URL. By Default LooWID uses localhost to connect with mongodb, set one of this variables to connect to another URL. 
+  8. MongoDB URL: By Default LooWID uses localhost to connect with mongodb, set one of this variables to connect to another URL. 
 
   ```
   MONGOLAB_URI=<MongoDB URI>
