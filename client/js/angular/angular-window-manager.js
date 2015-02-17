@@ -7,31 +7,6 @@
  * # wmWindow
  */
 
-var calculateBounds = function( element, maximizeToElement ){
-
-	var TOOLBARHEIGHT = 34;
-
-	var bound = {
-		'width'  : 0,
-		'height' : 0
-	};
-
-	var video = element[0].getElementsByTagName('video')[0];
-
-	var videoActualWidth  = parseInt(maximizeToElement.offsetWidth  || maximizeToElement.innerWidth, 10);
-	var videoActualHeight = parseInt(maximizeToElement.offsetHeight || maximizeToElement.innerHeight, 10);
-
-	if( video ){
-		videoActualWidth = video.getBoundingClientRect().width;
-		videoActualHeight = video.getBoundingClientRect().height;
-	}
-
-	bound.height = parseInt(maximizeToElement.offsetHeight || maximizeToElement.innerHeight, 10);
-	bound.width  = videoActualWidth * ( bound.height - TOOLBARHEIGHT) / videoActualHeight;
-
-	return bound;
-};
-
 angular.module('ngWindowManager',[])
 .directive('wmwindow', function () {
 	return {
@@ -284,13 +259,12 @@ angular.module('ngWindowManager',[])
 			
 				//Select the element where to maximize
 				var maximizeToElement = winHandler.getMaximizeToElement();
-				var bounds = calculateBounds( element, maximizeToElement );
 
 				var maximizeCoords = {
 					x: parseInt(maximizeToElement.offsetLeft || 0, 10) ,
 					y: parseInt(maximizeToElement.offsetTop ||0, 10),
-					width:  bounds.width,
-					height: bounds.height
+					width:  parseInt(maximizeToElement.offsetWidth ||maximizeToElement.innerWidth, 10),
+					height: parseInt(maximizeToElement.offsetHeight || maximizeToElement.innerHeight, 10)
 				};
 				
 				//move, set the effect and resize 
