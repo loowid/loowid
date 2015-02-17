@@ -119,7 +119,7 @@ angular.module('mean.rooms').factory('MediaService',['Rooms','UIHandler',functio
 						if (error==='installed-disabled'){
 							errmsg = $scope.resourceBundle['loowid-extension-activate'];
 						}else if (error === 'not-installed'){
-							errmsg = $scope.resourceBundle['loowid-extension-message'] + '<a target="_blank"  href="https://chrome.google.com/webstore/detail/loowid-screen-capturing/' + rtc.chromeDesktopExtensionId + '" >' +$scope.resourceBundle['loowid-extension-install']   +  '  </a>';
+							errmsg = $scope.resourceBundle['loowid-extension-message'] + ' <a target="_blank"  href="https://chrome.google.com/webstore/detail/loowid-screen-capturing/' + rtc.chromeDesktopExtensionId + '" >' +$scope.resourceBundle['loowid-extension-install']   +  '  </a>';
 						}
 					}else{
 						errmsg = $scope.resourceBundle['unablepermission'+source] +  (source ==='screen' ? $scope.resourceBundle.readmore : '');
