@@ -53,8 +53,7 @@ angular.module('mean.rooms').factory('MediaService',['Rooms','UIHandler',functio
 
 				mediasource.initializingMedia = true;
 				rtc.createStream(source, mediasource.constraints, function(stream){
-					mediasource.recording = true;
-					mediasource.initializingMedia = false;
+					
 					mediasource.onclose = onclose;
 					mediasource.stream = stream;
 
@@ -78,6 +77,8 @@ angular.module('mean.rooms').factory('MediaService',['Rooms','UIHandler',functio
 								'onopen': 	function (win){
 									//Attach the window reference to the media source
 									mediasource.window = win;
+									mediasource.initializingMedia = false;
+									mediasource.recording = true;
 									mediaElement.style.display = '';
 									win.winHandler.resize (mediaElement.offsetWidth);
 									if (typeof onrecord !== 'undefined' && onrecord !== null) {onrecord.call (self);}
@@ -107,6 +108,8 @@ angular.module('mean.rooms').factory('MediaService',['Rooms','UIHandler',functio
 							self.createVideoWindow($scope,windowHandler,windowOptions);
 						
 					}else if (mediasource.playtype === 'audio'){
+						mediasource.initializingMedia = false;
+						mediasource.recording = true;
 						if (onrecord) {onrecord.call (self);}
 						uiHandler.safeApply($scope,function(){});
 					}
