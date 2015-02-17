@@ -88,6 +88,19 @@ angular.module('mean.rooms').factory('MediaService',['Rooms','UIHandler',functio
 									uiHandler.safeApply ($scope,function(){
 										self.stopMedia($scope,source);
 									});
+								},
+								'onmaximize': function (win){
+									var moveZone = document.getElementById('moveZone');
+									var finalHeight = (parseInt(moveZone.offsetHeight,10)-20);
+									
+									var videoELement = angular.element(mediaElement);
+									videoELement.addClass('maximized');
+									videoELement.css ('height', finalHeight +'px');
+								},
+								'onrestore': function (win){
+									var videoELement = angular.element(mediaElement);
+									videoELement.removeClass ('maximized');
+									videoELement.css ('height', '100%');
 								}
 							};
 							
@@ -417,6 +430,19 @@ angular.module('mean.rooms').factory('MediaService',['Rooms','UIHandler',functio
 									$scope.askForStopSharing (connectionId,mediasource.type);
 								});	
 							}
+						},
+						'onmaximize': function (win){
+							var moveZone = document.getElementById('moveZone');
+							var finalHeight = (parseInt(moveZone.offsetHeight,10)-20);
+
+							var videoELement = angular.element(mediaElement);
+							videoELement.addClass('maximized');
+							videoELement.css ('height', finalHeight +'px');
+						},
+						'onrestore': function (win){
+							var videoELement = angular.element(mediaElement);
+							videoELement.removeClass ('maximized');
+							videoELement.css ('height', '100%');
 						}
 					};
 

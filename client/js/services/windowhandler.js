@@ -35,6 +35,8 @@ angular.module('mean.rooms').factory('WindowHandler',[function(){
 			var closeable = windowOptions.closeable;
 			var onopen = windowOptions.onopen;
 			var onclose = windowOptions.onclose;
+			var onmaximize = windowOptions.onmaximize;
+			var onrestore = windowOptions.onrestore;
 			var winWidth = this.getDefaultWidth(winscale);
 			var winHeight = this.getDefaultHeight(winratio,winscale);
 			
@@ -73,6 +75,15 @@ angular.module('mean.rooms').factory('WindowHandler',[function(){
 				setTimeout(function() {selWindow();}, 100);
 			};
 			
+			var maximize = function (win){
+				if (onmaximize!==undefined) { onmaximize (window);}	
+			};
+			
+			var restore = function (win){
+				if (onrestore!==undefined) { onrestore (window);}	
+			};
+			
+			
 			var selWindow = function (win){
 				//There is a perverse effect on window selection that pauses the video, lets play all 
 				var videos = document.getElementsByTagName('video');
@@ -89,6 +100,8 @@ angular.module('mean.rooms').factory('WindowHandler',[function(){
 				closeable: (closeable===undefined) ? false : closeable,
 				selectwindow: selWindow,
 				open: open,
+				maximize: maximize,
+				restore: restore
 			};
 			
 			$scope.windows.unshift (window);

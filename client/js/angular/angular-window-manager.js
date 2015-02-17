@@ -293,7 +293,7 @@ angular.module('ngWindowManager',[])
 				},500);
 				
 				if (scope.maximize){
-					scope.maximize();	
+					scope.maximize(winHandler);	
 				}
 				
 			};
@@ -323,7 +323,7 @@ angular.module('ngWindowManager',[])
 				
 				//Execute restore method if it's provided
 				if (scope.restore){
-					scope.restore();	
+					scope.restore(winHandler);	
 				}
 				
 				//Removes the element some time ago
