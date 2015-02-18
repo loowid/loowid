@@ -27,7 +27,7 @@ Wiki Documentation | Vote us !! | Bitnami Contest
   5. `npm start`
   6. Connect to https://localhost/
 
-**Note**: If you want to work with the **latest stable release** then you must clone `https://github.com/loowid/loowid/tree/1.1.0`
+**Note**: If you want to work with the **latest stable release** then you must clone `https://github.com/loowid/loowid/releases/latest`
 
 ## Docker
 
