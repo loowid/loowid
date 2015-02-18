@@ -15,6 +15,11 @@ module.exports = function(grunt) {
 	 *  The minified and css are compiled when client side is changed.
 	 * 
 	*/
+	
+	var getGruntOption = function(id,def) {
+		return grunt.option(id) || def;
+	};
+	
 	var generateOptions = function(arg) {
 		return {
             args: arg,
@@ -26,7 +31,7 @@ module.exports = function(grunt) {
 	};
 	
 	var checkMongoOff = function() {
-	    var mongodb = grunt.option('mongodb') || 'on';
+	    var mongodb = getGruntOption('mongodb','on');
 	    // Do not run mongo in openshift environment
 	    if (process.env.OPENSHIFT_NODEJS_PORT || mongodb==='off') {
 	    	grunt.config.data.concurrent.prod.tasks.splice(0,1);
@@ -49,7 +54,7 @@ module.exports = function(grunt) {
 	var generateTestNode = function(nodes) {
 		var taskName = 't';
 		var tasks = [];
-		var mongodb = grunt.option('mongodb') || 'on';
+		var mongodb = getGruntOption('mongodb','on');
 		if (!process.env.OPENSHIFT_NODEJS_PORT && mongodb!=='off') {
 			tasks.push('shell:mongo');
 			taskName = 'n';
@@ -251,14 +256,14 @@ module.exports = function(grunt) {
     checkMongoOff();
     
     if (!process.env.OPENSHIFT_NODEJS_PORT) {
-        process.env.LOOWID_HTTP_PORT = grunt.option('port') || 80;
-        process.env.LOOWID_HTTPS_PORT = grunt.option('sport') || 443;
-        process.env.LOOWID_BASE_PORT = grunt.option('bport') || 8000;
+        process.env.LOOWID_HTTP_PORT = getGruntOption('port',80);
+        process.env.LOOWID_HTTPS_PORT = getGruntOption('sport',443);
+        process.env.LOOWID_BASE_PORT = getGruntOption('bport',8000);
     }
     
     // Cluster local configuration N nodes BasePort + 1, BasePort + 2,...
     // grunt cluster --nodes=N
-    var nodes = grunt.option('nodes') || 2;
+    var nodes = getGruntOption('nodes',2);
     addClusterNodesToTasks(nodes);
 
     // Setting number of cluster nodes
@@ -283,7 +288,7 @@ module.exports = function(grunt) {
     var testNodes = (grunt.option('nodes')?[Number(grunt.option('nodes'))]:[3,2,1]);
     addTestNodesToTasks(testingTasks,testNodes);
 
-    process.env.LOOWID_TEST_CASE = grunt.option('testcase');
+    process.env.LOOWID_TEST_CASE = getGruntOption('testcase','');
     
     // Run tests
     grunt.registerTask('test', testingTasks);
