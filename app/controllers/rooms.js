@@ -109,7 +109,7 @@ exports.connection = function (req,res,next,id){
 
 var checkRoomReloading = function(room,data,socket,success,error) {
 	// No locked room, or isReloading, or is owner and room disconnected
-    if (!room.access.locked || isReloading(room,socket.sessionid) || (room.owner.sessionid === socket.sessionid && (room.status === 'DISCONNECTED' || room.status=== 'CREATED'))) {
+    if (!room.access.locked || isReloading(room,socket.sessionid) || ((room.owner.sessionid === socket.sessionid || isValid(room,'owner.'+socket.sessionid)) && (room.status === 'DISCONNECTED' || room.status=== 'CREATED'))) {
 		success(data,socket);
 	} else {
 		error(true);
@@ -118,7 +118,7 @@ var checkRoomReloading = function(room,data,socket,success,error) {
 
 var analyzeRoom = function(room,data,socket,success,error) {
 	// Open room, or owner and room disconnected or valid password
-	if (room.access.shared!=='PRIVATE' || room.access.passwd === data.pwd || (room.owner.sessionid === socket.sessionid && (room.status === 'DISCONNECTED' || room.status=== 'CREATED'))) {
+	if (room.access.shared!=='PRIVATE' || room.access.passwd === data.pwd || ((room.owner.sessionid === socket.sessionid || isValid(room,'owner.'+socket.sessionid)) && (room.status === 'DISCONNECTED' || room.status=== 'CREATED'))) {
 		checkRoomReloading(room,data,socket,success,error);
 	} else {
 		error(false);
@@ -256,7 +256,7 @@ exports.create = function(req, res, next) {
 					 connectionId: req.body.connectionId,
 					 avatar: req.body.avatar},
 				guests: [],
-				valid: [],
+				valid: ['owner.'+req.session._usrid],
 				chat: [],
 				alias: []
 		});
