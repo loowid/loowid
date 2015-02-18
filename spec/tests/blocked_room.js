@@ -77,6 +77,49 @@ module.exports = function(utils) {
 	    	});
 	    });
 	    
+	    utils.test('Owner leave the romm.',function(done) {
+        	// WebSocket Disconnect !!
+	    	utils.checkDone = 2;
+	    	utils.addListener('viewer0','owner_data_updated',function(own){
+	    		expect(own.ownerCid).toBe(utils.owner);
+	    		expect(own.ownerName).toBe('Owner');
+	    		expect(own.status).toBe('DISCONNECTED');
+	    		utils.multipleDone(done);
+	    	});
+	    	utils.addListener('viewer1','owner_data_updated',function(own){
+	    		expect(own.ownerCid).toBe(utils.owner);
+	    		expect(own.ownerName).toBe('Owner');
+	    		expect(own.status).toBe('DISCONNECTED');
+	    		utils.multipleDone(done);
+	    	});
+	    	utils.disconnect('owner');
+	    });
+
+	    utils.test('Owner websocket connection again.',function(done) {
+        	// WebSocket Connect !!
+        	utils.connect('owner',utils.browsers.owner.usrid);
+	    	utils.addListener('owner','get_updated_config',function(ice){
+	    		expect(ice.iceServers.length).toBeGreaterThan(0);
+	    		done();
+	    	});
+	    });
+
+	    utils.test('The owner joins the room again.',function(done) {
+	    	utils.addListener('owner','get_peers',function(join){
+	    		expect(join.you.length).toBeGreaterThan(0);
+	    		utils.owner = join.you;
+	    		done();
+	    	});
+	    	utils.ws.owner.send(JSON.stringify({
+				'eventName': 'join_room',
+				'data': {
+					'room': utils.roomID,
+					'pwd': '',
+					'reload': true
+				}
+	    	}));
+	    });
+	    
 	});	
 	
 };

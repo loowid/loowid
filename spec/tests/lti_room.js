@@ -76,7 +76,7 @@ module.exports = function(utils) {
 	    
 	    utils.test('Owner WebSocket connection done.',function(done) {
         	// WebSocket Connect !!
-        	utils.connect('owner');
+        	utils.connect('owner',utils.browsers.owner.usrid);
 	    	utils.addListener('owner','get_updated_config',function(ice){
 	    		expect(ice.iceServers.length).toBeGreaterThan(0);
 	    		done();
