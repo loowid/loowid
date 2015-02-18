@@ -338,6 +338,10 @@ var getReqWSPort = function(req) {
 	return (ind>0?req.headers.host.substring(ind+1):(req.protocol==='http' && !defaultPort && !isClustered?'80':'443'));
 };
 
+var getUsrId = function(req) {
+	return req.session._usrid || rooms.getUsrId(useUrl());
+};
+
 if (isOpenShift()) {
 	// OpenShift Deployment
 	/* At the top, with other redirect methods before other routes */
@@ -351,7 +355,7 @@ if (isOpenShift()) {
 				res.setHeader('X-FRAME-OPTIONS','DENY');
 				res.sendfile(__dirname + '/public/landing.html');
 			} else {
-				req.session._usrid = rooms.getUsrId(useUrl());
+				req.session._usrid = getUsrId(req);
 				res.setHeader('X-FRAME-OPTIONS','SAMEORIGIN');
 				res.render('index.jade', {
 					title : 'Look what I\'m doing!',
@@ -378,7 +382,7 @@ if (isOpenShift()) {
 				res.setHeader('X-FRAME-OPTIONS','DENY');
 				res.sendfile(__dirname + '/public/landing.html');
 			} else {
-				req.session._usrid = rooms.getUsrId(useUrl());
+				req.session._usrid = getUsrId(req);
 				res.setHeader('X-FRAME-OPTIONS','SAMEORIGIN');
 				res.render('index.jade', {
 					title : 'Look what I\'m doing!',
