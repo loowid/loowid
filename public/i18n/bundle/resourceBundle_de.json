@@ -37,7 +37,7 @@
     "easy": "Einfach", 
     "easydesc": "Du kannst deinen eigenen Raum jederzeit eröffnen. Jeder, der die Webadresse kennt, kann den Raum betreten, in dem du dich gerade befindest. Die Standard-Einstellung deines Raums ist privat, somit können nur Teilnehmer, die über die Raumadresse verfügen, den Raum betreten", 
     "errorleavetheroom": "Du willst den Raum verlassen, bist du dir sicher?", 
-    "feedback": "Rückmeldunga", 
+    "feedback": "Rückmeldung", 
     "feedbackdesc": "Bitte teile uns deine Erfahrungen mit sowie Dinge, die wir ändern oder verbessern können. Sende uns eine E-Mail an <a href='mailto:loowid@gmail.com'>email</a>. <br /> Deine Meinung hilft uns, unser Produkt zu verbessern. Wir würden uns über deine Beteiligung an einer <a href='/views/survey_en.html' target='_blank'>kleinen Umfrage</a> sehr freuen", 
     "fireuser": "wird des Raumes verwiesen, bist du dir sicher?", 
     "footerText": "LooWID 2015", 
