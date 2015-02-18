@@ -3,14 +3,23 @@ module.exports = function(utils,vid) {
 
 	var getRegExp = function() { return /.*\[([a-z]+([0-9]*))\].*/g; };
 	
-	var conditions = [];
-	var joins = [];
-	
-	var getListener = function(name,id,done) {
+	var getListener = function(nid,done) {
 		return function(peer){
-			conditions.push({name:name,received:peer.socketId,id:id});
-			utils.multipleDone(done);
+			checkExpected(peer.socketId,nid,done);
     	};
+	};
+	
+	var checkExpected = function(id,nid,done) {
+		if (utils[nid]) {
+			if (utils[nid]===id) {
+				utils.multipleDone(done);
+			}
+		} else {
+			// Wait until ws id is ready
+			setTimeout(function(){
+				checkExpected(id,nid,done);
+			},60);
+		}
 	};
 	
 	var nob = function(done) {
@@ -35,21 +44,18 @@ module.exports = function(utils,vid) {
     	var x = Number(match[2]-0);
     	utils.checkDone = (2*x)+3;
     	utils.addListener('owner','new_peer_connected',function(peer){
-    		conditions.push({name:'owner.npc',received:peer.socketId,id:match[1]});
-    		utils.multipleDone(done);
+    		checkExpected(peer.socketId,match[1],done);
     	});
     	utils.addListener('owner','peer_list_updated',function(peer){
-    		conditions.push({name:'owner.plu',received:peer.socketId,id:match[1]});
-    		utils.multipleDone(done);
+    		checkExpected(peer.socketId,match[1],done);
     	});
     	for (var h=0; h<x; h+=1) {
-	    	utils.addListener(vid[h],'new_peer_connected',getListener(vid[h]+'.npc',match[1],done));
-	    	utils.addListener(vid[h],'peer_list_updated',getListener(vid[h]+'.plu',match[1],done));
+	    	utils.addListener(vid[h],'new_peer_connected',getListener(match[1],done));
+	    	utils.addListener(vid[h],'peer_list_updated',getListener(match[1],done));
     	}
     	utils.addListener(match[1],'get_peers',function(join){
     		expect(join.you.length).toBeGreaterThan(0);
     		utils[match[1]] = join.you;
-    		joins.push({id:match[1],value:join.you});
 	    	utils.ws[match[1]].send(JSON.stringify({
 				'eventName': 'peer_list_updated',
 				'data': { 'room': utils.roomID }
@@ -95,33 +101,5 @@ module.exports = function(utils,vid) {
 	    utils.test('New ['+vid[x]+'] peer connected the room.',njr);
 	    utils.test('New ['+vid[x]+'] joins the room to get info.', njri);
 	}
-	
-	var isMemberOfTheRoom = function(id,uid,name) {
-		var ismember = utils.owner === id;
-		var fid = 'owner';
-		for (var x=0; x<vid.length && !ismember; x+=1) {
-			if (utils[vid[x]]===id) {
-				fid = vid[x];
-				ismember = true;
-			}
-		}
-		if (ismember && uid!==fid) {
-			console.log('Soy '+name+', me llega el ID de '+fid+' pero esperaba el id de '+uid);
-		}
-		return ismember;
-	};
-	
-    utils.test('Check all peers.',function(done){
-    	// Peer messages will be 2+4+6+8+10...
-    	var checked = 0;
-    	for (var k=0; k<conditions.length; k+=1) {
-    		if (isMemberOfTheRoom(conditions[k].received,conditions[k].id,conditions[k].name)) {
-        		checked += 1;
-    			expect(conditions[k].received).toBe(utils[conditions[k].id]);
-    		}
-    	}
-    	expect(checked).toBe(vid.length*(vid.length+1));
-    	done();
-    });
 	
 };
