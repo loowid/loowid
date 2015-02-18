@@ -51,7 +51,7 @@ Wiki Documentation | Vote us !! | Bitnami Contest
 
 	 ```
 	 Use --port=80 --sport=443 --bport=8000 to change default port values.
-	 And --mongodb=off to don't startup mongodb and provide it independently
+	 add --mongodb=off to don't startup mongodb and provide it independently
 	 ```
 	 ```
 	 grunt cluster --sport=9090 --port=8080 --bport=7000 --nodes=3 
@@ -64,6 +64,10 @@ Wiki Documentation | Vote us !! | Bitnami Contest
 	 ```
 	 grunt --mongodb=off 
 	 won't startup mongodb
+	 ```
+	 ```
+	 grunt test --testcase=<file_name> --nodes=3 
+	 run only <file_name> testcase in a cluster environment with 3 nodes. See spec/tests folder.
 	 ```
    
   7. If you get some npm packages errors try `npm update` (We had that errors on Windows 7 64bits)
