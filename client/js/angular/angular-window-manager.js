@@ -67,7 +67,7 @@ angular.module('ngWindowManager',[])
 			var windowArea = options.windowContainer===undefined ? parentWindow : document.getElementById(options.windowContainer);
 		
 			//Set some tricky controls to handle the layering
-			parentWindow.topZ = parentWindow.topZ || options.initialZIndex || parentWindow.css('z-index') || 100000;
+			parentWindow.topZ = parentWindow.topZ || options.initialZIndex || angular.element(parentWindow).css('z-index') || 100000;
 			
 			//This function is executed when close button is pushed
 			winHandler.close = function (){
