@@ -443,7 +443,7 @@ angular.module('mean.rooms').factory('FileService',['$sce','UIHandler',function(
 		
 	        rtc.uniqueon ('request_for_accept_files', function(data){
 	            if (data.files && data.requestId){
-	                var confirmationStr = '<strong>' +(uiHandler.isowner ? uiHandler.name : $scope.getUserName(data.id)) + '</strong> ' + $scope.resourceBundle.wantstosharefiles  +'<br/>';
+	                var confirmationStr = '<strong>' + $scope.getUserName(data.id) + '</strong> ' + $scope.resourceBundle.wantstosharefiles  +'<br/>';
 
 	                for (var fileId in data.files){
 						if (data.files.hasOwnProperty(fileId)) {
@@ -474,7 +474,8 @@ angular.module('mean.rooms').factory('FileService',['$sce','UIHandler',function(
 			 		                rtc.fileRequestFailed($scope.global.roomId,data.id,data.requestId,'files are not accepted');
 								},
 			    				'class':'modalform editable',
-			    				'done':false
+			    				'done':false,
+								'avatar': $scope.getUser(data.id).avatar
 			    			});	
 			    		});
 	                }
