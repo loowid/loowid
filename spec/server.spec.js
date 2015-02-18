@@ -182,25 +182,18 @@ describe('Main Server Tests', function() {
 		}
 	});
 	
-	require('./tests/init')(utils);
-	require('./tests/lti_room')(utils);
-	require('./tests/chat_talk')(utils);
-	require('./tests/change_log_level')(utils);
-	require('./tests/new_room')(utils);
-	require('./tests/join_room')(utils);
-	require('./tests/chat_room')(utils);
-	require('./tests/three_room')(utils);
-	require('./tests/multi_join_room')(utils);
-	require('./tests/move_room')(utils);
-	require('./tests/owner_leaves_room')(utils);
-	require('./tests/viewer_leaves_room')(utils);
-	require('./tests/blocked_room')(utils);
-	require('./tests/blocked_chat')(utils);
-	require('./tests/private_room')(utils);
-	require('./tests/permanent_room')(utils);
-	require('./tests/edit_name_room')(utils);
-	require('./tests/status_room')(utils);
-	require('./tests/moderated_room')(utils);
-	require('./tests/room_stats')(utils);
-
+	// Test collection
+	var tests = ['init','lti_room','chat_talk','change_log_level','new_room','join_room','chat_room','three_room',
+	             'multi_join_room','move_room','owner_leaves_room','viewer_leaves_room','blocked_room','blocked_chat',
+	             'private_room','permanent_room','edit_name_room','status_room','moderated_room','room_stats'];
+	
+	// Allow run a specific test
+	if (process.env.LOOWID_TEST_CASE) {
+		tests = [process.env.LOOWID_TEST_CASE];
+	}
+	
+	for (var t=0; t<tests.length; t+=1) {
+		require('./tests/'+tests[t])(utils);
+	}
+	
 });

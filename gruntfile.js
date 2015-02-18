@@ -283,6 +283,8 @@ module.exports = function(grunt) {
     var testNodes = (grunt.option('nodes')?[Number(grunt.option('nodes'))]:[3,2,1]);
     addTestNodesToTasks(testingTasks,testNodes);
 
+    process.env.LOOWID_TEST_CASE = grunt.option('testcase');
+    
     // Run tests
     grunt.registerTask('test', testingTasks);
     
