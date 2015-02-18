@@ -278,7 +278,10 @@ app.configure(function() {
 	 
 	});
 	app.use(express.logger({stream:{write:function(str){
-		logs.addLog(serverId,str.substring(0,str.length-1).split('@'));
+		// Write log info only when DB is connected
+		if (db.readyState===1) {
+			logs.addLog(serverId,str.substring(0,str.length-1).split('@'));
+		}
 	}},format:':date@:sessionid@:ip@:method@:url@:status@:res[content-length]@:response-time'}));
 	app.use(express.static(__dirname + '/public'));
 	app.use('/client',express.static(__dirname + '/client'));
