@@ -739,15 +739,27 @@ header{
 	}
 }
 
-.wikihelp{
+#wikihelp{
 		position: absolute;
-		left:10px;
+		left:210px;
 		bottom: 0px;
 		width: 32px;
 		height: 32px;
 		z-index: 10010;
 		background: @linkcolor;
 		.border-radius( 64px );
+		.transition(left 0.5s ease );
+		@media all and (max-width:800px){
+			left: 88%;
+			bottom: 40px;
+			&.chat_collapsed{
+				left: 88% !important;
+				bottom: 0px !important;
+			}
+			.titled{
+				right: 5%;
+			}
+		}
 		a{
 			text-decoration: none;
 			color: @bgcolor;
@@ -768,6 +780,14 @@ header{
 		&:hover{
 			.titled{
 				display: block;
+			}
+		}
+		&.connected_collapsed{
+			left:10px;
+			@media all and (max-width:800px){
+				left: 90%;
+				bottom: 30px;
+
 			}
 		}
 	}
@@ -925,8 +945,6 @@ header{
 		left: 170px;
 	}
 	.sharers, .watchers{
-		max-height: ~"calc(100% - 220px)";
-		overflow-y: auto;
 		width: 100%;
 		img{
 			margin: 0.4em 0.5em 0 0;
