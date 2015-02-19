@@ -234,41 +234,56 @@ exports.createid = function(req, res, next) {
 * Create a room
 */
 
+var getUniqueClaimId = function(cb) {
+	var ucid = makeId();
+	var result = function(err,room){
+		if (!room) {
+			cb(ucid);
+		} else {
+			ucid = makeId();
+			Room.load(ucid,0,result);
+		}
+	};
+	Room.load(ucid,0,result);
+};
+
 exports.create = function(req, res, next) {
 	// Check the id is the same as previously created
 	if (req.session.roomId === req.body.roomId){
-		var acc = {shared:'LINK',title:req.body.title,keywords:[],passwd:makeId(),moderated:req.lti?true:false,chat:false,locked:false,permanent:false,permanentkey:makeId()};
-		var now = new Date();
-		var due = new Date();
-		var tmout = Number(process.env.ROOM_TIMEOUT || 15);
-		due.setDate(new Date(now.getDate()+tmout));
-		logger.debug('['+now+'] Creating room '+req.session.roomId+ ' timeout '+ tmout + ': '+due);
-		var room = new Room (
-				{roomId: req.session.roomId, 
-				 created: now,
-				 dueDate: due,
-				 status: req.lti?'DISCONNECTED':'OPENED',
-				 access: acc,
-				 owner:
-				 	{name: req.body.name, 
-					 sessionid: req.sessionID,
-					 status:req.lti?'DISCONNECTED':'CONNECTED',
-					 connectionId: req.body.connectionId,
-					 avatar: req.body.avatar},
-				guests: [],
-				valid: ['owner.'+req.session._usrid],
-				chat: [],
-				alias: []
-		});
-		if (req.lti) {
-			room.lticontext = req.lti;
-		}
-		room.save(function(err) {
-			if (err) {
-				next(err);
-			} else {
-				res.json(room);
+		getUniqueClaimId(function(uniqueClaimId){
+			var acc = {shared:'LINK',title:req.body.title,keywords:[],passwd:makeId(),moderated:req.lti?true:false,chat:false,locked:false,permanent:false,permanentkey:uniqueClaimId};
+			var now = new Date();
+			var due = new Date();
+			var tmout = Number(process.env.ROOM_TIMEOUT || 15);
+			due.setDate(new Date(now.getDate()+tmout));
+			logger.debug('['+now+'] Creating room '+req.session.roomId+ ' timeout '+ tmout + ': '+due);
+			var room = new Room (
+					{roomId: req.session.roomId, 
+					 created: now,
+					 dueDate: due,
+					 status: req.lti?'DISCONNECTED':'OPENED',
+					 access: acc,
+					 owner:
+					 	{name: req.body.name, 
+						 sessionid: req.sessionID,
+						 status:req.lti?'DISCONNECTED':'CONNECTED',
+						 connectionId: req.body.connectionId,
+						 avatar: req.body.avatar},
+					guests: [],
+					valid: ['owner.'+req.session._usrid],
+					chat: [],
+					alias: []
+			});
+			if (req.lti) {
+				room.lticontext = req.lti;
 			}
+			room.save(function(err) {
+				if (err) {
+					next(err);
+				} else {
+					res.json(room);
+				}
+			});
 		});
 	} else {
 		var error = new Error('Failed to create the room: ' + req.body.roomId);
