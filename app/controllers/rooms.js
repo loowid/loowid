@@ -208,8 +208,27 @@ exports.join = function (req, res, next){
 	}
 };
 
-// Generate unique room id
-// Validate is unique in mongo
+//Generate unique room id
+//Validate is unique in mongo
+var getUniqueRoomId = function(cb,err) {
+	var ucid = makeId();
+	var maxCount = 20;
+	var result = function(err,room){
+		if (!room) {
+			cb(ucid);
+		} else {
+			if (maxCount>0) {
+				maxCount -= 1;
+				ucid = makeId();
+				Room.load(ucid,0,result);
+			} else {
+				err();
+			}
+		}
+	};
+	Room.load(ucid,0,result);
+};
+
 // Session is regenerated for every room you create
 exports.createid = function(req, res, next) {
 	var _csrfSecret = req.session._csrfSecret;
@@ -217,16 +236,15 @@ exports.createid = function(req, res, next) {
 	req.session.regenerate(function(){
 		req.session._csrfSecret = _csrfSecret;
 		req.session._usrid = _usrId;
-		req.session.roomId = makeId();
-		var result = function(err,room){
-			if (!room) {
-				res.json({id:req.session.roomId});
-			} else {
-				req.session.roomId = makeId();
-				Room.load(req.session.roomId,0,result);
-			}
-		};
-		Room.load(req.session.roomId,0,result);
+		getUniqueRoomId(function(urid){
+			req.session.roomId = urid;
+			res.json({id:req.session.roomId});
+		},function(){
+			var error = new Error('Failed to create the roomid!!');
+			var errorCode = 'http_code';
+			error[errorCode] = 500;
+			next(error);
+		});
 	});
 };
 
@@ -234,23 +252,10 @@ exports.createid = function(req, res, next) {
 * Create a room
 */
 
-var getUniqueClaimId = function(cb) {
-	var ucid = makeId();
-	var result = function(err,room){
-		if (!room) {
-			cb(ucid);
-		} else {
-			ucid = makeId();
-			Room.load(ucid,0,result);
-		}
-	};
-	Room.load(ucid,0,result);
-};
-
 exports.create = function(req, res, next) {
 	// Check the id is the same as previously created
 	if (req.session.roomId === req.body.roomId){
-		getUniqueClaimId(function(uniqueClaimId){
+		getUniqueRoomId(function(uniqueClaimId){
 			var acc = {shared:'LINK',title:req.body.title,keywords:[],passwd:makeId(),moderated:req.lti?true:false,chat:false,locked:false,permanent:false,permanentkey:uniqueClaimId};
 			var now = new Date();
 			var due = new Date();
@@ -284,6 +289,11 @@ exports.create = function(req, res, next) {
 					res.json(room);
 				}
 			});
+		},function(){
+			var error = new Error('Failed to create the room: ' + req.body.roomId);
+			var errorCode = 'http_code';
+			error[errorCode] = 500;
+			next(error);
 		});
 	} else {
 		var error = new Error('Failed to create the room: ' + req.body.roomId);
