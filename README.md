@@ -143,7 +143,7 @@ Wiki Documentation | Vote us !! | Bitnami Contest
   LooWID is licenced under [The MIT License (MIT)](https://github.com/loowid/loowid/blob/master/LICENSE)
   
 ## Help us to maintain LooWID
-LooWID is an open source project and code developement and translations contributions would be very appreciated. We encourage you to join to start developing on project and create a pull request to the main repository. If you can't contribute development or translations and still want to contribute to the project, you could donate via  [![Flattr this git repo](http://api.flattr.com/button/flattr-badge-large.png)](https://flattr.com/submit/auto?user_id=LooWIDCOM&url=https://github.com/loowid/loowid&title=LooWID&language=&tags=github&category=software) 
+LooWID is an open source project and code developement and translations contributions would be very appreciated. We encourage you to join to start developing on project and create a pull request to the main repository. If you can't contribute development or translations and still want to contribute to the project, you could donate via  [![Flattr this git repo](http://api.flattr.com/button/flattr-badge-large.png)](https://flattr.com/submit/auto?user_id=LoowidCOM&url=https://www.loowid.com&title=LooWID&language=&tags=github&category=software) 
 
 That will help us to maintain www.loowid.com service up and running.  
   
