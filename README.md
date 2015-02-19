@@ -1,5 +1,4 @@
 # LooWID [![Build Status](https://travis-ci.org/loowid/loowid.svg?branch=master)](https://travis-ci.org/loowid/loowid) [![Build Status](https://api.shippable.com/projects/54d253435ab6cc13528acebb/badge?branchName=master)](https://app.shippable.com/projects/54d253435ab6cc13528acebb/builds/latest) [![Coverage Status](https://coveralls.io/repos/loowid/loowid/badge.svg?branch=master)](https://coveralls.io/r/loowid/loowid?branch=master) [![Codacy Badge](https://www.codacy.com/project/badge/ac8effa59d594bb0aa4c344da6a92527)](https://www.codacy.com/public/alexballeste/loowid) [![Translated](https://hosted.weblate.org/widgets/loowid/-/svg-badge.svg)](https://hosted.weblate.org/widgets/loowid/-/svg-badge.svg)
-[![Flattr this git repo](http://api.flattr.com/button/flattr-badge-large.png)](https://flattr.com/submit/auto?user_id=LooWIDCOM&url=https://github.com/loowid/loowid&title=LooWID&language=&tags=github&category=software)
 
 *LOOk What I'm Doing* is a web application that allows you to connect with other users and share audio, video, screen and files without any plugin using WebRTC technology.
 
@@ -140,5 +139,12 @@ Wiki Documentation | Vote us !! | Bitnami Contest
   If you are interested in add a translation or improve the existing ones you can use weblate platform at: 
   https://hosted.weblate.org/engage/loowid/ . We'll incorporate your translations as soon as possible.
   
-##License
-  LooWID is licenced under [The MIT License (MIT)](https://github.com/loowid/loowid/blob/master/LICENSE) 
+## License
+  LooWID is licenced under [The MIT License (MIT)](https://github.com/loowid/loowid/blob/master/LICENSE)
+  
+## Help us to maintain LooWID
+LooWID is an open source project and code developement and translations contributions would be very appreciated. We encourage you to join to start developing on project and create a pull request to the main repository. If you can't contribute development or translations and still want to contribute to the project, you could donate via  [![Flattr this git repo](http://api.flattr.com/button/flattr-badge-large.png)](https://flattr.com/submit/auto?user_id=LooWIDCOM&url=https://github.com/loowid/loowid&title=LooWID&language=&tags=github&category=software) 
+
+That will help us to maintain www.loowid.com service up and running.  
+  
+  
