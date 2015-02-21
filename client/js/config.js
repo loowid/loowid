@@ -9,6 +9,8 @@ window.app.config(['$routeProvider',
             templateUrl: 'views/rooms/owner.html'
     	}).when ('/r/:roomId/claim',{
             templateUrl: 'views/rooms/claim.html'
+    	}).when ('/stats',{
+            templateUrl: 'views/rooms/stats.html'
     	}).when ('/lti/error',{
             templateUrl: 'views/rooms/lti.html'
         }).when ('/r/:roomId',{reloadOnSearch: false,

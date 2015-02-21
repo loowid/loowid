@@ -189,5 +189,14 @@
    "installMongo": "You will need to install MongoDB and just...",
    "canceledFile": "refused the file",
    "wikihelp": "Do you need any help? Try watching our wiki",
-   "wikilink": "https://github.com/loowid/loowid/wiki/How-to-use-it"
+   "wikilink": "https://github.com/loowid/loowid/wiki/How-to-use-it",
+   "statistics" : "Statistics",
+   "roomsbyday" : "Rooms Created By Day",
+   "roomsbytype" : "Rooms By Type",
+   "roomsmoderated" : "Moderated",
+   "roomsnomoderated" : "No Moderated",
+   "roomspass" : "Password",
+   "roomslink" : "Link",
+   "roomstemp" : "Temporal Room",
+   "roomspermanent" : "Permanent Room"
 }

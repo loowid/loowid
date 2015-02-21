@@ -1,0 +1,11 @@
+<div id="home" data-ng-controller="StatsController" data-ng-init="init()">
+	<section id="starred">
+		<h1>LooWID: {{resourceBundle.statistics}}</h1>
+		<div class="inner">
+			<hr/><br/>
+			<canvas id="line" class="chart chart-line" data="data0" labels="labels0" legend="true" series="series0"></canvas>
+			<hr/><br/>
+			<canvas id="pie" class="chart chart-pie" data="data1" labels="labels1" series="series1" legend="true" ></canvas>
+  		</div>
+	</section>
+</div>

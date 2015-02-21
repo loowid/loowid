@@ -292,6 +292,9 @@ app.configure(function() {
 	app.get('/stats/rooms',auth,function(req,res,next){
 		rooms.stats(res);
 	});
+	app.get('/stats/roomsbytype',auth,function(req,res,next){
+		rooms.statsbytype(res);
+	});
 	// LTI Routes
 	app.post(LTI_PATH,passport.authenticate('lti',{
 		failureRedirect: '/#!/lti/error'

@@ -115,6 +115,17 @@ RoomSchema.statics = {
 		        }
 		      }, { $sort : { _id: 1 } }
     	]).exec(cb);
+    },
+    bytype: function(cb) {
+    	this.aggregate([
+		      {
+		        $group : {
+		           _id : { access: '$access.shared', moderated: '$access.moderated', permanent: '$access.permanent' },
+		           //avgMembers: { $avg: { $add:[ { $size: '$guests' }, 1 ] } },
+		           count: { $sum: 1 }
+		        }
+		      }, { $sort : { _id: 1 } }
+    	]).exec(cb);
     }
 };
 

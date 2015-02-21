@@ -768,3 +768,9 @@ exports.stats = function(res) {
 		res.json(list);
 	});
 };
+
+exports.statsbytype = function(res) {
+	Room.bytype(function(err,list){
+		res.json(list);
+	});
+};
