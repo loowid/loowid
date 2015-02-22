@@ -105,27 +105,13 @@ RoomSchema.statics = {
     	}
     	return guests;
     },
-    all: function(cb) {
-    	this.aggregate([
-		      {
-		        $group : {
-		           _id : { day: { $dayOfMonth: '$created' }, month: { $month: '$created' }, year: { $year: '$created' } },
-		           //avgMembers: { $avg: { $add:[ { $size: '$guests' }, 1 ] } },
-		           count: { $sum: 1 }
-		        }
-		      }, { $sort : { _id: 1 } }
-    	]).exec(cb);
-    },
-    bytype: function(cb) {
-    	this.aggregate([
-		      {
-		        $group : {
-		           _id : { access: '$access.shared', moderated: '$access.moderated', permanent: '$access.permanent' },
-		           //avgMembers: { $avg: { $add:[ { $size: '$guests' }, 1 ] } },
-		           count: { $sum: 1 }
-		        }
-		      }, { $sort : { _id: 1 } }
-    	]).exec(cb);
+    all: function(first,cb) {
+    	var offSet = (1000*60*60*24); // One day
+    	var last = new Date();
+    	last.setTime(last.getTime()-offSet);
+    	var query = first?{'created':{'$gt':first,'$lte':last}}:{'created':{'$lte':last}};
+    	// Limited to 100, if you have more rooms by day you must increase this limit
+    	this.find(query).sort({'created':1}).limit(100).exec(cb);
     }
 };
 

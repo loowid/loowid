@@ -200,5 +200,16 @@
     "youarefired": "Has sido expulsado de la sala", 
     "youmustacceptterms": "Debes aceptar los términos", 
     "yourbrowsernot": "Aún no damos soporte a tu navegador. Sigue cualquier novedad desde @LooWIDCom", 
-    "youtubeVideo": "YouTube - Haz click para abrir"
+    "youtubeVideo": "YouTube - Haz click para abrir",
+    "statistics" : "Estadísticas",
+    "roomsbyday" : "Salas por día",
+    "membersbyday" : "Participantes por día",
+    "messagesbyroom" : "Mensajes por sala",
+    "roomsbytype" : "Salas por tipo",
+	"roomsmoderated" : "Moderada",
+    "roomsnomoderated" : "No Moderada",
+    "roomspass" : "Clave",
+    "roomslink" : "Enlace",
+    "roomstemp" : "Sala Temporal",
+    "roomspermanent" : "Sala Permanente"
 }

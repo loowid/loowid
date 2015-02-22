@@ -192,6 +192,8 @@
    "wikilink": "https://github.com/loowid/loowid/wiki/How-to-use-it",
    "statistics" : "Statistics",
    "roomsbyday" : "Rooms Created By Day",
+   "membersbyday" : "Members By Day",
+   "messagesbyroom" : "Messages By Room",
    "roomsbytype" : "Rooms By Type",
    "roomsmoderated" : "Moderated",
    "roomsnomoderated" : "No Moderated",

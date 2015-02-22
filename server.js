@@ -45,6 +45,7 @@ var server = http.createServer(app);
 var rooms = require('./app/controllers/rooms');
 var wsevents = require('./app/controllers/events');
 var logs = require('./app/controllers/log');
+var stats = require('./app/controllers/stats');
 
 if (!isOpenShift() && defaultPort) {
 	try {
@@ -292,8 +293,8 @@ app.configure(function() {
 		log4js.printLogLevels(res);
 	});
 	// Statistics service
-	app.get('/stats/rooms',auth,rooms.stats);
-	app.get('/stats/roomsbytype',auth,rooms.statsbytype);
+	app.get('/stats/rooms',auth,stats.byday);
+	app.get('/stats/roomsbytype',auth,stats.bytype);
 	// LTI Routes
 	app.post(LTI_PATH,passport.authenticate('lti',{
 		failureRedirect: '/#!/lti/error'
@@ -449,3 +450,14 @@ if (defaultPort) {
 } else {
 	logger.info('Express app started on '+ipaddr+' port ' + port);
 }
+
+// Save statistics every 6 hours
+setInterval(function(){
+	var sorted = serverCluster.split(',');
+	sorted.sort();
+	// Only one node save statistics
+	if (sorted[0] === serverId) {
+	    stats.saveStats();
+	}
+},1000*60*60*6);
+

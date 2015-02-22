@@ -19,10 +19,14 @@ module.exports = function(utils) {
 	    	utils.browsers.owner.request(utils.testDomain.replace('//','//admin:admin@')+'/stats/rooms', function(error, response, body){
 	            expect(error).toBeNull();
 	            expect(response.statusCode).toBe(200);
-	            var st = JSON.parse(body);
-	            expect(st.length).toBeGreaterThan(0);
-	            expect(st[0]._id.year).toBe(new Date().getFullYear());
-	            expect(st[0].count).toBeGreaterThan(0);
+	            done();
+	        });
+	    });
+
+	    utils.test('Can get room stats by type using basic auth.', function(done) {
+	    	utils.browsers.owner.request(utils.testDomain.replace('//','//admin:admin@')+'/stats/roomsbytype', function(error, response, body){
+	            expect(error).toBeNull();
+	            expect(response.statusCode).toBe(200);
 	            done();
 	        });
 	    });

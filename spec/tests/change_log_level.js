@@ -4,7 +4,7 @@ module.exports = function(utils) {
 
 	describe('Change log level', function() {
 		
-		var modules = ['server','rooms','events','log','webrtc.io','proxy','test'];
+		var modules = ['server','rooms','events','log','webrtc.io','proxy','test','stats'];
 		var checkLevels = function(text,level) {
 			var newText = text;
 			for (var k=0; k<modules.length; k+=1) {

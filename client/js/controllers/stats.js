@@ -1,5 +1,7 @@
 'use strict';
-angular.module('mean.stats').controller('StatsController',['$scope','Stats','ngI18nResourceBundle','ngI18nConfig', function ($scope,Stats,ngI18nResourceBundle,ngI18nConfig) {
+angular.module('mean.stats').controller('StatsController',['$scope','Stats','Global','ngI18nResourceBundle','ngI18nConfig', function ($scope,Stats,Global,ngI18nResourceBundle,ngI18nConfig) {
+	
+	$scope.global = Global;
 	
     ngI18nResourceBundle.get().success(function (resourceBundle) {
         $scope.resourceBundle = resourceBundle;
@@ -12,16 +14,24 @@ angular.module('mean.stats').controller('StatsController',['$scope','Stats','ngI
 			document.getElementById('noscript').style.display = 'none';
 		};
 		
+		var roundNumber = function(num) {
+			return Math.round(num * 100) / 100;
+		};
+		
 		Stats.rooms(function(list){
 			var labels = [];
 			var rooms = [];
+			var members = [];
+			var messages = [];
 			for (var k=0; k<list.length; k+=1) {
 				labels.push($scope.resourceBundle.dateformat.replace('dd',list[k]._id.day).replace('mm',list[k]._id.month).replace('yyyy',list[k]._id.year));
 				rooms.push(list[k].count);
+				members.push(list[k].members);
+				messages.push(roundNumber(list[k].count>0?list[k].messages/list[k].count:0));
 			}
 			$scope.labels0 = labels;
-			$scope.series0 = [$scope.resourceBundle.roomsbyday];
-			$scope.data0 = [ rooms ];
+			$scope.series0 = [$scope.resourceBundle.roomsbyday,$scope.resourceBundle.membersbyday,$scope.resourceBundle.messagesbyroom];
+			$scope.data0 = [ rooms, members, messages ];
 			stopLoading();
 		});
 
