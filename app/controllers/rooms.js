@@ -763,14 +763,22 @@ Array.prototype.indexOfField = function (propertyName, value) {
 	return -1;
 };
 
-exports.stats = function(res) {
+exports.stats = function(req,res,next) {
 	Room.all(function(err,list){
-		res.json(list);
+		if (!err) {
+			res.json(list);
+		} else {
+			next(err);
+		}
 	});
 };
 
-exports.statsbytype = function(res) {
+exports.statsbytype = function(req,res,next) {
 	Room.bytype(function(err,list){
-		res.json(list);
+		if (!err) {
+			res.json(list);
+		} else {
+			next(err);
+		}
 	});
 };

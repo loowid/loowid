@@ -284,17 +284,16 @@ app.configure(function() {
 		}
 	}},format:':date@:sessionid@:ip@:method@:url@:status@:res[content-length]@:response-time'}));
 	app.use(express.static(__dirname + '/public'));
+	// For js.map
 	app.use('/client',express.static(__dirname + '/client'));
+	// Allow change debug settings
 	app.get('/debug',auth,function(req,res,next){
 		log4js.setLogLevel(req.query.level,req.query.module);
 		log4js.printLogLevels(res);
 	});
-	app.get('/stats/rooms',auth,function(req,res,next){
-		rooms.stats(res);
-	});
-	app.get('/stats/roomsbytype',auth,function(req,res,next){
-		rooms.statsbytype(res);
-	});
+	// Statistics service
+	app.get('/stats/rooms',auth,rooms.stats);
+	app.get('/stats/roomsbytype',auth,rooms.statsbytype);
 	// LTI Routes
 	app.post(LTI_PATH,passport.authenticate('lti',{
 		failureRedirect: '/#!/lti/error'
