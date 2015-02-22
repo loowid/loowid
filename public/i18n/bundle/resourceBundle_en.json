@@ -198,5 +198,7 @@
    "roomspass" : "Password",
    "roomslink" : "Link",
    "roomstemp" : "Temporal Room",
-   "roomspermanent" : "Permanent Room"
+   "roomspermanent" : "Permanent Room",
+   "considerdonate" : "If you like this app, please consider to help us to grow with a donation via flattr",
+   "helpusgrow" : "Help us to grow"
 }
