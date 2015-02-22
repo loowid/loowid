@@ -7,7 +7,10 @@ angular.module('mean.stats').controller('StatsController',['$scope','Stats','ngI
     });
     
 	$scope.init = function(){
-		document.getElementById('noscript').style.display = 'none';
+		
+		var stopLoading = function() {
+			document.getElementById('noscript').style.display = 'none';
+		};
 		
 		Stats.rooms(function(list){
 			var labels = [];
@@ -19,6 +22,7 @@ angular.module('mean.stats').controller('StatsController',['$scope','Stats','ngI
 			$scope.labels0 = labels;
 			$scope.series0 = [$scope.resourceBundle.roomsbyday];
 			$scope.data0 = [ rooms ];
+			stopLoading();
 		});
 
 		var getNameFor = function(obj) {
@@ -37,6 +41,7 @@ angular.module('mean.stats').controller('StatsController',['$scope','Stats','ngI
 			$scope.labels1 = labels;
 			$scope.series1 = [$scope.resourceBundle.roomsbytype];
 			$scope.data1 = rooms;
+			stopLoading();
 		});
 	};
 
