@@ -72,6 +72,8 @@
     "maxBitrate": "Bitrate d'emissió màxim (kbs)", 
     "maxHeight": "Alçada màxima:", 
     "maxWidth": "Amplada màxima:", 
+    "membersbyday": "Participants per dia", 
+    "messagesbyroom": "Participants per sala", 
     "metadesc": "LooWID - Compartir escriptori, vídeo o pantalla amb qui tu vulguis i mostrar el que estàs fent", 
     "metakeys": "pantalla, escriptori, compartir, social, WebRTC, senzill, vídeo", 
     "minutes": "minuts", 
