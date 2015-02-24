@@ -147,13 +147,11 @@
 			<h3>{{ui.name}}</h3>
 		</div>
 		<p class="user_title">{{resourceBundle.roomowner}}</p>
-
-		
 	</div>
 	<h2>{{resourceBundle.roomviewers}}</h2>
 	<ul class="sharers connected">
 		<li data-ng-show="user.status == 'CONNECTED'" data-ng-repeat="user in ui.users"> 
-			<img ng-src="{{user.avatar}}" />
+			<img ng-src="{{user.avatar}}" title="{{user.name}}"/>
 			<h3>{{user.name}}</h3>
 			<p class="user_title">{{resourceBundle.roomviewer}}</p>
 			<p class="toolbar" ng-show="global.access.moderated">

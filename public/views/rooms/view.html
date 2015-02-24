@@ -109,7 +109,7 @@
 	<h1>{{resourceBundle.peopleconnected}}</h1>
 	<div class="owner connected">
 		<p class="user_title room_owner">{{resourceBundle.roomowner}}</p>
-		<img ng-src="{{ui.ownerAvatar}}"/>
+		<img ng-src="{{ui.ownerAvatar}}" title="{{ui.ownerName}}"/>
 		<h3>{{ui.ownerName}}</h3>
 		<p class="user_title" data-ng-show="ui.status=='OPENED'">{{resourceBundle.statusopen}}</p>
 		<p class="user_title" data-ng-show="ui.status=='BROADCASTING'">{{resourceBundle.statusbroadcasting}}</p>
@@ -154,7 +154,7 @@
 	
 	<ul class="sharers connected">
 		<li data-ng-show="user.status == 'CONNECTED' && user.connectionId != ui.currentConnectionId" data-ng-repeat="user in ui.users"> 
-			<img ng-src="{{user.avatar}}"/>
+			<img ng-src="{{user.avatar}}" title="{{user.name}}"/>
 			<h3>{{user.name}}</h3>
 			<p class="user_title">{{resourceBundle.roomviewer}}</p>
 		</li>
