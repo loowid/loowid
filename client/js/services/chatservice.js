@@ -1,6 +1,6 @@
 'use strict';
 /*global rtc: true */
-angular.module('mean.rooms').factory('ChatService',['$timeout','UIHandler','Rooms','Notification',function($timeout,UIHandler,Rooms,Notification){
+angular.module('mean.rooms').factory('ChatService',['$timeout','UIHandler','Rooms','Notification','$http',function($timeout,UIHandler,Rooms,Notification,$http){
 	return function (){
 
 		var uiHandler = UIHandler;
@@ -43,36 +43,108 @@ angular.module('mean.rooms').factory('ChatService',['$timeout','UIHandler','Room
 	        return secs>15;
 	    };
 	    
-	    
-	    
 	    this.link = function(url) {
 	    	return '<a href="' + url + '" target="_blank">' + url + '</a>';
 	    };
 	    
-	    this.parseUrls = function($scope,txt) {
-	    	
-			var youtube = function(url,vid) {
-	    		var frame = '<a href id="max_'+ vid +'"><img src="//img.youtube.com/vi/' + vid + '/0.jpg" width="100%" height="100%" frameborder="0" allowfullscreen></img></a><p class="videoLabel">'+$scope.resourceBundle.youtubeVideo+'</p>';
+	    this.getImageLink = function(service,vid,callb) {
+	    	if (service.link.indexOf('JSON_CALLBACK')>=0) {
+		    	$http.jsonp(service.link.replace('##id##',vid)).success(function(data, status, headers, config) {
+		    		callb(data[0][service.id].substring(data[0][service.id].indexOf('://')+1),data[0][service.title]);
+		        }).error(function(data, status, headers, config) {
+		        	callb(null);
+		        });
+	    	} else {
+	    		setTimeout(function(){
+	    			callb(service.link.replace('##id##',vid));
+	    		},300);
+	    	}
+	    };
 	    
-				var openyoutube = function (event){
-					$scope.openVideoFromYoutube(vid);
-					event.preventDefault();
-				};
-
+	    this.absoluteUrl = function(url) {
+	    	if (url.indexOf('://')>0) {
+	    		return url.substring(url.indexOf('://')+1);
+	    	} else {
+	    		return '//'+url;
+	    	}
+	    };
+	    
+	    this.getReplaceFunction = function($scope,imageLink,videoLink,videoTitle) {
+			var replaceFunction = function(url,vid,vit) {
+				// Avoid side effects copying the same video multiple times
+				var realUniqueId = 'max_'+vid+'_'+(new Date()).getTime()+Math.floor(Math.random()*100);
+				var spinner = '<div class="spinner"><div class="bounce1"></div><div class="bounce2"></div><div class="bounce3"></div></div>';
+	    		var newTabLink = '<a href="'+self.absoluteUrl(url)+'" target="_blank"><i class="fa fa-expand" style="float:right;"></i></a>';
+	    		var helpText = '<p class="videoLabel">'+$scope.resourceBundle.embedVideo+'</p>';
+	    		var frame = '<a href id="'+ realUniqueId +'">'+spinner+'</a>' + newTabLink + helpText;
+				self.getImageLink(imageLink,vid,function(img,title){
+					var element = document.getElementById (realUniqueId);
+					var imgTitle = videoTitle+(title?': '+title:(vit?': '+vit:''));
+					element.removeChild(element.getElementsByTagName('div')[0]);
+					var imgSrc = '<i class="fa fa-film" style="font-size:10em;" title="'+imgTitle+'"></i>';
+					if (img) {
+						imgSrc = '<img src="'+img+'" width="100%" height="100%" title="'+imgTitle+'"></img>';
+					}
+					element.innerHTML = imgSrc + element.innerHTML;
+				});
 				setTimeout (function (){
-					var element = document.getElementById ('max_' + vid);
-					element.addEventListener ('click',openyoutube);
+					var element = document.getElementById (realUniqueId);
+					element.addEventListener ('click',function (event){
+						$scope.openVideoFromService(event.target.title,videoLink.replace('##id##',vid));
+						event.preventDefault();
+					});
 				},300);
-
 				return frame;
-
 			};
-			
-			
-			return txt.replace(/https?:\/\/www\.youtube\.com\/watch\?v=([^\s]+)/g, youtube)
-					  .replace(/https?:\/\/m\.youtube\.com\/watch\?v=([^\s]+)/g, youtube)
-	    			  .replace(/https?:\/\/youtu\.be\/([^\s]+)/g, youtube)
-	    			  .replace(/(https?:\/\/[^\s]+)/g, this.link);
+			return replaceFunction;
+	    };
+	    
+	    this.videoServices = {
+	    		'youtube': { 
+	    			regexp: [/(?:https?:\/\/)?www\.youtube\.com\/watch\?v=([^\s]+)/g,/(?:https?:\/\/)?m\.youtube\.com\/watch\?v=([^\s]+)/g,/(?:https?:\/\/)?youtu\.be\/([^\s]+)/g],
+	    			getReplaceFunction: function($scope) { 
+	    				return self.getReplaceFunction($scope,{link:'//img.youtube.com/vi/##id##/0.jpg'},'//www.youtube.com/embed/##id##','YouTube');
+	    			}
+	    		},
+	    		'vimeo': {
+	    			regexp: [/(?:https?:\/\/)?vimeo\.com\/([0-9]+)/g,/(?:https?:\/\/)?vimeo\.com\/channels\/[^\/]+\/([0-9]+)/g],
+	    			getReplaceFunction: function($scope) { 
+	    				return self.getReplaceFunction($scope,{link:'//vimeo.com/api/v2/video/##id##.json?callback=JSON_CALLBACK',id:'thumbnail_small',title:'title'},'//player.vimeo.com/video/##id##','Vimeo');
+	    			}
+	    		},
+	    		'dailymotion': {
+	    			regexp: [/(?:https?:\/\/)?www\.dailymotion\.com\/video\/([^\_]+)_(.*)/g],
+	    			getReplaceFunction: function($scope) {
+	    				return self.getReplaceFunction($scope,{link:'//www.dailymotion.com/thumbnail/video/##id##'},'//www.dailymotion.com/embed/video/##id##','DailyMotion');
+	    			}
+	    		},
+	    		'vevo': {
+	    			regexp: [/(?:https?:\/\/)?www\.vevo\.com\/.*\/(.*)/g],
+	    			getReplaceFunction: function($scope) {
+	    				return self.getReplaceFunction($scope,{link:''},'//cache.vevo.com/assets/html/embed.html?video=##id##&autoplay=0','Vevo');
+	    			}
+	    		},
+	    		'yahoo': {
+	    			regexp: [/(?:https?:\/\/)?screen\.yahoo\.com\/.*\/(.*)/g],
+	    			getReplaceFunction: function($scope) {
+	    				return self.getReplaceFunction($scope,{link:''},'//screen.yahoo.com/##id##?format=embed','Yahoo');
+	    			}
+	    		}
+	    };
+	    
+	    this.parseVideoUrls = function($scope,txt) {
+			var videoTxt = txt;
+			for (var el in this.videoServices) {
+				for (var re in this.videoServices[el].regexp) {
+					videoTxt = videoTxt.replace(this.videoServices[el].regexp[re],this.videoServices[el].getReplaceFunction($scope));
+				}
+			}
+			return videoTxt;
+	    };
+	    
+	    this.parseUrls = function($scope,txt) {
+			var videoTxt = this.parseVideoUrls($scope,txt);
+			return videoTxt.replace(/(https?:\/\/[^\s]+)/g, this.link);
 	    };
 	    
 		

@@ -371,12 +371,12 @@ angular.module('mean.rooms').factory('MediaService',['Rooms','UIHandler',functio
 				}
 			};
 
-			$scope.openVideoFromYoutube = function (vid){
-				var iframe = '<iframe src="//www.youtube.com/embed/' + vid + '" style= "position: absolute; top:30px; left: 0;width: 100%; height: 100%;" frameborder="0" allowfullscreen ></iframe>';
+			$scope.openVideoFromService = function (wtitle,wurl){
+				var iframe = '<iframe src="' + wurl + '" style= "position: absolute; top:30px; left: 0;width: 100%; height: 100%;" frameborder="0" webkitallowfullscreen mozallowfullscreen allowfullscreen ></iframe>';
 				var iframeElement = angular.element (iframe);
 				var windowOptions = {
 					'mediaElement': iframeElement,
-					'title': 'YouTube',
+					'title': wtitle,
 					'ratio': RATIO_16_9,
 					'scale': 0.5,
 					'closeable': true	
