@@ -45,7 +45,7 @@ window.app.value('ngI18nConfig', {
     //defaultLocale should be in lowercase and is required!!
     defaultLocale:'en',
     //supportedLocales is required - all locales should be in lowercase!!
-    supportedLocales:['en', 'es', 'ca', 'de'],
+    supportedLocales:['en', 'es', 'ca', 'de', 'ru'],
     //without leading and trailing slashes, default is i18n
     basePath:'i18n/bundle',
     //default is false

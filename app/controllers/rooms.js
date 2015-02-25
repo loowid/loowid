@@ -76,7 +76,7 @@ exports.exists = function( req, res, next, id ){
 		}
 		next();
 	});
-}
+};
 
 /**
 * Find a room by id
