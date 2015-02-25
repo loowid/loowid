@@ -433,7 +433,16 @@ app.post('/rooms/keep', function(req, res, next){
 	res.json({keep:true});
 });
 
+app.get('/r/:staticId', function(req, res){
+	if( req.room !== null ){
+		res.redirect('/#!/r/' + req.room.roomId );
+	}else{
+		res.redirect('/' );
+	}
+});
+
 app.param('roomId', rooms.room);
+app.param('staticId', rooms.exists);
 app.param('connectionId', rooms.connection);
 
 app.use(function(err, req, res, next) {
@@ -442,6 +451,7 @@ app.use(function(err, req, res, next) {
 	var code = err[errorCode] || 500;
 	res.send(code, {error:err.message});
 });
+
 
 server.listen(port, ipaddr);
 

@@ -63,6 +63,22 @@ var removeDisconnectedSession = function(room,id) {
 };
 
 /**
+* Retun null or room id if the room exists or not
+*/
+
+exports.exists = function( req, res, next, id ){
+	req.aliasRoomId = id;
+	Room.load(id, req.sessionID, function(err, room) {
+		if (!room) {
+			req.room = null;
+		} else {
+			req.room = room;
+		}
+		next();
+	});
+}
+
+/**
 * Find a room by id
 */
 exports.room = function(req, res, next, id) {
