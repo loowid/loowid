@@ -3,11 +3,8 @@ angular.module('mean.stats').controller('StatsController',['$scope','Stats','Glo
 	
 	$scope.global = Global;
 	
-    ngI18nResourceBundle.get().success(function (resourceBundle) {
-        $scope.resourceBundle = resourceBundle;
-        $scope.resourceBundle._ = $scope.global._;
-    });
-    
+	$scope.global.setupI18N($scope,ngI18nResourceBundle,ngI18nConfig);
+	
 	$scope.init = function(){
 		
 		var stopLoading = function() {

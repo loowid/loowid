@@ -51,6 +51,29 @@ angular.module('mean.system').factory('Global', [function() {
         		}
         	}
         	return null;
+        },
+        setupI18N: function(scope,rbundle,config) {
+        	if (scope.ui) {
+        		scope.ui.supportedLocales = config.supportedLocales;
+        		scope.ui.defaultLocale = config.defaultLocale;
+        		scope.ui.basePath = config.basePath;
+        		scope.ui.cache = config.cache;
+        	}
+        	// Get default locale and then add
+        	if (!scope.resourceBundle) {
+	            rbundle.get({locale:'en'}).success(function (defaultBundle) {
+	                scope.resourceBundle = defaultBundle;
+	                scope.resourceBundle._ = _this._data._;
+	                rbundle.get().success(function (resourceBundle) {
+	                	for (var el in scope.resourceBundle) {
+	                		// Redefine i18n tags
+	                		if (resourceBundle[el]) {
+	                			scope.resourceBundle[el] = resourceBundle[el];
+	                		}
+	                	}
+	                });
+	            });
+        	}
         }
     };
 

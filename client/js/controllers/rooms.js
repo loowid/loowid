@@ -10,16 +10,8 @@ angular.module('mean.rooms').controller('RoomsController', ['$scope', '$routePar
     
     var room = new Rooms({});
     
-    uiHandler.supportedLocales = ngI18nConfig.supportedLocales;
-    uiHandler.defaultLocale = ngI18nConfig.defaultLocale;
-    uiHandler.basePath = ngI18nConfig.basePath;
-    uiHandler.cache = ngI18nConfig.cache;
-    uiHandler.step = 1;
-
-    ngI18nResourceBundle.get().success(function (resourceBundle) {
-            $scope.resourceBundle = resourceBundle;
-            $scope.resourceBundle._ = $scope.global._;
-    });
+    $scope.global.setupI18N($scope,ngI18nResourceBundle,ngI18nConfig);
+    
     uiHandler.liveRooms = [];
     uiHandler.liveRoomsCurrent = 0;
     $scope.gotoRoom = function(id) {

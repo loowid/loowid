@@ -29,16 +29,7 @@ angular.module('mean.rooms').controller('ViewDesktopController', ['$scope', '$ro
     var mediaService = new MediaService();
     var windowHandler = new WindowHandler();
 
-    
-    uiHandler.supportedLocales = ngI18nConfig.supportedLocales;
-    uiHandler.defaultLocale = ngI18nConfig.defaultLocale;
-    uiHandler.basePath = ngI18nConfig.basePath;
-    uiHandler.cache = ngI18nConfig.cache;
-    ngI18nResourceBundle.get().success(function (resourceBundle) {
-    	$scope.resourceBundle = resourceBundle;
-        $scope.resourceBundle._ = $scope.global._;
-    });
- 
+    $scope.global.setupI18N($scope,ngI18nResourceBundle,ngI18nConfig); 
 
     $scope.hideError = function() {
         $scope.global.hideError($scope);
