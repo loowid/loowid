@@ -740,6 +740,45 @@ header{
 	}
 }
 
+#minimizedPlace{
+		position: absolute;
+		left:210px;
+		bottom: 40px;
+		width: 32px;
+		z-index: 10010;
+		.transition(left 0.5s ease );
+		
+		@media all and (max-width:800px){
+			left: 88%;
+			bottom: 40px;
+			&.chat_collapsed{
+				left: 88% !important;
+				bottom: 0px !important;
+			}
+			.titled{
+				right: 5%;
+			}
+		}
+		span{
+			text-decoration: none;
+			color: @bgcolor;
+			font-size: 1.6em;
+			text-align: center;
+			display: block;
+		}
+		
+		&.connected_collapsed{
+			left:10px;
+			@media all and (max-width:800px){
+				left: 90%;
+				bottom: 30px;
+
+			}
+		}
+
+	
+}
+
 #wikihelp{
 		position: absolute;
 		left:210px;

@@ -51,6 +51,7 @@ angular.module('mean.rooms').factory('WindowHandler',[function(){
 				},
 				windowContainer: 'moveZone',
 				maximizeTo: 'moveZone',
+				minimizeTo: 'minimizedPlace',
 				title: winTitle,
 				initialZIndex: 500
 			};
