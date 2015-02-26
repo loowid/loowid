@@ -328,6 +328,95 @@ app.get('/chat/talk',function(req, res) {
 	});
 });
 
+var videoServices = {
+	'youtube': {
+		host: 'www.youtube.com',
+		path: '/oembed?url=##video##&format=json',
+		video: 'https://www.youtube.com/watch?v=##id##',
+		cache: []
+	},
+	'vimeo': {
+		host: 'vimeo.com',
+		path: '/api/oembed.json?url=##video##',
+		video: 'https://vimeo.com/##id##',
+		cache: []
+	},
+	'dailymotion': {
+		host: 'www.dailymotion.com',
+		path: '/services/oembed?url=##video##',
+		video: 'https://www.dailymotion.com/video/##id##',
+		cache: []
+	}
+};
+
+var getImg = function(obj,prop) {
+	return obj[prop].replace(/https?:/g,'');
+};
+
+var getUrlFromSrc = function(obj) {
+	var exp = /src=\"([^\"]+)\"/g;
+	var m = exp.exec(obj.html);
+	return m[1].replace(/https?:/g,'');
+};
+
+var addCache = function(service,id,data) {
+	videoServices[service].cache['_'+id] = data;
+	setTimeout(function(){
+		delete videoServices[service].cache['_'+id];
+	},600000); // Cache 10 minutes
+};
+
+var getVideoData = function(service,id,callback,error) {
+	if (videoServices[service]) {
+		if (!videoServices[service].cache['_'+id]) {
+			var videoData = {error:404};
+			var reqst = http.get(
+				{
+				 host:videoServices[service].host,
+				 path:videoServices[service].path.replace('##video##',escape(videoServices[service].video.replace('##id##',id))),
+				 headers:{'User-Agent':'Mozilla/5.0 (Windows NT 6.0; rv:26.0) Gecko/20100101 Firefox/33.0'}
+				}, function(response) {
+				//handle the response
+				var bodyData = '';
+				response.setEncoding('utf-8');
+				response.on('data',function(data){
+					bodyData += data;
+				});
+				response.on('end',function(){
+					try {
+						if (response.statusCode===200) {
+							var video = JSON.parse(bodyData);
+							videoData = {url:getUrlFromSrc(video),thumbnail:getImg(video,'thumbnail_url'),title:video.title,id:id,service:service};
+						}
+						callback(videoData);
+					} catch (err) {
+						error();
+					} finally {
+						addCache(service,id,videoData);
+					}
+				});
+			});
+			reqst.on('error',function(){
+				addCache(service,id,videoData);
+				error();
+			});
+			reqst.end();
+		} else {
+			callback(videoServices[service].cache['_'+id]);
+		}
+	} else {
+		error();
+	}
+};
+
+app.post('/chat/video',function(req, res, next) {
+	getVideoData(req.body.service,req.body.id,function(video){
+		res.json(video);
+	},function(){
+		res.json({error:404});
+	});
+});
+
 var pck = require('./package.json');
 var getClusterNode = function (req) {
 	var machineId = (process.env.OPENSHIFT_GEAR_UUID || 'local');

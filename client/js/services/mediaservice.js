@@ -373,7 +373,7 @@ angular.module('mean.rooms').factory('MediaService',['Rooms','UIHandler',functio
 
 			$scope.openVideoFromService = function (wtitle,wurl){
 				var iframe = '<iframe src="' + wurl + '" style= "position: absolute; top:30px; left: 0;width: 100%; height: 100%;" frameborder="0" webkitallowfullscreen mozallowfullscreen allowfullscreen ></iframe>';
-				var iframeElement = angular.element (iframe);
+				var iframeElement = angular.element(iframe);
 				var windowOptions = {
 					'mediaElement': iframeElement,
 					'title': wtitle,

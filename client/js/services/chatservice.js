@@ -8,6 +8,8 @@ angular.module('mean.rooms').factory('ChatService',['$timeout','UIHandler','Room
 		var self= this;
 		var room = new Rooms({});
 
+		this.videoData = {};
+		
 		this.formatDate = function($scope,t,fm) {
 		   var yyyy = t.getFullYear().toString();
 		   var mm = (t.getMonth()+1).toString();
@@ -44,20 +46,32 @@ angular.module('mean.rooms').factory('ChatService',['$timeout','UIHandler','Room
 	    };
 	    
 	    this.link = function(url) {
-	    	return '<a href="' + url + '" target="_blank">' + url + '</a>';
+	    	if (url.indexOf('@')>0 && url.indexOf(':')<0) {
+	    		return '<a href="mailto:' + url + '" target="_blank">' + url + '</a>';
+	    	} else {
+	    		return '<a href="' + (url.indexOf('http')===0?url:'http://'+url) + '" target="_blank">' + url + '</a>';
+	    	}
 	    };
 	    
-	    this.getImageLink = function(service,vid,callb) {
-	    	if (service.link.indexOf('JSON_CALLBACK')>=0) {
-		    	$http.jsonp(service.link.replace('##id##',vid)).success(function(data, status, headers, config) {
-		    		callb(data[0][service.id].substring(data[0][service.id].indexOf('://')+1),data[0][service.title]);
-		        }).error(function(data, status, headers, config) {
+	    this.getVideoData = function(service,vid,callb) {
+	    	if (!this.videoData[vid]) {
+		    	var retrieve = $http({
+		    			method:'post',
+		    			url:'/chat/video',
+		    			data:{
+		    				service:service,
+		    				id:vid
+		    			},
+		    			headers:{'x-csrf-token':window.csrf}
+		    	});
+		    	retrieve.success(function(response) {
+		    		self.videoData[vid] = response;
+		    		callb(self.videoData[vid]);
+		        }).error(function(response) {
 		        	callb(null);
 		        });
 	    	} else {
-	    		setTimeout(function(){
-	    			callb(service.link.replace('##id##',vid));
-	    		},300);
+	    		callb(this.videoData[vid]);
 	    	}
 	    };
 	    
@@ -69,31 +83,25 @@ angular.module('mean.rooms').factory('ChatService',['$timeout','UIHandler','Room
 	    	}
 	    };
 	    
-	    this.getReplaceFunction = function($scope,imageLink,videoLink,videoTitle) {
-			var replaceFunction = function(url,vid,vit) {
+	    this.getReplaceFunction = function($scope,service) {
+			var replaceFunction = function(url,vid) {
 				// Avoid side effects copying the same video multiple times
 				var realUniqueId = 'max_'+vid+'_'+(new Date()).getTime()+Math.floor(Math.random()*100);
 				var spinner = '<div class="spinner"><div class="bounce1"></div><div class="bounce2"></div><div class="bounce3"></div></div>';
-	    		var newTabLink = '<a href="'+self.absoluteUrl(url)+'" target="_blank"><i class="fa fa-expand" style="float:right;"></i></a>';
-	    		var helpText = '<p class="videoLabel">'+$scope.resourceBundle.embedVideo+'</p>';
-	    		var frame = '<a href id="'+ realUniqueId +'">'+spinner+'</a>' + newTabLink + helpText;
-				self.getImageLink(imageLink,vid,function(img,title){
+	    		var frame = '<a href id="'+ realUniqueId +'">'+spinner+'</a>' + url;
+				self.getVideoData(service,vid,function(video){
 					var element = document.getElementById (realUniqueId);
-					var imgTitle = videoTitle+(title?': '+title:(vit?': '+vit:''));
-					element.removeChild(element.getElementsByTagName('div')[0]);
-					var imgSrc = '<i class="fa fa-film" style="font-size:10em;" title="'+imgTitle+'"></i>';
-					if (img) {
-						imgSrc = '<img src="'+img+'" width="100%" height="100%" title="'+imgTitle+'"></img>';
+					if (video.error) {
+						element.parentNode.removeChild(element);
+					} else {
+						element.removeChild(element.getElementsByTagName('div')[0]);
+						element.innerHTML = '<img src="'+video.thumbnail+'" width="100%" height="100%" title="'+video.title+'" data-videoid="'+video.id+'"></img>' + element.innerHTML;
+						element.addEventListener ('click',function (event){
+							$scope.openVideoFromService(video.title,video.url);
+							event.preventDefault();
+						});
 					}
-					element.innerHTML = imgSrc + element.innerHTML;
 				});
-				setTimeout (function (){
-					var element = document.getElementById (realUniqueId);
-					element.addEventListener ('click',function (event){
-						$scope.openVideoFromService(event.target.title,videoLink.replace('##id##',vid));
-						event.preventDefault();
-					});
-				},300);
 				return frame;
 			};
 			return replaceFunction;
@@ -101,34 +109,13 @@ angular.module('mean.rooms').factory('ChatService',['$timeout','UIHandler','Room
 	    
 	    this.videoServices = {
 	    		'youtube': { 
-	    			regexp: [/(?:https?:\/\/)?www\.youtube\.com\/watch\?v=([^\s]+)/g,/(?:https?:\/\/)?m\.youtube\.com\/watch\?v=([^\s]+)/g,/(?:https?:\/\/)?youtu\.be\/([^\s]+)/g],
-	    			getReplaceFunction: function($scope) { 
-	    				return self.getReplaceFunction($scope,{link:'//img.youtube.com/vi/##id##/0.jpg'},'//www.youtube.com/embed/##id##','YouTube');
-	    			}
+	    			regexp: [/(?:https?:\/\/)?www\.youtube\.com\/watch\?v=([^\s]+)/g,/(?:https?:\/\/)?m\.youtube\.com\/watch\?v=([^\s]+)/g,/(?:https?:\/\/)?youtu\.be\/([^\s]+)/g]
 	    		},
 	    		'vimeo': {
-	    			regexp: [/(?:https?:\/\/)?vimeo\.com\/([0-9]+)/g,/(?:https?:\/\/)?vimeo\.com\/channels\/[^\/]+\/([0-9]+)/g],
-	    			getReplaceFunction: function($scope) { 
-	    				return self.getReplaceFunction($scope,{link:'//vimeo.com/api/v2/video/##id##.json?callback=JSON_CALLBACK',id:'thumbnail_small',title:'title'},'//player.vimeo.com/video/##id##','Vimeo');
-	    			}
+	    			regexp: [/(?:https?:\/\/)?vimeo\.com\/([0-9]+)/g,/(?:https?:\/\/)?vimeo\.com\/channels\/[^\/]+\/([0-9]+)/g]
 	    		},
 	    		'dailymotion': {
-	    			regexp: [/(?:https?:\/\/)?www\.dailymotion\.com\/video\/([^\_]+)_(.*)/g],
-	    			getReplaceFunction: function($scope) {
-	    				return self.getReplaceFunction($scope,{link:'//www.dailymotion.com/thumbnail/video/##id##'},'//www.dailymotion.com/embed/video/##id##','DailyMotion');
-	    			}
-	    		},
-	    		'vevo': {
-	    			regexp: [/(?:https?:\/\/)?www\.vevo\.com\/.*\/(.*)/g],
-	    			getReplaceFunction: function($scope) {
-	    				return self.getReplaceFunction($scope,{link:''},'//cache.vevo.com/assets/html/embed.html?video=##id##&autoplay=0','Vevo');
-	    			}
-	    		},
-	    		'yahoo': {
-	    			regexp: [/(?:https?:\/\/)?screen\.yahoo\.com\/.*\/(.*)/g],
-	    			getReplaceFunction: function($scope) {
-	    				return self.getReplaceFunction($scope,{link:''},'//screen.yahoo.com/##id##?format=embed','Yahoo');
-	    			}
+	    			regexp: [/(?:https?:\/\/)?www\.dailymotion\.com\/video\/([^\_]+)_.*/g]
 	    		}
 	    };
 	    
@@ -136,7 +123,7 @@ angular.module('mean.rooms').factory('ChatService',['$timeout','UIHandler','Room
 			var videoTxt = txt;
 			for (var el in this.videoServices) {
 				for (var re in this.videoServices[el].regexp) {
-					videoTxt = videoTxt.replace(this.videoServices[el].regexp[re],this.videoServices[el].getReplaceFunction($scope));
+					videoTxt = videoTxt.replace(this.videoServices[el].regexp[re],this.getReplaceFunction($scope,el));
 				}
 			}
 			return videoTxt;
@@ -144,7 +131,7 @@ angular.module('mean.rooms').factory('ChatService',['$timeout','UIHandler','Room
 	    
 	    this.parseUrls = function($scope,txt) {
 			var videoTxt = this.parseVideoUrls($scope,txt);
-			return videoTxt.replace(/(https?:\/\/[^\s]+)/g, this.link);
+			return videoTxt.replace(/(((https?:\/\/)?(((?!-)[A-Za-z0-9-:]{1,63}[@]{0,1}[A-Za-z0-9-]*(?!-)\.)+[A-Za-z]{2,6})(:\d+)?(\/([-\w/_\.\,]*(\?\S+)?)?)*)(?!@))/g, this.link);
 	    };
 	    
 		
