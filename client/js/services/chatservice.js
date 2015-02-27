@@ -95,7 +95,7 @@ angular.module('mean.rooms').factory('ChatService',['$timeout','UIHandler','Room
 						element.parentNode.removeChild(element);
 					} else {
 						element.removeChild(element.getElementsByTagName('div')[0]);
-						element.innerHTML = '<img src="'+video.thumbnail+'" width="100%" height="100%" title="'+video.title+'" data-videoid="'+video.id+'"></img>' + element.innerHTML;
+						element.innerHTML = '<div class="evideo"><img src="'+video.thumbnail+'" width="100%" height="100%" title="'+video.title+'" data-videoid="'+video.id+'"></img><i class="fa fa-play-circle"></i>' + element.innerHTML;
 						element.addEventListener ('click',function (event){
 							$scope.openVideoFromService(video.title,video.url);
 							event.preventDefault();
@@ -129,9 +129,24 @@ angular.module('mean.rooms').factory('ChatService',['$timeout','UIHandler','Room
 			return videoTxt;
 	    };
 	    
+	    this.replaceGoogle = function($scope) {
+	    	return function(url,doc) {
+		    	var docid = 'doc_'+doc+'_'+(new Date()).getTime()+Math.floor(Math.random()*100);
+		    	setTimeout(function(){
+		    		document.getElementById(docid).addEventListener('click',function(evt){
+		    			$scope.openVideoFromService($scope.resourceBundle.googledoc,'//docs.google.com/presentation/d/'+doc+'/embed?start=false&loop=false&delayms=3000');
+		    			evt.preventDefault();
+		    		});
+		    		
+		    	},500);
+		    	return '<div class="edoc"><a id="'+docid+'" href="#"><i class="fa fa-file"></i></a></div>'+url;
+	    	};
+	    };
+	    
 	    this.parseUrls = function($scope,txt) {
-			var videoTxt = this.parseVideoUrls($scope,txt);
-			return videoTxt.replace(/(((https?:\/\/)?(((?!-)[A-Za-z0-9-:]{1,63}[@]{0,1}[A-Za-z0-9-]*(?!-)\.)+[A-Za-z]{2,6})(:\d+)?(\/([-\w/_\.\,]*(\?\S+)?)?)*)(?!@))/g, this.link);
+			var newText = this.parseVideoUrls($scope,txt);
+			newText = newText.replace(/(?:https:\/\/)?docs\.google\.com\/presentation\/d\/([^\/\s]+)\/[^\s]+/g,this.replaceGoogle($scope));
+			return newText.replace(/(((https?:\/\/)?(((?!-)[A-Za-z0-9-:]{1,63}[@]{0,1}[A-Za-z0-9-]*(?!-)\.)+[A-Za-z]{2,6})(:\d+)?(\/([-\w/_\.\,]*(\?\S+)?)?)*)(#\S*)?(?!@))/g, this.link);
 	    };
 	    
 		

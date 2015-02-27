@@ -211,5 +211,6 @@
     "roomspass" : "Clave",
     "roomslink" : "Enlace",
     "roomstemp" : "Sala Temporal",
-    "roomspermanent" : "Sala Permanente"
+    "roomspermanent" : "Sala Permanente",
+    "googledoc" : "Documento Google"
 }
