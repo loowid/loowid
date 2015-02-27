@@ -260,6 +260,13 @@ angular.module('mean.rooms').controller('RecordController', ['$scope', '$routePa
    					room.chat($scope.global.roomId,function(results){
    						uiHandler.chatPage = results.page;
    						chatService.init ($scope,results.chat);
+                        if (window.innerWidth <= 800 ){
+                        	// Let user see welcome message
+                            setTimeout(function(){ 
+                            	$scope.toggleConnected();
+                            	$scope.toggleChat();
+                            },1800);
+                        }
    					});
    				}
    			}

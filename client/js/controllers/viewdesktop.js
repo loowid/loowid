@@ -121,7 +121,10 @@ angular.module('mean.rooms').controller('ViewDesktopController', ['$scope', '$ro
 			uiHandler.chatPage = resu.page;
 			chatService.init ($scope,resu.chat);
             if (window.innerWidth <= 800 ){
-                $scope.toggleChat();
+            	// Let user see welcome message
+            	setTimeout(function(){
+            		$scope.toggleChat();
+            	},1800);
             }
 		});
         // Set my own name

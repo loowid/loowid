@@ -22,6 +22,7 @@ angular.module('mean.rooms').controller('RoomsController', ['$scope', '$routePar
 		if ($scope.termsaccepted || $scope.isRoomAvailable()){
 
 		  document.getElementById('noscript').style.display = '';
+		  document.getElementById('home').style.display = 'none';
 		  $scope.global.sessionclosed = false;
 		  if ($scope.isRoomAvailable()) {
 			   $location.path('r/' + $scope.global.roomId + '/join');   
@@ -51,6 +52,7 @@ angular.module('mean.rooms').controller('RoomsController', ['$scope', '$routePar
 	$scope.setupExternal = function (){
       $scope.global.roomId = uiHandler.roomId =  $routeParams.roomId;
       document.getElementById('noscript').style.display = '';
+      document.getElementById('home').style.display = 'none';
       $scope.global.sessionclosed = false;
        
 	   room.claimforroom ($scope.global.roomId,function(rdo){
