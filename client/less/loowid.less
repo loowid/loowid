@@ -743,17 +743,18 @@ header{
 #minimizedPlace{
 		position: absolute;
 		left:210px;
-		bottom: 40px;
+		bottom: 36px;
 		width: 32px;
 		z-index: 10010;
 		.transition(left 0.5s ease );
 		
 		@media all and (max-width:800px){
 			left: 88%;
-			bottom: 40px;
+			bottom: 66px;
 			&.chat_collapsed{
 				left: 88% !important;
-				bottom: 0px !important;
+				bottom: 36px;
+
 			}
 			.titled{
 				right: 5%;
@@ -771,8 +772,6 @@ header{
 			left:10px;
 			@media all and (max-width:800px){
 				left: 90%;
-				bottom: 30px;
-
 			}
 		}
 

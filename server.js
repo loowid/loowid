@@ -1,5 +1,4 @@
 'use strict';
-
 /**
  * Module dependencies.
  * node server -> Run standalone port 80 and 443 (or cloud port)
