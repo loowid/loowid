@@ -372,7 +372,13 @@ angular.module('mean.rooms').factory('MediaService',['Rooms','UIHandler',functio
 			};
 
 			$scope.openVideoFromService = function (wtitle,wurl){
-				var iframe = '<iframe src="' + wurl + '" style= "position: absolute; top:30px; left: 0;width: 100%; height: 100%;" frameborder="0" webkitallowfullscreen mozallowfullscreen allowfullscreen ></iframe>';
+				$scope.openIFrameService(null,wtitle,wurl);
+			};
+
+			$scope.openIFrameService = function (wid,wtitle,wurl){
+				var iframe = '<iframe src="' + wurl +
+							 '" class="wframe" frameborder="0" ' + (wid?'id="'+wid+'" ':'') +
+							 'webkitallowfullscreen mozallowfullscreen allowfullscreen ></iframe>';
 				var iframeElement = angular.element(iframe);
 				var windowOptions = {
 					'mediaElement': iframeElement,
@@ -382,6 +388,11 @@ angular.module('mean.rooms').factory('MediaService',['Rooms','UIHandler',functio
 					'closeable': true	
 				};
 				windowHandler.create ($scope,windowOptions);
+				if (wid) {
+					setTimeout(function(){
+						document.getElementById(wid).className += ' wframemessage';
+					},3500);
+				}
 			};
 
 			/*Declar media related events */

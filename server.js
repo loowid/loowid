@@ -530,6 +530,14 @@ app.get('/r/:staticId', function(req, res){
 	}
 });
 
+app.get('/gdocmessage.svg',function(req,res){
+	var fs = require('fs');
+	var data = fs.readFileSync('public/text.svg','utf-8');
+	res.type('image/svg+xml');
+	data = data.replace('##text##',i18n.t('gdocmessage'));
+	res.send(data);
+});
+
 app.param('roomId', rooms.room);
 app.param('staticId', rooms.exists);
 app.param('connectionId', rooms.connection);

@@ -212,5 +212,6 @@
     "roomslink" : "Enlace",
     "roomstemp" : "Sala Temporal",
     "roomspermanent" : "Sala Permanente",
-    "googledoc" : "Documento Google"
+    "googledoc" : "Documento Google",
+    "gdocmessage" : "El documento no existe o debes autenticarte para verlo."
 }

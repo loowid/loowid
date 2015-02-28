@@ -134,7 +134,7 @@ angular.module('mean.rooms').factory('ChatService',['$timeout','UIHandler','Room
 		    	var docid = 'doc_'+doc+'_'+(new Date()).getTime()+Math.floor(Math.random()*100);
 		    	setTimeout(function(){
 		    		document.getElementById(docid).addEventListener('click',function(evt){
-		    			$scope.openVideoFromService($scope.resourceBundle.googledoc,'//docs.google.com/presentation/d/'+doc+'/embed?start=false&loop=false&delayms=3000');
+		    			$scope.openIFrameService('i'+docid,$scope.resourceBundle.googledoc,'//docs.google.com/presentation/d/'+doc+'/embed?start=false&loop=false&delayms=3000');
 		    			evt.preventDefault();
 		    		});
 		    		
