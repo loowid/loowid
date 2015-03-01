@@ -409,7 +409,7 @@
 }
 
 .wmWindow.minimized{
-	display: none !important;
+	display: none;
 }
 
 .wmWindow.active .wmContent * {
@@ -442,7 +442,7 @@
 }
 
 .wmWindow.restoring, .wmWindow.maximizing, .wmWindow.minimizing {
-    -webkit-transform: translate3d(0,0,0);
+    -webkit-transform: translate(0,0) scale(1,1);
     -webkit-transition: all .5s ease-out;
     -moz-transition: all .5s ease-out;
     -ms-transition: all .5s ease-out;
@@ -450,69 +450,77 @@
     transition: all .5s ease-out;
 }
 
-.wmWindow.minimizing  .wmWindowBox div.wmTitleBar {
-	display:none;
-}
-
-.wmWindow.minimizing {
-	min-width: 0px;
-}
-
-.minimizedWindow span{
-	text-decoration: none;
-	color: @bgcolor;
-	font-size: 1.6em;
-	text-align: center;
-	display: block;
-	.border-radius( 64px );
-	.transition(left 0.5s ease );
-	cursor: pointer;
-	margin-top: 5px;
+.wmWindow{
+	&.buttonized{
+		.border-radius( 64px );
+		min-width: 0px;
+		min-height: 0px;
+	}
 	
 }
 
-.minimizedWindow span{
+.wmWindow.minimizing .wmWindowBox div.wmTitleBar, .wmWindow.buttonized .wmWindowBox div.wmTitleBar{
+	display: none;
+}
+
+.minimizedWindowBtn{
+	display: none;
 	
-	&.btn_0 {
-		background:  #009688;
-	}
-	&.btn_1 {
-		background:  #ff9800;
-		color: #222;
-	}
-	&.btn_2{
-		background: #4caf50;
-	}
-	&.btn_3{
-		background: #03a9f4;
-	}
-	&.btn_4 {
-		background:  #cddc39;
-		color: #222;
-	}
-	&.btn_5{
-		background: #ffeb3b;
-		color: #222;
-	}
-	&.btn_6{
-		background: #9c27b0;
-	}
-	&.btn_7 {
-		background:  #e91e63;
-	}
-	&.btn_8{
-		background: #795548;
-	}
-	&.btn_9{
-		background: #00bcd4;
+	&.active{
+		display: block;
+		-webkit-animation: appear .4s 1 ease-out forwards;
+		-moz-animation: appear .4s 1 ease-out forwards;
+		animation: appear .4s 1 ease-out forwards;
 	}
 
+	&.disable{
+		-webkit-animation: close .4s 1 ease-out forwards;
+		-moz-animation: close .4s 1 ease-out forwards;
+		animation: close .4s 1 ease-out forwards;
+	}
+
+	span{
+		text-decoration: none;
+		color: @bgcolor;
+		font-size: 1.6em;
+		text-align: center;
+		.border-radius( 64px );
+		cursor: pointer;
+		margin-top: 5px;
+	
+		&.btn_0 {
+			background:  #009688;
+		}
+		&.btn_1 {
+			background:  #ff9800;
+			color: #222;
+		}
+		&.btn_2{
+			background: #4caf50;
+		}
+		&.btn_3{
+			background: #03a9f4;
+		}
+		&.btn_4 {
+			background:  #cddc39;
+			color: #222;
+		}
+		&.btn_5{
+			background: #ffeb3b;
+			color: #222;
+		}
+		&.btn_6{
+			background: #9c27b0;
+		}
+		&.btn_7 {
+			background:  #e91e63;
+		}
+		&.btn_8{
+			background: #795548;
+		}
+		&.btn_9{
+			background: #00bcd4;
+		}
+	}
 }
 
-
-
-.minimizedWindow.minimizing{
-	webkit-animation: appear .4s 1 ease-out forwards;
-    -moz-animation: appear .4s 1 ease-out forwards;
-    animation: appear .4s 1 ease-out forwards;
-}

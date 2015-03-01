@@ -100,8 +100,10 @@ angular.module('mean.rooms').factory('MediaService',['Rooms','UIHandler',functio
 								},
 								'onrestore': function (win){
 									var videoELement = angular.element(mediaElement);
-									videoELement.removeClass ('maximized');
-									videoELement.css ('height', '100%');
+									if (videoELement !== undefined){
+										videoELement.removeClass ('maximized');
+										videoELement.css ('height', '100%');
+									}
 								}
 							};
 							

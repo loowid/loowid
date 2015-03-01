@@ -233,15 +233,29 @@ angular.module('ngWindowManager',[])
 
 			//set the element in the specified position
 			winHandler.move = function(x, y) {
-				if (x) {element.css('left',x +'px');}
-				if(y) {element.css('top',y + 'px');}
-
+				winHandler.setWindowProps({'x':x, 'y':y});
 			};
 
 			//set the new size of the element
 			winHandler.resize = function (width,height) {
-				if (width) {element.css ('width', width + 'px');}
-				if (height) {element.css ('height', height + 'px');}
+				winHandler.setWindowProps ({'width':width,'height':height});
+			};
+			
+			
+			/**
+			* Set position and size properties
+			*/
+			winHandler.setWindowProps = function (props){
+				var cssObject = {};
+				
+				if (props) {
+					if (props.x) {cssObject.left = props.x +'px';}
+					if (props.y) {cssObject.top = props.y +'px';}
+					if (props.width) {cssObject.width = props.width + 'px';}
+					if (props.height) {cssObject.height = props.height + 'px';}
+					
+					element.css (cssObject);	
+				}	
 			};
 
 			//Move the current window to the highest position
@@ -283,11 +297,16 @@ angular.module('ngWindowManager',[])
 					height: parseInt(maximizeToElement.offsetHeight || maximizeToElement.innerHeight, 10)
 				};
 				
-				//move, set the effect and resize 
-				winHandler.move (maximizeCoords.x + 10,maximizeCoords.y +10 );
 				element.addClass ('maximizing');
 				element.addClass('maximized');
-				winHandler.resize (maximizeCoords.width -20, maximizeCoords.height - 20);
+				//move, set the effect and resize 
+				
+				winHandler.setWindowProps ( {
+						x: maximizeCoords.x + 10,
+						y: maximizeCoords.y +10,
+						width: maximizeCoords.width -20, 
+						height: maximizeCoords.height - 20
+				});
 				
 				//Set the apropiate listeners
 				maximizeButton.removeEventListener ('click',winHandler.maximize);
@@ -321,7 +340,7 @@ angular.module('ngWindowManager',[])
 				var childrenCount = (minimizeToElement.childElementCount + 1) % 10;
 				
 				
-				var minimizedBtn = angular.element('<div class="minimizedWindow" style="display:none" title="' +scope.title+ '" ><span class="btn_'+childrenCount+'">' + scope.title.substr(0,1) + '</span></div>')[0];
+				var minimizedBtn = angular.element('<div class="minimizedWindowBtn" title="' +scope.title+ '" ><span class="btn_'+childrenCount+'">' + scope.title.substr(0,1) + '</span></div>')[0];
 				
 				saveWindowState('minimized',minimizedBtn);
 				angular.element (minimizeToElement).prepend(minimizedBtn);
@@ -329,19 +348,25 @@ angular.module('ngWindowManager',[])
 				var minimizeCoords = {
 					x: parseInt(minimizeToElement.offsetLeft, 10),
 					y: parseInt(minimizeToElement.offsetTop - minimizeToElement.offsetHeight - 30 , 10) ,
-					width:  64,
-					height: 64
+					width:  32,
+					height: 32
 				};
 				
 				//Just do the effect of going there
 				element.addClass ('minimizing');
-				winHandler.resize (minimizeCoords.width, minimizeCoords.height);
-				winHandler.move (minimizeCoords.x ,minimizeCoords.y);
+				element.addClass ('buttonized');
+				
+				winHandler.setWindowProps ({
+					x: minimizeCoords.x  ,
+					y: minimizeCoords.y  ,
+					width: minimizeCoords.width,
+					height: minimizeCoords.height
+				});
 				
 				setTimeout (function (){
 					element.removeClass ('minimizing');
 					element.addClass('minimized');
-					angular.element(minimizedBtn).css('display','block');
+					angular.element(minimizedBtn).addClass('active');
 				},500);
 				
 				minimizedBtn.addEventListener ('mousedown',winHandler.restore);
@@ -353,20 +378,11 @@ angular.module('ngWindowManager',[])
 			
 			winHandler.restore = function (){
 				
-				//move and resize to previus state
-				element.removeClass ('minimized');
-				element.removeClass ('maximized');
-				
-				//Apply restoring effects
 				element.addClass ('restoring');
-				
+				element.removeClass ('minimized');
 				
 				//Set to the top of windows
 				winHandler.selectWindow();
-				
-				//move and resize to prior state
-				winHandler.move (currentWindowState.x,currentWindowState.y);
-				winHandler.resize(currentWindowState.width,currentWindowState.height);
 				
 				//Restore the listeners	   
 				if (currentWindowState.state === 'maximized'){
@@ -376,28 +392,47 @@ angular.module('ngWindowManager',[])
 					maximizeButton.addEventListener ('click',winHandler.maximize);
 					maximizeButton.addEventListener ('touchstart',winHandler.maximize);
 
-
 					titleBarElement.removeEventListener ('dblclick',winHandler.restore);
 					titleBarElement.addEventListener ('dblclick', winHandler.maximize);
 
 					//start all the window listener (drag,resize...)
 					startWindowListeners();
 				}else if (currentWindowState.state === 'minimized'){
-					angular.element (currentWindowState.minimizedBtn).remove();
+					angular.element (currentWindowState.minimizedBtn).addClass('disable');
+					setTimeout (function (){
+						angular.element (currentWindowState.minimizedBtn).remove();
+					
+					},500);
 				}
 				
 				currentWindowState.state = 'flow';
 				
 				
-				//Execute restore method if it's provided
-				if (scope.restore){
-					scope.restore(winHandler);	
-				}
-				
-				//Removes the element some time ago
 				setTimeout (function (){
-					element.removeClass ('restoring');
-				},500);
+					element.removeClass ('maximized');
+	
+					
+					winHandler.setWindowProps ({
+						x: currentWindowState.x,
+						y: currentWindowState.y,
+						width: currentWindowState.width,
+						height: currentWindowState.height
+					});
+					
+						//Execute restore method if it's provided
+					
+					//Removes the element some time ago
+					setTimeout (function (){
+						element.removeClass ('restoring');
+						element.removeClass ('buttonized');
+						if (scope.restore){
+							scope.restore(winHandler);	
+						}
+					},200);
+
+				},200);
+			
+				
 				
 			};
 			
