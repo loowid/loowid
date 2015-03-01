@@ -51,6 +51,50 @@ angular.module('mean.rooms').factory('UIHandler',['$window','$timeout',function(
 		  }
 	};
 
+	_this._data.hideAddThis = function() {
+		var rAddThis = setInterval(function(){
+			var addThis = document.getElementById('at4-share');
+			if (addThis) {
+				window.clearInterval(rAddThis);
+				_this._data.addThisParent = addThis.parentNode;
+				_this._data.addThisNode = addThis;
+				addThis.parentNode.removeChild(addThis);   
+			}
+	   	},100);
+	};
+	
+	_this._data.addThisSetUrl = function($scope,pm) {
+		var addthis = 'addthis_share';
+		var mtitle = 'addthistitle';
+		window[addthis] = {};
+		_this._data.sharepermanent = pm && _this._data.sharepermanent;
+		if (_this._data.sharepermanent) {
+			mtitle = 'addthisptitle';
+			window[addthis].url = _this._data.permanenturl;
+		} else {
+			window[addthis].url = _this._data.screenurl;
+		}
+		var itm = setTimeout(function(){
+			if ($scope.resourceBundle) {
+				window[addthis].title = $scope.resourceBundle[mtitle];
+				window.clearInterval(itm);
+			}
+		},100);
+	};
+	
+	_this._data.showAddThis = function($scope) {
+		_this._data.addThisSetUrl($scope);
+		if (_this._data.addThisParent) {
+			_this._data.addThisParent.appendChild(_this._data.addThisNode);
+		}
+	};
+
+	_this._data.sharePermanentUrl = function(value,$scope) {
+		_this._data.sharepermanent = value;
+		_this._data.addThisSetUrl($scope,true);
+		
+	};
+	
 	document.addEventListener ('keydown',_this.keyboard.keydown);
 	document.addEventListener ('keyup',_this.keyboard.keyup);
 	

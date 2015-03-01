@@ -96,6 +96,7 @@ angular.module('mean.rooms').controller('RoomsController', ['$scope', '$routePar
    };
 
    $scope.init = function(){
+	   uiHandler.hideAddThis();
    };
 
 

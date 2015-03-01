@@ -204,5 +204,7 @@
    "considerdonate" : "If you like this app, please consider to help us to grow with a donation via flattr",
    "helpusgrow" : "Help us to grow",
    "googledoc" : "Google Document",
-   "gdocmessage" : "The document is missing or you have to log in to see it."
+   "gdocmessage" : "The document is missing or you have to log in to see it.",
+   "addthistitle" : "Join this loowid room!!",
+   "addthisptitle" : "Back to this room as owner."
 }
