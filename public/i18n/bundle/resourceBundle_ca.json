@@ -38,11 +38,14 @@
     "earnmoney": "Comença a guanyar diners", 
     "easy": "Senzill", 
     "easydesc": "Pots crear una sala amb qui vulguis. Qualsevol que disposi de l'adreça pot entrar a la sala. Per defecte la sala és privada,  per tant només aquells que sàpiguen l'enllaç podran entrar a la sala", 
+    "embedVideo": "Video - Fes clic per obrir", 
     "errorleavetheroom": "Estàs a punt d'abandonar la sala, n'estàs segur?", 
     "feedback": "Informació", 
     "feedbackdesc": "Conta'ns com ha estat la teva experiencia amb LooWID, quines coses canviaries o milloraries, envian's un  <a href='mailto:loowid@gmail.com'>correu</a>. <br /> La teva opinió ens ajudarà a millorar, ens agradaria que emplenis aquesta <a href='/views/survey_ca.html' target='_blank'>petita enquesta</a>", 
     "fireuser": "serà expulsat de la sala, està segur?", 
     "footerText": "LooWID 2015", 
+    "gdocmessage": "No es troba el document o cal que us registreu per veure'l.", 
+    "googledoc": "Document Google", 
     "gototheroom": "Torna a la sala", 
     "gravatarclose": "Tanca", 
     "gravataremail": "Correu electrònic de gravatar", 
@@ -202,6 +205,5 @@
     "wintitlevideo": "La meva càmera", 
     "youarefired": "Has estat expulsat de la sala", 
     "youmustacceptterms": "Has d'acceptar els termes", 
-    "yourbrowsernot": "Encara no donem suport al teu navegador. Segueix qualsevol novetat des @LooWIDCom", 
-    "embedVideo": "Video - Fes clic per obrir"
+    "yourbrowsernot": "Encara no donem suport al teu navegador. Segueix qualsevol novetat des @LooWIDCom"
 }
