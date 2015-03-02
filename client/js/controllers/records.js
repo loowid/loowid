@@ -291,7 +291,7 @@ angular.module('mean.rooms').controller('RecordController', ['$scope', '$routePa
 		windowHandler.init ($scope);
         mediaService.init ($scope,windowHandler);
   
-        uiHandler.showAddThis($scope);
+        uiHandler.hideAddThis();
         
 		
     };
