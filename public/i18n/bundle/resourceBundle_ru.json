@@ -176,7 +176,7 @@
     "textsitemsharefile": "Отправьте файлы вашим гостям, не зарегистрированным тут", 
     "textslink": "Вы можете получить доступ ко всей информации, в которой нуждаетесь по <a href='https://github.com/loowid/loowid/wiki/How-to-use-it/How-to-use-it'>ссылке</a>, или в нашей библиотеке <a href='https://github.com/loowid/loowid/wiki'>wiki</a>", 
     "timeformat": "часы:минуты", 
-    "timeprep": "{0} минут(s) назад", 
+    "timeprep": "{0} минут(ы) назад", 
     "tutorialnext": "Следующий", 
     "tutorialno": "Нет", 
     "tutorialok": "Ок", 
