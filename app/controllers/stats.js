@@ -7,6 +7,7 @@ var mongoose = require('mongoose');
 require ('../models/stats');
 var Stats = mongoose.model('Stats');
 var Room = mongoose.model('Room');
+var webRTCHandler = {};
 
 var saveAll = function(docs,cnt) {
 	var doc = docs.pop();
@@ -81,4 +82,24 @@ exports.bytype = function(req,res,next) {
 			next(err);
 		}
 	});
+};
+
+exports.setWebRTCHandler = function(rtcHandler){
+	webRTCHandler = rtcHandler.rtc;
+};
+	
+exports.webrtcstats = function (req,res,next){
+	//room information from room controller
+	var room = req.room;
+	
+	console.log ('Requested ' + room.roomId + ' and get ' + JSON.stringify(webRTCHandler.statusList));
+	
+	if (webRTCHandler.statusList && webRTCHandler.statusList[room.roomId]){
+		res.json(webRTCHandler.statusList[room.roomId]);	
+	}else{
+		var error = new Error('No webrtc static found for room: ' + room.roomId);
+		var errorCode = 'http_code';
+		error[errorCode] = 404;
+		next(error);
+	}
 };

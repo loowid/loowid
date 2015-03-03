@@ -51,5 +51,8 @@ angular.module('mean.stats').controller('StatsController',['$scope','Stats','Glo
 			stopLoading();
 		});
 	};
-
+	
+	$scope.initWebRTCStatistics = function(){
+		//TODO
+	};
 }]);

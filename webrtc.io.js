@@ -4,7 +4,8 @@
 var WebSocketServer = require('ws').Server,
 signature = require( 'cookie-signature' ),prefix = 's:',
 ServerList = require('node-rest-client').Client,
-request = require('request');
+request = require('request'),
+_ = require('underscore');
 
 //Create a service definition for externar servers list
 var lclient = new ServerList();
@@ -20,6 +21,7 @@ lclient.registerMethod('getXirSysServers','https://api.xirsys.com:443/getIceServ
 rtc.sockets = [];
 
 rtc.rooms = {};
+rtc.statusList = {};
 
 rtc.prerooms = {};
 
@@ -188,6 +190,9 @@ function attachEvents(manager) {
   rtc.on('join_room', function(dataa, socketa) {
 	manager.rooms.checkLockOrPassword(dataa, socketa, function(data,socket) {
 		var roomList = rtc.rooms[data.room] || [];
+		var roomStatus = rtc.statusList [data.room] || {};
+		rtc.statusList[data.room] = roomStatus;
+		
 		if (socket._events) {
 			roomList.push(socket.id);
 			rtc.rooms[data.room] = roomList;
@@ -763,6 +768,29 @@ function attachEvents(manager) {
 			logger.error('Alert: a non owner is trying to move room');
 		});
 	});
+	
+	rtc.on('rtc_status_update', function(data, socket){
+		
+		var roomStatus = rtc.statusList[data.room] || {};
+		var userConnectionsList = roomStatus[socket.id] || [];
+		var connection = _.findWhere (userConnectionsList, { peerId: data.peerId, source: data.source, produced: data.produced });
+		
+		if (connection === undefined){
+			connection = {
+				peerId: data.peerId,
+				status: 'new',
+				source: data.source,
+				produced: data.produced
+			};
+			
+			userConnectionsList.push (connection);
+		}
+		
+		connection.status = data.status;
+		roomStatus[socket.id] = userConnectionsList;
+		rtc.statusList[data.room] = roomStatus;
+	});
+		
 
 	var sendStop = function(data, socket) {
 		var roomList = rtc.rooms[data.room] || [];
