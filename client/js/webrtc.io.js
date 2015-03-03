@@ -473,6 +473,16 @@ function mergeConstraints(cons1, cons2) {
 		};
 
 		pc.oniceconnectionstatechange = function (event){
+			rtc._socket.send(JSON.stringify({
+				'eventName': 'rtc_status_update',
+				'data': {
+					'peerId': id,
+					'source': mediatype,
+					'status': pc.iceConnectionState,
+					'produced': produced,
+					'room': rtc.room
+				}
+			}));
 			if (rtc.debug) { console.log ('User id: ' + id + ' changed : ' + pc.iceConnectionState +  ' mediatype' + mediatype); }
 		};
 

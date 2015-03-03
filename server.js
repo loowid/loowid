@@ -71,6 +71,7 @@ var sessionSecret = crypto.randomBytes(16).toString('hex');
 
 // load webrtc module
 var webRTC = require('./webrtc.io.js').listen(wserver,ipaddr);
+stats.setWebRTCHandler(webRTC);
 
 var serverId = (Math.random()/+new Date()).toString(36).replace(/[^a-z]+/g,'').substring(0,9);
 exports.serverId = serverId;
@@ -293,6 +294,7 @@ app.configure(function() {
 		log4js.printLogLevels(res);
 	});
 	// Statistics service
+	app.get('/stats/:roomId/webrtcstats',auth,stats.webrtcstats);
 	app.get('/stats/rooms',auth,stats.byday);
 	app.get('/stats/roomsbytype',auth,stats.bytype);
 	// LTI Routes
