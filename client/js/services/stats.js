@@ -6,7 +6,8 @@ angular.module('mean.stats').factory('Stats', ['$resource', function($resource) 
     	{roomId:'@id'},
     	{
     		rooms: {method: 'GET', params:{cmd: 'rooms'}, isArray: true},
-    		roomsbytype: {method: 'GET', params:{cmd: 'roomsbytype'}, isArray: true}
+    		roomsbytype: {method: 'GET', params:{cmd: 'roomsbytype'}, isArray: true},
+			webrtcstats: {method: 'GET', params:{cmd: 'webrtcstats'}}
         });
 	
 	var statsFactory = {};
@@ -19,6 +20,11 @@ angular.module('mean.stats').factory('Stats', ['$resource', function($resource) 
 		stats.roomsbytype({},cb);
 	};
 
+	statsFactory.webrtcstats = function(roomId,cb) {
+		stats.webrtcstats({id:roomId},cb);
+	};
+
+	
 	return statsFactory;
 	
 }]);
