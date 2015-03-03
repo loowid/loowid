@@ -53,6 +53,7 @@ angular.module('mean.rooms').controller('RecordController', ['$scope', '$routePa
 
         room.editShared($scope.global.roomId, uiHandler.access, function(rdo){
             $scope.global.access = angular.copy(uiHandler.access);
+            uiHandler.addThisSetUrl($scope,$scope.global.access.permanent);
             rtc.updateOwnerData(uiHandler.roomId,uiHandler.name,uiHandler.avatar,uiHandler.status,uiHandler.access);
             if (uiHandler.enabledChat !==  uiHandler.access.chat) {
                 chatService.alertChatStatus($scope,rdo.access.chat?'disabled':'enabled');
@@ -105,6 +106,9 @@ angular.module('mean.rooms').controller('RecordController', ['$scope', '$routePa
         });
     };
     
+    $scope.sharePermanentUrl = function(value) {
+    	uiHandler.sharePermanentUrl(value,this);
+    };
 
     $scope.enableEditAccess = function() {
     	uiHandler.access = angular.copy($scope.global.access);
@@ -287,6 +291,8 @@ angular.module('mean.rooms').controller('RecordController', ['$scope', '$routePa
 		windowHandler.init ($scope);
         mediaService.init ($scope,windowHandler);
   
+        uiHandler.hideAddThis();
+        
 		
     };
     

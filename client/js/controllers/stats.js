@@ -1,5 +1,5 @@
 'use strict';
-angular.module('mean.stats').controller('StatsController',['$scope','Stats','Global','ngI18nResourceBundle','ngI18nConfig', function ($scope,Stats,Global,ngI18nResourceBundle,ngI18nConfig) {
+angular.module('mean.stats').controller('StatsController',['$scope','Stats','Global','ngI18nResourceBundle','ngI18nConfig','UIHandler', function ($scope,Stats,Global,ngI18nResourceBundle,ngI18nConfig,uiHandler) {
 	
 	$scope.global = Global;
 	
@@ -50,6 +50,8 @@ angular.module('mean.stats').controller('StatsController',['$scope','Stats','Glo
 			$scope.data1 = rooms;
 			stopLoading();
 		});
+		
+		uiHandler.hideAddThis();
 	};
 	
 	$scope.initWebRTCStatistics = function(){

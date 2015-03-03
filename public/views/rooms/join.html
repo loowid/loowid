@@ -222,15 +222,15 @@
 			<br />
 			<p>{{resourceBundle.desktopsharingnotactive}} <a href="/#!/about-desktop-sharing" target="_blank">{{resourceBundle.readmore}}</a>
 		</article>
-		<article class="creator_message" data-ng-show="ui.roomStatus == 'active' && !areWindowsOpened()  && shareDesktopStatus != 'failed'">
+		<article class="creator_message" data-ng-show="ui.roomStatus == 'active'">
 			<h1>{{resourceBundle.sharethisurl}}</h1>
-			<a href="{{ui.screenurl}}" target="_blank">{{ui.screenurl}}</a>
+			<a href="{{ui.screenurl}}" target="_blank">{{ui.screenurl}}</a> <a href="" ng-click="sharePermanentUrl(false)"><i class="fa fa-share-alt"></i></a>
 		</article>
 		<div class="url-message" ng-show="global.access.permanent" ng-class="{'active-broadcasting' : isRecording('screen') || isInitializingMedia('screen')}">
 			<h3>{{resourceBundle.permanentroom}} - {{resourceBundle.roomowner}}</h3>
 			<div class="nomsg">{{resourceBundle.hideUrl}}</div>
 			<p class="message">{{resourceBundle.permanentUrl}}</p>
-			<a href="{{ui.permanenturl}}">{{ui.permanenturl}}</a>
+			<a href="{{ui.permanenturl}}">{{ui.permanenturl}}</a> <a href="" ng-click="sharePermanentUrl(true)"><i class="fa fa-share-alt"></i></a>
 			<p class="datetime">{{ui.countDown}}</p>
 		</div>
 </section>

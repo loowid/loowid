@@ -1,6 +1,6 @@
 @import "ng-tags-input.min.less";
 @import "window-manager.less";
-@import "fontawesome.less";
+@import "./fa/font-awesome.less";
 @import "animations.less";
 @import "css3.less";
 @import "angular-chart.less";
@@ -98,7 +98,7 @@ h1, h2, h3, h4, h5, h6{
 		margin: 0 0 0.2em 0;
 	}
 	a{
-		display: block;
+		/*display: block;*/
 		margin: 0 0 0.15em 0;
 		.transition(all 1s linear);
 	}
@@ -135,6 +135,9 @@ h1, h2, h3, h4, h5, h6{
 			padding: 0.85em;
 			font-size: 0.8em;
 		}
+	}
+	@media all and (max-width:800px) {
+		right: 40px;
 	}
 }
 
@@ -688,8 +691,7 @@ header{
 	}
 	@media all and (max-width:800px){  
 		.creator_message{
-			display: none;
-			visibility: hidden;
+			font-size: 1.5em;
 		}
 	}
 }
@@ -1483,3 +1485,7 @@ header{
           }
     }
 }
+
+.atss { top: auto !important; bottom: 1%; }
+.at-share-open-control-left { top: auto !important; bottom: 1%; }
+.atss-perm { border-left: 5px solid #bf360c; }

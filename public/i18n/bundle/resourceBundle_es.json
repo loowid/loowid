@@ -213,5 +213,7 @@
     "roomstemp" : "Sala Temporal",
     "roomspermanent" : "Sala Permanente",
     "googledoc" : "Documento Google",
-    "gdocmessage" : "El documento no existe o debes autenticarte para verlo."
+    "gdocmessage" : "El documento no existe o debes autenticarte para verlo.",
+    "addthistitle" : "Entra en esta sala loowid!!",
+    "addthisptitle" : "Vuelve a esta sala loowid como propietario."
 }

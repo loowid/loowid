@@ -259,7 +259,9 @@ angular.module('mean.rooms').controller('ViewDesktopController', ['$scope', '$ro
 		    $scope.global.gravatar = uiHandler.gravatar;
 			    
         });
-
+        
+        uiHandler.hideAddThis();
+        
     };
 
     $scope.isValidBrowser = function(){
