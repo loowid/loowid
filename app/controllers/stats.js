@@ -92,8 +92,6 @@ exports.webrtcstats = function (req,res,next){
 	//room information from room controller
 	var room = req.room;
 	
-	console.log ('Requested ' + room.roomId + ' and get ' + JSON.stringify(webRTCHandler.statusList));
-	
 	if (webRTCHandler.statusList && webRTCHandler.statusList[room.roomId]){
 		res.json(webRTCHandler.statusList[room.roomId]);	
 	}else{
