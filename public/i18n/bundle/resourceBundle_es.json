@@ -215,5 +215,6 @@
     "googledoc" : "Documento Google",
     "gdocmessage" : "El documento no existe o debes autenticarte para verlo.",
     "addthistitle" : "Entra en esta sala loowid!!",
-    "addthisptitle" : "Vuelve a esta sala loowid como propietario."
+    "addthisptitle" : "Vuelve a esta sala loowid como propietario.",
+    "typeform" : "Formulario web typeform"
 }
