@@ -224,15 +224,15 @@
 		</article>
 		<article class="creator_message" data-ng-show="ui.roomStatus == 'active'">
 			<h1>{{resourceBundle.sharethisurl}}</h1>
-			<a href="{{ui.screenurl}}" target="_blank">{{ui.screenurl}}</a>
 			<div class="addthis_sharing_toolbox" data-url="{{ui.screenurl}}" data-title="{{resourceBundle.addthistitle}}"></div>
+			<a href="{{ui.screenurl}}" target="_blank">{{ui.screenurl}}</a>
 		</article>
 		<div class="url-message" ng-show="global.access.permanent" ng-class="{'active-broadcasting' : isRecording('screen') || isInitializingMedia('screen')}">
 			<h3>{{resourceBundle.permanentroom}} - {{resourceBundle.roomowner}}</h3>
 			<div class="nomsg">{{resourceBundle.hideUrl}}</div>
 			<p class="message">{{resourceBundle.permanentUrl}}</p>
 			<a href="{{ui.permanenturl}}">{{ui.permanenturl}}</a>
-			<div class="addthis_sharing_toolbox" data-url="{{ui.permanenturl}}" data-title="{{resourceBundle.addthisptitle}}"></div>
+			<div class="addthis_sharing_toolbox addthis_mini" data-url="{{ui.permanenturl}}" data-title="{{resourceBundle.addthisptitle}}"></div>
 			<p class="datetime">{{ui.countDown}}</p>
 		</div>
 </section>

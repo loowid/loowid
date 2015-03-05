@@ -290,6 +290,10 @@ angular.module('mean.rooms').controller('RecordController', ['$scope', '$routePa
 		windowHandler.init ($scope);
         mediaService.init ($scope,windowHandler);
   
+        angular.element(document).ready(function () {
+        	window.addthis.layers.refresh();
+        });
+        
     };
     
     $scope.$on('$routeUpdate', function(a,b,c){
