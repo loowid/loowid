@@ -653,7 +653,7 @@ header{
 		margin-right: 30px;
 	}
 	.creator_message{
-		font-size: 2.2em;
+		font-size: 2em;
 		font-weight: 300;
 		padding: 1.5em;
 		margin: 3em auto 0 auto;
@@ -692,7 +692,7 @@ header{
 	}
 	@media all and (max-width:800px){  
 		.creator_message{
-			font-size: 1.5em;
+			font-size: 1.3em;
 		}
 	}
 }
@@ -1490,8 +1490,13 @@ header{
 }
 
 .addthis_sharing_toolbox { 
-	text-align: right;
-	#atstbx2 {
+	div {
+		float: right;
+	}
+}
+
+.addthis_mini {
+	div {
 		.at-share-btn {
 			max-width: 16px !important;
 			max-height: 16px !important;
@@ -1501,6 +1506,10 @@ header{
   			height: 16px !important;
   			line-height: 16px !important;
   			background-size: 16px !important;
+  		}
+  		.at-svc-google_plusone_share, 
+  		.at-svc-twitter {
+  			display: none;
   		}
 	} 
 }
