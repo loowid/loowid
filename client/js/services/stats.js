@@ -21,7 +21,7 @@ angular.module('mean.stats').factory('Stats', ['$resource', function($resource) 
 	};
 
 	statsFactory.webrtcstats = function(roomId,cb) {
-		stats.webrtcstats({id:roomId},cb);
+		stats.webrtcstats({roomId:roomId},cb);
 	};
 
 	
