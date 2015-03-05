@@ -167,7 +167,8 @@ db.on('connected',function() {
 db.on('error',function(err) {
 	logger.error('ERROR connecting to: ' + safeUriString + '. ' + err);
 });
-mongoose.connect(uristring,{server:{'auto_reconnect':true}});
+// Add keepAlive to db connection
+mongoose.connect(uristring,{server:{'auto_reconnect':true,socketOptions:{keepAlive: 1}},replset:{socketOptions:{keepAlive: 1}}});
 
 /*function isMobile(req) {
 	return (/mobile/i.test(req.headers['user-agent']));
