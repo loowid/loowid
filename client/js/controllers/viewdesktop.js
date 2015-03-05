@@ -260,8 +260,6 @@ angular.module('mean.rooms').controller('ViewDesktopController', ['$scope', '$ro
 			    
         });
         
-        uiHandler.hideAddThis();
-        
     };
 
     $scope.isValidBrowser = function(){

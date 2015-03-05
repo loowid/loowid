@@ -137,7 +137,8 @@ h1, h2, h3, h4, h5, h6{
 		}
 	}
 	@media all and (max-width:800px) {
-		right: 40px;
+		right: 15px;
+		width: auto;
 	}
 }
 
@@ -1379,7 +1380,8 @@ header{
 .evideo {
 	position: relative;
 	img {
-		border: 3px dotted;
+		width: 90%;
+		border: 5px solid;
 	}
 	.fa {
 		position: absolute;
@@ -1392,10 +1394,11 @@ header{
 }
 
 .edoc {
-	.fa {
-		font-size: 5em;
-		width: 100%;
-		text-align: center;
+	position: relative;
+	text-align: center;
+	img {
+		width: 50%;
+		border: 5px solid;
 	}
 }
 
@@ -1486,6 +1489,18 @@ header{
     }
 }
 
-.atss { top: auto !important; bottom: 1%; }
-.at-share-open-control-left { top: auto !important; bottom: 1%; }
-.atss-perm { border-left: 5px solid #bf360c; }
+.addthis_sharing_toolbox { 
+	text-align: right;
+	#atstbx2 {
+		.at-share-btn {
+			max-width: 16px !important;
+			max-height: 16px !important;
+		}
+		.at4-icon {
+			width: 16px !important;
+  			height: 16px !important;
+  			line-height: 16px !important;
+  			background-size: 16px !important;
+  		}
+	} 
+}

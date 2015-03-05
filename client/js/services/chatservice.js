@@ -139,13 +139,28 @@ angular.module('mean.rooms').factory('ChatService',['$timeout','UIHandler','Room
 		    		});
 		    		
 		    	},500);
-		    	return '<div class="edoc"><a id="'+docid+'" href="#"><i class="fa fa-file"></i></a></div>'+url;
+		    	return '<div class="edoc"><a id="'+docid+'" href="#"><img src="/img/gslides%2Epng"/></a></div>'+url;
+	    	};
+	    };
+	    
+	    this.replaceTypeform = function($scope) {
+	    	return function(url,doc) {
+		    	var docid = 'frm_'+doc+'_'+(new Date()).getTime()+Math.floor(Math.random()*100);
+		    	setTimeout(function(){
+		    		document.getElementById(docid).addEventListener('click',function(evt){
+		    			$scope.openIFrameService('if'+docid,$scope.resourceBundle.typeform,'//showroom.typeform.com/to/'+doc);
+		    			evt.preventDefault();
+		    		});
+		    		
+		    	},500);
+		    	return '<div class="edoc"><a id="'+docid+'" href="#"><img src="/img/typeform%2Epng"/></a></div>'+url;
 	    	};
 	    };
 	    
 	    this.parseUrls = function($scope,txt) {
 			var newText = this.parseVideoUrls($scope,txt);
 			newText = newText.replace(/(?:https:\/\/)?docs\.google\.com\/presentation\/d\/([^\/\s]+)\/[^\s]+/g,this.replaceGoogle($scope));
+			newText = newText.replace(/(?:https:\/\/)?[^\.]+\.typeform\.com\/to\/([^\s]+)/g,this.replaceTypeform($scope));
 			return newText.replace(/(((https?:\/\/)?(((?!-)[A-Za-z0-9-:]{1,63}[@]{0,1}[A-Za-z0-9-]*(?!-)\.)+[A-Za-z]{2,6})(:\d+)?(\/([-\w/_\.\,]*(\?\S+)?)?)*)(#\S*)?(?!@))/g, this.link);
 	    };
 	    

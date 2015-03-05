@@ -206,5 +206,6 @@
    "googledoc" : "Google Document",
    "gdocmessage" : "The document is missing or you have to log in to see it.",
    "addthistitle" : "Join this loowid room!!",
-   "addthisptitle" : "Back to this room as owner."
+   "addthisptitle" : "Back to this room as owner.",
+   "typeform" : "Typeform web form"
 }
