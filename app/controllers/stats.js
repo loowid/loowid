@@ -93,7 +93,12 @@ exports.webrtcstats = function (req,res,next){
 	var room = req.room;
 	
 	if (webRTCHandler.statusList && webRTCHandler.statusList[room.roomId]){
-		res.json(webRTCHandler.statusList[room.roomId]);	
+		var info = {
+			webrtcStats: webRTCHandler.statusList[room.roomId],
+			roomInfo: room
+		};
+		
+		res.json(info);	
 	}else{
 		var error = new Error('No webrtc static found for room: ' + room.roomId);
 		var errorCode = 'http_code';

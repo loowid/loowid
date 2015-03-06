@@ -1,23 +1,23 @@
 'use strict';
 angular.module('mean.stats').controller('StatsController',['$scope','Stats','Global','ngI18nResourceBundle','ngI18nConfig','UIHandler','$routeParams','_', function ($scope,Stats,Global,ngI18nResourceBundle,ngI18nConfig,uiHandler,$routeParams,_) {
-	
+
 	$scope.global = Global;
-	
+
 	$scope.global.setupI18N($scope,ngI18nResourceBundle,ngI18nConfig);
-	
+
 	var stopLoading = function() {
-			document.getElementById('noscript').style.display = 'none';
+		document.getElementById('noscript').style.display = 'none';
 	};
-	
+
 	var sources = ['video','screen','audio'];
-	
+
 	$scope.init = function(){
-		
-		
+
+
 		var roundNumber = function(num) {
 			return Math.round(num * 100) / 100;
 		};
-		
+
 		Stats.rooms(function(list){
 			var labels = [];
 			var rooms = [];
@@ -40,7 +40,7 @@ angular.module('mean.stats').controller('StatsController',['$scope','Stats','Glo
 			first += '/'+(obj.access==='LINK'?$scope.resourceBundle.roomslink:$scope.resourceBundle.roomspass);
 			return first+'/'+(obj.moderated?$scope.resourceBundle.roomsmoderated:$scope.resourceBundle.roomsnomoderated);
 		};
-		
+
 		Stats.roomsbytype(function(list){
 			var labels = [];
 			var rooms = [];
@@ -53,168 +53,176 @@ angular.module('mean.stats').controller('StatsController',['$scope','Stats','Glo
 			$scope.data1 = rooms;
 			stopLoading();
 		});
-		
-	};
-	
-	$scope.initWebRTCStatistics = function() {
-			
-			$scope.graphvideo = {
-			  'nodes': [],
-			  'edges': []
-			};
 
-			$scope.graphscreen = {
-			  'nodes': [],
-			  'edges': []
-			};
-		
-			$scope.graphaudio = {
-			  'nodes': [],
-			  'edges': []
-			};
-	
-			var colors = [
-			  '#617db4',
-			  '#668f3c',
-			  '#c6583e',
-			  '#b956af'
-			];
-		
-			var edgeColors = {
-				'video': {
-					'new': 'rgba(97, 125, 180, 0.76)',
-					'checking': 'rgba(97, 125, 180, 0.94)',
-					'connecting': 'rgba(0, 189, 196, 0.76)',
-					'connected': 'rgba(0, 245, 255, 0.76)',
-					'completed': 'rgb(0, 95, 248)',
-					'failed':  'rgb(224, 89, 229)',
-					'disconnected':  'rgb(166, 105, 168)',
-					'closed': 'rgb(166, 105, 168)'
-				},
-				'screen': {
-					'new': 'rgba(116, 180, 97, 0.76)',
-					'checking': 'rgba(129, 180, 97, 0.94)',
-					'connecting': 'rgba(173, 196, 0, 0.76)',
-					'connected': 'rgba(255, 245, 0, 0.76)',
-					'completed': 'rgb(0, 248, 29)',
-					'failed':  'rgb(117, 157, 87)',
-					'disconnected':  'rgb(153, 168, 105)',
-					'closed': 'rgb(134, 168, 105)'
-				},
-				'audio': {
-					'new': 'rgba(180, 135, 97, 0.76)',
-					'checking': 'rgba(180, 142, 97, 0.94)',
-					'connecting': 'rgba(196, 0, 0, 0.76)',
-					'connected': 'rgba(255, 0, 0, 0.76)',
-					'completed': 'rgb(248, 172, 0)',
-					'failed':  'rgb(157, 103, 87)',
-					'disconnected':  'rgb(168, 105, 105)',
-					'closed': 'rgb(168, 141, 105)'
-				}
+	};
+
+	$scope.initWebRTCStatistics = function() {
+
+		$scope.graphvideo = {
+			'nodes': [],
+			'edges': []
+		};
+
+		$scope.graphscreen = {
+			'nodes': [],
+			'edges': []
+		};
+
+		$scope.graphaudio = {
+			'nodes': [],
+			'edges': []
+		};
+
+		var colors = [
+			'#617db4',
+			'#668f3c',
+			'#c6583e',
+			'#b956af'
+		];
+
+		var edgeColors = {
+			'new': 'rgba(234, 234, 23, 0.76)',
+			'checking': 'rgba(255, 165, 1, 0.94)',
+			'connecting': 'rgb(57, 100, 35)',
+			'connected': 'rgb(0, 255, 39)',
+			'completed': 'rgb(19, 248, 0)',
+			'failed':  'rgb(155, 9, 9)',
+			'disconnected':  'rgb(255, 0, 0)',
+			'closed': 'rgb(0, 0, 0)'
 		};
 
 		var graphs={};
-				
+
 		graphs.video = {
-		  'nodes': [],
-		  'edges': []
+			'nodes': [],
+			'edges': []
 		};
 
 		graphs.screen = {
-		  'nodes': [],
-		  'edges': []
+			'nodes': [],
+			'edges': []
 		};
 
 		graphs.audio = {
-		  'nodes': [],
-		  'edges': []
+			'nodes': [],
+			'edges': []
 		};
+
+
+		var processData = function (list){
+			$scope.graphvideo = [];
+			$scope.graphscreen = [];
+			$scope.graphaudio = [];
+			//Clean the edges
+			graphs.video.edges = [];
+			graphs.screen.edges = [];
+			graphs.audio.edges = [];
+
+			for (var key in list.webrtcStats){
+
 				
-		
-		var readWebRTCStats = function (){
-			Stats.webrtcstats ($routeParams.roomId,function (list){
-				$scope.graphvideo = [];
-				$scope.graphscreen = [];
-				$scope.graphaudio = [];
-				//Clean the edges
-				graphs.video.edges = [];
-				graphs.screen.edges = [];
-				graphs.audio.edges = [];
-				
-				for (var key in list){
+				if (list.webrtcStats.hasOwnProperty(key)){
 					
-					if (list.hasOwnProperty(key)){
-						var peerList = list[key];
-						
-						for (var sourceId in sources){
-							var source = sources[sourceId];
-														
-							//Look if there are connections to other nodes of this source type
-							var sourceEdges = _.findWhere (peerList,{'source': source});
-							
-							if (sourceEdges){
-								
-								//Look if the node is already in the list
-								var node = _.findWhere (graphs[source].nodes, {id: key});	
-								
-								if (node === undefined){
-									//If it's not in the list put it in
-									node = {
-										'id': key,
-										'label': key,
-										'size': peerList.length,
-										'x': Math.random(),
-										'y': Math.random(),
-										'color': colors[Math.floor(Math.random() * colors.length)]
-									};
-									graphs[source].nodes.push (node);
-								}
-							}
-						}
-						
-						//Add the edges
-						for (var edgeKey in peerList){
-							var peerInfo = peerList[edgeKey];
-							if (peerInfo.produced){
-								var edge = {
-									id: 'ed_' +	key + '_' + peerInfo.peerId +'_' + peerInfo.source,
-									color: edgeColors[peerInfo.source][peerInfo.status],
-									source: key,
-									target: peerInfo.peerId,
-									type: 'curvedArrow'
-								};
-								graphs[peerInfo.source].edges.push (edge);
-							}
-						}
+					
+					var username;
+					
+					if (list.roomInfo.owner.connectionId === key ){
+						username = list.roomInfo.owner.name;
+					}else{
+						var user = _.findWhere (list.roomInfo.guests, {connectionId: key});	
+						username = user ? user.name : key;
+					}
+				
+					
+					
+					var peerList = list.webrtcStats[key];
+
+					addNodes (key,username,peerList);
+
+					//Add the edges
+					addEdges (key,peerList);
+				}
+			}
+
+			uiHandler.safeApply($scope,function(){
+				$scope.graphvideo.nodes = graphs.video.nodes;
+				$scope.graphvideo.edges = graphs.video.edges;
+				$scope.graphscreen.nodes = graphs.screen.nodes;
+				$scope.graphscreen.edges = graphs.screen.edges;
+				$scope.graphaudio.nodes = graphs.audio.nodes;
+				$scope.graphaudio.edges = graphs.audio.edges;
+
+			});
+		};
+
+		var addNodes = function (key,username,peerList){
+			for (var sourceId in sources){
+				var source = sources[sourceId];
+
+				//Look if there are connections to other nodes of this source type
+				var sourceEdges = _.findWhere (peerList,{'source': source});
+
+				if (sourceEdges){
+
+					//Look if the node is already in the list
+					var node = _.findWhere (graphs[source].nodes, {id: key});	
+
+					if (node === undefined){
+						//If it's not in the list put it in
+						node = {
+							'id': key,
+							'label': username || key,
+							'size': peerList.length,
+							'x': Math.random(),
+							'y': Math.random(),
+							'color': colors[Math.floor(Math.random() * colors.length)]
+						};
+						graphs[source].nodes.push (node);
+					}else{
+						//we change the name in case user changed
+						node.label = username || key;	
 					}
 				}
-				
-				uiHandler.safeApply($scope,function(){
-					$scope.graphvideo.nodes = graphs.video.nodes;
-					$scope.graphvideo.edges = graphs.video.edges;
-					$scope.graphscreen.nodes = graphs.screen.nodes;
-					$scope.graphscreen.edges = graphs.screen.edges;
-					$scope.graphaudio.nodes = graphs.audio.nodes;
-					$scope.graphaudio.edges = graphs.audio.edges;
-				
-				});
-		
-				
+			}
+
+		};
+
+		var addEdges = function (key,peerList){
+			for (var edgeKey in peerList){
+				var peerInfo = peerList[edgeKey];
+				if (peerInfo.produced){
+					var edge = {
+						id: 'ed_' +	key + '_' + peerInfo.peerId +'_' + peerInfo.source,
+						color: edgeColors[peerInfo.status],
+						source: key,
+						label: peerInfo.status,
+						target: peerInfo.peerId,
+						type: 'curvedArrow'
+					};
+					graphs[peerInfo.source].edges.push (edge);
+				}
+			}	
+		};
+
+		var readWebRTCStats = function (){
+
+			Stats.webrtcstats ($routeParams.roomId,function (list){
+				processData(list);
 			});
-			
+
 			setTimeout (function (){
 				uiHandler.safeApply($scope,function(){
 					readWebRTCStats();
 				});
 			},5000);
 		};
-		
+
 		readWebRTCStats();
 
-		
+
 		uiHandler.safeApply($scope,function(){
-				stopLoading();
-			});
-	
+			stopLoading();
+		});
+
 	};
 }]);
