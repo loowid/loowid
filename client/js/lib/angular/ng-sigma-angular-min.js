@@ -39,41 +39,10 @@ var i,
       '#b956af'
     ];
 
-// Generate a random graph, going through the different edge shapes
-for (i = 0; i < N; i++) {
-  g.nodes.push({
-    id: 'n' + i,
-    label: 'Node ' + i,
-    x: Math.random(),
-    y: Math.random(),
-    size: Math.random(),
-    color: colors[Math.floor(Math.random() * colors.length)]
-  });
-}
-
-for (i = 0; i < E; i++) {
-  g.edges.push({
-    id: 'e' + i,
-    source: 'n' + (Math.random() * N | 0),
-    target: 'n' + (Math.random() * N | 0),
-    type: [
-      'line',
-      'curve',
-      'arrow',
-      'curvedArrow',
-      'dashed',
-      'dotted',
-      'parallel',
-      'tapered'
-    ][Math.round(Math.random()*8)],
-    size: Math.random()
-  });
-}
-
 				s = new sigma({
 				  graph: g,
 				  renderer: {
-					container: document.getElementById(divId),
+					container: element[0].firstChild,
 					type: 'canvas'
 				  },
 				  settings: {

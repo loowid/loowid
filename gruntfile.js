@@ -128,8 +128,10 @@ module.exports = function(grunt) {
             		src: ['*.js',
             		      'app/**/*.js',
             		      'spec/**/*.js',
-            		      'client/js/**/*.js',
-            		      '!client/js/**/*min.js'
+            		      'client/js/*.js',
+            		      'client/js/services/*.js',
+            		      'client/js/controllers/*.js',
+            		      '!client/js/lib/**/*.js'
             		      ] 
             	},
             	options: { 
@@ -190,10 +192,12 @@ module.exports = function(grunt) {
         	build: {
         		files: {
         			'public/js/loowid.min.js':[
-						'client/js/angular/angular.min.js',
-						'client/js/angular/angular-*.js',
-						'client/js/angular/ui-*.js',
-						'client/js/angular/ng-*.js',
+						'client/js/lib/angular/angular.min.js',
+						'client/js/lib/angular/angular-*.js',
+						'client/js/lib/angular/ng-*.js',
+						'client/js/lib/angular/ui-*.js',
+						'client/js/lib/underscore/*.js',
+						'client/js/lib/sigma/*.js',
 						'client/js/*.js',
 						'client/js/services/*.js',
 						'client/js/controllers/*.js'        			

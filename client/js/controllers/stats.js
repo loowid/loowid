@@ -1,5 +1,5 @@
 'use strict';
-angular.module('mean.stats').controller('StatsController',['$scope','Stats','Global','ngI18nResourceBundle','ngI18nConfig','UIHandler','$routeParams', function ($scope,Stats,Global,ngI18nResourceBundle,ngI18nConfig,uiHandler,$routeParams) {
+angular.module('mean.stats').controller('StatsController',['$scope','Stats','Global','ngI18nResourceBundle','ngI18nConfig','UIHandler','$routeParams','_', function ($scope,Stats,Global,ngI18nResourceBundle,ngI18nConfig,uiHandler,$routeParams,_) {
 	
 	$scope.global = Global;
 	
@@ -8,7 +8,8 @@ angular.module('mean.stats').controller('StatsController',['$scope','Stats','Glo
 	var stopLoading = function() {
 			document.getElementById('noscript').style.display = 'none';
 	};
-		
+	
+	var sources = ['video','screen','audio'];
 	
 	$scope.init = function(){
 		
@@ -56,19 +57,30 @@ angular.module('mean.stats').controller('StatsController',['$scope','Stats','Glo
 	};
 	
 	$scope.initWebRTCStatistics = function() {
-		$scope.sigmaGraph = {
-		  'nodes': [],
-		  'edges': []
-		};
+			
+			$scope.graphvideo = {
+			  'nodes': [],
+			  'edges': []
+			};
+
+			$scope.graphscreen = {
+			  'nodes': [],
+			  'edges': []
+			};
 		
-		var colors = [
+			$scope.graphaudio = {
+			  'nodes': [],
+			  'edges': []
+			};
+	
+			var colors = [
 			  '#617db4',
 			  '#668f3c',
 			  '#c6583e',
 			  '#b956af'
 			];
 		
-		var edgeColors = {
+			var edgeColors = {
 				'video': {
 					'new': 'rgba(97, 125, 180, 0.76)',
 					'checking': 'rgba(97, 125, 180, 0.94)',
@@ -101,26 +113,66 @@ angular.module('mean.stats').controller('StatsController',['$scope','Stats','Glo
 				}
 		};
 
+		var graphs={};
+				
+		graphs.video = {
+		  'nodes': [],
+		  'edges': []
+		};
+
+		graphs.screen = {
+		  'nodes': [],
+		  'edges': []
+		};
+
+		graphs.audio = {
+		  'nodes': [],
+		  'edges': []
+		};
+				
+		
 		var readWebRTCStats = function (){
 			Stats.webrtcstats ($routeParams.roomId,function (list){
-				var graph={};
-				graph.nodes =[];
-				graph.edges = [];
+				$scope.graphvideo = [];
+				$scope.graphscreen = [];
+				$scope.graphaudio = [];
+				//Clean the edges
+				graphs.video.edges = [];
+				graphs.screen.edges = [];
+				graphs.audio.edges = [];
+				
 				for (var key in list){
+					
 					if (list.hasOwnProperty(key)){
 						var peerList = list[key];
-						var node = {
-							'id': key,
-							'label': key,
-							'size': peerList.length,
-							'x': Math.random(),
-							'y': Math.random(),
-							'color': colors[Math.floor(Math.random() * colors.length)]
-						};
-						graph.nodes.push (node);
+						
+						for (var sourceId in sources){
+							var source = sources[sourceId];
+														
+							//Look if there are connections to other nodes of this source type
+							var sourceEdges = _.findWhere (peerList,{'source': source});
+							
+							if (sourceEdges){
+								
+								//Look if the node is already in the list
+								var node = _.findWhere (graphs[source].nodes, {id: key});	
+								
+								if (node === undefined){
+									//If it's not in the list put it in
+									node = {
+										'id': key,
+										'label': key,
+										'size': peerList.length,
+										'x': Math.random(),
+										'y': Math.random(),
+										'color': colors[Math.floor(Math.random() * colors.length)]
+									};
+									graphs[source].nodes.push (node);
+								}
+							}
+						}
 						
 						//Add the edges
-						
 						for (var edgeKey in peerList){
 							var peerInfo = peerList[edgeKey];
 							if (peerInfo.produced){
@@ -131,15 +183,22 @@ angular.module('mean.stats').controller('StatsController',['$scope','Stats','Glo
 									target: peerInfo.peerId,
 									type: 'curvedArrow'
 								};
-								graph.edges.push (edge);
+								graphs[peerInfo.source].edges.push (edge);
 							}
 						}
 					}
 				}
 				
-				$scope.sigmaGraph = graph;
+				uiHandler.safeApply($scope,function(){
+					$scope.graphvideo.nodes = graphs.video.nodes;
+					$scope.graphvideo.edges = graphs.video.edges;
+					$scope.graphscreen.nodes = graphs.screen.nodes;
+					$scope.graphscreen.edges = graphs.screen.edges;
+					$scope.graphaudio.nodes = graphs.audio.nodes;
+					$scope.graphaudio.edges = graphs.audio.edges;
 				
-				
+				});
+		
 				
 			});
 			
@@ -153,58 +212,7 @@ angular.module('mean.stats').controller('StatsController',['$scope','Stats','Glo
 		readWebRTCStats();
 
 		
-		/*$scope.sigmaGraph = {
-		  'nodes': [
-			{
-			  'id': 'n0',
-			  'label': 'A node',
-			  'x': 0,
-			  'y': 0,
-			  'size': 3
-			},
-			{
-			  'id': 'n1',
-			  'label': 'Another node',
-			  'x': 3,
-			  'y': 1,
-			  'size': 2
-			},
-			{
-			  'id': 'n2',
-			  'label': 'And a last one',
-			  'x': 1,
-			  'y': 3,
-			  'size': 1
-			}
-		  ],
-		  'edges': [
-			{
-			  'id': 'e0',
-			  'source': 'n0',
-			  'target': 'n1',
-			  'type': 'curvedArrow'
-			},
-			  {
-			  'id': 'e3',
-			  'source': 'n1',
-			  'target': 'n0',
-			  'type': 'curvedArrow'
-			},
-
-			  {
-			  'id': 'e1',
-			  'source': 'n1',
-			  'target': 'n2'
-			},
-			{
-			  'id': 'e2',
-			  'source': 'n2',
-			  'target': 'n0'
-			}
-		  ]
-	
-		};*/
-			uiHandler.safeApply($scope,function(){
+		uiHandler.safeApply($scope,function(){
 				stopLoading();
 			});
 	

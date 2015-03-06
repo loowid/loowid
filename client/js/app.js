@@ -4,6 +4,6 @@ window.app = angular.module('mean', ['ngCookies', 'ngResource', 'ngRoute', 'mean
 
 angular.module('mean.system', []);
 angular.module('mean.rooms', ['luegg.directives']);
-angular.module('mean.stats', ['chart.js','sigmajs-ng']);
+angular.module('mean.stats', ['chart.js','sigmajs-ng','underscore']);
 
 
