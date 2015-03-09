@@ -45,14 +45,14 @@
 </header>
 <div id="moveZone">
 <div id="editName" ng-class="ui.editNameClass">
-	<form novalidate data-ng-submit="changeName()">
+	<form name="editNameForm" novalidate data-ng-submit="changeName()">
 		<fieldset>
 			<p class="toolbar">
 				<a href="" ng-click="changeName()">{{resourceBundle.accesssave}}</a>
 				<a href="" ng-click="enableEditName()" class="warnedbtn">{{resourceBundle.gravatarclose}}</a>
 			</p>
 			<p><label for="chgname">{{resourceBundle.gravatarname}}</label></p>
-			<p><input id="chgname" type="text" data-ng-model="ui.name" ng-pattern="global.namePattern" required class="input-lg" size="15"></p>
+			<p><input id="chgname" type="text" data-ng-model="ui.tmpName" ng-pattern="global.namePattern" required class="input-lg" size="15"></p>
 			<p><label for="chgavatar">{{resourceBundle.gravataremail}}</label></p>
 			<p><input id="chgavatar" type="email" data-ng-model="ui.gravatar" class="input-lg" size="15"></p>
 			<p><input type="submit" style="position: absolute; left: -9999px; width: 1px; height: 1px;"/></p><!-- Needed to submit with enter key -->
