@@ -10,7 +10,7 @@ angular.module('mean.stats').controller('StatsController',['$scope','Stats','Glo
 	};
 
 	var sources = ['video','screen','audio'];
-	
+
 	$scope.selectedSource = 'video';
 
 	$scope.init = function(){
@@ -108,6 +108,10 @@ angular.module('mean.stats').controller('StatsController',['$scope','Stats','Glo
 			'edges': []
 		};
 
+		$scope.selectTab = function (tab){
+			$scope.selectedSource = tab;
+			readWebRTCStats(true);
+		};
 
 		var processData = function (list){
 			$scope.graphvideo = [];
@@ -120,12 +124,12 @@ angular.module('mean.stats').controller('StatsController',['$scope','Stats','Glo
 
 			for (var key in list.webrtcStats){
 
-				
+
 				if (list.webrtcStats.hasOwnProperty(key)){
-					
-					
+
+
 					var username , userstatus;
-					
+
 					if (list.roomInfo.owner.connectionId === key ){
 						username = list.roomInfo.owner.name;
 						userstatus = list.roomInfo.owner.status;
@@ -134,7 +138,7 @@ angular.module('mean.stats').controller('StatsController',['$scope','Stats','Glo
 						username = user ? user.name : key;
 						userstatus = user ? user.status : 'DISCONNECTED';
 					}
-					
+
 					var peerList = list.webrtcStats[key];
 
 					addNodes (key,username,userstatus,peerList);
@@ -166,24 +170,29 @@ angular.module('mean.stats').controller('StatsController',['$scope','Stats','Glo
 
 					//Look if the node is already in the list
 					var node = _.findWhere (graphs[source].nodes, {id: key});	
+					handleNode(node,key,username,userstatus,source);
 
-					if (node === undefined){
-						//If it's not in the list put it in
-						node = {
-							'id': key,
-							'label': username || key,
-							'size': 3,
-							'x': Math.random(),
-							'y': Math.random(),
-							'color': userstatus === 'CONNECTED' ? $scope.colors.userConnected : $scope.colors.userDisconnected
-						};
-						graphs[source].nodes.push (node);
-					}else{
-						//we change the name in case user changed
-						node.label = username || key;
-						node.color = userstatus === 'CONNECTED' ? $scope.colors.userConnected : $scope.colors.userDisconnected;
-					}
 				}
+			}
+		};
+
+		var handleNode = function (node,key,username,userstatus,source){
+
+			if (node === undefined){
+				//If it's not in the list put it in
+				node = {
+					'id': key,
+					'label': username || key,
+					'size': 3,
+					'x': Math.random(),
+					'y': Math.random(),
+					'color': userstatus === 'CONNECTED' ? $scope.colors.userConnected : $scope.colors.userDisconnected
+				};
+				graphs[source].nodes.push (node);
+			}else{
+				//we change the name in case user changed
+				node.label = username || key;
+				node.color = userstatus === 'CONNECTED' ? $scope.colors.userConnected : $scope.colors.userDisconnected;
 			}
 		};
 
@@ -204,17 +213,20 @@ angular.module('mean.stats').controller('StatsController',['$scope','Stats','Glo
 			}	
 		};
 
-		var readWebRTCStats = function (){
+		var readWebRTCStats = function (justonetime){
 
 			Stats.webrtcstats ($routeParams.roomId,function (list){
 				processData(list);
 			});
 
-			setTimeout (function (){
-				uiHandler.safeApply($scope,function(){
-					readWebRTCStats();
-				});
-			},5000);
+			if (justonetime === undefined || !justonetime){
+				setTimeout (function (){
+					uiHandler.safeApply($scope,function(){
+						readWebRTCStats();
+					});
+
+				},5000);
+			}
 		};
 
 		readWebRTCStats();

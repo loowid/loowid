@@ -207,5 +207,14 @@
    "gdocmessage" : "The document is missing or you have to log in to see it.",
    "addthistitle" : "Join this loowid room!!",
    "addthisptitle" : "Back to this room as owner.",
-   "typeform" : "Typeform web form"
+   "typeform" : "Typeform web form",
+   "webrtcstats": "WebRTC stats",
+   "screentab": "Screen",
+   "videotab": "Video",
+   "audiotab": "Audio",
+   "dataconnectionunavailable": "Connection data is not available",
+   "nodes": "Nodes (members):",
+   "edges": "Edges (ICE connection status):",
+   "connectedusers": "Connected user",
+   "disconnectedusers": "Disconnected user"
 }
