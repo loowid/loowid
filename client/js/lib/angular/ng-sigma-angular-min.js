@@ -17,28 +17,13 @@
 				// Let's first initialize sigma:
 				
 				
-var i,
-    s,
-    img,
-    N = 10,
-    E = 50,
-    g = {
-      nodes: [],
-      edges: []
-    },
-    urls = [
-      'img/img1.png',
-      'img/img2.png',
-      'img/img3.png',
-      'img/img4.png'
-    ],
-    colors = [
-      '#617db4',
-      '#668f3c',
-      '#c6583e',
-      '#b956af'
-    ];
-
+			var i,
+				s,
+				g = {
+				  nodes: [],
+				  edges: []
+				};
+  
 				s = new sigma({
 				  graph: g,
 				  renderer: {
@@ -46,13 +31,9 @@ var i,
 					type: 'canvas'
 				  },
 				  settings: {
-					minNodeSize: 1,
-					maxNodeSize: 10,
-					minEdgeSize: 0.1,
-					maxEdgeSize: 2,
 					minArrowSize: 8,
-					enableEdgeHovering: true,
-					edgeHoverSizeRatio: 2
+					mouseEnabled: false,
+					 defaultLabelColor: '#FFF'
 				  }
 				});
 	
@@ -67,13 +48,11 @@ var i,
 				});
 	
 				scope.$watch('width', function(newVal,oldVal) {
-					console.log("graph width: "+scope.width);
 					element.children().css("width",scope.width);
 					s.refresh();
 					window.dispatchEvent(new Event('resize')); //hack so that it will be shown instantly
 				});
 				scope.$watch('height', function(newVal,oldVal) {
-					console.log("graph height: "+scope.height);
 					element.children().css("height",scope.height);
 					s.refresh();
 					window.dispatchEvent(new Event('resize'));//hack so that it will be shown instantly

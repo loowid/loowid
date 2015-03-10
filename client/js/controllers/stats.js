@@ -10,6 +10,8 @@ angular.module('mean.stats').controller('StatsController',['$scope','Stats','Glo
 	};
 
 	var sources = ['video','screen','audio'];
+	
+	$scope.selectedSource = 'video';
 
 	$scope.init = function(){
 
@@ -73,14 +75,12 @@ angular.module('mean.stats').controller('StatsController',['$scope','Stats','Glo
 			'edges': []
 		};
 
-		var colors = [
-			'#617db4',
-			'#668f3c',
-			'#c6583e',
-			'#b956af'
-		];
+		$scope.colors = {
+			'userConnected' : '#617db4',
+			'userDisconnected' :'#080808'
+		};
 
-		var edgeColors = {
+		$scope.edgeColors = {
 			'new': 'rgba(234, 234, 23, 0.76)',
 			'checking': 'rgba(255, 165, 1, 0.94)',
 			'connecting': 'rgb(57, 100, 35)',
@@ -124,20 +124,20 @@ angular.module('mean.stats').controller('StatsController',['$scope','Stats','Glo
 				if (list.webrtcStats.hasOwnProperty(key)){
 					
 					
-					var username;
+					var username , userstatus;
 					
 					if (list.roomInfo.owner.connectionId === key ){
 						username = list.roomInfo.owner.name;
+						userstatus = list.roomInfo.owner.status;
 					}else{
 						var user = _.findWhere (list.roomInfo.guests, {connectionId: key});	
 						username = user ? user.name : key;
+						userstatus = user ? user.status : 'DISCONNECTED';
 					}
-				
-					
 					
 					var peerList = list.webrtcStats[key];
 
-					addNodes (key,username,peerList);
+					addNodes (key,username,userstatus,peerList);
 
 					//Add the edges
 					addEdges (key,peerList);
@@ -155,7 +155,7 @@ angular.module('mean.stats').controller('StatsController',['$scope','Stats','Glo
 			});
 		};
 
-		var addNodes = function (key,username,peerList){
+		var addNodes = function (key,username,userstatus,peerList){
 			for (var sourceId in sources){
 				var source = sources[sourceId];
 
@@ -172,19 +172,19 @@ angular.module('mean.stats').controller('StatsController',['$scope','Stats','Glo
 						node = {
 							'id': key,
 							'label': username || key,
-							'size': peerList.length,
+							'size': 3,
 							'x': Math.random(),
 							'y': Math.random(),
-							'color': colors[Math.floor(Math.random() * colors.length)]
+							'color': userstatus === 'CONNECTED' ? $scope.colors.userConnected : $scope.colors.userDisconnected
 						};
 						graphs[source].nodes.push (node);
 					}else{
 						//we change the name in case user changed
-						node.label = username || key;	
+						node.label = username || key;
+						node.color = userstatus === 'CONNECTED' ? $scope.colors.userConnected : $scope.colors.userDisconnected;
 					}
 				}
 			}
-
 		};
 
 		var addEdges = function (key,peerList){
@@ -193,7 +193,7 @@ angular.module('mean.stats').controller('StatsController',['$scope','Stats','Glo
 				if (peerInfo.produced){
 					var edge = {
 						id: 'ed_' +	key + '_' + peerInfo.peerId +'_' + peerInfo.source,
-						color: edgeColors[peerInfo.status],
+						color: $scope.edgeColors[peerInfo.status],
 						source: key,
 						label: peerInfo.status,
 						target: peerInfo.peerId,

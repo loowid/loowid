@@ -1,11 +1,35 @@
-<div id="home" data-ng-controller="StatsController" data-ng-init="initWebRTCStatistics()">
+<div id="webrtcstats" data-ng-controller="StatsController" data-ng-init="initWebRTCStatistics()">
 	<section id="starred">
-		<h1>{{resourceBundle.statistics}}</h1>
-		<h2>Screen connections</h2>
-		<p><sigmajs  graph="graphscreen" width="100%" height="200px" releative-size-node="false"></sigmajs></p>
-		<h2>Video connections</h2>
-		<p><sigmajs  graph="graphvideo" width="100%" height="200px" releative-size-node="false"> </sigmajs></p>
-		<h2>Audio connections</h2>
-		<p><sigmajs  graph="graphaudio" width="100%" height="200px" releative-size-node="false"> </sigmajs></p>
+
+		<h1>WebRTC stats</h1>
+		<hr/>
+		<nav class="toolbar">
+			<ul>
+
+				<li ng-hide="selectedSource=='screen'" ><p ng-click="selectedSource = 'screen'"><i class="fa fa-desktop"></i> <span class="title">Screen</span></p></li>
+				<li ng-show="selectedSource=='screen'" ><p class="selected"><i class="fa fa-desktop"></i> <span class="title">Screen</span></p></li>
+				<li ng-hide="selectedSource=='video'" ><p ng-click="selectedSource = 'video'"><i class="fa fa-video-camera"></i> <span class="title">Video</span></p></li>
+				<li ng-show="selectedSource=='video'" ><p class="selected"><i class="fa fa-video-camera"></i> <span class="title">Video</span></p></li>
+				<li ng-hide="selectedSource=='audio'" ><p ng-click="selectedSource = 'audio'"><i class="fa fa-microphone"></i> <span class="title">Audio</span></p></li>
+				<li ng-show="selectedSource=='audio'" ><p class="selected"><i class="fa fa-microphone"></i> <span class="title">Audio</span></p></li>
+			</ul>
+		</nav>
+
+
+
+		<div class="grapharea" ng-show="selectedSource==='screen'">
+			<p ng-show="graphscreen.nodes.length > 0"><sigmajs  graph="graphscreen" width="100%" height="400px" releative-size-node="false"></sigmajs></p>
+			<p class="message" ng-hide="graphscreen.nodes.length > 0"><span>Connection data is not available yet</span></p>
+		</div>
+		<div class="grapharea" ng-show="selectedSource==='video'">
+			<p ng-show="graphvideo.nodes.length > 0"><sigmajs  graph="graphvideo" width="100%" height="400px" releative-size-node="false"> </sigmajs></p>
+			<p class="message" ng-hide="graphvideo.nodes.length > 0"><span>Connection data is not available yet</span></p>
+		</div>
+		<div class="grapharea" ng-show="selectedSource==='audio'">
+			<p ng-show="graphaudio.nodes.length > 0"><sigmajs  graph="graphaudio" width="100%" height="400px" releative-size-node="false"> </sigmajs></p>
+			<p class="message" ng-hide="graphaudio.nodes.length > 0"><span>Connection data is not available yet</span></p>
+		</div>
+
+		
 	</section>
 </div>
