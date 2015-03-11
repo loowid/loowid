@@ -132,6 +132,7 @@ angular.module('mean.rooms').controller('ViewDesktopController', ['$scope', '$ro
             if (results.guests[i].connectionId === rtc._me) {
             	uiHandler.name = results.guests[i].name;
             	uiHandler.avatar = results.guests[i].avatar;
+            	uiHandler.hero = room.getHero(uiHandler.avatar);
             }
         }
         
@@ -253,6 +254,7 @@ angular.module('mean.rooms').controller('ViewDesktopController', ['$scope', '$ro
 		    uiHandler.avatar = joinUsr.avatar;
 		    uiHandler.gravatar = joinUsr.gravatar;
 		    uiHandler.access = joinUsr.access;
+		    uiHandler.hero = joinUsr.hero;
 		
 		    
 		    $scope.global.name = uiHandler.name;

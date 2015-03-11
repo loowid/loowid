@@ -51,6 +51,10 @@
 				<a href="" ng-click="changeName()">{{resourceBundle.accesssave}}</a>
 				<a href="" ng-click="enableEditName()" class="warnedbtn">{{resourceBundle.gravatarclose}}</a>
 			</p>
+			<p class="hero">
+				<a href="" ng-click="ui.tmpHero='hero'" ng-show="ui.tmpHero==='heroine'"><i class="fa fa-venus"></i></a>
+				<a href="" ng-click="ui.tmpHero='heroine'" ng-show="ui.tmpHero==='hero'"><i class="fa fa-mars"></i></a>
+			</p>
 			<p><label for="chgname">{{resourceBundle.gravatarname}}</label></p>
 			<p><input id="chgname" type="text" data-ng-model="ui.tmpName" ng-pattern="global.namePattern" required class="input-lg" size="15"></p>
 			<p><label for="chgavatar">{{resourceBundle.gravataremail}}</label></p>

@@ -1,6 +1,7 @@
 'use strict';
 /*jslint bitwise: true */
 /*exported getGravatarImg */
+/*exported getHeroImg */
 var gravatarMd5 = function(str) {
   // http://kevin.vanzonneveld.net
   // +   original by: Webtoolkit.info (http://www.webtoolkit.info/)
@@ -213,8 +214,14 @@ var gravatarMd5 = function(str) {
   return temp.toLowerCase();
 };
 
-var getGravatarImg = function(email) {
+var getHeroImg = function(name) {
+	if (/.*(Boy|Man)/g.test(name)) { return 'hero'; }
+	if (/.*(Girl|Woman)/g.test(name)) { return 'heroine'; }
+	return (Math.random()*10 > 4)?'hero':'heroine';
+};
+
+var getGravatarImg = function(email,hero) {
   var email2 = email || '';
-  return (email2.trim()==='')?'img/hero.jpg':'//www.gravatar.com/avatar/'+gravatarMd5(email2.trim().toLowerCase());
+  return (email2.trim()==='')?'img/'+hero+'.jpg':'//www.gravatar.com/avatar/'+gravatarMd5(email2.trim().toLowerCase());
 };
 

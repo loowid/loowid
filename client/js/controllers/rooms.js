@@ -28,7 +28,7 @@ angular.module('mean.rooms').controller('RoomsController', ['$scope', '$routePar
 			   $location.path('r/' + $scope.global.roomId + '/join');   
 		  }else {
 			   uiHandler.creating=true;
-			   room.create(uiHandler.name,function(id,gav,av,acc,dueDate){
+			   room.create(uiHandler.name,uiHandler.hero,function(id,gav,av,acc,dueDate){
 				   $scope.global.roomId = id;
 				   $scope.global.name = uiHandler.name;
 				   $scope.global.avatar = av;
@@ -68,11 +68,15 @@ angular.module('mean.rooms').controller('RoomsController', ['$scope', '$routePar
 
    };
 
-   uiHandler.name = room.rememberUser();
+   var u = room.rememberUser();
+   uiHandler.name = u.name;
+   uiHandler.hero = u.hero;
 
    $scope.resetName = function() {
 	   room.resetName();
-	   uiHandler.name = room.rememberUser();
+	   var u = room.rememberUser();
+	   uiHandler.name = u.name;
+	   uiHandler.hero = u.hero;
    };
    
    $scope.join = function() {

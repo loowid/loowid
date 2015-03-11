@@ -83,6 +83,10 @@
 	<form name="editNameForm" data-ng-submit="changeName()" novalidate>
 		<fieldset>
 			<p class="toolbar"><a href="" ng-click="changeName()">{{resourceBundle.accesssave}}</a> <a href="" ng-click="enableEditName()" class="warnedbtn">{{resourceBundle.gravatarclose}}</a></p>
+			<p class="hero">
+				<a href="" ng-click="ui.tmpHero='hero'" ng-show="ui.tmpHero==='heroine'"><i class="fa fa-venus"></i></a>
+				<a href="" ng-click="ui.tmpHero='heroine'" ng-show="ui.tmpHero==='hero'"><i class="fa fa-mars"></i></a>
+			</p>
 			<p><label for="chgname">{{resourceBundle.gravatarname}}</label></p>
 			<p><input id="chgname" type="text" data-ng-model="ui.tmpName" ng-pattern="global.namePattern" required class="input-lg" size="15"></p>
 			<p><label for="chgavatar">{{resourceBundle.gravataremail}}</label></p>
@@ -141,12 +145,13 @@
 <aside id="connected" ng-class="ui.connectedClass">
 	<span title="{{resourceBundle.titleOpencloseconnections}}" class="toggler" ng-click="toggleConnected()"><i class="fa fa-angle-double-left"></i></span>
 	<h1>{{resourceBundle.peopleconnected}}</h1>
-	<div class="owner connected">
+	<div class="owner connected myself">
+		<p class="user_title room_owner">{{resourceBundle.roomowner}}</p>
 		<img class="editable" ng-src="{{ui.avatar}}" ng-click="enableEditName()" title="{{resourceBundle.changemyidentity}}">
 		<div>
 			<h3>{{ui.name}}</h3>
 		</div>
-		<p class="user_title">{{resourceBundle.roomowner}}</p>
+		<p class="user_title">{{resourceBundle.roomme}}</p>
 	</div>
 	<h2>{{resourceBundle.roomviewers}}</h2>
 	<ul class="sharers connected">
