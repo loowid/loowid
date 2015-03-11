@@ -16,7 +16,7 @@ angular.module('ngWindowManager',[])
 							'<div class="wmTitle">{{title}}</div>'+
 							'<div class="wmButtonBar">' +
 								'<button class="wmMinimize" ng-show="isMinimizable()">' + 
-								'<button class="wmMaximize" ng-show="isMaximizable()">' + 
+								'<button title="{{maximizeTitle}}" class="wmMaximize" ng-show="isMaximizable()">' + 
 								'<button style="display:none" class="wmRestore"/>'+
 								'<button class="wmClose" ng-show="isCloseable()" />'+
 							'</div>'+
@@ -40,6 +40,7 @@ angular.module('ngWindowManager',[])
 			maximizable: '@',
 			minimizable: '@',
 			closeable: '@',
+			maximizeTitle: '@'
 		},
 		link: function (scope, element) {
 			

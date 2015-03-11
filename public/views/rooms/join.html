@@ -3,28 +3,28 @@
 	<div class="main-header">
 		<span class="loowidLogo">LooWID</span>
 		<span>{{global.access.title}}</span>
-		<a class="loowidurl expanded" href="{{ui.screenurl}}" target="_blank">{{ui.screenurl}}</a>
-		<a class="loowidurl short" href="{{ui.screenurl}}" target="_blank">https://...{{lastCharsUrl(ui.screenurl)}}</a>
-		<a href="" class="btn btn-icon" ng-click="enableEditAccess()"><i class="fa fa-gear"></i><span class="inner_label">{{resourceBundle.configureroom}}</span></a>
-		<a ng-hide="ui.notificationReady || !ui.audible" ng-click="enableAudio()" class="btn btn-icon" href=""><i class="fa fa-bell"></i><span class="inner_label">{{resourceBundle.notifaudible}}</span></a>
-		<a ng-hide="ui.notificationReady || ui.audible" ng-click="enableAudio()" class="btn btn-icon" href=""><i class="fa fa-bell-o"></i><span class="inner_label">{{resourceBundle.notifnotaudible}}</span></a>
-		<a ng-click="roomLeave()" href=""><span class="leave">{{resourceBundle.leaveroom}} <i class="fa fa-power-off"></i></span></a>
+		<a title="{{resourceBundle.titleShareurl}}" class="loowidurl expanded" href="{{ui.screenurl}}" target="_blank">{{ui.screenurl}}</a>
+		<a title="{{resourceBundle.titleShareurl}}" class="loowidurl short" href="{{ui.screenurl}}" target="_blank">https://...{{lastCharsUrl(ui.screenurl)}}</a>
+		<a href="" title="{{resourceBundle.titleConfigureroom}}" class="btn btn-icon" ng-click="enableEditAccess()"><i class="fa fa-gear"></i><span class="inner_label">{{resourceBundle.configureroom}}</span></a>
+		<a title="{{resourceBundle.titleDisableeaudionoti}}" ng-hide="ui.notificationReady || !ui.audible" ng-click="enableAudio()" class="btn btn-icon" href=""><i class="fa fa-bell"></i><span class="inner_label">{{resourceBundle.notifaudible}}</span></a>
+		<a title="{{resourceBundle.titleActivateaudionoti}}" ng-hide="ui.notificationReady || ui.audible" ng-click="enableAudio()" class="btn btn-icon" href=""><i class="fa fa-bell-o"></i><span class="inner_label">{{resourceBundle.notifnotaudible}}</span></a>
+		<a title="{{resourceBundle.titleLeaveroom}}" ng-click="roomLeave()" href=""><span class="leave">{{resourceBundle.leaveroom}} <i class="fa fa-power-off"></i></span></a>
 </div>
 	<nav class="toolbar">
 		<ul>
 
 			<li id="share_screen" ng-hide="ui.canShareDesktop">
-				<p ng-click="showDesktopAlertMessage()"><i class="fa fa-desktop"></i> <span class="title">{{resourceBundle.sharedesktopmainbar}}</span></p>
+				<p title="{{resourceBundle.titleSharedesktop}}" ng-click="showDesktopAlertMessage()"><i class="fa fa-desktop"></i> <span class="title">{{resourceBundle.sharedesktopmainbar}}</span></p>
 			</li>
 			<li id="share_screen" ng-show="ui.canShareDesktop">
-				<p ng-hide="isRecording('screen') || isInitializingMedia('screen')" ng-click="startRecording('screen')"><i class="fa fa-desktop"></i> <span class="title">{{resourceBundle.sharedesktopmainbar}}</span></p>
+				<p title="{{resourceBundle.titleSharedesktop}}" title="{{resourceBundle.titleSharedesktop}}"ng-hide="isRecording('screen') || isInitializingMedia('screen')" ng-click="startRecording('screen')"><i class="fa fa-desktop"></i> <span class="title">{{resourceBundle.sharedesktopmainbar}}</span></p>
 				<p ng-show="isInitializingMedia('screen')"><i class="fa fa-desktop"></i> <span class="title">{{resourceBundle.initcapture}}</span></p>
 				
 				
-				<p ng-show="isRecording('screen')" ng-click="stopRecording('screen')"><i class="tachado activo">/</i><i class="fa fa-desktop activo"></i><span class="title">{{resourceBundle.stopsharedesktopmainbar}}</span></p>
+				<p title="{{resourceBundle.titleStopsharedesktop}}" ng-show="isRecording('screen')" ng-click="stopRecording('screen')"><i class="tachado activo">/</i><i class="fa fa-desktop activo"></i><span class="title">{{resourceBundle.stopsharedesktopmainbar}}</span></p>
 			</li>
 			<li id="dropdown" ng-show="ui.canShareDesktop" ng-click="ui.showResolutionMenu=!ui.showResolutionMenu"	>
-				<p ng-hide="isRecording('screen') || isInitializingMedia('screen')" class="down" ><i class="fa fa-sort-down"></i> <span class="title"></span></p>
+				<p title="{{resourceBundle.titleChangeresolution}}" ng-hide="isRecording('screen') || isInitializingMedia('screen')" class="down" ><i class="fa fa-sort-down"></i> <span class="title"></span></p>
 				<ul ng-show="!isRecording('screen') && ui.showResolutionMenu" class="resolutionlist">
 					<li  data-ng-repeat="resolution in ui.resolutions" >
 						<p ng-click="changeToResolution($index)"><span>{{resolution.x}}</span> x <span> {{resolution.y}}</span><i ng-show="ui.currentResolution==$index" class ="fa fa-circle"></i></p>
@@ -32,19 +32,19 @@
 				</ul>
 			</li>
 			<li id="share_webcam">
-				<p ng-hide="isRecording('video') || isInitializingMedia('video') " ng-click="startRecording('video')"><i class="fa fa-video-camera"></i> <span class="title">{{resourceBundle.sharewebcammainbar}}</span></p>
+				<p  title="{{resourceBundle.titleSharevideo}}" ng-hide="isRecording('video') || isInitializingMedia('video') " ng-click="startRecording('video')"><i class="fa fa-video-camera"></i> <span class="title">{{resourceBundle.sharewebcammainbar}}</span></p>
 				<p ng-show="isInitializingMedia('video')"><i class="fa fa-video-camera"></i> <span class="title">{{resourceBundle.initcapture}}</span></p>
-				<p ng-show="isRecording('video')" ng-click="stopRecording('video')"><i class="tachado activo">/</i><i class="fa fa-video-camera activo"></i> <span class="title">{{resourceBundle.stopsharewebcammainbar}}</span></p>
+				<p title="{{resourceBundle.titleStopsharevideo}}"  ng-show="isRecording('video')" ng-click="stopRecording('video')"><i class="tachado activo">/</i><i class="fa fa-video-camera activo"></i> <span class="title">{{resourceBundle.stopsharewebcammainbar}}</span></p>
 			</li>
 			<li id="share_audio">
-				<p ng-hide="isRecording('audio')  || isInitializingMedia('audio')" ng-click="startRecording('audio')"><i class="fa fa-microphone"></i> <span class="title">{{resourceBundle.shareaudiobar}}</span></p>
+				<p title="{{resourceBundle.titleShareaudio}}"ng-hide="isRecording('audio')  || isInitializingMedia('audio')" ng-click="startRecording('audio')"><i class="fa fa-microphone"></i> <span class="title">{{resourceBundle.shareaudiobar}}</span></p>
 				<p ng-show="isInitializingMedia('audio')"><i class="fa fa-micophone"></i> <span class="title">{{resourceBundle.initcapture}}</span></p>
-				<p ng-show="isRecording('audio')" ng-click="stopRecording('audio')"><i class="tachado activo">/</i><i class="fa fa-microphone activo"></i> <span class="title">{{resourceBundle.stopshareaudiobar}}</span></p>
+				<p title="{{resourceBundle.titleStopshareaudio}}"  ng-show="isRecording('audio')" ng-click="stopRecording('audio')"><i class="tachado activo">/</i><i class="fa fa-microphone activo"></i> <span class="title">{{resourceBundle.stopshareaudiobar}}</span></p>
 			</li>
 
 			<li id="mute_audio" ng-show="isRecording('audio')">
-				<p ng-click="muteAudio()" ng-hide="ui.isMuted"><i class="fa fa-times"></i> <span class="title">{{resourceBundle.mutemainbar}}</span></p>
-				<p ng-click="unmuteAudio()" ng-show="ui.isMuted"><i class="fa fa-volume-up"></i> <span class="title">{{resourceBundle.unmutemainbar}}</span></p>
+				<p title="{{resourceBundle.titleMute}}"  ng-click="muteAudio()" ng-hide="ui.isMuted"><i class="fa fa-times"></i> <span class="title">{{resourceBundle.mutemainbar}}</span></p>
+				<p title="{{resourceBundle.titleUnmute}}"  ng-click="unmuteAudio()" ng-show="ui.isMuted"><i class="fa fa-volume-up"></i> <span class="title">{{resourceBundle.unmutemainbar}}</span></p>
 			</li>
 		</ul>
 	</nav>
@@ -139,7 +139,7 @@
 	</div>
 </div>
 <aside id="connected" ng-class="ui.connectedClass">
-	<span class="toggler" ng-click="toggleConnected()"><i class="fa fa-angle-double-left"></i></span>
+	<span title="{{resourceBundle.titleOpencloseconnections}}" class="toggler" ng-click="toggleConnected()"><i class="fa fa-angle-double-left"></i></span>
 	<h1>{{resourceBundle.peopleconnected}}</h1>
 	<div class="owner connected">
 		<img class="editable" ng-src="{{ui.avatar}}" ng-click="enableEditName()" title="{{resourceBundle.changemyidentity}}">
@@ -156,21 +156,21 @@
 			<p class="user_title">{{resourceBundle.roomviewer}}</p>
 			<p class="toolbar" ng-show="global.access.moderated">
 				
-				<a href="" ng-hide="ui.userStatus[user.connectionId]['screen']" ng-click="askForSharing(user.connectionId,'screen')"><i class="fa fa-desktop"></i></a>
-				<a href="" ng-show="ui.userStatus[user.connectionId]['screen']" ng-click="askForStopSharing(user.connectionId,'screen')"><i class="fa fa-times"></i></a>
+				<a title="{{resourceBundle._('titleAskforscreen',user.name)}}" href="" ng-hide="ui.userStatus[user.connectionId]['screen']" ng-click="askForSharing(user.connectionId,'screen')"><i class="fa fa-desktop"></i></a>
+				<a title="{{resourceBundle._('titleAskforstopscreen',user.name)}}" href="" ng-show="ui.userStatus[user.connectionId]['screen']" ng-click="askForStopSharing(user.connectionId,'screen')"><i class="fa fa-times"></i></a>
 				
-				<a href="" ng-hide="ui.userStatus[user.connectionId]['video']"ng-click="askForSharing(user.connectionId,'video')"><i class="fa fa-video-camera"></i></a>
-				<a href="" ng-show="ui.userStatus[user.connectionId]['video']"ng-click="askForStopSharing(user.connectionId,'video')"><i class="fa fa-times"></i></a>
+				<a title="{{resourceBundle._('titleAskforvideo',user.name)}}" href="" ng-hide="ui.userStatus[user.connectionId]['video']"ng-click="askForSharing(user.connectionId,'video')"><i class="fa fa-video-camera"></i></a>
+				<a title="{{resourceBundle._('titleAskforstopvideo',user.name)}}" href="" ng-show="ui.userStatus[user.connectionId]['video']"ng-click="askForStopSharing(user.connectionId,'video')"><i class="fa fa-times"></i></a>
 
-				<a href=""  ng-hide="ui.userStatus[user.connectionId]['audio'] "   ng-click="askForSharing(user.connectionId,'audio')"><i class="fa fa-microphone"></i></a>
-				<a href=""  ng-show="ui.userStatus[user.connectionId]['audio']"   ng-click="askForStopSharing(user.connectionId,'audio')"><i class="fa fa-times"></i></a>
+				<a title="{{resourceBundle._('titleAskforaudio',user.name)}}" href=""  ng-hide="ui.userStatus[user.connectionId]['audio'] "   ng-click="askForSharing(user.connectionId,'audio')"><i class="fa fa-microphone"></i></a>
+				<a title="{{resourceBundle._('titleAskforstopaudio',user.name)}}" href=""  ng-show="ui.userStatus[user.connectionId]['audio']"   ng-click="askForStopSharing(user.connectionId,'audio')"><i class="fa fa-times"></i></a>
 				
-				<a href="" ng-click="openFileDialog($index);"><i class="fa fa-cloud-upload"></i></a>
-				<a href="" ng-click="fireUser($index)"><i class="fa fa-sign-out"> </i></a>
+				<a title="{{resourceBundle._('titleSendfiles',user.name)}}" href="" ng-click="openFileDialog($index);"><i class="fa fa-cloud-upload"></i></a>
+				<a title="{{resourceBundle._('titleFireuser',user.name)}}" href="" ng-click="fireUser($index)"><i class="fa fa-sign-out"> </i></a>
 			</p>
 			<p class="toolbar" ng-hide="global.access.moderated">
-				<a  href="" ng-click="openFileDialog($index);"><i class="fa fa-cloud-upload"></i></a>
-				<a  href="" ng-click="fireUser($index)" class="warnedbtn"><i class="fa fa-sign-out"> </i></a>
+				<a title="{{resourceBundle._('titleSendfiles',user.name)}}" href="" ng-click="openFileDialog($index);"><i class="fa fa-cloud-upload"></i></a>
+				<a title="{{resourceBundle._('titleFireuser',user.name)}}" href="" ng-click="fireUser($index)" class="warnedbtn"><i class="fa fa-sign-out"> </i></a>
 			</p>
 			<input ng-show="false" type="file" id="userfiles_{{$index}}" name="{{$index}}files[]" multiple />
 			
@@ -190,9 +190,9 @@
 					<span ng-show="file.completed==101 && !file.canceled"><!--Rebuilding...--></span>
 					
 					<div class="file_actions">
-						<a href="" ng-show="file.completed < 100 && !file.canceled"ng-click="cancelFile(user.connectionId,file)"><i ng-show="file.completed < 100" class="fa fa-eject"  ></i></a> 
+						<a title="{{resourceBundle._('titleCancelfile',file.name)}}" href="" ng-show="file.completed < 100 && !file.canceled"ng-click="cancelFile(user.connectionId,file)"><i ng-show="file.completed < 100" class="fa fa-eject"  ></i></a> 
 
-						<a ng-show="file.completed >= 100 || file.canceled==true" href="" ng-click="file.cleared=true"><i class="fa fa-trash-o"></i></a>
+						<a title="{{resourceBundle._('titleClearfile',file.name)}}" ng-show="file.completed >= 100 || file.canceled==true" href="" ng-click="file.cleared=true"><i class="fa fa-trash-o"></i></a>
 					</div>
 				</li>
 			</ul>	
@@ -209,7 +209,7 @@
 		<div id="remoteAudios" ></div>
 		
 		<div id="remoteVideos" >
-			<wmwindow title="{{window.title}}" open="window.open" close="window.close" maximize="window.maximize" restore="window.restore" selectwindow="window.selectwindow" closeable="{{window.closeable}}" options="{{window.options}}" data-ng-repeat="window in windows" >
+			<wmwindow title="{{window.title}}" open="window.open" close="window.close" maximize="window.maximize" maximizeTitle="window.maximizeTitle" restore="window.restore" selectwindow="window.selectwindow" closeable="{{window.closeable}}" options="{{window.options}}" data-ng-repeat="window in windows" >
 				<video></video>
 			</wmwindow>
 		</div>
@@ -238,7 +238,7 @@
 </section>
 <div id="error" ng-class="errorClass" ng-click="hideError()"><div class="error"><h3 ng-bind-html="errorMessage"></h3></div></div>
 <aside id="chat" ng-class="ui.chatClass">
-	<span class="toggler" ng-click="toggleChat()"><i class="fa fa-angle-double-right"></i></span>
+	<span title="{{resourceBundle.titleOpenclosechat}}" class="toggler" ng-click="toggleChat()"><i class="fa fa-angle-double-right"></i></span>
 	<form data-ng-submit="sendMessage()">
 	<fieldset id="chat_form">
 		<input type="text" data-ng-model="ui.messageText" id="text_chat" placeholder="{{resourceBundle.sendamessage}}" data-ng-change="sendTyping()" autofocus>

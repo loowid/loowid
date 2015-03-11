@@ -92,6 +92,7 @@ angular.module('mean.rooms').factory('WindowHandler',[function(){
 					videos[i].play();	
 				}
 			};
+			var maxTitle = $scope.resourceBundle._('titleMaximizeWindow',winTitle);
 			
 			var window = {
 				options: options,
@@ -102,6 +103,7 @@ angular.module('mean.rooms').factory('WindowHandler',[function(){
 				selectwindow: selWindow,
 				open: open,
 				maximize: maximize,
+				maximizeTitle: maxTitle,
 				restore: restore
 			};
 			
