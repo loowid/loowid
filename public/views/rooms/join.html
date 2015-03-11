@@ -145,12 +145,13 @@
 <aside id="connected" ng-class="ui.connectedClass">
 	<span class="toggler" ng-click="toggleConnected()"><i class="fa fa-angle-double-left"></i></span>
 	<h1>{{resourceBundle.peopleconnected}}</h1>
-	<div class="owner connected">
+	<div class="owner connected myself">
+		<p class="user_title room_owner">{{resourceBundle.roomowner}}</p>
 		<img class="editable" ng-src="{{ui.avatar}}" ng-click="enableEditName()" title="{{resourceBundle.changemyidentity}}">
 		<div>
 			<h3>{{ui.name}}</h3>
 		</div>
-		<p class="user_title">{{resourceBundle.roomowner}}</p>
+		<p class="user_title">{{resourceBundle.roomme}}</p>
 	</div>
 	<h2>{{resourceBundle.roomviewers}}</h2>
 	<ul class="sharers connected">
