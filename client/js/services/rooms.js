@@ -28,10 +28,18 @@ angular.module('mean.rooms').factory('Rooms', ['$resource','$http','$window','No
 		
     	this.rememberUser = function() {
     		var userName = (typeof(Storage)!=='undefined')?localStorage.loowidUserName:null;
+    		var userHero = (typeof(Storage)!=='undefined')?localStorage.loowidUserHero:null;
     		if (!userName) {
     			userName = $window.getSuperHero();
+    			userHero = $window.getHeroImg(userName);
     		}
-           	return userName;
+           	return {name:userName,hero:userHero};
+    	};
+    	
+    	this.getHero = function(image) {
+    		var r = /img\/(hero|heroine)\.jpg/g;
+    		var g = r.exec(image);
+    		return g?g[1]:null;
     	};
     	
     	this.makeId = function(){
@@ -55,12 +63,12 @@ angular.module('mean.rooms').factory('Rooms', ['$resource','$http','$window','No
      	   if (typeof(Storage)!=='undefined') { localStorage.loowidGravatarEmail = gravatar; }
      	};
     	
-    	this.saveName = function(name) {
-    	   if (typeof(Storage)!=='undefined') { localStorage.loowidUserName = name; }
+    	this.saveName = function(name,hero) {
+    	   if (typeof(Storage)!=='undefined') { localStorage.loowidUserName = name; localStorage.loowidUserHero = hero; }
     	};
     	
     	this.resetName = function() {
-    		if (typeof(Storage)!=='undefined') { localStorage.loowidUserName = ''; }
+    		if (typeof(Storage)!=='undefined') { localStorage.loowidUserName = ''; localStorage.loowidUserHero = ''; }
     	};
 
         this.getInitWebSocketUrl = function () {
@@ -71,10 +79,10 @@ angular.module('mean.rooms').factory('Rooms', ['$resource','$http','$window','No
         	return 'ws'+(location.protocol.indexOf('s:')>0?'s':'')+'://'+window.wsocket.host+window.wsocket.port+(window.usrid?'/'+window.usrid:'');
         };
 		
-		this.create = function (name,success,ownerToken){
+		this.create = function (name,hero,success,ownerToken){
             var gravatar = this.getGravatar();
             var self = this;
-			this.saveName(name);
+			this.saveName(name,hero);
 			
 			//Go to the ws host and ask for a rest service in order to set the cookie
 			var connectFunction = function (){
@@ -83,8 +91,8 @@ angular.module('mean.rooms').factory('Rooms', ['$resource','$http','$window','No
 					var newId = obj.id;
 					
 					rtc.on('connections',function(){
-						room.create ({roomId: newId, name: name,connectionId: rtc._me, avatar: $window.getGravatarImg(gravatar)},function(newRoom){
-							success(newRoom.roomId,gravatar,$window.getGravatarImg(gravatar),newRoom.access,newRoom.dueDate);
+						room.create ({roomId: newId, name: name,connectionId: rtc._me, avatar: $window.getGravatarImg(gravatar,hero)},function(newRoom){
+							success(newRoom.roomId,gravatar,$window.getGravatarImg(gravatar,hero),newRoom.access,newRoom.dueDate);
 						}); 
 					});
 					rtc.connect(self.getWebSocketUrl(), newId);
@@ -119,17 +127,19 @@ angular.module('mean.rooms').factory('Rooms', ['$resource','$http','$window','No
         };
         
 		this.join = function (roomId,success){
-			var userName = this.rememberUser();
+			var u = this.rememberUser();
+			var userName = u.name;
+			var hero = u.hero;
 			var gravatar = this.getGravatar();
             //Connections event is fired just when you perform all the connection process
 			if (!rtc._me) {
 	            rtc.on('connections',function(conns){
-	           		room.join ({id: roomId, name: userName, connectionId: rtc._me, avatar: $window.getGravatarImg(gravatar)},success);
+	           		room.join ({id: roomId, name: userName, connectionId: rtc._me, avatar: $window.getGravatarImg(gravatar,hero)},success);
 	            });
 			} else {
-				room.join ({id: roomId, name: userName, connectionId: rtc._me, avatar: $window.getGravatarImg(gravatar)},success);
+				room.join ({id: roomId, name: userName, connectionId: rtc._me, avatar: $window.getGravatarImg(gravatar,hero)},success);
 			}
-			return {name:userName,avatar:$window.getGravatarImg(gravatar),gravatar:gravatar};
+			return {name:userName,avatar:$window.getGravatarImg(gravatar,hero),gravatar:gravatar,hero:hero};
 		};
 
 		this.joinPass = function(roomId,passwdVal,reload) {
@@ -171,10 +181,10 @@ angular.module('mean.rooms').factory('Rooms', ['$resource','$http','$window','No
             }
         };
 
-        this.editOwnerName = function (roomId, name, gravatar, success) {
-        	this.saveName(name);
+        this.editOwnerName = function (roomId, name, gravatar, hero, success) {
+        	this.saveName(name,hero);
         	this.saveGravatar(gravatar);
-        	room.editOwnerName({id:roomId, name:name, avatar: $window.getGravatarImg(gravatar)},success);
+        	room.editOwnerName({id:roomId, name:name, avatar: $window.getGravatarImg(gravatar,hero)},success);
         };
 
         this.editShared = function (roomId, acc, success) {
@@ -185,10 +195,10 @@ angular.module('mean.rooms').factory('Rooms', ['$resource','$http','$window','No
             room.changeRoomStatus({id:roomId, status:status},success);   
         };
 
-        this.editGuestName = function (roomId, name, gravatar, success) {
-        	this.saveName(name);
+        this.editGuestName = function (roomId, name, gravatar, hero, success) {
+        	this.saveName(name,hero);
         	this.saveGravatar(gravatar);
-        	room.editGuestName({id:roomId, cid: rtc._me, name:name, avatar: $window.getGravatarImg(gravatar)},success);
+        	room.editGuestName({id:roomId, cid: rtc._me, name:name, avatar: $window.getGravatarImg(gravatar,hero)},success);
         };
 
         this.getConnectionId = function() {

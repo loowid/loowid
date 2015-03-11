@@ -219,6 +219,7 @@ angular.module('mean.rooms').controller('RecordController', ['$scope', '$routePa
 						 	uiHandler.users = results.guests;
 						 	uiHandler.name = results.owner.name;
 						 	uiHandler.avatar = results.owner.avatar;
+						 	uiHandler.hero = room.getHero(uiHandler.avatar);
 						 	uiHandler.gravatar = results.owner.gravatar;
 						 	uiHandler.status = results.status;
 						 	uiHandler.access = results.access;
@@ -243,6 +244,7 @@ angular.module('mean.rooms').controller('RecordController', ['$scope', '$routePa
                         uiHandler.name = joinUsr.name;
                         uiHandler.avatar = joinUsr.avatar;
                         uiHandler.gravatar = joinUsr.gravatar;
+                        uiHandler.hero = joinUsr.hero;
 			            $scope.global.name = uiHandler.name;
 			            $scope.global.gravatar = uiHandler.gravatar;
 

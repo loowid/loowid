@@ -23,23 +23,25 @@ angular.module('mean.rooms').factory('UserHandler',['Rooms','UIHandler','Notific
 			$scope.changeName = function() {
 		        if (!$scope.editNameForm.$valid) { 
 		        	uiHandler.tmpName = $scope.global.name;
+		        	uiHandler.tmpHero = uiHandler.hero;
 		        	uiHandler.gravatar = $scope.global.gravatar;
 		        	return; 
 		        }
 		        uiHandler.name = uiHandler.tmpName;
+		        uiHandler.hero = uiHandler.tmpHero;
 		        if (uiHandler.isowner){
-					room.editOwnerName($scope.global.roomId, uiHandler.name, uiHandler.gravatar, function(rdo){
+					room.editOwnerName($scope.global.roomId, uiHandler.name, uiHandler.gravatar, uiHandler.hero, function(rdo){
 			            $scope.global.name = uiHandler.name;
 			            $scope.global.gravatar = uiHandler.gravatar;
 			            $scope.enableEditName();
 			            uiHandler.avatar = rdo.owner.avatar;
 			            $scope.global.avatar = uiHandler.avatar;
-			            
+			            uiHandler.hero = room.getHero(uiHandler.avatar);
 			            rtc.peerListUpdated(uiHandler.roomId);
 			            rtc.updateOwnerData (uiHandler.roomId,uiHandler.name,uiHandler.avatar,uiHandler.status,uiHandler.access);
 		        	});
 		        }else{
-		        	room.editGuestName($scope.global.roomId, uiHandler.name, uiHandler.gravatar, function(rdo){
+		        	room.editGuestName($scope.global.roomId, uiHandler.name, uiHandler.gravatar, uiHandler.hero, function(rdo){
             			$scope.global.name = uiHandler.name;
             			$scope.global.gravatar = uiHandler.gravatar;
             			$scope.enableEditName();
@@ -47,6 +49,7 @@ angular.module('mean.rooms').factory('UserHandler',['Rooms','UIHandler','Notific
 			            for (var i=0; i<rdo.guests.length; i+=1) {
 			                if (rdo.guests[i].connectionId === cid) {
 			                	uiHandler.avatar = rdo.guests[i].avatar;
+			                	uiHandler.hero = room.getHero(uiHandler.avatar);
 			                }
 			            }
 			            rtc.peerListUpdated($scope.global.roomId);
@@ -57,6 +60,7 @@ angular.module('mean.rooms').factory('UserHandler',['Rooms','UIHandler','Notific
 		    $scope.enableEditName = function() {
   				if (!uiHandler.isowner && uiHandler.passNeeded) { return; }
 		        uiHandler.tmpName = uiHandler.name;
+		        uiHandler.tmpHero = uiHandler.hero;
 		        uiHandler.gravatar = $scope.global.gravatar;
 		        uiHandler.editName = !uiHandler.editName;
 		        if (uiHandler.editName) {
