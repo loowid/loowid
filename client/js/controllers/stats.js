@@ -161,17 +161,19 @@ angular.module('mean.stats').controller('StatsController',['$scope','Stats','Glo
 
 		var addNodes = function (key,username,userstatus,peerList){
 			for (var sourceId in sources){
-				var source = sources[sourceId];
+				if (sources.hasOwnProperty (sourceId)){
+					var source = sources[sourceId];
 
-				//Look if there are connections to other nodes of this source type
-				var sourceEdges = _.findWhere (peerList,{'source': source});
+					//Look if there are connections to other nodes of this source type
+					var sourceEdges = _.findWhere (peerList,{'source': source});
 
-				if (sourceEdges){
+					if (sourceEdges){
 
-					//Look if the node is already in the list
-					var node = _.findWhere (graphs[source].nodes, {id: key});	
-					handleNode(node,key,username,userstatus,source);
+						//Look if the node is already in the list
+						var node = _.findWhere (graphs[source].nodes, {id: key});	
+						handleNode(node,key,username,userstatus,source);
 
+					}
 				}
 			}
 		};
@@ -198,17 +200,19 @@ angular.module('mean.stats').controller('StatsController',['$scope','Stats','Glo
 
 		var addEdges = function (key,peerList){
 			for (var edgeKey in peerList){
-				var peerInfo = peerList[edgeKey];
-				if (peerInfo.produced){
-					var edge = {
-						id: 'ed_' +	key + '_' + peerInfo.peerId +'_' + peerInfo.source,
-						color: $scope.edgeColors[peerInfo.status],
-						source: key,
-						label: peerInfo.status,
-						target: peerInfo.peerId,
-						type: 'curvedArrow'
-					};
-					graphs[peerInfo.source].edges.push (edge);
+				if (peerList.hasOwnProperty(edgeKey)){
+					var peerInfo = peerList[edgeKey];
+					if (peerInfo.produced){
+						var edge = {
+							id: 'ed_' +	key + '_' + peerInfo.peerId +'_' + peerInfo.source,
+							color: $scope.edgeColors[peerInfo.status],
+							source: key,
+							label: peerInfo.status,
+							target: peerInfo.peerId,
+							type: 'curvedArrow'
+						};
+						graphs[peerInfo.source].edges.push (edge);
+					}
 				}
 			}	
 		};
@@ -217,6 +221,9 @@ angular.module('mean.stats').controller('StatsController',['$scope','Stats','Glo
 
 			Stats.webrtcstats ($routeParams.roomId,function (list){
 				processData(list);
+				uiHandler.safeApply($scope,function(){
+					stopLoading();
+				});
 			});
 
 			if (justonetime === undefined || !justonetime){
@@ -225,16 +232,14 @@ angular.module('mean.stats').controller('StatsController',['$scope','Stats','Glo
 						readWebRTCStats();
 					});
 
-				},5000);
+				},2500);
 			}
 		};
 
 		readWebRTCStats();
 
 
-		uiHandler.safeApply($scope,function(){
-			stopLoading();
-		});
+	
 
 	};
 }]);

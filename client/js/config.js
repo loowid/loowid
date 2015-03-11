@@ -11,7 +11,7 @@ window.app.config(['$routeProvider',
             templateUrl: 'views/rooms/claim.html'
     	}).when ('/stats',{
             templateUrl: 'views/rooms/stats.html'
-    	}).when ('/webrtcstatus/:roomId',{
+    	}).when ('/r/:roomId/webrtcstatus',{
             templateUrl: 'views/rooms/webrtcstats.html'
     	}).when ('/lti/error',{
             templateUrl: 'views/rooms/lti.html'
