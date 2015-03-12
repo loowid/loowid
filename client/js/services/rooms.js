@@ -34,10 +34,10 @@ angular.module('mean.rooms').factory('Rooms', ['$resource','$http','$window','No
            	return {name:userName,hero:userHero};
     	};
     	
-    	this.getHero = function(image) {
+    	this.getHero = function(image,h) {
     		var r = /img\/(hero|heroine)\.jpg/g;
     		var g = r.exec(image);
-    		return g?g[1]:null;
+    		return g?g[1]:h;
     	};
     	
     	this.makeId = function(){

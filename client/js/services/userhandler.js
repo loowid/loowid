@@ -36,7 +36,9 @@ angular.module('mean.rooms').factory('UserHandler',['Rooms','UIHandler','Notific
 			            $scope.enableEditName();
 			            uiHandler.avatar = rdo.owner.avatar;
 			            $scope.global.avatar = uiHandler.avatar;
-			            uiHandler.hero = room.getHero(uiHandler.avatar);
+			            console.log(uiHandler.hero);
+			            uiHandler.hero = room.getHero(uiHandler.avatar,uiHandler.hero);
+			            console.log(uiHandler.hero);
 			            rtc.peerListUpdated(uiHandler.roomId);
 			            rtc.updateOwnerData (uiHandler.roomId,uiHandler.name,uiHandler.avatar,uiHandler.status,uiHandler.access);
 		        	});
@@ -49,7 +51,7 @@ angular.module('mean.rooms').factory('UserHandler',['Rooms','UIHandler','Notific
 			            for (var i=0; i<rdo.guests.length; i+=1) {
 			                if (rdo.guests[i].connectionId === cid) {
 			                	uiHandler.avatar = rdo.guests[i].avatar;
-			                	uiHandler.hero = room.getHero(uiHandler.avatar);
+			                	uiHandler.hero = room.getHero(uiHandler.avatar,uiHandler.hero);
 			                }
 			            }
 			            rtc.peerListUpdated($scope.global.roomId);
