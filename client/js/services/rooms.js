@@ -30,7 +30,7 @@ angular.module('mean.rooms').factory('Rooms', ['$resource','$http','$window','No
     		var userName = (typeof(Storage)!=='undefined')?localStorage.loowidUserName:null;
     		var userHero = (typeof(Storage)!=='undefined')?localStorage.loowidUserHero:null;
    			userName = !userName?$window.getSuperHero():userName;
-    		userHero = (!userHero || userHero==='undefined')?$window.getHeroImg(userName):userHero;
+    		userHero = (!userHero || userHero==='undefined' || userHero==='null')?$window.getHeroImg(userName):userHero;
            	return {name:userName,hero:userHero};
     	};
     	
