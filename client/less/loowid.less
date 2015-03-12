@@ -1095,18 +1095,18 @@ header{
 	border-right: 0 none;
 	border-left: 0 none;
 	border-bottom: 0 none;
-	border-top: 1px solid darken(@maincolor,5%);
+	border-top: 1px solid darken( #eee , 10% );
 	bottom: 0px;
 	width: 250px;
 	padding: 8px 0 5px 0;
-	background: @maincolor;
+	background: #eee;
 	right: 0;
 	text-align: center;
 	#text_chat{
 		z-index: 9999;
 		width: 215px;
 		padding: 5px;
-		border: 1px solid darken( @maincolor, 5% );
+		border: 1px solid darken( #eee, 10% );
 		position: relative;
 		outline: none;
 		.box-shadow( inset 0 0 5px rgba(0,0,0,.15) );
@@ -1114,6 +1114,7 @@ header{
 		   -moz-animation:  chatglow 1s linear 1;
 		        animation:  chatglow 1s linear 1;
 		&:focus{
+			border: 1px solid @linkcolor;
 			box-shadow: 0 0 5px rgba(255,255,255, 0.5);
 		}
 	}
