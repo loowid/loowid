@@ -443,16 +443,18 @@ angular.module('mean.rooms').factory('FileService',['$sce','UIHandler',function(
 		
 	        rtc.uniqueon ('request_for_accept_files', function(data){
 	            if (data.files && data.requestId){
-	                var confirmationStr = '<strong>' + $scope.getUserName(data.id) + '</strong> ' + $scope.resourceBundle.wantstosharefiles  +'<br/>';
+	                var confirmationStr = '<strong>' + $scope.getUserName(data.id) + '</strong> ' + $scope.resourceBundle.wantstosharefiles  +'<br/><ul class="filelist">';
 
 	                for (var fileId in data.files){
 						if (data.files.hasOwnProperty(fileId)) {
 							var curFile = data.files[fileId];
 							//Set the first chunk
 							curFile.processedChunks = 0;
-							confirmationStr = confirmationStr + '<li>' + curFile.name + ' (' + self.bytesToSize(curFile.size) + ') </li>';
+							confirmationStr = confirmationStr + '<li>' + curFile.name + ' <span class="size">(' + self.bytesToSize(curFile.size) + ')</span> </li>';
 						}
 	                }
+
+	                confirmationStr = confirmationStr + '</ul>';
 
 	                if (!self.acceptedFileOffers[data.requestId]){
 	                	uiHandler.safeApply ($scope,function (){

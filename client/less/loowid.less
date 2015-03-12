@@ -966,6 +966,20 @@ header{
 			.border-radius(5px);
 		}	
 	}
+	ul.filelist{
+		background: @bgcolor;
+		position: relative;
+		left: -10px;
+		width: 200px;
+		box-shadow: inset 4px 0px 6px rgba(0,0,0,0.15);
+		li{
+			float: none;
+			margin: 0 0 0 0;
+			border-left: 3px solid @linkcolor;
+			border-bottom: 1px solid darken( @bgcolor, 5% );
+			padding: 0 0 0 3px;
+		}
+	}
 }
 #connected{
 	width: 180px;
@@ -1226,6 +1240,19 @@ header{
 	.transition(all 1s ease );
 	margin: 50px auto;
 	width: 400px;
+
+	.filelist{
+		list-style: square;
+		margin: 15px 0 0 85px;
+  		line-height: 1.05;
+		li{
+			font-size: 0.75em;
+			margin: 0 0 8px 0;
+			.size{
+				font-style: oblique;
+			}
+		}
+	}
  	
  	@media all and (max-width:800px) {
 	    	width: ~"calc( 100% - 10px )" !important;
@@ -1386,28 +1413,35 @@ header{
 }
 
 .file_name{
+	vertical-align: middle;
 	width: auto;
-	float:left;
+	display: inline-block;
 }
 .file_canceled span{
 	text-decoration: line-through;
 }
 .file_percent{
-	float: left;
+	vertical-align: middle;
+	display: inline-block;
 	clear:both;
+	color: @maincolor;
 }
 .file_direction{
-	float:left;
+	vertical-align: middle;
+	display: inline-block;
 	padding: 3px;
 }
 .file_description{
-	float:left;
-	padding: 3px;
+	vertical-align: middle;
+	display: inline-block;
+	padding: 2px;
 	width: 65%;
 	overflow: hidden;
+	font-size: 0.85em;
 }
 .file_actions{
-	float:left;
+	vertical-align: middle;
+	display: inline-block;
 	padding: 3px 3px 3px 10px;
 }
 

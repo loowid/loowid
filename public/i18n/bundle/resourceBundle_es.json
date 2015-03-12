@@ -14,7 +14,7 @@
     "audiotab": "Audio", 
     "bitratevelocity": "Parámetros de ancho de banda", 
     "browsernotsupported": "Tu navegador no está soportado", 
-    "canceledFile": "ha reusado el envio de ficheros", 
+    "canceledFile": "ha rehusado el envio de ficheros", 
     "cantaccessaudio": "<strong>{0}</strong> no tiene micrófono o ha denegado el permiso de acceso al navegador", 
     "cantaccessscreen": "El navegador no puede capturar el escritorio o bien <strong>{0}</strong> ha denegado el permiso", 
     "cantaccessvideo": "<strong>{0}</strong> no tiene micrófono o cámara web, o bien ha denegado el permiso de acceso al navegador", 

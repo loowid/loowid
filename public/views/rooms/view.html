@@ -127,7 +127,7 @@
 		<p class="user_title" data-ng-show="ui.status=='DISCONNECTED'">{{resourceBundle.statusdisconnected}}</p>
 		<a title="{{resourceBundle._('titleSendfiles',ui.ownerName)}}" href="" ng-show="ui.status && ui.status!='DISCONNECTED' && !ui.access.moderated" ng-click="openFileDialog('owner');">
 		<i class="fa fa-cloud-upload"></i></a>	
-		<ul>
+		<ul class="filelist">
 			<li data-ng-show="file.name!='' && !file.cleared" data-ng-repeat="file in ui.ownerFiles">
 				 
 				<div class="file_direction">
