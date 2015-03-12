@@ -23,12 +23,12 @@ angular.module('mean.rooms').factory('UserHandler',['Rooms','UIHandler','Notific
 			$scope.changeName = function() {
 		        if (!$scope.editNameForm.$valid) { 
 		        	uiHandler.tmpName = $scope.global.name;
-		        	uiHandler.tmpHero = uiHandler.hero;
+		        	uiHandler.tmpHero = 'img/'+uiHandler.hero+'.jpg';
 		        	uiHandler.gravatar = $scope.global.gravatar;
 		        	return; 
 		        }
 		        uiHandler.name = uiHandler.tmpName;
-		        uiHandler.hero = uiHandler.tmpHero;
+		        uiHandler.hero = room.getHero(uiHandler.tmpHero);
 		        if (uiHandler.isowner){
 					room.editOwnerName($scope.global.roomId, uiHandler.name, uiHandler.gravatar, uiHandler.hero, function(rdo){
 			            $scope.global.name = uiHandler.name;
@@ -60,7 +60,7 @@ angular.module('mean.rooms').factory('UserHandler',['Rooms','UIHandler','Notific
 		    $scope.enableEditName = function() {
   				if (!uiHandler.isowner && uiHandler.passNeeded) { return; }
 		        uiHandler.tmpName = uiHandler.name;
-		        uiHandler.tmpHero = uiHandler.hero;
+		        uiHandler.tmpHero = 'img/'+uiHandler.hero+'.jpg';
 		        uiHandler.gravatar = $scope.global.gravatar;
 		        uiHandler.editName = !uiHandler.editName;
 		        if (uiHandler.editName) {

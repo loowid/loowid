@@ -29,10 +29,8 @@ angular.module('mean.rooms').factory('Rooms', ['$resource','$http','$window','No
     	this.rememberUser = function() {
     		var userName = (typeof(Storage)!=='undefined')?localStorage.loowidUserName:null;
     		var userHero = (typeof(Storage)!=='undefined')?localStorage.loowidUserHero:null;
-    		if (!userName) {
-    			userName = $window.getSuperHero();
-    			userHero = $window.getHeroImg(userName);
-    		}
+   			userName = !userName?$window.getSuperHero():userName;
+    		userHero = (!userHero || userHero==='undefined')?$window.getHeroImg(userName):userHero;
            	return {name:userName,hero:userHero};
     	};
     	
