@@ -36,9 +36,7 @@ angular.module('mean.rooms').factory('UserHandler',['Rooms','UIHandler','Notific
 			            $scope.enableEditName();
 			            uiHandler.avatar = rdo.owner.avatar;
 			            $scope.global.avatar = uiHandler.avatar;
-			            console.log(uiHandler.hero);
 			            uiHandler.hero = room.getHero(uiHandler.avatar,uiHandler.hero);
-			            console.log(uiHandler.hero);
 			            rtc.peerListUpdated(uiHandler.roomId);
 			            rtc.updateOwnerData (uiHandler.roomId,uiHandler.name,uiHandler.avatar,uiHandler.status,uiHandler.access);
 		        	});
