@@ -87,12 +87,10 @@
 				<a href="" ng-click="enableEditName()" class="warnedbtn">{{resourceBundle.gravatarclose}}</a>
 			</p>
 			<p class="hero">
-				<a href="" ng-click="ui.tmpHero='img/hero.jpg'" ng-show="ui.tmpHero==='img/heroine.jpg' && !ui.gravatar">
-					<i class="fa fa-venus"></i>
+				<a title="{{resourceBundle.titleChangeAvatarImage}}" href="" ng-click="ui.tmpHero='img/hero.jpg'" ng-show="ui.tmpHero==='img/heroine.jpg' && !ui.gravatar">
 					<img ng-src="{{ui.tmpHero}}"/>
 				</a>
-				<a href="" ng-click="ui.tmpHero='img/heroine.jpg'" ng-show="ui.tmpHero==='img/hero.jpg' && !ui.gravatar">
-					<i class="fa fa-mars"></i>
+				<a title="{{resourceBundle.titleChangeAvatarImage}}" href="" ng-click="ui.tmpHero='img/heroine.jpg'" ng-show="ui.tmpHero==='img/hero.jpg' && !ui.gravatar">
 					<img ng-src="{{ui.tmpHero}}"/>
 				</a>
 			</p>
@@ -223,7 +221,7 @@
 		<div id="remoteAudios" ></div>
 		
 		<div id="remoteVideos" >
-			<wmwindow title="{{window.title}}" open="window.open" close="window.close" maximize="window.maximize" maximizeTitle="window.maximizeTitle" restore="window.restore" selectwindow="window.selectwindow" closeable="{{window.closeable}}" options="{{window.options}}" data-ng-repeat="window in windows" >
+			<wmwindow title="{{window.title}}" maximizetitle="{{window.maximizeTitle}}" minimizetitle="{{window.minimizeTitle}}"  restoretitle="{{window.restoreTitle}}" closetitle="{{window.closeTitle}}"  open="window.open" close="window.close" maximize="window.maximize" restore="window.restore" selectwindow="window.selectwindow" closeable="{{window.closeable}}" options="{{window.options}}" data-ng-repeat="window in windows" >
 				<video></video>
 			</wmwindow>
 		</div>

@@ -92,8 +92,7 @@ angular.module('mean.rooms').factory('WindowHandler',[function(){
 					videos[i].play();	
 				}
 			};
-			var maxTitle = $scope.resourceBundle._('titleMaximizeWindow',winTitle);
-			
+
 			var window = {
 				options: options,
 				title: winTitle,
@@ -103,7 +102,10 @@ angular.module('mean.rooms').factory('WindowHandler',[function(){
 				selectwindow: selWindow,
 				open: open,
 				maximize: maximize,
-				maximizeTitle: maxTitle,
+				maximizeTitle:  $scope.resourceBundle._('titleMaximizeWindow',winTitle),
+				minimizeTitle:  $scope.resourceBundle._('titleMinimizeWindow',winTitle),
+				restoreTitle:  $scope.resourceBundle._('titleRestoreWindow',winTitle),
+				closeTitle:  $scope.resourceBundle._('titleCloseWindow',winTitle),
 				restore: restore
 			};
 			

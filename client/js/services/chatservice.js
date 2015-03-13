@@ -95,7 +95,7 @@ angular.module('mean.rooms').factory('ChatService',['$timeout','UIHandler','Room
 						element.parentNode.removeChild(element);
 					} else {
 						element.removeChild(element.getElementsByTagName('div')[0]);
-						element.innerHTML = '<div class="evideo"><img src="'+video.thumbnail+'" width="100%" height="100%" title="'+video.title+'" data-videoid="'+video.id+'"></img><i class="fa fa-play-circle"></i>' + element.innerHTML;
+						element.innerHTML = '<div class="evideo" title="' + $scope.resourceBundle._('titleOpenVideoInWindow',video.title) +'"><img src="'+video.thumbnail+'" width="100%" height="100%"  data-videoid="'+video.id+'"></img><i class="fa fa-play-circle"></i>' + element.innerHTML;
 						element.addEventListener ('click',function (event){
 							$scope.openVideoFromService(video.title,video.url);
 							event.preventDefault();
@@ -139,7 +139,7 @@ angular.module('mean.rooms').factory('ChatService',['$timeout','UIHandler','Room
 		    		});
 		    		
 		    	},500);
-		    	return '<div class="edoc"><a id="'+docid+'" href="#"><img src="/img/gslides%2Epng"/></a></div>'+url;
+		    	return '<div class="edoc"><a id="'+docid+'" href="#"><img title="'+$scope.resourceBundle.titleOpenGDocInWindow+'" src="/img/gslides%2Epng"/></a></div>'+url;
 	    	};
 	    };
 	    
@@ -153,7 +153,7 @@ angular.module('mean.rooms').factory('ChatService',['$timeout','UIHandler','Room
 		    		});
 		    		
 		    	},500);
-		    	return '<div class="edoc"><a id="'+docid+'" href="#"><img src="/img/typeform%2Epng"/></a></div>'+url;
+		    	return '<div class="edoc"><a title="'+$scope.resourceBundle.titleOpenTypeFormInWindow+'" id="'+docid+'" href="#"><img src="/img/typeform%2Epng"/></a></div>'+url;
 	    	};
 	    };
 	    

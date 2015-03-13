@@ -246,7 +246,13 @@
    "titleClearfile": "Clear '{0}'",
    "titleOpencloseconnections": "Open/Close the connections panel",
    "titleOpenclosechat": "Open/Close the chat panel",
-   "titleMaximizeWindow": "Maximize '{0}' window"
-   
+   "titleMaximizeWindow": "Maximize {0}'s window",
+   "titleMinimizeWindow": "Minimize {0}'s window",
+   "titleRestoreWindow": "Restore {0}'s window",
+   "titleCloseWindow": "Close {0}'s window",
+   "titleChangeAvatarImage": "Click to change my avata's image",
+   "titleOpenVideoInWindow": "Open '{0}' video in a LooWID window",
+   "titleOpenTypeFormInWindow": "Open this Typeform in a LooWID window",
+   "titleOpenGDocInWindow": "Open this Google document in a LooWID window"
    
 }

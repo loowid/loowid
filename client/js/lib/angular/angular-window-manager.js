@@ -15,10 +15,10 @@ angular.module('ngWindowManager',[])
 						'<div class="wmTitleBar">' +
 							'<div class="wmTitle">{{title}}</div>'+
 							'<div class="wmButtonBar">' +
-								'<button class="wmMinimize" ng-show="isMinimizable()">' + 
-								'<button title="{{maximizeTitle}}" class="wmMaximize" ng-show="isMaximizable()">' + 
-								'<button style="display:none" class="wmRestore"/>'+
-								'<button class="wmClose" ng-show="isCloseable()" />'+
+								'<button title="{{minimizetitle}}" class="wmMinimize" ng-show="isMinimizable()">' + 
+								'<button title="{{maximizetitle}}" class="wmMaximize" ng-show="isMaximizable()">' + 
+								'<button title="{{restoretitle}}"  class="isHidden wmRestore"/>'+
+								'<button title="{{closetitle}}" class="wmClose" ng-show="isCloseable()" />'+
 							'</div>'+
 						'</div>'+
 						'<div class="wmContent" data-ng-transclude ></div>'+
@@ -40,7 +40,10 @@ angular.module('ngWindowManager',[])
 			maximizable: '@',
 			minimizable: '@',
 			closeable: '@',
-			maximizeTitle: '@'
+			maximizetitle: '@',
+			minimizetitle: '@',
+			restoretitle: '@',
+			closetitle: '@'
 		},
 		link: function (scope, element) {
 			
@@ -54,6 +57,8 @@ angular.module('ngWindowManager',[])
 		
 			var minimizeButton = buttonBar.children[0];
 			var maximizeButton = buttonBar.children[1];
+			var restoreButton = buttonBar.children[2];
+			
 			var closeButton = buttonBar.children[3];
 			
 			//State variables
@@ -310,14 +315,10 @@ angular.module('ngWindowManager',[])
 				});
 				
 				//Set the apropiate listeners
-				maximizeButton.removeEventListener ('click',winHandler.maximize);
-				maximizeButton.removeEventListener ('touchstart',winHandler.maximize);
-				
-				maximizeButton.addEventListener ('click',winHandler.restore);
-				maximizeButton.addEventListener ('touchstart',winHandler.restore);
-				
 				titleBarElement.removeEventListener ('dblclick', winHandler.maximize);
 				titleBarElement.addEventListener ('dblclick', winHandler.restore);
+				angular.element(maximizeButton).addClass('isHidden');
+				angular.element(restoreButton).removeClass('isHidden');
 				
 				//Stop all the window listener (drag,resize...)
 				stopWindowListeners();
@@ -341,7 +342,7 @@ angular.module('ngWindowManager',[])
 				var childrenCount = (minimizeToElement.childElementCount + 1) % 10;
 				
 				
-				var minimizedBtn = angular.element('<div class="minimizedWindowBtn" title="' +scope.title+ '" ><span class="btn_'+childrenCount+'">' + scope.title.substr(0,1) + '</span></div>')[0];
+				var minimizedBtn = angular.element('<div class="minimizedWindowBtn" title="'+scope.restoretitle +'" ><span class="btn_'+childrenCount+'">' + scope.title.substr(0,1) + '</span></div>')[0];
 				
 				saveWindowState('minimized',minimizedBtn);
 				angular.element (minimizeToElement).prepend(minimizedBtn);
@@ -381,18 +382,13 @@ angular.module('ngWindowManager',[])
 				
 				element.addClass ('restoring');
 				element.removeClass ('minimized');
-				
+				angular.element(restoreButton).addClass('isHidden');
+				angular.element(maximizeButton).removeClass('isHidden');
 				//Set to the top of windows
 				winHandler.selectWindow();
 				
 				//Restore the listeners	   
 				if (currentWindowState.state === 'maximized'){
-					maximizeButton.removeEventListener ('click',winHandler.restore);
-					maximizeButton.removeEventListener ('touchstart',winHandler.restore);
-
-					maximizeButton.addEventListener ('click',winHandler.maximize);
-					maximizeButton.addEventListener ('touchstart',winHandler.maximize);
-
 					titleBarElement.removeEventListener ('dblclick',winHandler.restore);
 					titleBarElement.addEventListener ('dblclick', winHandler.maximize);
 
@@ -484,6 +480,8 @@ angular.module('ngWindowManager',[])
 			closeButton.addEventListener ('touchstart',winHandler.close);
 			maximizeButton.addEventListener ('click',winHandler.maximize);
 			maximizeButton.addEventListener ('touchstart',winHandler.maximize);
+			restoreButton.addEventListener ('click',winHandler.restore);
+			restoreButton.addEventListener ('touchstart',winHandler.restore);
 			minimizeButton.addEventListener ('click',winHandler.minimize);
 			minimizeButton.addEventListener ('touchstart',winHandler.minimize);
 			
