@@ -266,7 +266,19 @@
 	  	<li ng-class="msg.class" ng-repeat="msg in ui.messages">
 	  		<div class="avatar"><img ng-src="{{getUser(msg.id).avatar}}" /></div>
 	  		<div class="messages">
-	  			<p ng-repeat="txt in msg.list track by $index" ng-bind-html="txt | to_trusted"></p>
+	  			<p ng-repeat="sitem in msg.list track by $index">
+	  				<span ng-repeat="obj in sitem.embed track by $index">
+	  					<span ng-show="obj.type==='typeform' || obj.type==='gdoc'" class="edoc"><a id="{{obj.id}}" href="#"><img title="{{obj.title}}" ng-src="{{obj.thumbnail}}"/><i title="{{obj.title}}" ng-class="{'fa':true,'fa-caret-square-o-right':true,'black':obj.fablack,'white':obj.fawhite}"></i></a></span>
+	  					<span ng-show="obj.type==='video'">
+  							<span ng-show="obj.loading" class="spinner"><span class="bounce1"></span><span class="bounce2"></span><span class="bounce3"></span></span>
+  							<span ng-show="obj.ready" class="evideo"><a id="{{obj.idv}}" href="#"><img title="{{obj.title}}" ng-src="{{obj.thumbnail}}" width="100%" height="100%"  data-videoid="{{obj.videoid}}"/><i title="{{obj.title}}" class="fa fa-play-circle"></i></a></span>
+	  					</span>
+	  				</span>
+	  				<span ng-repeat="item in sitem.list track by $index">
+		  				<a ng-show="item.type==='link'" href="{{item.to}}" target="_blank">{{item.text}}</a>
+		  				<span ng-show="item.type==='text'">{{item.text}}</span>
+	  				</span>
+	  			</p>
 				<div class="spinner" ng-show="msg.istyping">
 				  <div class="bounce1"></div>
 				  <div class="bounce2"></div>

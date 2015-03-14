@@ -45,14 +45,6 @@ angular.module('mean.rooms').factory('ChatService',['$timeout','UIHandler','Room
 	        return secs>15;
 	    };
 	    
-	    this.link = function(url) {
-	    	if (url.indexOf('@')>0 && url.indexOf(':')<0) {
-	    		return '<a href="mailto:' + url + '" target="_blank">' + url + '</a>';
-	    	} else {
-	    		return '<a href="' + (url.indexOf('http')===0?url:'http://'+url) + '" target="_blank">' + url + '</a>';
-	    	}
-	    };
-	    
 	    this.getVideoData = function(service,vid,callb) {
 	    	if (!this.videoData[vid]) {
 		    	var retrieve = $http({
@@ -75,36 +67,26 @@ angular.module('mean.rooms').factory('ChatService',['$timeout','UIHandler','Room
 	    	}
 	    };
 	    
-	    this.absoluteUrl = function(url) {
-	    	if (url.indexOf('://')>0) {
-	    		return url.substring(url.indexOf('://')+1);
-	    	} else {
-	    		return '//'+url;
-	    	}
-	    };
-	    
-	    this.getReplaceFunction = function($scope,service) {
-			var replaceFunction = function(url,vid) {
-				// Avoid side effects copying the same video multiple times
-				var realUniqueId = 'max_'+vid+'_'+(new Date()).getTime()+Math.floor(Math.random()*100);
-				var spinner = '<div class="spinner"><div class="bounce1"></div><div class="bounce2"></div><div class="bounce3"></div></div>';
-	    		var frame = '<a href id="'+ realUniqueId +'">'+spinner+'</a>' + url;
-				self.getVideoData(service,vid,function(video){
-					var element = document.getElementById (realUniqueId);
-					if (video.error) {
-						element.parentNode.removeChild(element);
-					} else {
-						element.removeChild(element.getElementsByTagName('div')[0]);
-						element.innerHTML = '<div class="evideo" title="' + $scope.resourceBundle._('titleOpenVideoInWindow',video.title) +'"><img src="'+video.thumbnail+'" width="100%" height="100%"  data-videoid="'+video.id+'"></img><i class="fa fa-play-circle"></i>' + element.innerHTML;
-						element.addEventListener ('click',function (event){
+	    this.processVideoLinks = function($scope,vid,list,service) {
+			// Avoid side effects copying the same video multiple times
+			var realUniqueId = 'max_'+vid+'_'+(new Date()).getTime()+Math.floor(Math.random()*100);
+			var miObj = {type:'video',idv:realUniqueId,loading:true,ready:false};
+			self.getVideoData(service,vid,function(video){
+				if (!video.error) {
+					miObj.loading = false;
+					miObj.ready = true;
+					miObj.title = $scope.resourceBundle._('titleOpenVideoInWindow',video.title);
+					miObj.thumbnail = video.thumbnail;
+					miObj.videoid = video.id;
+					setTimeout(function(){
+						document.getElementById(realUniqueId).addEventListener ('click',function (event){
 							$scope.openVideoFromService(video.title,video.url);
 							event.preventDefault();
 						});
-					}
-				});
-				return frame;
-			};
-			return replaceFunction;
+					},500);
+				}
+			});
+			list.push(miObj);
 	    };
 	    
 	    this.videoServices = {
@@ -119,18 +101,21 @@ angular.module('mean.rooms').factory('ChatService',['$timeout','UIHandler','Room
 	    		}
 	    };
 	    
-	    this.parseVideoUrls = function($scope,txt) {
-			var videoTxt = txt;
+	    this.processVideoUrls = function($scope,txt,list) {
 			for (var el in this.videoServices) {
 				for (var re in this.videoServices[el].regexp) {
-					videoTxt = videoTxt.replace(this.videoServices[el].regexp[re],this.getReplaceFunction($scope,el));
+					var matches = this.videoServices[el].regexp[re].exec(txt);
+					if (matches) {
+						this.processVideoLinks($scope,matches[1],list,el);
+					}
 				}
 			}
-			return videoTxt;
 	    };
 	    
-	    this.replaceGoogle = function($scope) {
-	    	return function(url,doc) {
+	    this.processGoogleDoc = function($scope,txt,list) {
+	    	var matches = /(?:https:\/\/)?docs\.google\.com\/presentation\/d\/([^\/\s]+)\/[^\s]+/g.exec(txt);
+	    	if (matches) {
+	    		var doc = matches[1];
 		    	var docid = 'doc_'+doc+'_'+(new Date()).getTime()+Math.floor(Math.random()*100);
 		    	setTimeout(function(){
 		    		document.getElementById(docid).addEventListener('click',function(evt){
@@ -139,13 +124,15 @@ angular.module('mean.rooms').factory('ChatService',['$timeout','UIHandler','Room
 		    		});
 		    		
 		    	},500);
-		    	return '<div class="edoc"><a id="'+docid+'" href="#"><img title="'+$scope.resourceBundle.titleOpenGDocInWindow+'" src="/img/gslides%2Epng"/></a></div>'+url;
-	    	};
+		    	list.push({type:'gdoc',fablack:true,title:$scope.resourceBundle.titleOpenGDocInWindow,id:docid,thumbnail:'/img/gslides.png'});
+	    	}
 	    };
 	    
-	    this.replaceTypeform = function($scope) {
-	    	return function(url,doc) {
-		    	var docid = 'frm_'+doc+'_'+(new Date()).getTime()+Math.floor(Math.random()*100);
+	    this.processTypeForm = function($scope,txt,list) {
+	    	var matches = /(?:https:\/\/)?[^\.]+\.typeform\.com\/to\/([^\s]+)/g.exec(txt);
+	    	if (matches) {
+	    		var doc = matches[1];
+	    		var docid = 'frm_'+doc+'_'+(new Date()).getTime()+Math.floor(Math.random()*100);
 		    	setTimeout(function(){
 		    		document.getElementById(docid).addEventListener('click',function(evt){
 		    			$scope.openIFrameService('if'+docid,$scope.resourceBundle.typeform,'//showroom.typeform.com/to/'+doc);
@@ -153,24 +140,42 @@ angular.module('mean.rooms').factory('ChatService',['$timeout','UIHandler','Room
 		    		});
 		    		
 		    	},500);
-		    	return '<div class="edoc"><a title="'+$scope.resourceBundle.titleOpenTypeFormInWindow+'" id="'+docid+'" href="#"><img src="/img/typeform%2Epng"/></a></div>'+url;
-	    	};
+	    		list.push({type:'typeform',fawhite:true,title:$scope.resourceBundle.titleOpenTypeFormInWindow,id:docid,thumbnail:'/img/typeform.png'});
+	    	}
 	    };
 	    
-	    this.parseUrls = function($scope,txt) {
-			var newText = this.parseVideoUrls($scope,txt);
-			newText = newText.replace(/(?:https:\/\/)?docs\.google\.com\/presentation\/d\/([^\/\s]+)\/[^\s]+/g,this.replaceGoogle($scope));
-			newText = newText.replace(/(?:https:\/\/)?[^\.]+\.typeform\.com\/to\/([^\s]+)/g,this.replaceTypeform($scope));
-			return newText.replace(/(((https?:\/\/)?(((?!-)[A-Za-z0-9-:]{1,63}[@]{0,1}[A-Za-z0-9-]*(?!-)\.)+[A-Za-z]{2,6})(:\d+)?(\/([-\w/_\.\,]*(\?\S+)?)?)*)(#\S*)?(?!@))/g, this.link);
+	    this.addObjects = function($scope,txt,list) {
+	    	this.processTypeForm($scope,txt,list);
+	    	this.processGoogleDoc($scope,txt,list);
+	    	this.processVideoUrls($scope,txt,list);
 	    };
 	    
-		
-		
-	    this.getHtml = function($scope,data) {
-	        if (data.id===$scope.global.bot) {
-	            return this.parseUrls($scope,data.text);
-	        }
-	        return this.parseUrls($scope,data.text.replace(/&/g,'&amp;').replace(/</g,'&lt;'));
+	    this.addItems = function($scope,txt,list) {
+    		var slinks = [], embeds = [];
+	    	var matches = txt.match(/(((https?:\/\/)?(((?!-)[A-Za-z0-9-:]{1,63}[@]{0,1}[A-Za-z0-9-]*(?!-)\.)+[A-Za-z]{2,6})(:\d+)?(\/([-\w/_\.\,]*(\?\S+)?)?)*)(#\S*)?(?!@))/g);
+	    	if (matches) {
+	    		var mtxt = txt;
+	    		for (var i=0; i<matches.length; i+=1) {
+	    			var ind = mtxt.indexOf(matches[i]);
+	    			var pre = mtxt.substring(0,ind);
+	    			var post = mtxt.substring(ind+matches[i].length);
+	    			if (pre) {
+	    				slinks.push({type:'text',text:pre});
+	    			}
+	    	    	if (matches[i].indexOf('@')>0 && matches[i].indexOf(':')<0) {
+	    	    		slinks.push({type:'link',to:'mailto:'+matches[i],text:matches[i]});
+	    	    	} else {
+	    	    		slinks.push({type:'link',to:(matches[i].indexOf('http')===0?matches[i]:'http://'+matches[i]),text:matches[i]});
+	    	    	}
+	    	    	this.addObjects($scope,matches[i],embeds);
+	    			if (post) {
+	    				slinks.push({type:'text',text:post});
+	    			}
+	    		}
+	    	} else {
+	    		slinks.push({type:'text',text:txt});
+	    	}
+    		list.push({list:slinks,embed:embeds});
 	    };
 	    
 	    this.addToQueue = function(data) {
@@ -200,7 +205,8 @@ angular.module('mean.rooms').factory('ChatService',['$timeout','UIHandler','Room
                         'list':[]};
 	        	if (data.text) {
 	        		this.checkTypingIcons(data.id);
-	        		m.list.push(this.getHtml($scope,data)); 
+	        		//m.list.push(this.parseUrls($scope,data.text));
+	        		this.addItems($scope,data.text,m.list);
 	        	}
 	        	uiHandler.messages.push(m);
 	        } else {
@@ -208,7 +214,8 @@ angular.module('mean.rooms').factory('ChatService',['$timeout','UIHandler','Room
 	        		uiHandler.messages[messageIndex].istyping = true;	
 	        	} else {
 	        		uiHandler.messages[messageIndex].istyping = false;
-	        		uiHandler.messages[messageIndex].list.push(this.getHtml($scope,data));
+	        		this.addItems($scope,data.text,uiHandler.messages[messageIndex].list);
+	        		//uiHandler.messages[messageIndex].list.push(this.parseUrls($scope,data.text));
 	        	}
 	        }
 	    };
@@ -362,8 +369,4 @@ angular.module('mean.rooms').factory('ChatService',['$timeout','UIHandler','Room
 			
 		};
 	};
-}]).filter('to_trusted', ['$sce', function($sce){
-    return function(text) {
-        return $sce.trustAsHtml(text);
-    };
 }]);
