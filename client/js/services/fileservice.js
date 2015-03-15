@@ -1,6 +1,8 @@
 	'use strict';
 /*global rtc: true */
-angular.module('mean.rooms').factory('FileService',['$sce','UIHandler',function($sce,UIHandler){
+angular.module('mean.rooms').config(['$compileProvider', function($compileProvider){   
+	$compileProvider.aHrefSanitizationWhitelist(/^\s*(https?|ftp|mailto|blob):/);
+}]).factory('FileService',['$sce','UIHandler',function($sce,UIHandler){
 	return function (){
 
 	    //Control files
@@ -338,10 +340,7 @@ angular.module('mean.rooms').factory('FileService',['$sce','UIHandler',function(
 	                self.acceptedFileOffers[requestId].files[data.fileid].completed = true;
 	                self.acceptedFileOffers[requestId].filesCompleted+=1;
 
-	                var filename2 = self.acceptedFileOffers[requestId].files[data.fileid].name;
-
 					closeIfCompleted (channel,connectionId,requestId,mediatype);
-					
 	                
 	                uiHandler.safeApply($scope,function (){
 	                	files[renderedIndex].completed = 101; //data is composed
@@ -355,7 +354,7 @@ angular.module('mean.rooms').factory('FileService',['$sce','UIHandler',function(
 
 	                var virtualURL = (window.URL || window.webkitURL).createObjectURL(blob);
 
-	                files[renderedIndex].virtualURL = $sce.trustAsHtml('<a target="_blank" download="'+filename2+'" href="'+virtualURL+'" >' +  filename2+'</a>');
+					files[renderedIndex].virtualURL =  $sce.trustAsResourceUrl(virtualURL);
 	                self.arrayToStoreChunks[connectionId][mediatype][data.fileid] = []; // resetting array
 	                
 					//Mark that a percentage of refresh is needed
