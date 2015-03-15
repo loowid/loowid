@@ -150,17 +150,151 @@ angular.module('mean.rooms').factory('ChatService',['$timeout','UIHandler','Room
 	    	this.processVideoUrls($scope,txt,list);
 	    };
 	    
-	    this.addItems = function($scope,txt,list) {
-    		var slinks = [], embeds = [];
-	    	var matches = txt.match(/(((https?:\/\/)?(((?!-)[A-Za-z0-9-:]{1,63}[@]{0,1}[A-Za-z0-9-]*(?!-)\.)+[A-Za-z]{2,6})(:\d+)?(\/([-\w/_\.\,]*(\?\S+)?)?)*)(#\S*)?(?!@))/g);
+	    this.getAllSelectors = function() { 
+	        var ret = [];
+	        for(var i = 0; i < document.styleSheets.length; i+=1) {
+	            var rules = document.styleSheets[i].rules || document.styleSheets[i].cssRules;
+	            for(var x in rules) {
+	                if(typeof rules[x].selectorText === 'string') {
+	                	ret.push(rules[x].selectorText);
+	                }
+	            }
+	        }
+	        return ret;
+	    };
+
+	    this.selectorExists = function(selector) { 
+	        var selectors = this.getAllSelectors();
+	        for(var i = 0; i < selectors.length; i+=1) {
+	            if(selectors[i] === selector) {
+	            	return true;
+	            }
+	        }
+	        return false;
+	    };
+	    
+		this.emoticonsData = {
+				'<3':'heart',
+				':o)':'monkey_face',
+				':*':'kiss',
+				':-*':'kiss',
+				'<\/3':'broken_heart',
+				'=)':'smiley',
+				'=-)':'smiley',
+				'C:':'smile',
+				'c:':'smile',
+				':D':'smile',
+				':-D':'smile',
+				':>':'laughing',
+				':->':'laughing',
+				';)':'wink',
+				';-)':'wink',
+				':)':'blush',
+				'(:':'blush',
+				':-)':'blush',
+				'8)':'sunglasses',
+				':|':'neutral_face',
+				':-|':'neutral_face',
+				':\\\\':'confused',
+				':-\\\\':'confused',
+				':/':'confused',
+				':-/':'confused',
+				':p':'stuck_out_tongue',
+				':-p':'stuck_out_tongue',
+				':P':'stuck_out_tongue',
+				':-P':'stuck_out_tongue',
+				':b':'stuck_out_tongue',
+				':-b':'stuck_out_tongue',
+				';p':'stuck_out_tongue_winking_eye',
+				';-p':'stuck_out_tongue_winking_eye',
+				';b':'stuck_out_tongue_winking_eye',
+				';-b':'stuck_out_tongue_winking_eye',
+				';P':'stuck_out_tongue_winking_eye',
+				';-P':'stuck_out_tongue_winking_eye',
+				'):':'disappointed',
+				':(':'disappointed',
+				':-(':'disappointed',
+				'>:(':'angry',
+				'>:-(':'angry',
+				':\'(':'cry',
+				'D:':'anguished',
+				':o':'open_mouth',
+				':-o':'open_mouth'
+			};
+		
+		this.getEmoticonsRegExp = function() {
+			var pattern = '';
+			for (var e in this.emoticonsData) {
+				pattern += e.replace(/\*/g,'\\*').replace(/\)/g,'\\)').replace(/\(/g,'\\(').replace(/\|/g,'\\|') + '|';
+			}
+			return new RegExp('('+pattern.substring(0,pattern.length-1)+')','g');
+		};
+		
+	    this.emoticonItems = function($scope,txt,list) {
+	    	var matches = txt.match(this.getEmoticonsRegExp());
 	    	if (matches) {
-	    		var mtxt = txt;
+	    		var mtxt = txt; 
 	    		for (var i=0; i<matches.length; i+=1) {
 	    			var ind = mtxt.indexOf(matches[i]);
 	    			var pre = mtxt.substring(0,ind);
 	    			var post = mtxt.substring(ind+matches[i].length);
 	    			if (pre) {
-	    				slinks.push({type:'text',text:pre});
+	    				list.push({type:'text',text:pre});
+	    			}
+	    			var selector = this.emoticonsData[matches[i]].replace(/_/g,'-');
+	    			if (this.selectorExists('.twa-'+selector)) {
+	    				list.push({type:'emoji',twaclass:'twa twa-lg twa-'+selector});
+	    			} else {
+	    				list.push({type:'text',text:matches[i]});
+	    			}
+	    			if (post && i===matches.length-1) {
+	    				list.push({type:'text',text:post});
+	    			}
+	    			mtxt = post;
+	    		}
+	    	} else {
+	    		list.push({type:'text',text:txt});
+	    	}
+	    };
+	    
+	    this.emojiItems = function($scope,txt,list) {
+	    	var matches = txt.match(/\:[a-z\_\+0-9]+\:/g);
+	    	if (matches) {
+	    		var mtxt = txt; 
+	    		for (var i=0; i<matches.length; i+=1) {
+	    			var ind = mtxt.indexOf(matches[i]);
+	    			var pre = mtxt.substring(0,ind);
+	    			var post = mtxt.substring(ind+matches[i].length);
+	    			if (pre) {
+	    				this.emoticonItems($scope,pre,list);
+	    			}
+	    			var selector = matches[i].substring(1,matches[i].length-1).replace(/_/g,'-');
+	    			if (this.selectorExists('.twa-'+selector)) {
+	    				list.push({type:'emoji',twaclass:'twa twa-lg twa-'+selector});
+	    			} else {
+	    				list.push({type:'text',text:matches[i]});
+	    			}
+	    			if (post && i===matches.length-1) {
+	    				this.emoticonItems($scope,post,list);
+	    			}
+	    			mtxt = post;
+	    		}
+	    	} else {
+	    		this.emoticonItems($scope,txt,list);
+	    	}
+	    };
+	    
+	    this.addItems = function($scope,txt,list) {
+    		var slinks = [], embeds = [];
+	    	var matches = txt.match(/(((https?:\/\/)?(((?!-)[A-Za-z0-9-:]{1,63}[@]{0,1}[A-Za-z0-9-]*(?!-)\.)+[A-Za-z]{2,6})(:\d+)?(\/([-\w/_\.\,]*(\?\S+)?)?)*)(#\S*)?(?!@))/g);
+	    	if (matches) {
+	    		var mtxt = txt; 
+	    		for (var i=0; i<matches.length; i+=1) {
+	    			var ind = mtxt.indexOf(matches[i]);
+	    			var pre = mtxt.substring(0,ind);
+	    			var post = mtxt.substring(ind+matches[i].length);
+	    			if (pre) {
+	    				this.emojiItems($scope,pre,slinks);
 	    			}
 	    	    	if (matches[i].indexOf('@')>0 && matches[i].indexOf(':')<0) {
 	    	    		slinks.push({type:'link',to:'mailto:'+matches[i],text:matches[i]});
@@ -169,12 +303,12 @@ angular.module('mean.rooms').factory('ChatService',['$timeout','UIHandler','Room
 	    	    	}
 	    	    	this.addObjects($scope,matches[i],embeds);
 	    			if (post && i===matches.length-1) {
-	    				slinks.push({type:'text',text:post});
+	    				this.emojiItems($scope,post,slinks);
 	    			}
 	    			mtxt = post;
 	    		}
 	    	} else {
-	    		slinks.push({type:'text',text:txt});
+	    		this.emojiItems($scope,txt,slinks);
 	    	}
     		list.push({list:slinks,embed:embeds});
 	    };

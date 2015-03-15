@@ -237,6 +237,7 @@
 	  				<span ng-repeat="item in sitem.list track by $index">
 		  				<a ng-show="item.type==='link'" href="{{item.to}}" target="_blank">{{item.text}}</a>
 		  				<span ng-show="item.type==='text'">{{item.text}}</span>
+	  					<span ng-show="item.type==='emoji'"><i ng-class="item.twaclass"></i></span>
 	  				</span>
 	  			</p>
 				<div class="spinner" ng-show="msg.istyping">
