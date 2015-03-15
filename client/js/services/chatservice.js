@@ -103,10 +103,14 @@ angular.module('mean.rooms').factory('ChatService',['$timeout','UIHandler','Room
 	    
 	    this.processVideoUrls = function($scope,txt,list) {
 			for (var el in this.videoServices) {
-				for (var re in this.videoServices[el].regexp) {
-					var matches = this.videoServices[el].regexp[re].exec(txt);
-					if (matches) {
-						this.processVideoLinks($scope,matches[1],list,el);
+				if (this.videoServices.hasOwnProperty(el)) {
+					for (var re in this.videoServices[el].regexp) {
+						if (this.videoServices[el].regexp.hasOwnProperty(re)) {
+							var matches = this.videoServices[el].regexp[re].exec(txt);
+							if (matches) {
+								this.processVideoLinks($scope,matches[1],list,el);
+							}
+						}
 					}
 				}
 			}
@@ -225,7 +229,9 @@ angular.module('mean.rooms').factory('ChatService',['$timeout','UIHandler','Room
 		this.getEmoticonsRegExp = function() {
 			var pattern = '';
 			for (var e in this.emoticonsData) {
-				pattern += e.replace(/\*/g,'\\*').replace(/\)/g,'\\)').replace(/\(/g,'\\(').replace(/\|/g,'\\|') + '|';
+				if (this.emoticonsData.hasOwnProperty(e)) {
+					pattern += e.replace(/\*/g,'\\*').replace(/\)/g,'\\)').replace(/\(/g,'\\(').replace(/\|/g,'\\|') + '|';
+				}
 			}
 			return new RegExp('('+pattern.substring(0,pattern.length-1)+')','g');
 		};
