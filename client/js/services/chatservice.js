@@ -168,9 +168,10 @@ angular.module('mean.rooms').factory('ChatService',['$timeout','UIHandler','Room
 	    	    		slinks.push({type:'link',to:(matches[i].indexOf('http')===0?matches[i]:'http://'+matches[i]),text:matches[i]});
 	    	    	}
 	    	    	this.addObjects($scope,matches[i],embeds);
-	    			if (post) {
+	    			if (post && i===matches.length-1) {
 	    				slinks.push({type:'text',text:post});
 	    			}
+	    			mtxt = post;
 	    		}
 	    	} else {
 	    		slinks.push({type:'text',text:txt});
