@@ -197,7 +197,9 @@
 					</div>
 
 					<div class="file_description {{file.canceled ? 'file_canceled' :''}}"> 
-						<span ng-bind-html="file.name" class="file_name"></span> 
+						<span ng-hide="file.virtualURL"  class="file_name">{{file.name}}</span> 
+						<span ng-show="file.virtualURL" ng-bind-html="file.virtualURL" class="file_name"></span> 
+						
 						<span ng-show="file.completed < 100  && !file.canceled" class="file_percent"> {{file.completed}}%</span> 
 					</div>
 					

@@ -355,7 +355,7 @@ angular.module('mean.rooms').factory('FileService',['$sce','UIHandler',function(
 
 	                var virtualURL = (window.URL || window.webkitURL).createObjectURL(blob);
 
-	                files[renderedIndex].name = $sce.trustAsHtml('<a target="_blank" download="'+filename2+'" href="'+virtualURL+'" >' + filename2 +'</a>');
+	                files[renderedIndex].virtualURL = $sce.trustAsHtml('<a target="_blank" download="'+filename2+'" href="'+virtualURL+'" >' +  filename2+'</a>');
 	                self.arrayToStoreChunks[connectionId][mediatype][data.fileid] = []; // resetting array
 	                
 					//Mark that a percentage of refresh is needed
