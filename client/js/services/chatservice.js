@@ -233,7 +233,7 @@ angular.module('mean.rooms').factory('ChatService',['$timeout','UIHandler','Room
 					pattern += e.replace(/\*/g,'\\*').replace(/\)/g,'\\)').replace(/\(/g,'\\(').replace(/\|/g,'\\|') + '|';
 				}
 			}
-			return new RegExp('('+pattern.substring(0,pattern.length-1)+')','g');
+			return new RegExp('(^|\\s)('+pattern.substring(0,pattern.length-1)+')(\\s|$)','g');
 		};
 		
 	    this.emoticonItems = function($scope,txt,list) {
@@ -247,9 +247,9 @@ angular.module('mean.rooms').factory('ChatService',['$timeout','UIHandler','Room
 	    			if (pre) {
 	    				list.push({type:'text',text:pre});
 	    			}
-	    			var selector = this.emoticonsData[matches[i]].replace(/_/g,'-');
+	    			var selector = this.emoticonsData[matches[i].trim()].replace(/_/g,'-');
 	    			if (this.selectorExists('.twa-'+selector)) {
-	    				list.push({type:'emoji',twaclass:'twa twa-lg twa-'+selector});
+	    				list.push({type:'emoji',twaclass:'twa twa-lg twa-'+selector, base: matches[i]});
 	    			} else {
 	    				list.push({type:'text',text:matches[i]});
 	    			}
@@ -264,7 +264,7 @@ angular.module('mean.rooms').factory('ChatService',['$timeout','UIHandler','Room
 	    };
 	    
 	    this.emojiItems = function($scope,txt,list) {
-	    	var matches = txt.match(/\:[a-z\_\+0-9]+\:/g);
+	    	var matches = txt.match(/\:[a-z0-9\_\+\-]+\:/g);
 	    	if (matches) {
 	    		var mtxt = txt; 
 	    		for (var i=0; i<matches.length; i+=1) {
@@ -274,9 +274,9 @@ angular.module('mean.rooms').factory('ChatService',['$timeout','UIHandler','Room
 	    			if (pre) {
 	    				this.emoticonItems($scope,pre,list);
 	    			}
-	    			var selector = matches[i].substring(1,matches[i].length-1).replace(/_/g,'-');
+	    			var selector = matches[i].substring(1,matches[i].length-1).replace(/_/g,'-').replace(/^\+1$/g,'thumbsup').replace(/^\-1$/g,'thumbsdown');
 	    			if (this.selectorExists('.twa-'+selector)) {
-	    				list.push({type:'emoji',twaclass:'twa twa-lg twa-'+selector});
+	    				list.push({type:'emoji',twaclass:'twa twa-lg twa-'+selector, base: matches[i]});
 	    			} else {
 	    				list.push({type:'text',text:matches[i]});
 	    			}
