@@ -346,7 +346,6 @@ angular.module('mean.rooms').factory('ChatService',['$timeout','UIHandler','Room
                         'list':[]};
 	        	if (data.text) {
 	        		this.checkTypingIcons(data.id);
-	        		//m.list.push(this.parseUrls($scope,data.text));
 	        		this.addItems($scope,data.text,m.list);
 	        	}
 	        	uiHandler.messages.push(m);
@@ -356,7 +355,6 @@ angular.module('mean.rooms').factory('ChatService',['$timeout','UIHandler','Room
 	        	} else {
 	        		uiHandler.messages[messageIndex].istyping = false;
 	        		this.addItems($scope,data.text,uiHandler.messages[messageIndex].list);
-	        		//uiHandler.messages[messageIndex].list.push(this.parseUrls($scope,data.text));
 	        	}
 	        }
 	    };
@@ -390,6 +388,11 @@ angular.module('mean.rooms').factory('ChatService',['$timeout','UIHandler','Room
 	    	
 	    	uiHandler.messages = [];
 	    	uiHandler.audible = true;
+	    	
+	    	var tips = 0;
+	    	var tipObjects = ['https://www.youtube.com/watch?v=7mWX_KLo7iA',':)',
+	    	                  'https://docs.google.com/presentation/d/1QSGn19Pg7EllzzsLj0pGdZOsEMRkgvgAgvP7YP_UvKQ/share',
+	    	                  ':heart:','https://vimeo.com/79834337','https://showroom.typeform.com/to/ggBJPd'];
 
 	    	$scope.enableAudio = function() {
 	    		uiHandler.audible = !uiHandler.audible;
@@ -400,6 +403,19 @@ angular.module('mean.rooms').factory('ChatService',['$timeout','UIHandler','Room
 	        	uiHandler.dashChat=(uiHandler.chatClass==='collapsed')?'chat_collapsed':'';
 	        };
 
+	        $scope.chatTip = function(more) {
+	        	if (!$scope.resourceBundle['chattip'+tips]) {
+	        		tips = 0;
+	        		self.addNewMessage($scope,{id:$scope.global.bot,text:':information_source: '+$scope.resourceBundle.nomoretips+' :weary:',time:new Date()});
+	        	} else {
+		        	self.addNewMessage($scope,{id:$scope.global.bot,text:':information_source: '+$scope.resourceBundle._('chattip'+tips,tipObjects[tips]),time:new Date()});
+		        	if (more) {
+		        		self.addNewMessage($scope,{id:$scope.global.bot,text:$scope.resourceBundle._('chattipmore',':information_source:'),time:new Date()});
+		        	}
+		        	tips += 1;
+	        	}
+	        };
+	        
 	    	$scope.sendTyping = function() {
 			 	if (!uiHandler.isowner && uiHandler.passNeeded) {
 			 		chSrv.alertNotConected ($scope);
@@ -503,6 +519,7 @@ angular.module('mean.rooms').factory('ChatService',['$timeout','UIHandler','Room
 				//Publish the messages
 			    $timeout(function(){
 			        self.addNewMessage($scope,{id:$scope.global.bot,text:$scope.resourceBundle.welcomechatmess,time:new Date()});
+			        self.addNewMessage($scope,{id:$scope.global.bot,text:$scope.resourceBundle.showchattips+' :point_right: :information_source:',time:new Date()});
 			        self.welcomePublished =true;
 			    },1000);
 			    $timeout(function(){ self.checkTypingIcons(); },2000);

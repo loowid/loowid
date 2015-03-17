@@ -253,5 +253,16 @@
     "wintitlevideo": "Mi cámara web", 
     "youarefired": "Has sido expulsado de la sala", 
     "youmustacceptterms": "Debes aceptar los términos", 
-    "yourbrowsernot": "Aún no damos soporte a tu navegador. Sigue cualquier novedad desde @LooWIDCom"
+    "yourbrowsernot": "Aún no damos soporte a tu navegador. Sigue cualquier novedad desde @LooWIDCom",
+   	"titleChatTip": "Mostrar trucos del chat",
+   	"chattipmore": "Puedes ver más trucos pulsando {0}",
+   	"chattip0": "Puedes escribir direcciones de youtube como esta {0}",
+   	"chattip1": "Prueba a usar emoticonos como este {0}",
+   	"chattip2": "También puedes usar presentaciones de google como {0}",
+   	"chattip3": "Usa iconos emoji como {0}",
+   	"chattip4": "Puedes escribir también direcciones de vimeo y dailymotion {0}",
+   	"chattip5": "Incluye formularios con TypeForm {0}",
+   	"nomoretips": "No tengo más trucos que enseñarte",
+   	"showchattips": "Trucos del chat"
+    
 }

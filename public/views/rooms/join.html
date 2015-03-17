@@ -254,6 +254,7 @@
 <div id="error" ng-class="errorClass" ng-click="hideError()"><div class="error"><h3 ng-bind-html="errorMessage"></h3></div></div>
 <aside id="chat" ng-class="ui.chatClass">
 	<span title="{{resourceBundle.titleOpenclosechat}}" class="toggler" ng-click="toggleChat()"><i class="fa fa-angle-double-right"></i></span>
+	<span title="{{resourceBundle.titleChatTip}}" class="right" ng-click="chatTip()"><i class="twa twa-lg twa-information-source"></i></span>
 	<form data-ng-submit="sendMessage()">
 	<fieldset id="chat_form">
 		<input type="text" data-ng-model="ui.messageText" id="text_chat" placeholder="{{resourceBundle.sendamessage}}" data-ng-change="sendTyping()" autofocus>
