@@ -202,8 +202,9 @@ angular.module('mean.stats').controller('StatsController',['$scope','Stats','Glo
 			for (var edgeKey in peerList){
 				if (peerList.hasOwnProperty(edgeKey)){
 					var peerInfo = peerList[edgeKey];
-					if (peerInfo.produced){
+					if (peerInfo.produced && _.findWhere (graphs[peerInfo.source].nodes, {id: peerInfo.peerId})){
 						var edge = {
+							
 							id: 'ed_' +	key + '_' + peerInfo.peerId +'_' + peerInfo.source,
 							color: $scope.edgeColors[peerInfo.status],
 							source: key,
