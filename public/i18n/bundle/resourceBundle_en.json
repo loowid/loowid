@@ -253,6 +253,16 @@
    "titleChangeAvatarImage": "Click to change my avatar image",
    "titleOpenVideoInWindow": "Open '{0}' video in a LooWID window",
    "titleOpenTypeFormInWindow": "Open this Typeform in a LooWID window",
-   "titleOpenGDocInWindow": "Open this Google document in a LooWID window"
+   "titleOpenGDocInWindow": "Open this Google document in a LooWID window",
+   "titleChatTip": "Show chat tips",
+   "chattipmore": "Show more tips by clicking {0}",
+   "chattip0": "You can add youtube urls like this {0}",
+   "chattip1": "Try to use emoticons like this {0}",
+   	"chattip2": "Also add google presentations like this {0}",
+   	"chattip3": "Use emoji icons like this {0}",
+   	"chattip4": "You can add vimeo and dailymotion urls {0}",
+   	"chattip5": "TypeForm support {0}",
+   	"nomoretips": "No more tips to show",
+   	"showchattips": "Chat tips"
    
 }
