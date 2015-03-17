@@ -157,12 +157,16 @@ angular.module('mean.rooms').factory('ChatService',['$timeout','UIHandler','Room
 	    this.getAllSelectors = function() { 
 	        var ret = [];
 	        for(var i = 0; i < document.styleSheets.length; i+=1) {
-	            var rules = document.styleSheets[i].rules || document.styleSheets[i].cssRules;
-	            for(var x in rules) {
-	                if(typeof rules[x].selectorText === 'string') {
-	                	ret.push(rules[x].selectorText);
-	                }
-	            }
+	        	try {
+		            var rules = document.styleSheets[i].rules || document.styleSheets[i].cssRules;
+		            for(var x in rules) {
+		                if(typeof rules[x].selectorText === 'string') {
+		                	ret.push(rules[x].selectorText);
+		                }
+		            }
+	        	} catch (e) {
+	        		// Firefox throw security error in other domain rules
+	        	}
 	        }
 	        return ret;
 	    };
