@@ -1059,6 +1059,9 @@ header{
 		.right {
 			display: none;
 		}
+		.chatTip{
+			display: none;	
+		}
 	}
 	.toggler{
 		right: 230px;
@@ -1066,6 +1069,13 @@ header{
 	}
 	.right {
 		float: right;
+	}
+	.chatTip{
+		float: right;
+		position: relative;
+		@media all and (max-width:800px){ 
+			top: 14px;
+		}
 	}
 	#chat_container{
 		position: relative;
@@ -1129,7 +1139,7 @@ header{
 		}
 	}
 	@media all and (max-width:800px){  
-		width: 95%;
+		width: 100%;
 		#text_chat{
 			width: 100%;
 		}
