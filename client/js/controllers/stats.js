@@ -144,7 +144,9 @@ angular.module('mean.stats').controller('StatsController',['$scope','Stats','Glo
 					addNodes (key,username,userstatus,peerList);
 
 					//Add the edges
-					addEdges (key,peerList);
+					addEdges (key,_.filter(peerList,function (peer){
+						return (peer.source === 'video' || peer.source === 'audio' || peer.source === 'screen') ;		
+					}));
 				}
 			}
 
