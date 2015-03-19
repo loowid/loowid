@@ -171,10 +171,10 @@
 			<p class="toolbar" ng-show="global.access.moderated">
 				
 				<a title="{{resourceBundle._('titleAskforscreen',user.name)}}" href="" ng-hide="ui.userStatus[user.connectionId]['screen']" ng-click="askForSharing(user.connectionId,'screen')"><i class="fa fa-desktop"></i></a>
-				<a title="{{resourceBundle._('titleAskforstopscreen',user.name)}}" href="" ng-show="ui.userStatus[user.connectionId]['screen']" ng-click="askForStopSharing(user.connectionId,'screen')"><i class="fa fa-times"></i></a>
+				<a title="{{resourceBundle._('titleAskforstopscreen',user.name)}}" href="" ng-show="ui.userStatus[user.connectionId]['screen']" ng-click="closeRemoteWindow(user.connectionId,'screen')"><i class="fa fa-times"></i></a>
 				
 				<a title="{{resourceBundle._('titleAskforvideo',user.name)}}" href="" ng-hide="ui.userStatus[user.connectionId]['video']"ng-click="askForSharing(user.connectionId,'video')"><i class="fa fa-video-camera"></i></a>
-				<a title="{{resourceBundle._('titleAskforstopvideo',user.name)}}" href="" ng-show="ui.userStatus[user.connectionId]['video']"ng-click="askForStopSharing(user.connectionId,'video')"><i class="fa fa-times"></i></a>
+				<a title="{{resourceBundle._('titleAskforstopvideo',user.name)}}" href="" ng-show="ui.userStatus[user.connectionId]['video']"ng-click="closeRemoteWindow(user.connectionId,'video')"><i class="fa fa-times"></i></a>
 
 				<a title="{{resourceBundle._('titleAskforaudio',user.name)}}" href=""  ng-hide="ui.userStatus[user.connectionId]['audio'] "   ng-click="askForSharing(user.connectionId,'audio')"><i class="fa fa-microphone"></i></a>
 				<a title="{{resourceBundle._('titleAskforstopaudio',user.name)}}" href=""  ng-show="ui.userStatus[user.connectionId]['audio']"   ng-click="askForStopSharing(user.connectionId,'audio')"><i class="fa fa-times"></i></a>

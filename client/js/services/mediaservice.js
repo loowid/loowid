@@ -372,7 +372,19 @@ angular.module('mean.rooms').factory('MediaService',['Rooms','UIHandler',functio
 					});
 				}
 			};
+			
+			$scope.closeRemoteWindow = function(connectionId,origin){
+				for (var i=0; i< self.receivedStreams.length; i+=1){
+					var mediasource = self.receivedStreams[i];
 
+					var streamId = mediasource.connectionId + '_' + mediasource.type;
+					if (mediasource.stream && streamId === (connectionId + '_' + origin)){
+						mediasource.window.winHandler.close();
+						mediasource.window.closedByOwner =true;
+					}
+				}
+			};
+			
 			$scope.openVideoFromService = function (wtitle,wurl){
 				$scope.openIFrameService(null,wtitle,wurl);
 			};
@@ -441,10 +453,14 @@ angular.module('mean.rooms').factory('MediaService',['Rooms','UIHandler',functio
 							uiHandler.safeApply($scope,function(){});
 						},
 						'onclose': function (win){
-							if (uiHandler.isowner){
-								uiHandler.safeApply ($scope,function(){
-									$scope.askForStopSharing (connectionId,mediasource.type);
-								});	
+							if (uiHandler.isowner && uiHandler.access.moderated ){
+								
+								if (win.closedByStream === undefined){
+									uiHandler.safeApply ($scope,function(){
+										$scope.askForStopSharing (connectionId,mediasource.type);
+										win.closedByOwner = true;
+									});
+								}
 							}
 						},
 						'onmaximize': function (win){
@@ -486,9 +502,13 @@ angular.module('mean.rooms').factory('MediaService',['Rooms','UIHandler',functio
 			var streamId = mediasource.connectionId + '_' + mediasource.type;
 			if (mediasource.stream && streamId === (data.connectionId + '_' + data.mediatype)){
 				rtc.dropPeerConnection(data.connectionId,data.mediatype,false);
-
+				
+				//also look if the window is already closed
 				if (mediasource.playtype==='video'){
-					mediasource.window.winHandler.close();
+					if (mediasource.window.closedByOwner === undefined){
+						mediasource.window.winHandler.close();
+						mediasource.window.closedByStrem =true;
+					}
 				}else{
 					var el = document.getElementById('remote_' + streamId); 
 					el.parentNode.removeChild(el);
