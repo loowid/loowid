@@ -205,13 +205,13 @@ var strategy = new LTIStrategy({
   	passReqToCallback : true
 }, function(req, lti, done) {
 	// LTI launch parameters
-	var definedRole = (process.env.LTI_OWNER_ROLES || 'Instructor').split(',');
+	var ltiFields = { name: 'lis_person_name_full', email: 'lis_person_contact_email_primary', ownerRoles: 'custom_lti_owner_roles' };
+	var definedRole = (lti[ltiFields.ownerRoles] || process.env.LTI_OWNER_ROLES || 'Instructor').split(',');
 	var isOwner = false;
 	for (var k=0; k<definedRole.length && !isOwner; k+=1) {
 		isOwner = (lti.roles.indexOf(definedRole[k]) > -1);
 	}
 	rooms.createOrFindLTI(req,lti,isOwner,function(r){
-		var ltiFields = { name: 'lis_person_name_full', email: 'lis_person_contact_email_primary' };
 		req.session.ltiname = lti[ltiFields.name];
 		req.session.ltiavtr = rooms.getGravatarImg(lti[ltiFields.email]);
 		return done(null,{url:'/#!/r/'+r.roomId+(isOwner?'/join':'')});
