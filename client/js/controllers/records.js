@@ -169,8 +169,7 @@ angular.module('mean.rooms').controller('RecordController', ['$scope', '$routePa
 	};
 
 	$scope.getScreenUrl = function() {
-		var po = ($location.$$port===80 || $location.$$port===443)?'':':'+$location.$$port;
-		return $location.$$protocol+ '://'+ $location.$$host + po + '/#!/r/' + $scope.global.roomId;
+		return $location.$$protocol+ '://'+ $location.$$host + $scope.global.getUrlPort($location) + '/#!/r/' + $scope.global.roomId;
 	};
 
  	$scope.init = function (){
@@ -220,7 +219,7 @@ angular.module('mean.rooms').controller('RecordController', ['$scope', '$routePa
 						 	uiHandler.gravatar = results.owner.gravatar;
 						 	$scope.global.roomDueDate = results.dueDate;
 					    	$scope.global.access = uiHandler.access;
-					    	uiHandler.permanenturl = $location.$$protocol+ '://'+ $location.$$host +  '/#!/r/' + uiHandler.access.permanentkey + '/claim';
+					    	uiHandler.permanenturl = $location.$$protocol+ '://'+ $location.$$host + $scope.global.getUrlPort($location) + '/#!/r/' + uiHandler.access.permanentkey + '/claim';
                             $scope.global.name = uiHandler.name;
 					    	$scope.global.avatar = uiHandler.avatar;
 					    	$scope.global.gravatar = uiHandler.gravatar;
