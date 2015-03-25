@@ -237,14 +237,14 @@ app.configure(function() {
 	//app.use(express.session({secret:'Secret'}));	
 	app.use(express.session({
 		store:new MongoStore({'mongoose_connection':mongoose.connection},function(){logger.info('Session store connected !!');}),
-		cookie: { maxAge : 3600000 }, // 1 hour
+		cookie: { maxAge : null }, // Browser-Session Cookie
 		key:'jsessionid', 
 		secret:sessionSecret}));
 	app.use(express.bodyParser());
 	var csrf = express.csrf();
 	app.use(function(req,res,next){
 		if (isClustered && (!req.cookies.stickyid || (req.headers.stickyid && req.cookies.stickyid !== req.headers.stickyid)) && req.headers.stickyid) {
-			res.cookie('stickyid', req.headers.stickyid, { maxAge: 3600000, httpOnly: true });
+			res.cookie('stickyid', req.headers.stickyid, { maxAge: null, httpOnly: true });
 		}
 		// Skip CSRF Check for LTI Initial Route, and forces https
 		if ((req.protocol === 'http') && (req.url === LTI_PATH) && isOpenShift()) {
