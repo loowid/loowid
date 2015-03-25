@@ -521,10 +521,6 @@ app.post('/rooms/:roomId/move', function(req, res, next) {
 	rooms.moveRoom(req, res, next);
 });
 
-app.post('/rooms/keep', function(req, res, next){
-	res.json({keep:true});
-});
-
 app.get('/r/:staticId', function(req, res){
 	if( req.room !== null ){
 		res.redirect('/#!/r/' + req.room.roomId );
