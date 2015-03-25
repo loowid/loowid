@@ -35,7 +35,7 @@ angular.module('mean.rooms').controller('RoomsController', ['$scope', '$routePar
 				   $scope.global.access = acc;
 				   $scope.global.gravatar = gav;
 				   $scope.global.roomDueDate = dueDate; 
-			       uiHandler.permanenturl = $location.$$protocol+ '://'+ $location.$$host +  '/#!/r/' + $scope.global.access.permanentkey + '/claim';
+			       uiHandler.permanenturl = $location.$$protocol+ '://'+ $location.$$host + $scope.global.getUrlPort($location) +  '/#!/r/' + $scope.global.access.permanentkey + '/claim';
 				   $location.path('r/' + id + '/join');
 			   });
 		   }

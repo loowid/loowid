@@ -74,7 +74,10 @@ angular.module('mean.system').factory('Global', [function() {
 	                });
 	            });
         	}
-        }
+        },
+        getUrlPort:	function($location) {
+    		return ($location.$$port===80 || $location.$$port===443)?'':':'+$location.$$port;
+    	}
     };
 
     return _this._data;
