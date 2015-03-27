@@ -6,6 +6,7 @@
  * 
  */
 /*global escape: true */
+/*global unescape: true */
 var log4js = require('./log.js');
 var logger = log4js.getLog('server');
 var crypto = require('crypto') ;
@@ -331,93 +332,81 @@ app.get('/chat/talk',function(req, res) {
 	});
 });
 
-var videoServices = {
-	'youtube': {
-		host: 'www.youtube.com',
-		path: '/oembed?url=##video##&format=json',
-		video: 'https://www.youtube.com/watch?v=##id##',
-		cache: []
-	},
-	'vimeo': {
-		host: 'vimeo.com',
-		path: '/api/oembed.json?url=##video##',
-		video: 'https://vimeo.com/##id##',
-		cache: []
-	},
-	'dailymotion': {
-		host: 'www.dailymotion.com',
-		path: '/services/oembed?url=##video##',
-		video: 'https://www.dailymotion.com/video/##id##',
-		cache: []
+var finalHeaders = {'User-Agent':'Mozilla/5.0 (Windows NT 6.0; rv:26.0) Gecko/20100101 Firefox/33.0'};
+
+/* Discover oembed services */
+var getOEmbedEntryPoint = function(url,callback,errfn) {
+	var request = require('request');
+	var finalUrl = url.indexOf('http')===0?url:'http://'+url;
+	request({headers:finalHeaders,url:finalUrl}, function (error, response, body) {
+	  if (!error && body) {
+		  var linkAtts = /<link([^>]*)type="(?:application|text)\/json\+oembed"([^>]*)>/g.exec(body);
+		  if (linkAtts) {
+			var otherAtts = linkAtts[1] + ' ' + linkAtts[2];
+			var matches = /\s*href="([^"]*)"/g.exec(otherAtts);
+			if (matches) {
+				callback(matches[1]);
+			} else {
+				errfn({error:404});
+			}
+		  } else {
+			  errfn({error:404});
+		  }
+	  } else {
+		  errfn({error:404});
+	  }
+	});
+};
+
+var getOEmbedData = function(url,callback,error) {
+	var oembedData = {error:404};
+	var request = require('request');
+	request({headers:finalHeaders,url:url}, function (error, response, body) {
+	  if (!error && response.statusCode === 200) {
+			oembedData = JSON.parse(body);
+	  }
+	  callback(oembedData);
+	});
+};
+
+var embedlyApiKey = process.env.EMBEDLY_APIKEY;
+
+var oembedProviders = [
+    'vimeo.com','flickr.com','youtube.com','codepen.io','dailymotion.com','ustream.tv','animoto.com','hulu.com',
+    'slideshare.net','ted.com','circuitlab.com','soundcloud.com','sketchfab.com','vine.co','collegehumor.com','instagram.com'];
+           	    
+var getOEmbedProvidersRegExp = function() {
+	var domains = '';
+	for (var d=0;d<oembedProviders.length;d+=1) {
+		domains += (domains===''?'':'|')+'(www\.)?'+oembedProviders[d].replace('.','\\.');
 	}
+	return new RegExp('(^|^https?://)('+domains+')/.+','g');
 };
 
-var getImg = function(obj,prop) {
-	return obj[prop].replace(/https?:/g,'');
-};
-
-var getUrlFromSrc = function(obj) {
-	var exp = /src=\"([^\"]+)\"/g;
-	var m = exp.exec(obj.html);
-	return m[1].replace(/https?:/g,'');
-};
-
-var addCache = function(service,id,data) {
-	videoServices[service].cache['_'+id] = data;
-	setTimeout(function(){
-		delete videoServices[service].cache['_'+id];
-	},600000); // Cache 10 minutes
-};
-
-var getVideoData = function(service,id,callback,error) {
-	if (videoServices[service]) {
-		if (!videoServices[service].cache['_'+id]) {
-			var videoData = {error:404};
-			var reqst = http.get(
-				{
-				 host:videoServices[service].host,
-				 path:videoServices[service].path.replace('##video##',escape(videoServices[service].video.replace('##id##',id))),
-				 headers:{'User-Agent':'Mozilla/5.0 (Windows NT 6.0; rv:26.0) Gecko/20100101 Firefox/33.0'}
-				}, function(response) {
-				//handle the response
-				var bodyData = '';
-				response.setEncoding('utf-8');
-				response.on('data',function(data){
-					bodyData += data;
-				});
-				response.on('end',function(){
-					try {
-						if (response.statusCode===200) {
-							var video = JSON.parse(bodyData);
-							videoData = {url:getUrlFromSrc(video),thumbnail:getImg(video,'thumbnail_url'),title:video.title,id:id,service:service};
-						}
-						callback(videoData);
-					} catch (err) {
-						error();
-					} finally {
-						addCache(service,id,videoData);
-					}
-				});
+app.post('/chat/oembed',function(req, res, next) {
+	var matches = getOEmbedProvidersRegExp().exec(req.body.url);
+	if (matches) {
+		if (embedlyApiKey) {
+			// Using embedly service
+			getOEmbedData('http://api.embed.ly/1/oembed?key='+embedlyApiKey+'&url='+escape(req.body.url)+'&maxwidth=500&autoplay=true',function(oembed){
+				res.json(oembed);
+			},function(){
+				res.json({error:404});
 			});
-			reqst.on('error',function(){
-				addCache(service,id,videoData);
-				error();
-			});
-			reqst.end();
 		} else {
-			callback(videoServices[service].cache['_'+id]);
+			getOEmbedEntryPoint(req.body.url,function(entryPoint){
+				getOEmbedData(unescape(entryPoint),function(oembed){
+					res.json(oembed);
+				},function(){
+					res.json({error:404});
+				});
+			},function(){
+				res.json({error:404});
+			});
 		}
 	} else {
-		error();
-	}
-};
-
-app.post('/chat/video',function(req, res, next) {
-	getVideoData(req.body.service,req.body.id,function(video){
-		res.json(video);
-	},function(){
 		res.json({error:404});
-	});
+	}
 });
 
 var pck = require('./package.json');

@@ -134,6 +134,12 @@ Wiki Documentation | Vote us !! | Bitnami Contest
   MONGOLAB_URI=<MongoDB URI>
   MONGOHQ_URL=<MongoDB URL>
   ```
+
+  9. Embed.ly configuration, to enable OEMBED service with [Embed.ly](http://embed.ly/)
+  
+  ```
+  EMBEDLY_APIKEY=<embedly api key>
+  ```
   
 ## Translate
   If you are interested in add a translation or improve the existing ones you can use weblate platform at: 

@@ -8,7 +8,7 @@ angular.module('mean.rooms').factory('ChatService',['$timeout','UIHandler','Room
 		var self= this;
 		var room = new Rooms({});
 
-		this.videoData = {};
+		this.oembedData = {};
 		
 		this.formatDate = function($scope,t,fm) {
 		   var yyyy = t.getFullYear().toString();
@@ -45,75 +45,65 @@ angular.module('mean.rooms').factory('ChatService',['$timeout','UIHandler','Room
 	        return secs>15;
 	    };
 	    
-	    this.getVideoData = function(service,vid,callb) {
-	    	if (!this.videoData[vid]) {
-		    	var retrieve = $http({
-		    			method:'post',
-		    			url:'/chat/video',
-		    			data:{
-		    				service:service,
-		    				id:vid
-		    			},
-		    			headers:{'x-csrf-token':window.csrf}
-		    	});
-		    	retrieve.success(function(response) {
-		    		self.videoData[vid] = response;
-		    		callb(self.videoData[vid]);
-		        }).error(function(response) {
-		        	callb(null);
-		        });
-	    	} else {
-	    		callb(this.videoData[vid]);
-	    	}
+	    this.getOEmbedData = function(url,callb) {
+	    	var retrieve = $http({
+	    			method:'post',
+	    			url:'/chat/oembed',
+	    			data:{
+	    				url:url
+	    			},
+	    			headers:{'x-csrf-token':window.csrf}
+	    	});
+	    	retrieve.success(function(response) {
+	    		callb(response);
+	        }).error(function() {
+	        	callb(null);
+	        });
 	    };
 	    
-	    this.processVideoLinks = function($scope,vid,list,service) {
-			// Avoid side effects copying the same video multiple times
-			var realUniqueId = 'max_'+vid+'_'+(new Date()).getTime()+Math.floor(Math.random()*100);
-			var miObj = {type:'video',idv:realUniqueId,loading:true,ready:false};
-			self.getVideoData(service,vid,function(video){
-				if (!video.error) {
+	    this.processOEmbedUrl = function($scope,url,list) {
+			var realUniqueId = 'embed_'+(new Date()).getTime()+Math.floor(Math.random()*100);
+			var miObj = {type:'oembed',idv:realUniqueId,loading:true,ready:false};
+			var thumb = 'thumbnail_url';
+	    	self.getOEmbedData(url,function(oembed){
+	    		if (!oembed.error) {
 					miObj.loading = false;
 					miObj.ready = true;
-					miObj.title = $scope.resourceBundle._('titleOpenVideoInWindow',video.title);
-					miObj.thumbnail = video.thumbnail;
-					miObj.videoid = video.id;
+					miObj.title = $scope.resourceBundle._('titleOpenVideoInWindow',oembed.title);
+					var thumbUrl = oembed[thumb] || oembed.thumbnail;
+					miObj.thumbnail = thumbUrl?thumbUrl:'';
+					//miObj.videoid = video.id;
 					setTimeout(function(){
 						document.getElementById(realUniqueId).addEventListener ('click',function (event){
-							$scope.openVideoFromService(video.title,video.url);
+							$scope.openOEmbedFromService(oembed);
 							event.preventDefault();
 						});
 					},500);
-				}
-			});
+	    		} else {
+					miObj.loading = false;
+					miObj.ready = false;
+	    		}
+	    	});
 			list.push(miObj);
 	    };
 	    
-	    this.videoServices = {
-	    		'youtube': { 
-	    			regexp: [/(?:https?:\/\/)?www\.youtube\.com\/watch\?v=([^\s]+)/g,/(?:https?:\/\/)?m\.youtube\.com\/watch\?v=([^\s]+)/g,/(?:https?:\/\/)?youtu\.be\/([^\s]+)/g]
-	    		},
-	    		'vimeo': {
-	    			regexp: [/(?:https?:\/\/)?vimeo\.com\/([0-9]+)/g,/(?:https?:\/\/)?vimeo\.com\/channels\/[^\/]+\/([0-9]+)/g]
-	    		},
-	    		'dailymotion': {
-	    			regexp: [/(?:https?:\/\/)?www\.dailymotion\.com\/video\/([^\_]+)_.*/g]
-	    		}
+	    this.oembedProviders = [
+	         'vimeo.com','flickr.com','youtube.com','codepen.io','dailymotion.com','ustream.tv','animoto.com','hulu.com',
+	         'slideshare.net','ted.com','circuitlab.com','soundcloud.com','sketchfab.com','vine.co','collegehumor.com','instagram.com'];
+	    
+	    this.getOEmbedProvidersRegExp = function() {
+	    	var domains = '';
+	    	for (var d=0;d<self.oembedProviders.length;d+=1) {
+	    		domains += (domains===''?'':'|')+'(www\.)?'+self.oembedProviders[d].replace('.','\\.');
+	    	}
+	    	return new RegExp('(^|^https?://)('+domains+')/.+','g');
 	    };
 	    
-	    this.processVideoUrls = function($scope,txt,list) {
-			for (var el in this.videoServices) {
-				if (this.videoServices.hasOwnProperty(el)) {
-					for (var re in this.videoServices[el].regexp) {
-						if (this.videoServices[el].regexp.hasOwnProperty(re)) {
-							var matches = this.videoServices[el].regexp[re].exec(txt);
-							if (matches) {
-								this.processVideoLinks($scope,matches[1],list,el);
-							}
-						}
-					}
-				}
-			}
+	    this.processOEmbedUrls = function($scope,txt,list) {
+	    	var matches = self.getOEmbedProvidersRegExp().exec(txt);
+	    	if (matches) {
+	    		self.processOEmbedUrl($scope,txt,list);
+	    	}
 	    };
 	    
 	    this.processGoogleDoc = function($scope,txt,list) {
@@ -151,7 +141,7 @@ angular.module('mean.rooms').factory('ChatService',['$timeout','UIHandler','Room
 	    this.addObjects = function($scope,txt,list) {
 	    	this.processTypeForm($scope,txt,list);
 	    	this.processGoogleDoc($scope,txt,list);
-	    	this.processVideoUrls($scope,txt,list);
+	    	this.processOEmbedUrls($scope,txt,list);
 	    };
 	    
 	    this.getAllSelectors = function() { 
@@ -396,7 +386,11 @@ angular.module('mean.rooms').factory('ChatService',['$timeout','UIHandler','Room
 	    	var tips = 0;
 	    	var tipObjects = ['https://www.youtube.com/watch?v=7mWX_KLo7iA',':)',
 	    	                  'https://docs.google.com/presentation/d/1QSGn19Pg7EllzzsLj0pGdZOsEMRkgvgAgvP7YP_UvKQ/share',
-	    	                  ':heart:','https://vimeo.com/79834337','https://showroom.typeform.com/to/ggBJPd'];
+	    	                  ':heart:','https://vimeo.com/79834337','https://showroom.typeform.com/to/ggBJPd',
+	    	                  'https://www.flickr.com/photos/theenmoy/16747301848/in/explore-2015-03-26',
+	    	                  'http://www.ted.com/talks/amy_webb_how_i_hacked_online_dating',
+	    	                  'http://www.slideshare.net/um_mncs/en-20-minutos-charla-loowid',
+	    	                  'http://codepen.io/RomainJeff/pen/myRWeo','https://github.com/loowid/loowid/wiki'];
 
 	    	$scope.enableAudio = function() {
 	    		uiHandler.audible = !uiHandler.audible;
