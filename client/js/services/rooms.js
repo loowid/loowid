@@ -21,7 +21,6 @@ angular.module('mean.rooms').factory('Rooms', ['$resource','$http','$window','No
 	            askForSharing: {method: 'POST', params: {cmd: 'askForSharing'}, headers:{'x-csrf-token':csrf}},
 	            askForStopSharing: {method: 'POST', params: {cmd: 'askForStopSharing'}, headers:{'x-csrf-token':csrf}},
 	            moveRoom: {method: 'POST', params: {cmd: 'move'},headers:{'x-csrf-token':csrf}},
-	            keepSession: {method: 'POST', params: {cmd: 'keep'},headers:{'x-csrf-token':csrf}},
                 claimforroom: {method: 'POST', params:{cmd: 'claimforroom'},headers:{'x-csrf-token':csrf}},
 	            chat: {method: 'POST', params: {cmd: 'chat'}, headers:{'x-csrf-token':csrf}},
 	        });
@@ -224,10 +223,6 @@ angular.module('mean.rooms').factory('Rooms', ['$resource','$http','$window','No
         	room.moveRoom({id: roomId, list: userids},success,failure);
         };
 
-        this.keepSession = function (success,failure) {
-        	room.keepSession(success,failure);
-        };
-        
         this.notifyIn = function($scope) {
    		    Notification.requestPermission(function (){
 				var notification = new Notification($scope.resourceBundle.welcometo, {

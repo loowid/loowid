@@ -145,12 +145,6 @@ angular.module('mean.rooms').controller('ViewDesktopController', ['$scope', '$ro
     	uiHandler.roomId = $scope.global.roomId = rid;
         $scope.isowner = false;
         
-        // Keep Session with auto request every 15 min
-		window.clearInterval($scope.global.keepInterval);
-		$scope.global.keepInterval = window.setInterval(function(){
-			room.keepSession(function(){},function(){});
-		},900000);
-
 		// Reload if is a permanent room
 		window.clearInterval($scope.global.reloadInterval);
 		$scope.global.reloadInterval = window.setInterval(function(){
