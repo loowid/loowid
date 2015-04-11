@@ -371,14 +371,12 @@ var getOEmbedData = function(url,callback,error) {
 
 var embedlyApiKey = process.env.EMBEDLY_APIKEY;
 
-var oembedProviders = [
-    'vimeo.com','flickr.com','youtube.com','codepen.io','dailymotion.com','ustream.tv','animoto.com','hulu.com',
-    'slideshare.net','ted.com','circuitlab.com','soundcloud.com','sketchfab.com','vine.co','collegehumor.com','instagram.com'];
-           	    
+var oembedProviders = require('./oembed');
+
 var getOEmbedProvidersRegExp = function() {
 	var domains = '';
-	for (var d=0;d<oembedProviders.length;d+=1) {
-		domains += (domains===''?'':'|')+'(www\.)?'+oembedProviders[d].replace('.','\\.');
+	for (var d=0;d<oembedProviders.domains.length;d+=1) {
+		domains += (domains===''?'':'|')+'(www\.)?'+oembedProviders.domains[d].replace('.','\\.');
 	}
 	return new RegExp('(^|^https?://)('+domains+')/.+','g');
 };

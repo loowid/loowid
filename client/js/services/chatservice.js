@@ -1,5 +1,6 @@
 'use strict';
 /*global rtc: true */
+/*global OEmbedProviders: true */
 angular.module('mean.rooms').factory('ChatService',['$timeout','UIHandler','Rooms','Notification','$http',function($timeout,UIHandler,Rooms,Notification,$http){
 	return function (){
 
@@ -87,14 +88,10 @@ angular.module('mean.rooms').factory('ChatService',['$timeout','UIHandler','Room
 			list.push(miObj);
 	    };
 	    
-	    this.oembedProviders = [
-	         'vimeo.com','flickr.com','youtube.com','codepen.io','dailymotion.com','ustream.tv','animoto.com','hulu.com',
-	         'slideshare.net','ted.com','circuitlab.com','soundcloud.com','sketchfab.com','vine.co','collegehumor.com','instagram.com'];
-	    
 	    this.getOEmbedProvidersRegExp = function() {
 	    	var domains = '';
-	    	for (var d=0;d<self.oembedProviders.length;d+=1) {
-	    		domains += (domains===''?'':'|')+'(www\.)?'+self.oembedProviders[d].replace('.','\\.');
+	    	for (var d=0;d<OEmbedProviders.domains.length;d+=1) {
+	    		domains += (domains===''?'':'|')+'(www\.)?'+OEmbedProviders.domains[d].replace('.','\\.');
 	    	}
 	    	return new RegExp('(^|^https?://)('+domains+')/.+','g');
 	    };
