@@ -385,8 +385,27 @@ angular.module('mean.rooms').factory('MediaService',['Rooms','UIHandler',functio
 				}
 			};
 			
-			$scope.openVideoFromService = function (wtitle,wurl){
-				$scope.openIFrameService(null,wtitle,wurl);
+			$scope.openOEmbedFromService = function (oembed){
+				var htmlCode = oembed.html;
+				if (!htmlCode) {
+					if (oembed.type==='image') {
+						htmlCode = '<img src="'+oembed.url+'"/>';
+					} else {
+						htmlCode = '<iframe src="'+oembed.url+'"></iframe>';
+					}
+				}
+				htmlCode = htmlCode.replace('http:','');
+				var iframeElement = angular.element(htmlCode);
+				var windowOptions = {
+					'mediaElement': iframeElement,
+					'title': oembed.title,
+					'ratio': RATIO_16_9,
+					'scale': 0.5,
+					'closeable': true	
+				};
+				iframeElement[0].width='100%';
+				iframeElement[0].className += iframeElement[0].className ? ' wframe' : 'wframe';
+				windowHandler.create ($scope,windowOptions);
 			};
 
 			$scope.openIFrameService = function (wid,wtitle,wurl){

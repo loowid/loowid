@@ -102,7 +102,7 @@ module.exports = function(grunt) {
                 },
             },
             js: {
-                files: ['client/js/**/*js'],
+                files: ['client/js/**/*js','oembed.js'],
                 tasks: ['minicheck'],
                 options: {
                     livereload: true,
@@ -200,7 +200,8 @@ module.exports = function(grunt) {
 						'client/js/lib/sigma/*.js',
 						'client/js/*.js',
 						'client/js/services/*.js',
-						'client/js/controllers/*.js'        			
+						'client/js/controllers/*.js',
+						'oembed.js'        			
 					]
         		}
         	}
