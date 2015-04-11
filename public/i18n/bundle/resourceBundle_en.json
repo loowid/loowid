@@ -258,11 +258,16 @@
    "chattipmore": "Show more tips by clicking {0}",
    "chattip0": "You can add YouTube URLs like this {0}",
    "chattip1": "Try to use emoticons like this {0}",
-   	"chattip2": "Also add Google presentations like this {0}",
-   	"chattip3": "Use emoji icons like this {0}",
-   	"chattip4": "You can add Vimeo and Dailymotion URLs {0}",
-   	"chattip5": "TypeForm support {0}",
-   	"nomoretips": "No more tips to show",
-   	"showchattips": "Chat tips"
+   "chattip2": "Also add Google presentations like this {0}",
+   "chattip3": "Use emoji icons like this {0}",
+   "chattip4": "You can add Vimeo and Dailymotion URLs {0}",
+   "chattip5": "TypeForm support {0}",
+   "chattip6": "LooWID chat can embed a lot of things like flickr or instagram images {0}",
+   "chattip7": "You can also embed ted talks {0}",
+   "chattip8": "Try to add some slides like {0}",
+   "chattip9": "Or your fauvorite code examples with {0}",
+   "chattip10": "Check LooWID help to get the complete list of things that you can do {0}",
+   "nomoretips": "No more tips to show",
+   "showchattips": "Chat tips"
    
 }

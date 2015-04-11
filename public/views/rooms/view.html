@@ -231,7 +231,7 @@
 	  			<p ng-repeat="sitem in msg.list track by $index">
 	  				<span ng-repeat="obj in sitem.embed track by $index">
 	  					<span ng-show="obj.type==='typeform' || obj.type==='gdoc'" class="edoc"><a id="{{obj.id}}" href="#"><img title="{{obj.title}}" ng-src="{{obj.thumbnail}}"/><i title="{{obj.title}}" ng-class="{'fa':true,'fa-caret-square-o-right':true,'black':obj.fablack,'white':obj.fawhite}"></i></a></span>
-	  					<span ng-show="obj.type==='video'">
+	  					<span ng-show="obj.type==='oembed'">
   							<span ng-show="obj.loading" class="spinner"><span class="bounce1"></span><span class="bounce2"></span><span class="bounce3"></span></span>
   							<span ng-show="obj.ready" class="evideo"><a id="{{obj.idv}}" href="#"><img title="{{obj.title}}" ng-src="{{obj.thumbnail}}" width="100%" height="100%"  data-videoid="{{obj.videoid}}"/><i title="{{obj.title}}" class="fa fa-play-circle"></i></a></span>
 	  					</span>
