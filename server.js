@@ -74,6 +74,9 @@ var sessionSecret = crypto.randomBytes(16).toString('hex');
 var webRTC = require('./webrtc.io.js').listen(wserver,ipaddr);
 stats.setWebRTCHandler(webRTC);
 
+// Run relay connector
+require('./relay/connector.js').relayConnector(webRTC);
+
 var serverId = (Math.random()/+new Date()).toString(36).replace(/[^a-z]+/g,'').substring(0,9);
 exports.serverId = serverId;
 
