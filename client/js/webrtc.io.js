@@ -1057,78 +1057,78 @@ function mergeConstraints(cons1, cons2) {
 			}
 		}));
 	};
+	
+	/**
+	* RTC relay methods
+	*/
+	
+	rtc.relayStreamAdded = function (room,origin,sender,type){
+		rtc._socket.send(JSON.stringify({
+			'eventName': 'r_stream_added',
+			'data': {
+				'room': room,
+				'origin': origin,
+				'sender': sender,
+				'type':type
+			}
+		}));
+	};
 
+	rtc.relayStreamAdded = function (room,origin,sender,type){
+		rtc._socket.send(JSON.stringify({
+			'eventName': 'r_stream_added',
+			'data': {
+				'room': room,
+				'origin': origin,
+				'sender': sender,
+				'type':type
+			}
+		}));
+	};
+
+	rtc.relayStreamRemoved = function (room,origin,sender,type){
+		rtc._socket.send(JSON.stringify({
+			'eventName': 'r_stream_removed',
+			'data': {
+				'room': room,
+				'origin': origin,
+				'sender': sender,
+				'type':type
+			}
+		}));
+	};
+	
+	rtc.relayShouldAccept = function (room,origin,sender,type){
+		rtc._socket.send(JSON.stringify({
+			'eventName': 'r_should_accept',
+			'data': {
+				'room': room,
+				'origin': origin,
+				'sender': sender,
+				'type':type
+			}
+		}));
+	};
+	
+	rtc.relaySendNodeInfo = function (room,nodeInfo){
+		rtc._socket.send(JSON.stringify({
+			'eventName': 'r_update_info',
+			'data': {
+				'room': room,
+				'info': nodeInfo
+			}
+		}));
+	};
+
+	
+	/**
+	* Signals received from server (proposals)
+	*/
+	
+	rtc.on('r_proposal', function(data) {
+			if (rtc.debug){console.log ('Proposal received: ' + JSON.stringify (data));}
+	});
 
 }).call();
 
-/*
-function extractSdp(sdpLine, pattern) {
-	var result = sdpLine.match(pattern);
-	return (result && result.length === 2) ? result[1] : null;
-}
-
-function setDefaultCodec(mLine, payload) {
-	var elements = mLine.split(' ');
-	var newLine = [];
-	var index = 0;
-	for (var i = 0; i < elements.length; i+=1) {
-		if (index === 3) {// Format of media starts from the fourth.
-			newLine[index] = payload; // Put target payload to the first.
-			index+=1; 
-		}
-		if (elements[i] !== payload) {
-			newLine[index] = elements[i];
-			index += 1;
-		}
-	}
-	return newLine.join(' ');
-}
-
-function removeCN(sdpLines, mLineIndex) {
-	var mLineElements = sdpLines[mLineIndex].split(' ');
-	// Scan from end for the convenience of removing an item.
-	for (var i = sdpLines.length - 1; i >= 0; i-=1) {
-		var payload = extractSdp(sdpLines[i], /a=rtpmap:(\d+) CN\/\d+/i);
-		if (payload) {
-			var cnPos = mLineElements.indexOf(payload);
-			if (cnPos !== -1) {
-				// Remove CN payload from m line.
-				mLineElements.splice(cnPos, 1);
-			}
-			// Remove CN line in sdp
-			sdpLines.splice(i, 1);
-		}
-	}
-
-	sdpLines[mLineIndex] = mLineElements.join(' ');
-	return sdpLines;
-}
-
-function preferOpus(sdp) {
-	var sdpLines = sdp.split('\r\n');
-	var mLineIndex = null;
-	// Search for m line.
-	for (var i = 0; i < sdpLines.length; i+=1) {
-		if (sdpLines[i].search('m=audio') !== -1) {
-			mLineIndex = i;
-			break;
-		}
-	}
-	if (mLineIndex === null) return sdp;
-
-	// If Opus is available, set it as the default in m line.
-	for (var j = 0; j < sdpLines.length; j+=1) {
-		if (sdpLines[j].search('opus/48000') !== -1) {
-			var opusPayload = extractSdp(sdpLines[j], /:(\d+) opus\/48000/i);
-			if (opusPayload) sdpLines[mLineIndex] = setDefaultCodec(sdpLines[mLineIndex], opusPayload);
-			break;
-		}
-	}
-
-	// Remove CN in m line and sdp.
-	sdpLines = removeCN(sdpLines, mLineIndex);
-
-	sdp = sdpLines.join('\r\n');
-	return sdp;
-}
-*/
+	
