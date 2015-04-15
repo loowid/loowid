@@ -272,7 +272,7 @@ exports.create = function(req, res, next) {
 	// Check the id is the same as previously created
 	if (req.session.roomId === req.body.roomId){
 		getUniqueRoomId(function(uniqueClaimId){
-			var acc = {shared:'LINK',title:req.body.title,keywords:[],passwd:makeId(),moderated:req.lti?true:false,chat:false,locked:false,permanent:false,permanentkey:uniqueClaimId};
+			var acc = {shared:'LINK',relay:false,title:req.body.title,keywords:[],passwd:makeId(),moderated:req.lti?true:false,chat:false,locked:false,permanent:false,permanentkey:uniqueClaimId};
 			var now = new Date();
 			var due = new Date();
 			var tmout = Number(process.env.ROOM_TIMEOUT || 15);

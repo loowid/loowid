@@ -110,7 +110,8 @@
    "loaded":"If this message does not go away in a few moments",
    "metadesc":"LooWID - Share your screen, your video or your webcam with whoever you want and show them what are you doing",
    "metakeys":"screen, share, social, WebRTC, screencast, easy",
-   "moderatedroom":"Moderate room",
+   "moderatedroom": "Moderate room",
+   "relayedroom": "Massive room (experimental)",
    "requestownerforscreen":"Would you ask the owner to allow you to share your desktop?",
    "requestownerforvideo":"Would you ask the owner to allow you to share your webcam?",
    "requestownerforaudio":"Would you to ask the owner to allow you to share your audio?",
@@ -268,6 +269,7 @@
    "chattip9": "Or your fauvorite code examples with {0}",
    "chattip10": "Check LooWID help to get the complete list of things that you can do {0}",
    "nomoretips": "No more tips to show",
-   "showchattips": "Chat tips"
+   "showchattips": "Chat tips",
+   "relaymodeactive": "Relay mode active"
    
 }

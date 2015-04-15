@@ -41,7 +41,8 @@ var RoomSchema = new Schema({
        	keywords: [String],
        	passwd: String,
        	moderated: Boolean,
-        chat: {type: Boolean, default: true},
+		relay: Boolean,
+		chat: {type: Boolean, default: true},
         locked: Boolean,
         permanent: Boolean,
         permanentkey: String

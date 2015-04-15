@@ -92,9 +92,9 @@ exports.webrtcstats = function (req,res,next){
 	//room information from room controller
 	var room = req.room;
 	
-	if (webRTCHandler.statusList && webRTCHandler.statusList[room.roomId]){
+	if (webRTCHandler.roomsState && webRTCHandler.roomsState[room.roomId]){
 		var info = {
-			webrtcStats: webRTCHandler.statusList[room.roomId],
+			webrtcConnectionStats: webRTCHandler.roomsState[room.roomId].connections,
 			roomInfo: room
 		};
 		

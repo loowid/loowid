@@ -12,6 +12,7 @@ angular.module('mean.stats').controller('StatsController',['$scope','Stats','Glo
 	var sources = ['video','screen','audio'];
 
 	$scope.selectedSource = 'video';
+	$scope.relay = false;
 
 	$scope.init = function(){
 
@@ -113,33 +114,33 @@ angular.module('mean.stats').controller('StatsController',['$scope','Stats','Glo
 			readWebRTCStats(true);
 		};
 
-		var processData = function (list){
+		var processData = function (webrtcRoomStatus){
 			$scope.graphvideo = [];
 			$scope.graphscreen = [];
 			$scope.graphaudio = [];
+			$scope.relay = webrtcRoomStatus.roomInfo.access.relay;
 			//Clean the edges
 			graphs.video.edges = [];
 			graphs.screen.edges = [];
 			graphs.audio.edges = [];
 
-			for (var key in list.webrtcStats){
+			for (var key in webrtcRoomStatus.webrtcConnectionStats){
 
-
-				if (list.webrtcStats.hasOwnProperty(key)){
-
+				if (webrtcRoomStatus.webrtcConnectionStats.hasOwnProperty(key)){
 
 					var username , userstatus;
 
-					if (list.roomInfo.owner.connectionId === key ){
-						username = list.roomInfo.owner.name;
-						userstatus = list.roomInfo.owner.status;
+					if (webrtcRoomStatus.webrtcConnectionStats.roomInfo.owner.connectionId === key ){
+						username = webrtcRoomStatus.roomInfo.owner.name;
+						userstatus = webrtcRoomStatus.roomInfo.owner.status;
 					}else{
-						var user = _.findWhere (list.roomInfo.guests, {connectionId: key});	
+						var user = _.findWhere (webrtcRoomStatus.roomInfo.guests, {connectionId: key});	
 						username = user ? user.name : key;
 						userstatus = user ? user.status : 'DISCONNECTED';
 					}
-
-					var peerList = list.webrtcStats[key];
+					
+					
+					var peerList = webrtcRoomStatus.webrtcConnectionStats[key];
 
 					addNodes (key,username,userstatus,peerList);
 
@@ -222,8 +223,8 @@ angular.module('mean.stats').controller('StatsController',['$scope','Stats','Glo
 
 		var readWebRTCStats = function (justonetime){
 
-			Stats.webrtcstats ($routeParams.roomId,function (list){
-				processData(list);
+			Stats.webrtcstats ($routeParams.roomId,function (webrtcRoomStatus){
+				processData(webrtcRoomStatus);
 				uiHandler.safeApply($scope,function(){
 					stopLoading();
 				});

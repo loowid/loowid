@@ -1,7 +1,8 @@
 <div id="webrtcstats" data-ng-controller="StatsController" data-ng-init="initWebRTCStatistics()">
 	<section id="starred">
 
-		<h1>{{resourceBundle.webrtcstats}}</h1>
+		<h1>{{resourceBundle.webrtcstats}} <span ng-show="relay"> ({{resourceBundle.relaymodeactive}})</span></h1> 
+		
 		<hr/>
 		<nav class="toolbar">
 			<ul>

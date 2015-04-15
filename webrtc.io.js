@@ -21,7 +21,7 @@ lclient.registerMethod('getXirSysServers','https://api.xirsys.com:443/getIceServ
 rtc.sockets = [];
 
 rtc.rooms = {};
-rtc.statusList = {};
+rtc.roomsState = {};
 
 rtc.prerooms = {};
 
@@ -190,8 +190,8 @@ function attachEvents(manager) {
   rtc.on('join_room', function(dataa, socketa) {
 	manager.rooms.checkLockOrPassword(dataa, socketa, function(data,socket) {
 		var roomList = rtc.rooms[data.room] || [];
-		var roomStatus = rtc.statusList [data.room] || {};
-		rtc.statusList[data.room] = roomStatus;
+		var roomStatus = rtc.roomsState [data.room] || {connections: [], relay: false};
+		rtc.roomsState[data.room] = roomStatus;
 		
 		if (socket._events) {
 			roomList.push(socket.id);
@@ -388,13 +388,17 @@ function attachEvents(manager) {
 	rtc.on('update_owner_data', function(data, socket) {
 		var roomList = rtc.rooms[data.room] || [];
 		manager.rooms.checkOwner(socket.id, data.room, function() {
+			
+			//update relay mode information
+			rtc.roomsState[data.room].relay = data.access.relay;
+			
 			for ( var i = 0; i < roomList.length; i+=1) {
 				var id = roomList[i];
 				if (id === socket.id) {
 					continue;
 				} else {
 					var soc = rtc.getSocket(id);
-					// inform the peers that they have a new peer
+					// inform the peers that they have a new peeradr
 					if (soc) {
 						soc.send(JSON.stringify({
 							'eventName' : 'owner_data_updated',
@@ -708,7 +712,8 @@ function attachEvents(manager) {
 				    	title: room.access.title,
 				       	moderated: room.access.moderated,
 				        chat: room.access.chat,
-				        locked: room.access.locked
+				        locked: room.access.locked,
+						relay: room.access.relay
 					}
 				}, newsocket);
 			} else {
@@ -771,8 +776,8 @@ function attachEvents(manager) {
 	
 	rtc.on('rtc_status_update', function(data, socket){
 		
-		var roomStatus = rtc.statusList[data.room] || {};
-		var userConnectionsList = roomStatus[socket.id] || [];
+		var roomStatus = rtc.roomsState[data.room] || {connections: [], relay:false};
+		var userConnectionsList = roomStatus[socket.id].connections || [];
 		var connection = _.findWhere (userConnectionsList, { peerId: data.peerId, source: data.source, produced: data.produced });
 		
 		if (connection === undefined){
@@ -787,8 +792,8 @@ function attachEvents(manager) {
 		}
 		
 		connection.status = data.status;
-		roomStatus[socket.id] = userConnectionsList;
-		rtc.statusList[data.room] = roomStatus;
+		roomStatus[socket.id].connections = userConnectionsList;
+		rtc.roomsState[data.room] = roomStatus;
 	});
 		
 
