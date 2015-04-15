@@ -777,7 +777,7 @@ function attachEvents(manager) {
 	rtc.on('rtc_status_update', function(data, socket){
 		
 		var roomStatus = rtc.roomsState[data.room] || {connections: [], relay:false};
-		var userConnectionsList = roomStatus[socket.id].connections || [];
+		var userConnectionsList = roomStatus.connections[socket.id] || [];
 		var connection = _.findWhere (userConnectionsList, { peerId: data.peerId, source: data.source, produced: data.produced });
 		
 		if (connection === undefined){
@@ -792,7 +792,7 @@ function attachEvents(manager) {
 		}
 		
 		connection.status = data.status;
-		roomStatus[socket.id].connections = userConnectionsList;
+		roomStatus.connections [socket.id] = userConnectionsList;
 		rtc.roomsState[data.room] = roomStatus;
 	});
 		
