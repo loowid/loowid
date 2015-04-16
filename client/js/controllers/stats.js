@@ -130,7 +130,7 @@ angular.module('mean.stats').controller('StatsController',['$scope','Stats','Glo
 
 					var username , userstatus;
 
-					if (webrtcRoomStatus.webrtcConnectionStats.roomInfo.owner.connectionId === key ){
+					if (webrtcRoomStatus.roomInfo.owner.connectionId === key ){
 						username = webrtcRoomStatus.roomInfo.owner.name;
 						userstatus = webrtcRoomStatus.roomInfo.owner.status;
 					}else{

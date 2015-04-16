@@ -190,7 +190,7 @@ function attachEvents(manager) {
   rtc.on('join_room', function(dataa, socketa) {
 	manager.rooms.checkLockOrPassword(dataa, socketa, function(data,socket) {
 		var roomList = rtc.rooms[data.room] || [];
-		var roomStatus = rtc.roomsState [data.room] || {connections: [], relay: false};
+		var roomStatus = rtc.roomsState [data.room] || {connections: {}, relay: false};
 		rtc.roomsState[data.room] = roomStatus;
 		
 		if (socket._events) {
@@ -776,7 +776,7 @@ function attachEvents(manager) {
 	
 	rtc.on('rtc_status_update', function(data, socket){
 		
-		var roomStatus = rtc.roomsState[data.room] || {connections: [], relay:false};
+		var roomStatus = rtc.roomsState[data.room] || {connections: {}, relay:false};
 		var userConnectionsList = roomStatus.connections[socket.id] || [];
 		var connection = _.findWhere (userConnectionsList, { peerId: data.peerId, source: data.source, produced: data.produced });
 		
