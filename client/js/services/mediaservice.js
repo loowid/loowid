@@ -194,7 +194,7 @@ angular.module('mean.rooms').factory('MediaService',['Rooms','UIHandler',functio
 		self.stopMedia = function ($scope,source){
 			var mediasource = this.mediasources[source];
 			mediasource.recording = false;
-			rtc.removeStream($scope.global.roomId,source);
+			rtc.removeStream($scope.global.roomId,rtc._me,source);
 			if (!this.isAnythingRecording()) { uiHandler.status = 'STOPPED'; }
 			if (mediasource.onclose) {mediasource.onclose.call (self);}
 			mediasource.onclose = null;			
@@ -429,18 +429,18 @@ angular.module('mean.rooms').factory('MediaService',['Rooms','UIHandler',functio
 			};
 
 			/*Declar media related events */
-			rtc.uniqueon('add remote stream', function(stream,connectionId,mediatype){
+			rtc.uniqueon('add remote stream', function(stream,connectionId,origin,mediatype){
 
 				var mediasource = {};
 				mediasource.stream = stream;
+				mediasource.origin = origin;
 				mediasource.connectionId = connectionId;
 				mediasource.type = mediatype;
 				mediasource.recording = true;
 
-
 				mediasource.playtype = self.mediasources[mediatype] ? self.mediasources[mediatype].playtype : 'unknow';
 				self.receivedStreams.push (mediasource); 
-
+				
 				var streamId = connectionId + '_' + mediatype;
 
 				if (mediasource.playtype === 'video'){
@@ -517,10 +517,10 @@ angular.module('mean.rooms').factory('MediaService',['Rooms','UIHandler',functio
 
 		for (var i=0; i< self.receivedStreams.length; i+=1){
 			var mediasource = self.receivedStreams[i];
-
 			var streamId = mediasource.connectionId + '_' + mediasource.type;
-			if (mediasource.stream && streamId === (data.connectionId + '_' + data.mediatype)){
-				rtc.dropPeerConnection(data.connectionId,data.mediatype,false);
+		
+			if (mediasource.stream && mediasource.type === data.mediatype && mediasource.origin === data.origin && mediasource.connectionId === data.connectionId){
+				rtc.dropPeerConnection(data.connectionId,data.origin,data.mediatype,false);
 				
 				//also look if the window is already closed
 				if (mediasource.playtype==='video'){
@@ -547,7 +547,7 @@ angular.module('mean.rooms').factory('MediaService',['Rooms','UIHandler',functio
 
 			if (mediasource.connectionId === connectionId){
 				var streamId = mediasource.connectionId + '_' + mediasource.type;
-				rtc.dropPeerConnection(connectionId,mediasource.type,false);
+				rtc.dropPeerConnection(connectionId,mediasource.origin,mediasource.type,false);
 
 				if (mediasource.playtype ==='video'){
 					mediasource.window.winHandler.close();

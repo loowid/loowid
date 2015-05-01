@@ -293,6 +293,7 @@ function attachEvents(manager) {
           'candidate': data.candidate,
           'socketId': socket.id,
           'mediatype': data.mediatype,
+		  'origin': data.origin,
           'produced': data.produced
         }
       }), errorFn);
@@ -313,6 +314,7 @@ function attachEvents(manager) {
 		          'sdp': data.sdp,
 		          'socketId': socket.id,
 		          'mediatype': data.mediatype,
+				  'origin': data.origin,
 		          'requestId': data.requestId,
 		          'token': data.token
 		      }
@@ -335,6 +337,7 @@ function attachEvents(manager) {
         'data' : {
           'sdp': data.sdp,
           'socketId': socket.id,
+		  'origin':data.origin,
           'mediatype': data.mediatype
         }
       }), errorFn);
@@ -431,7 +434,8 @@ function attachEvents(manager) {
 						'eventName' : 'stream_closed',
 						'data' : {
 							'connectionId' : socket.id,
-							'mediatype' : data.mediatype
+							'mediatype' : data.mediatype,
+							'origin':data.origin
 						}
 					}), errorFn);
 				}

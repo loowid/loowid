@@ -111,6 +111,8 @@ angular.module('mean.rooms').controller('ViewDesktopController', ['$scope', '$ro
         uiHandler.passNeeded = false;
         uiHandler.connectionError = false;
         uiHandler.access = results.access;
+		rtc.relay = results.access.relay;
+		
         uiHandler.chatstatus = results.access.chat;
         if (!uiHandler.currentConnectionId || uiHandler.currentConnectionId !== rtc._me) {
         	room.notifyIn($scope);
@@ -206,6 +208,8 @@ angular.module('mean.rooms').controller('ViewDesktopController', ['$scope', '$ro
 		        rtc.on ('owner_data_updated',function(data){
 		       		uiHandler.status = data.status;
 		    		uiHandler.access = data.access;
+					rtc.relay = data.access.relay;
+					
 		            var chatModified = (uiHandler.chatstatus !== undefined && uiHandler.chatstatus !== data.access.chat); 
 		            uiHandler.chatstatus = data.access.chat;
 		            
