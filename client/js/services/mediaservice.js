@@ -441,6 +441,11 @@ angular.module('mean.rooms').factory('MediaService',['Rooms','UIHandler',functio
 				mediasource.playtype = self.mediasources[mediatype] ? self.mediasources[mediatype].playtype : 'unknow';
 				self.receivedStreams.push (mediasource); 
 				
+				if (rtc.relay){
+					//In this case we should anounce that relay has been added to our list and we are able to resend
+					rtc.relayStreamAdded(mediasource.origin,mediasource.type);
+				}
+				
 				var streamId = connectionId + '_' + mediatype;
 
 				if (mediasource.playtype === 'video'){
@@ -522,11 +527,16 @@ angular.module('mean.rooms').factory('MediaService',['Rooms','UIHandler',functio
 			if (mediasource.stream && mediasource.type === data.mediatype && mediasource.origin === data.origin && mediasource.connectionId === data.connectionId){
 				rtc.dropPeerConnection(data.connectionId,data.origin,data.mediatype,false);
 				
+				//If we removed the steram in relay mode we should notify to the server
+				if (rtc.relay){
+					rtc.relayStreamRemoved(mediasource.origin,mediasource.type);
+				}
+				
 				//also look if the window is already closed
 				if (mediasource.playtype==='video'){
 					if (mediasource.window.closedByOwner === undefined){
 						mediasource.window.winHandler.close();
-						mediasource.window.closedByStrem =true;
+						mediasource.window.closedByStream =true;
 					}
 				}else{
 					var el = document.getElementById('remote_' + streamId); 

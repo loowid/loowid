@@ -268,13 +268,17 @@ function mergeConstraints(cons1, cons2) {
 				//rtc._socket = null;
 			};
 
-			rtc.on('ready', function(mediatype,maxBitrate) {
+			rtc.on('ready', function(origin,mediatype,maxBitrate) {
 				///This process is for produced connections
-				if (!rtc.relay){
+				if (rtc.relay){
+					//Anounce to the server that an stream has been added
+					rtc.relayStreamAdded(origin,mediatype);
+				}else{
+					//Create connections and send streams to all participants
 					rtc.createPeerConnections(mediatype);
 					rtc.addOwnStreams(mediatype);
 					rtc.sendOffers(mediatype,maxBitrate);
-				}
+				} 
 			});
 
 			rtc.on('get_peers', function(data) {
@@ -474,6 +478,7 @@ function mergeConstraints(cons1, cons2) {
 					'room': rtc.room
 				}
 			}));
+			
 			if (rtc.debug) { console.log ('User id: ' + id + ' changed : ' + pc.iceConnectionState +  ' mediatype' + mediatype); }
 		};
 
@@ -659,7 +664,7 @@ function mergeConstraints(cons1, cons2) {
 					rtc.initializedStreams+=1;
 					onSuccess(stream);
 					if (rtc.initializedStreams === rtc.numStreams) {
-						rtc.fire('ready', mediatype,maxBitrate);
+						rtc.fire('ready', streamObj.origin,streamObj.mediatype,maxBitrate);
 					}
 				}, function(error) {
 					//alert('Could not connect stream.');
@@ -706,7 +711,7 @@ function mergeConstraints(cons1, cons2) {
 			var streamObj = rtc.streams[i];
 			if (streamObj.mediatype === mediatype){
 				if (rtc.relay){
-					rtc.relayStreamAdded(rtc.room,streamObj.origin,streamObj.sender,streamObj.mediatype);
+					rtc.relayStreamAdded(streamObj.origin,streamObj.mediatype);
 				}else{
 					rtc.producedPeerConnections[connectionId][origin][mediatype].addStream(streamObj.mediastream);
 				}
@@ -877,7 +882,9 @@ function mergeConstraints(cons1, cons2) {
 
 			//Stop the stream
 			stream.mediastream.stop();
-
+			
+			//If the room is in relay mode we should notify this operation to the server
+			
 			//remove each peer connection where we had
 			for (var j=0; j < rtc.connections.length; j+=1 ){
 				var connectionId = rtc.connections[j];
@@ -885,10 +892,13 @@ function mergeConstraints(cons1, cons2) {
 				rtc.dropPeerConnection(connectionId,origin,mediatype,true);
 			}
 
-
-			//announceit
-			rtc.streamClosed(room,origin,mediatype);
-
+			if (rtc.relay){
+				rtc.relayStreamRemoved (origin,mediatype);	
+			}else{
+			//announceit to everybody
+				rtc.streamClosed(room,origin,mediatype);
+			}
+			
 			//get the stream out of the array
 			rtc.streams.splice(index, 1);   
 
@@ -1095,47 +1105,44 @@ function mergeConstraints(cons1, cons2) {
 	
 	rtc.relay = false;
 		
-	rtc.relayStreamAdded = function (room,origin,sender,type){
+	rtc.relayStreamAdded = function (origin,type){
 		rtc._socket.send(JSON.stringify({
 			'eventName': 'r_stream_added',
 			'data': {
-				'room': room,
+				'room': rtc.room,
 				'origin': origin,
-				'sender': sender,
 				'type':type
 			}
 		}));
 	};
 
-	rtc.relayStreamRemoved = function (room,origin,sender,type){
+	rtc.relayStreamRemoved = function (origin,type){
 		rtc._socket.send(JSON.stringify({
 			'eventName': 'r_stream_removed',
 			'data': {
-				'room': room,
+				'room': rtc.room,
 				'origin': origin,
-				'sender': sender,
 				'type':type
 			}
 		}));
 	};
 	
-	rtc.relayShouldAccept = function (room,origin,sender,type){
+	rtc.relayShouldAccept = function (origin,type){
 		rtc._socket.send(JSON.stringify({
 			'eventName': 'r_should_accept',
 			'data': {
-				'room': room,
+				'room': rtc.room,
 				'origin': origin,
-				'sender': sender,
 				'type':type
 			}
 		}));
 	};
 	
-	rtc.relaySendNodeInfo = function (room,nodeInfo){
+	rtc.relaySendNodeInfo = function (nodeInfo){
 		rtc._socket.send(JSON.stringify({
 			'eventName': 'r_update_info',
 			'data': {
-				'room': room,
+				'room': rtc.room,
 				'info': nodeInfo
 			}
 		}));
@@ -1165,16 +1172,16 @@ function mergeConstraints(cons1, cons2) {
 				
 	rtc.relayStream  = function(connectionid,stream){
 			
-			var sendDelayedOffer =  function (id,origin,mediatype){
-				setTimeout (function (){
-					rtc.sendOffer (connectionid,origin,mediatype);
-					if (rtc.debug) { console.log ('Sending to ' + id + ' a ' + mediatype + 'offer'); }
-				},2000);
-			};  
+	
+			//if it's not yet sent through a peer connection create it and send
+			if (!rtc.producedPeerConnections[connectionid] || !rtc.producedPeerConnections[connectionid][stream.origin] || 			!rtc.producedPeerConnections[connectionid][stream.origin][stream.type]){
+				var pc = rtc.createPeerConnection(connectionid,stream.origin,stream.type,true);
+				pc.addStream(stream);
+				rtc.sendOffer (connectionid,stream.origin,stream.type);
+				
+			}
 
-			var pc = rtc.createPeerConnection(connectionid,stream.origin,stream.mediatype,true);
-			pc.addStream(stream);
-			sendDelayedOffer (connectionid,stream.origin,stream.mediatype);
+			
 	};
 
 
