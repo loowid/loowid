@@ -254,12 +254,15 @@
 		</div>
 		<div ng-show="global.access.relay">
 			<form>
-				<input type="radio" name="ptype" value="audio" ng-model="ui.proposalType"/>&nbsp;Audio&nbsp;
+				<br/><hr/><br/>
+				<b>SendTo:</b>&nbsp;<select name="ptarget" ng-model="ui.proposalTarget"><option value="-1">{{ui.name}}</option><option data-ng-repeat="user in ui.users" value="{{user.connectionId}}">{{user.name}}</option></select><br/>
+				<br/><hr/><br/>
+				<b>Payload:</b><br/><input type="radio" name="ptype" value="audio" ng-model="ui.proposalType"/>&nbsp;Audio&nbsp;
 				<input type="radio" name="ptype" value="video" ng-model="ui.proposalType"/>&nbsp;Video&nbsp;
-				<input type="radio" name="ptype" value="screen" ng-model="ui.proposalType"/>&nbsp;Screen<br/>
-				SendTo: <select name="ptarget" ng-model="ui.proposalTarget"><option value="-1">{{ui.name}}</option><option data-ng-repeat="user in ui.users" value="{{user.connectionId}}">{{user.name}}</option></select><br/>
-				Origin: <select name="porigin" ng-model="ui.proposalOrigin"><option value="-1">{{ui.name}}</option><option data-ng-repeat="user in ui.users" value="{{user.connectionId}}">{{user.name}}</option></select><br/>
+				<input type="radio" name="ptype" value="screen" ng-model="ui.proposalType"/>&nbsp;Screen&nbsp;&nbsp;
+				Origin: <select name="porigin" ng-model="ui.proposalOrigin"><option value="-1">{{ui.name}}</option><option data-ng-repeat="user in ui.users" value="{{user.connectionId}}">{{user.name}}</option></select>&nbsp;&nbsp;
 				Target: <select name="porigin" ng-model="ui.proposalDestin"><option value="-1">{{ui.name}}</option><option data-ng-repeat="user in ui.users" value="{{user.connectionId}}">{{user.name}}</option></select><br/>
+				<br/><hr/><br/>
 				<input type="button" value="Send Proposal" ng-click="sendProposal();"/>
 			</form>
 		</div>
