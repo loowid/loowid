@@ -373,6 +373,8 @@ function mergeConstraints(cons1, cons2) {
 				rtc.fire('receive answer', data);
 			});
 
+			rtc.on('r_proposal', rtc.listenProposal);
+			
 			rtc.fire('connect');
 		};
 	};
@@ -1153,7 +1155,7 @@ function mergeConstraints(cons1, cons2) {
 	* Signals received from server (proposals)
 	*/
 	
-	rtc.on('r_proposal', function(data) {
+	rtc.listenProposal = function(data) {
 			if (rtc.debug){console.log ('Proposal received: ' + JSON.stringify (data));}
 			
 			//Look for the stream on streams or receivedstreams depending on the proposal info
@@ -1168,7 +1170,7 @@ function mergeConstraints(cons1, cons2) {
 					rtc.relayStream (streamMember);
 				}
 			}
-	});
+	};
 				
 	rtc.relayStream  = function(connectionid,stream){
 			
