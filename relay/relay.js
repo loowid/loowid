@@ -12,9 +12,11 @@ var saveRProposal = function(p) {
 };
 
 require('./listener').initListener(function(event){
-	logger.info(event.eventName+'::'+event.socket);
 	if (event.eventName==='r_stream_added') {
 		saveRProposal('Test Proposal');
+	}
+	if (event.eventName==='r_stream_test') {
+		saveRProposal(event);
 	}
 });
 

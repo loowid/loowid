@@ -23,7 +23,7 @@ module.exports = function(grunt) {
 	var generateOptions = function(arg) {
 		return {
             args: arg,
-            watch: ['log.js','proxy.js','server.js','webrtc.io.js','app'],
+            watch: ['log.js','proxy.js','server.js','webrtc.io.js','app','relay'],
             debug: true,
             delayTime: 1,
             cwd: __dirname

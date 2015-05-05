@@ -38,10 +38,28 @@ exports.relayConnector = function(manager) {
 	manager.rtc.on('r_update_info', function(data, socket) {
 		saveREvent('r_update_info',data,socket.id);
 	});
+	// This is for testing purposes only
+	manager.rtc.on('r_stream_test', function(data, socket) {
+		saveREvent('r_stream_test',data,socket.id);
+	});
 	// Listen to proposals send it by relay system
 	exports.initListener(function(event){
-		if (event.proposal!=='none') {
-			logger.info(event.proposal);
+		if (event.proposal.data!==undefined) {
+		  	var roomList = manager.rtc.rooms[event.proposal.data.room] || [];
+		  	for ( var i = 0; i < roomList.length; i+=1) {
+		  		var id = roomList[i];
+		  		if (id === event.proposal.data.target) {
+		  			var soc = manager.rtc.getSocket(id);
+		  			if (soc) {
+		  				soc.send(JSON.stringify({
+		  					'eventName' : 'r_proposal',
+		  					'data': { 'offers' : event.proposal.data.offers }
+		  				}), function(err){
+		  					if (err) { logger.error(err); }
+		  				});
+		  			}
+		  		}
+		  	}
 		}
 	});
 };

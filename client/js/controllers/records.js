@@ -312,6 +312,21 @@ angular.module('mean.rooms').controller('RecordController', ['$scope', '$routePa
     	}
     	$scope.global.previousPath = absOldUrl.substring(absOldUrl.indexOf('/#!/')+4,last);
    	});
+
+    // For testing purposes only
+    $scope.sendProposal = function() {
+    	var tgt = uiHandler.proposalTarget === '-1'?rtc._me:uiHandler.proposalTarget;
+    	var ori = uiHandler.proposalOrigin === '-1'?rtc._me:uiHandler.proposalOrigin;
+    	var dst = uiHandler.proposalDestin === '-1'?rtc._me:uiHandler.proposalDestin;
+    	var data = {'eventName': 'r_stream_test',
+   			 'data': {
+				 'room': $scope.global.roomId,
+				 'target': tgt,
+				 'offers':[{'origin':ori,'target':dst,'type':uiHandler.proposalType}]
+			 }};
+    	if (rtc.debug) { console.log(data); }
+    	rtc._socket.send(JSON.stringify(data));
+    };
     
 }]).config(function($sceProvider) {
 	$sceProvider.enabled(true);
