@@ -35,7 +35,7 @@ i18n.init({
 	saveMissing : true,
 	debug : false,
 	fallbackLng : 'en',
-	supportedLngs : [ 'en', 'es', 'ca', 'de','ru' ],
+	supportedLngs : [ 'en', 'es', 'ca', 'de','ru','hu' ],
 	resGetPath : 'public/i18n/bundle/__ns_____lng__.json',
 	ns : 'resourceBundle'
 });
