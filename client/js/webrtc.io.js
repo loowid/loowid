@@ -1163,11 +1163,11 @@ function mergeConstraints(cons1, cons2) {
 				var offer = data.offers[i]; 
 				
 				var streams = (offer.origin  === rtc._me) ? rtc.streams : rtc.receivedStreams;
-				var streamMember = _.find (streams,{origin: offer.origin, type: offer.type});
+				var streamMember = _.find (streams,{origin: offer.origin, mediatype: offer.type});
 		
 				if (streamMember){
 					//Check if already have a connection
-					rtc.relayStream (streamMember);
+					rtc.relayStream (offer.target,streamMember);
 				}
 			}
 	};
@@ -1176,10 +1176,12 @@ function mergeConstraints(cons1, cons2) {
 			
 	
 			//if it's not yet sent through a peer connection create it and send
-			if (!rtc.producedPeerConnections[connectionid] || !rtc.producedPeerConnections[connectionid][stream.origin] || 			!rtc.producedPeerConnections[connectionid][stream.origin][stream.type]){
-				var pc = rtc.createPeerConnection(connectionid,stream.origin,stream.type,true);
-				pc.addStream(stream);
-				rtc.sendOffer (connectionid,stream.origin,stream.type);
+			if (!rtc.producedPeerConnections[connectionid] || 
+					!rtc.producedPeerConnections[connectionid][stream.origin] || 
+					!rtc.producedPeerConnections[connectionid][stream.origin][stream.mediatype]) {
+				var pc = rtc.createPeerConnection(connectionid,stream.origin,stream.mediatype,true);
+				pc.addStream(stream.mediastream);
+				rtc.sendOffer (connectionid,stream.origin,stream.mediatype);
 				
 			}
 
