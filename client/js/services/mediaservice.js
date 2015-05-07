@@ -36,7 +36,7 @@ angular.module('mean.rooms').factory('MediaService',['Rooms','UIHandler',functio
 
 		this.possibleResolutions = [{x:800,y:600},{x:1024,y:768},{x:1280,y:720},{x:1280,y:768},{x:1280,y:800},{x:1280,y:960},{x:1280,y:1024},{x:1366,y:768},{x:1440,y:900},{x:1680,y:900},{x:1680,y:1050},{x:1910,y:1200}];
 		this.resolutions = [];
-		this.receivedStreams = [];
+		rtc.receivedStreams = [];
 
 		self.mute = function(stream,mute){
 			if (stream) {
@@ -307,11 +307,11 @@ angular.module('mean.rooms').factory('MediaService',['Rooms','UIHandler',functio
 			};
 
 			$scope.changeWindowName = function(connectionId,name) {
-				if (self.receivedStreams.length>0) {
-					for (var i=0; i<self.receivedStreams.length; i+=1) {
-						if (self.receivedStreams[i].connectionId===connectionId) {
+				if (rtc.receivedStreams.length>0) {
+					for (var i=0; i<rtc.receivedStreams.length; i+=1) {
+						if (rtc.receivedStreams[i].connectionId===connectionId) {
 							//Could be that the window could not be setup already because the method was called for a new status of member
-							if (self.receivedStreams[i].window) { self.receivedStreams[i].window.title = name; }
+							if (rtc.receivedStreams[i].window) { rtc.receivedStreams[i].window.title = name; }
 						}
 					}
 				}
@@ -374,8 +374,8 @@ angular.module('mean.rooms').factory('MediaService',['Rooms','UIHandler',functio
 			};
 			
 			$scope.closeRemoteWindow = function(connectionId,origin){
-				for (var i=0; i< self.receivedStreams.length; i+=1){
-					var mediasource = self.receivedStreams[i];
+				for (var i=0; i< rtc.receivedStreams.length; i+=1){
+					var mediasource = rtc.receivedStreams[i];
 
 					var streamId = mediasource.connectionId + '_' + mediasource.type;
 					if (mediasource.stream && streamId === (connectionId + '_' + origin)){
@@ -439,7 +439,7 @@ angular.module('mean.rooms').factory('MediaService',['Rooms','UIHandler',functio
 				mediasource.recording = true;
 
 				mediasource.playtype = self.mediasources[mediatype] ? self.mediasources[mediatype].playtype : 'unknow';
-				self.receivedStreams.push (mediasource); 
+				rtc.receivedStreams.push (mediasource); 
 				
 				if (rtc.relay){
 					//In this case we should anounce that relay has been added to our list and we are able to resend
@@ -520,8 +520,8 @@ angular.module('mean.rooms').factory('MediaService',['Rooms','UIHandler',functio
 
 	rtc.uniqueon('stream_closed',function(data){
 
-		for (var i=0; i< self.receivedStreams.length; i+=1){
-			var mediasource = self.receivedStreams[i];
+		for (var i=0; i< rtc.receivedStreams.length; i+=1){
+			var mediasource = rtc.receivedStreams[i];
 			var streamId = mediasource.connectionId + '_' + mediasource.type;
 		
 			if (mediasource.stream && mediasource.type === data.mediatype && mediasource.origin === data.origin && mediasource.connectionId === data.connectionId){
@@ -544,7 +544,7 @@ angular.module('mean.rooms').factory('MediaService',['Rooms','UIHandler',functio
 					$scope.askForStopSharing (data.connectionId,mediasource.type);
 				}
 
-				self.receivedStreams.splice (i,1);
+				rtc.receivedStreams.splice (i,1);
 				break;
 			}
 
@@ -552,8 +552,8 @@ angular.module('mean.rooms').factory('MediaService',['Rooms','UIHandler',functio
 	});
 
 	var removeReceivedStreams = function(connectionId) {
-		for (var j = 0 ; j < self.receivedStreams.length ; j+=1){
-			var mediasource = self.receivedStreams [j];
+		for (var j = 0 ; j < rtc.receivedStreams.length ; j+=1){
+			var mediasource = rtc.receivedStreams [j];
 
 			if (mediasource.connectionId === connectionId){
 				var streamId = mediasource.connectionId + '_' + mediasource.type;
@@ -566,7 +566,7 @@ angular.module('mean.rooms').factory('MediaService',['Rooms','UIHandler',functio
 					el2.parentNode.removeChild(el2);
 				}
 
-				self.receivedStreams.splice (j,1);
+				rtc.receivedStreams.splice (j,1);
 				j-=1;
 			}
 		}
