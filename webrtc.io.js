@@ -423,21 +423,37 @@ function attachEvents(manager) {
 
 	rtc.on('stream_closed', function(data, socket) {
 		var roomList = rtc.rooms[data.room] || [];
-		for ( var i = 0; i < roomList.length; i+=1) {
-			var id = roomList[i];
-			if (id === socket.id) {
-				continue;
-			} else {
-				var soc = rtc.getSocket(id);
-				if (soc) {
-					soc.send(JSON.stringify({
-						'eventName' : 'stream_closed',
-						'data' : {
-							'connectionId' : socket.id,
-							'mediatype' : data.mediatype,
-							'origin':data.origin
-						}
-					}), errorFn);
+		var soc;
+		
+		if (data.target){
+			 soc = rtc.getSocket(data.target);
+			if (soc) {
+				soc.send(JSON.stringify({
+							'eventName' : 'stream_closed',
+							'data' : {
+								'connectionId' : socket.id,
+								'mediatype' : data.mediatype,
+								'origin':data.origin
+							}
+				}), errorFn);
+			}
+		}else{
+			for ( var i = 0; i < roomList.length; i+=1) {
+				var id = roomList[i];
+				if (id === socket.id) {
+					continue;
+				} else {
+					soc = rtc.getSocket(id);
+					if (soc) {
+						soc.send(JSON.stringify({
+							'eventName' : 'stream_closed',
+							'data' : {
+								'connectionId' : socket.id,
+								'mediatype' : data.mediatype,
+								'origin':data.origin
+							}
+						}), errorFn);
+					}
 				}
 			}
 		}

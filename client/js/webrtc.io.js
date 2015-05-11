@@ -949,13 +949,14 @@ function mergeConstraints(cons1, cons2) {
 
 	/*Since there is no good way to get an event of stream closed it's necessary a announcement from emiter*/
 	//HERE
-	rtc.streamClosed = function(roomId,origin,mediatype){
+	rtc.streamClosed = function(roomId,origin,mediatype,target){
 		rtc._socket.send(JSON.stringify({
 			'eventName': 'stream_closed',
 			'data': {
 				'room': roomId,
 				'mediatype':mediatype,
-				'origin': origin
+				'origin': origin,
+				'target': target
 			}
 		}));  
 	};
@@ -1156,36 +1157,71 @@ function mergeConstraints(cons1, cons2) {
 	*/
 	
 	rtc.listenProposal = function(data) {
-			if (rtc.debug){console.log ('Proposal received: ' + JSON.stringify (data));}
-			
-			//Look for the stream on streams or receivedstreams depending on the proposal info
-			for (var i=0; data.offers && i < data.offers.length; i+=1){
-				var offer = data.offers[i]; 
-				
-				var streams = (offer.origin  === rtc._me) ? rtc.streams : rtc.receivedStreams;
-				var streamMember = _.find (streams,{origin: offer.origin, mediatype: offer.type});
+		if (rtc.debug){console.log ('Proposal received: ' + JSON.stringify (data));}
+
+
+		//Look for the stream on streams or receivedstreams depending on the proposal info
+
+		var propNumber = Math.random();
+
+		for (var i=0; data.offers && i < data.offers.length; i+=1){
+			var offer = data.offers[i]; 
+
+			var streams = (offer.origin  === rtc._me) ? rtc.streams : rtc.receivedStreams;
+			var streamMember = _.find (streams,{origin: offer.origin, mediatype: offer.type});
+
+			if (streamMember){
+				//Check if already have a connection
+				rtc.relayStream (offer.target,streamMember,propNumber);
+			}
+		}
+
+		//Stop the streaming of the resto of connections that were not in our received proposal
+		rtc.dropOldProposalConnection(propNumber);
+	};
+	
+	rtc.dropOldProposalConnection = function (propNumber){
+		rtc.eachPeerConnection (rtc.producedPeerConnections,propNumber,[],0,function (pc,propNumber,params){
+			if (rtc.producedPeerConnections[params[0]][params[1]][params[2]].propNumber !== propNumber){
+				rtc.dropPeerConnection (params[0],params[1],params[2],true);
+				rtc.streamClosed (rtc.room,params[1],params[2],params[0]);
+			}
+		});
+	};
+	
+ 	//Execute the function when recursively found a PeerConnection Object in the array
+	rtc.eachPeerConnection = function (lookForObject,propNumber,params,level, foundFn){
 		
-				if (streamMember){
-					//Check if already have a connection
-					rtc.relayStream (offer.target,streamMember);
+		for (var objIndex in lookForObject){
+			if (lookForObject.hasOwnProperty(objIndex)){
+				//clone the rout array
+				var currentParams = params.length > 0 ? params.slice(0) : params;
+				currentParams[level] = objIndex;
+				
+				if (lookForObject[objIndex] instanceof PeerConnection){
+					foundFn(lookForObject[objIndex],propNumber,currentParams);
+				}else{
+					var nextLevel = level + 1;
+					rtc.eachPeerConnection (lookForObject[objIndex],propNumber,currentParams,nextLevel,foundFn);			
 				}
 			}
+		}	
 	};
 				
-	rtc.relayStream  = function(connectionid,stream){
-			
+	rtc.relayStream  = function(connectionid,stream,propNumber){
 	
-			//if it's not yet sent through a peer connection create it and send
-			if (!rtc.producedPeerConnections[connectionid] || 
-					!rtc.producedPeerConnections[connectionid][stream.origin] || 
-					!rtc.producedPeerConnections[connectionid][stream.origin][stream.mediatype]) {
-				var pc = rtc.createPeerConnection(connectionid,stream.origin,stream.mediatype,true);
-				pc.addStream(stream.mediastream);
-				rtc.sendOffer (connectionid,stream.origin,stream.mediatype);
-				
-			}
+		//if it's not yet sent through a peer connection create it and send
+		if (!rtc.producedPeerConnections[connectionid] || 
+				!rtc.producedPeerConnections[connectionid][stream.origin] || 
+				!rtc.producedPeerConnections[connectionid][stream.origin][stream.mediatype]) {
+			var pc = rtc.createPeerConnection(connectionid,stream.origin,stream.mediatype,true);
+			pc.addStream(stream.mediastream);
+			rtc.sendOffer (connectionid,stream.origin,stream.mediatype);
+		}
 
-			
+		//Set a number for the pc
+		rtc.producedPeerConnections[connectionid][stream.origin][stream.mediatype].propNumber = propNumber;
+
 	};
 
 
