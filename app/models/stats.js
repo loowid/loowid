@@ -48,4 +48,4 @@ StatsSchema.statics = {
     }
 };
 
-mongoose.model('Stats', StatsSchema);
+mongoose.model('LooStats', StatsSchema);

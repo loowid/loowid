@@ -5,7 +5,7 @@
 var logger = require('../../log.js').getLog('stats');
 var mongoose = require('mongoose');
 require ('../models/stats');
-var Stats = mongoose.model('Stats');
+var Stats = mongoose.model('LooStats');
 var Room = mongoose.model('Room');
 var webRTCHandler = {};
 
