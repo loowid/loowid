@@ -146,8 +146,7 @@ function mergeConstraints(cons1, cons2) {
 	rtc.connections = [];
 	// Stream-related variables.
 	rtc.streams = [];
-	rtc.numStreams = 0;
-	rtc.initializedStreams = 0;
+
 
 	// Reference to the data channels
 	rtc.dataChannels = {};
@@ -414,7 +413,7 @@ function mergeConstraints(cons1, cons2) {
  		rtc.initPeerArray (peerConnections,id,sourceOrigin);
 
 			
-		var pc = peerConnections[id][sourceOrigin	][mediatype] = new PeerConnection({iceServers:rtc.iceServers}, config);
+		var pc = peerConnections[id][sourceOrigin][mediatype] = new PeerConnection({iceServers:rtc.iceServers}, config);
 	
 		pc.onicecandidate = function(event) {
 			if (event.candidate && event.candidate.candidate) {
@@ -654,7 +653,6 @@ function mergeConstraints(cons1, cons2) {
 
 		if (getUserMedia) {
 			var startStream = function (){
-				rtc.numStreams+=1;
 				getUserMedia.call(navigator, options, function(stream) {
 					var streamObj = {};
 					streamObj.mediastream = stream;
@@ -663,11 +661,8 @@ function mergeConstraints(cons1, cons2) {
 					//Nothing to add as sender streamObj.sender = undefined
 					
 					rtc.streams.push(streamObj);
-					rtc.initializedStreams+=1;
 					onSuccess(stream);
-					if (rtc.initializedStreams === rtc.numStreams) {
-						rtc.fire('ready', streamObj.origin,streamObj.mediatype,maxBitrate);
-					}
+					rtc.fire('ready', streamObj.origin,streamObj.mediatype,maxBitrate);
 				}, function(error) {
 					//alert('Could not connect stream.');
 					onFail(error);
@@ -860,7 +855,9 @@ function mergeConstraints(cons1, cons2) {
 			delete peerConnections[connectionId][origin][mediatype];
 			//Clean the array if needed
 			rtc.cleanClosedConnection(peerConnections,connectionId,origin);
+			return true;
 		}
+		return false;
 	};
 
 	rtc.cleanClosedConnection = function (peerConnections,connectionId,origin){
@@ -886,36 +883,32 @@ function mergeConstraints(cons1, cons2) {
 			stream.mediastream.stop();
 			
 			//If the room is in relay mode we should notify this operation to the server
-			
-			//remove each peer connection where we had
-			for (var j=0; j < rtc.connections.length; j+=1 ){
-				var connectionId = rtc.connections[j];
-				//Drop produced peers
-				rtc.dropPeerConnection(connectionId,origin,mediatype,true);
-			}
-
 			if (rtc.relay){
-				rtc.relayStreamRemoved (origin,mediatype);	
+				rtc.relayStreamRemoved (origin,mediatype);
 			}else{
 			//announceit to everybody
 				rtc.streamClosed(room,origin,mediatype);
 			}
 			
+			rtc.dropPeerConnections (origin,mediatype);
+			
+			
 			//get the stream out of the array
-			rtc.streams.splice(index, 1);   
-
-			//delete stream;
-			rtc.numStreams-=1;
-			rtc.initializedStreams-=1;
+			streams.splice(index, 1);   
 		}	
 	};
 
-	/*rtc.dropPeerConnections = function (origin,mediatype){
-		// AQUI
-		_.(producedConnections, {});
-		
-	}*/
-
+	rtc.dropPeerConnections = function (origin,mediatype){
+		for (var index in rtc.producedPeerConnections){
+			if (rtc.producedPeerConnections.hasOwnProperty(index)){
+				if (rtc.relay && rtc.dropPeerConnection (index,origin,mediatype,true)){
+					//Anounce to the client that stream is closed
+					rtc.streamClosed (rtc.room,origin,mediatype,index);
+				}
+			}
+		}			
+	};
+	
 	rtc.attachStream = function(stream, element) {
 		if (typeof(element) === 'string') {
 			element = document.getElementById(element);
@@ -1168,7 +1161,7 @@ function mergeConstraints(cons1, cons2) {
 			var offer = data.offers[i]; 
 
 			var streams = (offer.origin  === rtc._me) ? rtc.streams : rtc.receivedStreams;
-			var streamMember = _.find (streams,{origin: offer.origin, mediatype: offer.type});
+			var streamMember = _.find (streams,{origin: offer.origin, mediatype: offer.mediatype});
 
 			if (streamMember){
 				//Check if already have a connection

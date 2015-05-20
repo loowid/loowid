@@ -55,7 +55,7 @@ angular.module('mean.rooms').factory('MediaService',['Rooms','UIHandler',functio
 				rtc.createStream(source, mediasource.constraints, function(stream){
 					
 					mediasource.onclose = onclose;
-					mediasource.stream = stream;
+					mediasource.mediastream = stream;
 
 					if (mediasource.playtype === 'video'){
 						var mediaElement = document.createElement('video');
@@ -65,7 +65,7 @@ angular.module('mean.rooms').factory('MediaService',['Rooms','UIHandler',functio
 						mediaElement.setAttribute('muted','');
 						
 						//Wait to start until 
-						rtc.attachStream (mediasource.stream,mediaElement);
+						rtc.attachStream (mediasource.mediastream,mediaElement);
 										
 						var windowOptions =
 							{
@@ -198,7 +198,7 @@ angular.module('mean.rooms').factory('MediaService',['Rooms','UIHandler',functio
 			if (!this.isAnythingRecording()) { uiHandler.status = 'STOPPED'; }
 			if (mediasource.onclose) {mediasource.onclose.call (self);}
 			mediasource.onclose = null;			
-			mediasource.stream = null;
+			mediasource.mediastream = null;
 		};
 
 
@@ -237,7 +237,7 @@ angular.module('mean.rooms').factory('MediaService',['Rooms','UIHandler',functio
 				uiHandler.isMuted = true; 
 
 				if (self.mediasources.audio.recording){
-					self.mute (self.mediasources.audio.stream,true);
+					self.mute (self.mediasources.audio.mediastream,true);
 				}
 			};
 
@@ -245,7 +245,7 @@ angular.module('mean.rooms').factory('MediaService',['Rooms','UIHandler',functio
 				uiHandler.isMuted = false;
 
 				if (self.mediasources.audio.recording){
-					self.mute (self.mediasources.audio.stream,false);
+					self.mute (self.mediasources.audio.mediastream,false);
 				}   
 			};
 
@@ -377,8 +377,8 @@ angular.module('mean.rooms').factory('MediaService',['Rooms','UIHandler',functio
 				for (var i=0; i< rtc.receivedStreams.length; i+=1){
 					var mediasource = rtc.receivedStreams[i];
 
-					var streamId = mediasource.connectionId + '_' + mediasource.type;
-					if (mediasource.stream && streamId === (connectionId + '_' + origin)){
+					var streamId = mediasource.connectionId + '_' + mediasource.mediatype;
+					if (mediasource.mediastream && streamId === (connectionId + '_' + origin)){
 						mediasource.window.winHandler.close();
 						mediasource.window.closedByOwner =true;
 					}
@@ -432,10 +432,10 @@ angular.module('mean.rooms').factory('MediaService',['Rooms','UIHandler',functio
 			rtc.uniqueon('add remote stream', function(stream,connectionId,origin,mediatype){
 
 				var mediasource = {};
-				mediasource.stream = stream;
+				mediasource.mediastream = stream;
 				mediasource.origin = origin;
 				mediasource.connectionId = connectionId;
-				mediasource.type = mediatype;
+				mediasource.mediatype = mediatype;
 				mediasource.recording = true;
 
 				mediasource.playtype = self.mediasources[mediatype] ? self.mediasources[mediatype].playtype : 'unknow';
@@ -443,7 +443,7 @@ angular.module('mean.rooms').factory('MediaService',['Rooms','UIHandler',functio
 				
 				if (rtc.relay){
 					//In this case we should anounce that relay has been added to our list and we are able to resend
-					rtc.relayStreamAdded(mediasource.origin,mediasource.type);
+					rtc.relayStreamAdded(mediasource.origin,mediasource.mediatype);
 				}
 				
 				var streamId = connectionId + '_' + mediatype;
@@ -456,7 +456,7 @@ angular.module('mean.rooms').factory('MediaService',['Rooms','UIHandler',functio
 					mediaElement.style.display = 'none';
 					mediaElement.setAttribute('autoplay','');
 					mediaElement.setAttribute('muted','');
-					rtc.attachStream (mediasource.stream,mediaElement);
+					rtc.attachStream (mediasource.mediastream,mediaElement);
 
 					var windowOptions = {
 						'mediaElement' :mediaElement,
@@ -481,7 +481,7 @@ angular.module('mean.rooms').factory('MediaService',['Rooms','UIHandler',functio
 								
 								if (win.closedByStream === undefined){
 									uiHandler.safeApply ($scope,function(){
-										$scope.askForStopSharing (connectionId,mediasource.type);
+										$scope.askForStopSharing (connectionId,mediasource.mediatype);
 										win.closedByOwner = true;
 									});
 								}
@@ -510,7 +510,7 @@ angular.module('mean.rooms').factory('MediaService',['Rooms','UIHandler',functio
 			mediaElement2.style.display = 'none';
 			mediaElement2.setAttribute('autoplay','');
 			document.getElementById('remoteAudios').appendChild(mediaElement2);
-			rtc.attachStream(mediasource.stream,'remote_' + streamId);
+			rtc.attachStream(mediasource.mediastream,'remote_' + streamId);
 			//Press play again for firefox
 			mediaElement2.play();
 		}
@@ -522,14 +522,17 @@ angular.module('mean.rooms').factory('MediaService',['Rooms','UIHandler',functio
 
 		for (var i=0; i< rtc.receivedStreams.length; i+=1){
 			var mediasource = rtc.receivedStreams[i];
-			var streamId = mediasource.connectionId + '_' + mediasource.type;
+			var streamId = mediasource.connectionId + '_' + mediasource.mediatype;
 		
-			if (mediasource.stream && mediasource.type === data.mediatype && mediasource.origin === data.origin && mediasource.connectionId === data.connectionId){
+			if (mediasource.mediastream && mediasource.mediatype === data.mediatype && mediasource.origin === data.origin && mediasource.connectionId === data.connectionId){
 				rtc.dropPeerConnection(data.connectionId,data.origin,data.mediatype,false);
 				
 				//If we removed the steram in relay mode we should notify to the server
 				if (rtc.relay){
-					rtc.relayStreamRemoved(mediasource.origin,mediasource.type);
+					rtc.relayStreamRemoved(mediasource.origin,mediasource.mediatype);
+					
+					//Lets announce to any posible client that we don't have the stream
+					rtc.removeStream (rtc.room,mediasource.origin,mediasource.mediatype);
 				}
 				
 				//also look if the window is already closed
@@ -541,7 +544,7 @@ angular.module('mean.rooms').factory('MediaService',['Rooms','UIHandler',functio
 				}else{
 					var el = document.getElementById('remote_' + streamId); 
 					el.parentNode.removeChild(el);
-					$scope.askForStopSharing (data.connectionId,mediasource.type);
+					$scope.askForStopSharing (data.connectionId,mediasource.mediatype);
 				}
 
 				rtc.receivedStreams.splice (i,1);
@@ -556,8 +559,8 @@ angular.module('mean.rooms').factory('MediaService',['Rooms','UIHandler',functio
 			var mediasource = rtc.receivedStreams [j];
 
 			if (mediasource.connectionId === connectionId){
-				var streamId = mediasource.connectionId + '_' + mediasource.type;
-				rtc.dropPeerConnection(connectionId,mediasource.origin,mediasource.type,false);
+				var streamId = mediasource.connectionId + '_' + mediasource.mediatype;
+				rtc.dropPeerConnection(connectionId,mediasource.origin,mediasource.mediatype,false);
 
 				if (mediasource.playtype ==='video'){
 					mediasource.window.winHandler.close();
@@ -636,10 +639,10 @@ angular.module('mean.rooms').factory('MediaService',['Rooms','UIHandler',functio
 		//Look for status to change the controls of the user
 		if (uiHandler.isowner && uiHandler.userStatus[data.connectionId] &&  uiHandler.userStatus[data.connectionId][data.origin]){
 			uiHandler.userStatus[data.connectionId][data.origin] = false;  
-			var errMessage = $scope.resourceBundle._(data.type,$scope.getUserName(data.connectionId));
+			var errMessage = $scope.resourceBundle._(data.mediatype,$scope.getUserName(data.connectionId));
 			$scope.global.showError($scope,errMessage);
 		}else if (uiHandler.isowner){
-			var errMessage2 = $scope.getUserName(data.connectionId) + ' ' + $scope.resourceBundle['deny'+data.type+'request'];
+			var errMessage2 = $scope.getUserName(data.connectionId) + ' ' + $scope.resourceBundle['deny'+data.mediatype+'request'];
 			$scope.global.showError($scope,errMessage2);
 		}
 

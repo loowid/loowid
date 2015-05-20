@@ -322,7 +322,7 @@ angular.module('mean.rooms').controller('RecordController', ['$scope', '$routePa
    			 'data': {
 				 'room': $scope.global.roomId,
 				 'target': tgt,
-				 'offers':[{'origin':ori,'target':dst,'type':uiHandler.proposalType}]
+				 'offers':[{'origin':ori,'target':dst,'mediatype':uiHandler.proposalType}]
 			 }};
     	if (rtc.debug) { console.log(data); }
     	rtc._socket.send(JSON.stringify(data));

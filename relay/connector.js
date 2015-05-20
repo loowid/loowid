@@ -4,6 +4,8 @@
 */
 var logger = require('../log.js').getLog('connector');
 var mongoose = require('mongoose');
+var util = require ('util');
+
 require ('./revents');
 require ('./rproposals');
 var REvent = mongoose.model('REvent');
@@ -27,9 +29,11 @@ exports.initListener = function(cb) {
 exports.relayConnector = function(manager) {
 	// Receive client events and send to relay system
 	manager.rtc.on('r_stream_added', function(data, socket) {
+		logger.debug ('r_stream_added from ' + socket + '\n' + util.inspect (data)); 
 		saveREvent('r_stream_added',data,socket.id);
 	});
 	manager.rtc.on('r_stream_removed', function(data, socket) {
+		logger.debug ('r_stream_removed from ' + socket + '\n' + util.inspect (data)); 
 		saveREvent('r_stream_removed',data,socket.id);
 	});
 	manager.rtc.on('r_should_accept', function(data, socket) {

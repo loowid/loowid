@@ -684,7 +684,7 @@ function attachEvents(manager) {
 						'data' : {
 							connectionId : socket.id,
 							origin : data.origin,
-							type : data.type
+							mediatype : data.mediatype
 						}
 					}), errorFn);
 				}
@@ -706,7 +706,7 @@ function attachEvents(manager) {
 							'data' : {
 								connectionId : socket.id,
 								origin : data.origin,
-								type : data.type
+								mediatype : data.mediatype
 							}
 						}), errorFn);
 					}
