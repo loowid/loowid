@@ -46,6 +46,36 @@ exports.relayConnector = function(manager) {
 	manager.rtc.on('r_stream_test', function(data, socket) {
 		saveREvent('r_stream_test',data,socket.id);
 	});
+	
+	//We also add a eventlistener to on join and out to maintain the users list update
+	
+	manager.rtc.on  ('join_room',function(data, socket) {
+		
+		var roomStatus = manager.rtc.roomsState [data.room] || { connections: {}, relay: false};
+		manager.rtc.roomsState[data.room] = roomStatus;
+	
+		//We add also the room Status
+		data.roomState = roomStatus;
+		
+		if (roomStatus.relay){
+			logger.debug ('join_room ' + socket.id + ' to ' + data.room);
+			saveREvent('join_room', data, socket.id);
+		}
+	});
+	
+	manager.rtc.on ('room_leave', function (room, socket) {
+
+		var data = {
+			'room': room,
+			'roomState': manager.rtc.roomsState[room]
+		};
+		
+		if (data.roomState.relay){
+			logger.debug ('room_leave ' + socket.id + ' from ' + room);
+			saveREvent ('room_leave', data, socket.id);
+		}
+	});
+	
 	// Listen to proposals send it by relay system
 	exports.initListener(function(event){
 		if (event.proposal.data!==undefined) {
