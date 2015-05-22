@@ -390,11 +390,9 @@ function attachEvents(manager) {
 
 	rtc.on('update_owner_data', function(data, socket) {
 		var roomList = rtc.rooms[data.room] || [];
+
 		manager.rooms.checkOwner(socket.id, data.room, function() {
-			
-			//update relay mode information
-			rtc.roomsState[data.room].relay = data.access.relay;
-			
+				
 			for ( var i = 0; i < roomList.length; i+=1) {
 				var id = roomList[i];
 				if (id === socket.id) {

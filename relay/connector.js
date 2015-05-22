@@ -53,9 +53,6 @@ exports.relayConnector = function(manager) {
 		
 		var roomStatus = manager.rtc.roomsState [data.room] || { connections: {}, relay: false};
 		manager.rtc.roomsState[data.room] = roomStatus;
-	
-		//We add also the room Status
-		data.roomState = roomStatus;
 		
 		if (roomStatus.relay){
 			logger.debug ('join_room ' + socket.id + ' to ' + data.room);
@@ -74,6 +71,26 @@ exports.relayConnector = function(manager) {
 			logger.debug ('room_leave ' + socket.id + ' from ' + room);
 			saveREvent ('room_leave', data, socket.id);
 		}
+	});
+	
+	manager.rtc.on('update_owner_data', function(data, socket) {
+				
+			manager.rooms.checkOwner(socket.id, data.room, function() {
+
+			if (manager.rtc.roomsState[data.room].relay !== data.access.relay){
+				//Sent the state when relay mode starts and ends. Algorithm will know what to do with this infomration
+				manager.rtc.roomsState[data.room].relay = data.access.relay;
+
+				var sendData = {
+					'room': data.room,
+					'roomState': manager.rtc.roomsState[data.room]
+				};
+				
+				logger.debug ('room information update ' + socket.id + ' from ' + data.room + ' state ' + util.inspect (sendData.roomState));
+				saveREvent ('set_initial_state', sendData, socket.id);
+			}
+		});
+				
 	});
 	
 	// Listen to proposals send it by relay system
