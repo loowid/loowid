@@ -131,6 +131,7 @@ module.exports = function(grunt) {
             		      'client/js/*.js',
             		      'client/js/services/*.js',
             		      'client/js/controllers/*.js',
+            		      'relay/*.js',
             		      '!client/js/lib/**/*.js'
             		      ] 
             	},

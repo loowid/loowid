@@ -53,9 +53,9 @@ exports.relayConnector = function(manager) {
 		
 		var roomStatus = manager.rtc.roomsState [data.room] || { connections: {}, relay: false};
 		manager.rtc.roomsState[data.room] = roomStatus;
-		
 		if (roomStatus.relay){
 			logger.debug ('join_room ' + socket.id + ' to ' + data.room);
+			data.roomState = roomStatus;
 			saveREvent('join_room', data, socket.id);
 		}
 	});
@@ -83,7 +83,8 @@ exports.relayConnector = function(manager) {
 
 				var sendData = {
 					'room': data.room,
-					'roomState': manager.rtc.roomsState[data.room]
+					'roomState': manager.rtc.roomsState[data.room],
+					'roomMembers': manager.rtc.rooms[data.room]
 				};
 				
 				logger.debug ('room information update ' + socket.id + ' from ' + data.room + ' state ' + util.inspect (sendData.roomState));
@@ -92,6 +93,10 @@ exports.relayConnector = function(manager) {
 		});
 				
 	});
+	
+	var errfn = function(err){
+		if (err) { logger.error(err); }
+	};
 	
 	// Listen to proposals send it by relay system
 	exports.initListener(function(event){
@@ -105,9 +110,7 @@ exports.relayConnector = function(manager) {
 		  				soc.send(JSON.stringify({
 		  					'eventName' : 'r_proposal',
 		  					'data': { 'offers' : event.proposal.data.offers }
-		  				}), function(err){
-		  					if (err) { logger.error(err); }
-		  				});
+		  				}), errfn);
 		  			}
 		  		}
 		  	}

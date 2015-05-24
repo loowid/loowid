@@ -796,12 +796,13 @@ function attachEvents(manager) {
 		
 		var roomStatus = rtc.roomsState[data.room] || {connections: {}, relay:false};
 		var userConnectionsList = roomStatus.connections[socket.id] || [];
-		var connection = _.findWhere (userConnectionsList, { peerId: data.peerId, source: data.source, produced: data.produced });
+		var connection = _.findWhere (userConnectionsList, { peerId: data.peerId, source: data.source, origin: data.origin, produced: data.produced });
 		
 		if (connection === undefined){
 			connection = {
 				peerId: data.peerId,
 				status: 'new',
+				origin: data.origin,
 				source: data.source,
 				produced: data.produced
 			};
