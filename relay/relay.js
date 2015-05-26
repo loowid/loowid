@@ -4,6 +4,7 @@ var logger = require('../log.js').getLog('relay');
 var mongoose = require('mongoose');
 require ('./rproposals');
 var RProposal = mongoose.model('RProposal');
+var util = require ('util');
 
 logger.info('Relay algorithm started !!');
 
@@ -14,6 +15,7 @@ var saveRProposal = function(p) {
 
 var sendProposal = function(room,origin,offers) {
 	if (offers && offers.length>0) {
+		logger.debug('Sending proposal in '+room+' to '+origin+' with \n'+util.inspect(offers));
 		saveRProposal({'data':{'room':room,'target':origin,'offers':offers}});
 	}
 };

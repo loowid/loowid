@@ -74,9 +74,6 @@ var sessionSecret = crypto.randomBytes(16).toString('hex');
 var webRTC = require('./webrtc.io.js').listen(wserver,ipaddr);
 stats.setWebRTCHandler(webRTC);
 
-// Run relay connector
-require('./relay/connector.js').relayConnector(webRTC);
-
 var serverId = (Math.random()/+new Date()).toString(36).replace(/[^a-z]+/g,'').substring(0,9);
 exports.serverId = serverId;
 
@@ -557,3 +554,13 @@ setInterval(function(){
 	}
 },1000*60*60*6);
 
+// Run relay algorithm, is there a better way to do this?
+setTimeout(function(){
+	var sorted = serverCluster.split(',');
+	sorted.sort();
+	// Only one node save statistics
+	if (sorted[0] === serverId) {
+		// Run relay connector
+		require('./relay/connector.js').relayConnector(webRTC);
+	}
+},2000);

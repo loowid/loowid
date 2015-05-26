@@ -29,13 +29,13 @@ exports.initListener = function(cb) {
 exports.relayConnector = function(manager) {
 	// Receive client events and send to relay system
 	manager.rtc.on('r_stream_added', function(data, socket) {
-		logger.debug ('r_stream_added from ' + socket + '\n' + util.inspect (data)); 
+		logger.debug ('r_stream_added from ' + socket.id + '\n' + util.inspect (data)); 
 		data.roomMembers = manager.rtc.rooms[data.room];
 		data.roomState = manager.rtc.roomsState[data.room];
 		saveREvent('r_stream_added',data,socket.id);
 	});
 	manager.rtc.on('r_stream_removed', function(data, socket) {
-		logger.debug ('r_stream_removed from ' + socket + '\n' + util.inspect (data)); 
+		logger.debug ('r_stream_removed from ' + socket.id + '\n' + util.inspect (data)); 
 		data.roomMembers = manager.rtc.rooms[data.room];
 		data.roomState = manager.rtc.roomsState[data.room];
 		saveREvent('r_stream_removed',data,socket.id);
