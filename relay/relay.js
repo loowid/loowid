@@ -5,8 +5,7 @@ var mongoose = require('mongoose');
 require ('./rproposals');
 var RProposal = mongoose.model('RProposal');
 var util = require ('util');
-
-logger.info('Relay algorithm started !!');
+var relayId = null;
 
 var saveRProposal = function(p) {
 	var rprop = new RProposal({proposalDate:new Date(),proposal:p});
@@ -15,7 +14,7 @@ var saveRProposal = function(p) {
 
 var sendProposal = function(room,origin,offers) {
 	if (offers && offers.length>0) {
-		logger.debug('Sending proposal in '+room+' to '+origin+' with \n'+util.inspect(offers));
+		logger.debug('Node '+relayId+' sending proposal in '+room+' to '+origin+' with \n'+util.inspect(offers));
 		saveRProposal({'data':{'room':room,'target':origin,'offers':offers}});
 	}
 };
@@ -86,19 +85,24 @@ var processTreeUpdate = function(room,id,members,connections,isNew) {
 	}
 };
 
-require('./listener').initListener(function(event){
-	if (event.eventName==='join_room') {
-		processTreeUpdate(event.data.room,event.socket,event.data.roomMembers,event.data.roomState.connections,true);
-	}
-	if (event.eventName==='room_leave') {
-		processTreeUpdate(event.data.room,event.socket,event.data.roomMembers,event.data.roomState.connections,false);
-	}
-	if (event.eventName==='r_stream_added') {
-		var offers = getOffers(event.socket,event.data.origin,event.data.type,event.data.roomMembers,event.data.roomState.connections);
-		sendProposal(event.data.room,event.socket,offers);
-	}
-	if (event.eventName==='r_stream_test') {
-		saveRProposal(event);
-	}
-});
+exports.start = function(srvId) {
+	relayId = srvId;
+	logger.info('Relay algorithm started on '+relayId+' !!');
+	require('./listener').initListener(function(event){
+		logger.debug('Received '+event.eventName+' on listener '+relayId);
+		if (event.eventName==='join_room') {
+			processTreeUpdate(event.data.room,event.socket,event.data.roomMembers,event.data.roomState.connections,true);
+		}
+		if (event.eventName==='room_leave') {
+			processTreeUpdate(event.data.room,event.socket,event.data.roomMembers,event.data.roomState.connections,false);
+		}
+		if (event.eventName==='r_stream_added') {
+			var offers = getOffers(event.socket,event.data.origin,event.data.type,event.data.roomMembers,event.data.roomState.connections);
+			sendProposal(event.data.room,event.socket,offers);
+		}
+		if (event.eventName==='r_stream_test') {
+			saveRProposal(event);
+		}
+	});
+};
 

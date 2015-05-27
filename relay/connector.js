@@ -11,12 +11,14 @@ require ('./rproposals');
 var REvent = mongoose.model('REvent');
 var RProposal = mongoose.model('RProposal');
 
+var connectorId = null;
+
 var saveREvent = function(ev,d,s) {
 	var revt = new REvent({eventName:ev,eventDate:new Date(),data:d,socket:s});
 	revt.save(function(err){ if (err) { logger.error(err); } });
 };
 
-exports.initListener = function(srvId,cb) {
+exports.initListener = function(cb) {
 	// Add initial data to start tail
 	var startDate = new Date();
 	var initProposal = new RProposal({proposalDate:startDate,proposal:'none'});
@@ -24,21 +26,24 @@ exports.initListener = function(srvId,cb) {
 	// Query with tail
 	var stream = RProposal.find({proposalDate:{'$gte':startDate}}).tailable().stream();
 	stream.on('data', cb);
-	logger.info('Running relay proposal listener on '+srvId+' !!');
+	logger.info('Running relay proposal listener on '+connectorId+' !!');
 };
 
 exports.relayConnector = function(srvId,manager,runRelay) {
+	
+	connectorId = srvId;
+	
 	// Receive client events and send to relay system
 	manager.rtc.on('r_stream_added', function(data, socket) {
-		logger.debug ('r_stream_added from ' + socket.id + '\n' + util.inspect (data)); 
 		data.roomMembers = manager.rtc.rooms[data.room];
 		data.roomState = manager.rtc.roomsState[data.room];
+		logger.debug ('r_stream_added from ' + socket.id + '\n' + util.inspect (data)); 
 		saveREvent('r_stream_added',data,socket.id);
 	});
 	manager.rtc.on('r_stream_removed', function(data, socket) {
-		logger.debug ('r_stream_removed from ' + socket.id + '\n' + util.inspect (data)); 
 		data.roomMembers = manager.rtc.rooms[data.room];
 		data.roomState = manager.rtc.roomsState[data.room];
+		logger.debug ('r_stream_removed from ' + socket.id + '\n' + util.inspect (data)); 
 		saveREvent('r_stream_removed',data,socket.id);
 	});
 	manager.rtc.on('r_should_accept', function(data, socket) {
@@ -106,7 +111,7 @@ exports.relayConnector = function(srvId,manager,runRelay) {
 	};
 	
 	// Listen to proposals send it by relay system
-	exports.initListener(srvId,function(event){
+	exports.initListener(function(event){
 		if (event.proposal.data!==undefined) {
 		  	var roomList = manager.rtc.rooms[event.proposal.data.room] || [];
 		  	for ( var i = 0; i < roomList.length; i+=1) {
@@ -126,7 +131,7 @@ exports.relayConnector = function(srvId,manager,runRelay) {
 	
 	if (runRelay) {
 		// This should be run in a separated process later
-		require('./relay');		
+		require('./relay').start(srvId);		
 	}
 	
 };

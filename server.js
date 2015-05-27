@@ -245,7 +245,7 @@ app.configure(function() {
 	var csrf = express.csrf();
 	app.use(function(req,res,next){
 		if (isClustered && (!req.cookies.stickyid || (req.headers.stickyid && req.cookies.stickyid !== req.headers.stickyid)) && req.headers.stickyid) {
-			res.cookie('stickyid', req.headers.stickyid, { maxAge: null, httpOnly: true });
+			res.cookie('stickyid', req.headers.stickyid, { httpOnly: true });
 		}
 		// Skip CSRF Check for LTI Initial Route, and forces https
 		if ((req.protocol === 'http') && (req.url === LTI_PATH) && isOpenShift()) {
@@ -559,5 +559,7 @@ setTimeout(function(){
 	var sorted = serverCluster.split(',');
 	sorted.sort();
 	// Only one node run relay algorithm
-	require('./relay/connector.js').relayConnector(serverId,webRTC,(sorted[0] === serverId));
+	if (sorted[0] === serverId) {
+		require('./relay/connector.js').relayConnector(serverId,webRTC,(sorted[0] === serverId));
+	}
 },2000);
