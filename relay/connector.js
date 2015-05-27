@@ -16,7 +16,7 @@ var saveREvent = function(ev,d,s) {
 	revt.save(function(err){ if (err) { logger.error(err); } });
 };
 
-exports.initListener = function(cb) {
+exports.initListener = function(srvId,cb) {
 	// Add initial data to start tail
 	var startDate = new Date();
 	var initProposal = new RProposal({proposalDate:startDate,proposal:'none'});
@@ -24,9 +24,10 @@ exports.initListener = function(cb) {
 	// Query with tail
 	var stream = RProposal.find({proposalDate:{'$gte':startDate}}).tailable().stream();
 	stream.on('data', cb);
+	logger.info('Running relay proposal listener on '+srvId+' !!');
 };
 
-exports.relayConnector = function(manager) {
+exports.relayConnector = function(srvId,manager,runRelay) {
 	// Receive client events and send to relay system
 	manager.rtc.on('r_stream_added', function(data, socket) {
 		logger.debug ('r_stream_added from ' + socket.id + '\n' + util.inspect (data)); 
@@ -105,7 +106,7 @@ exports.relayConnector = function(manager) {
 	};
 	
 	// Listen to proposals send it by relay system
-	exports.initListener(function(event){
+	exports.initListener(srvId,function(event){
 		if (event.proposal.data!==undefined) {
 		  	var roomList = manager.rtc.rooms[event.proposal.data.room] || [];
 		  	for ( var i = 0; i < roomList.length; i+=1) {
@@ -122,7 +123,11 @@ exports.relayConnector = function(manager) {
 		  	}
 		}
 	});
+	
+	if (runRelay) {
+		// This should be run in a separated process later
+		require('./relay');		
+	}
+	
 };
 
-// This should be run in a separated process later
-require('./relay');
