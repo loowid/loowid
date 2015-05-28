@@ -460,7 +460,7 @@ angular.module('mean.rooms').factory('MediaService',['Rooms','UIHandler',functio
 
 					var windowOptions = {
 						'mediaElement' :mediaElement,
-						'title': $scope.getUserName(connectionId),
+						'title': $scope.getUserName(origin),
 						'ratio': mediasource.winratio,
 						'scale': mediasource.winscale, 
 						'closeable': (uiHandler.isowner && uiHandler.access.moderated) ,

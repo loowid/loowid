@@ -4,7 +4,7 @@ var logger = require('../log.js').getLog('relay');
 var mongoose = require('mongoose');
 require ('./rproposals');
 var RProposal = mongoose.model('RProposal');
-var util = require ('util');
+
 var relayId = null;
 
 var saveRProposal = function(p) {

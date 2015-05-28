@@ -122,6 +122,11 @@ var sendNewPeerConnected = function(socket,roomList) {
 	return connectionsId;
 };
 
+var removeFromCompleteList = function(key,id) {
+	var croom = rtc.crooms[key];
+	if (croom && croom.indexOf(id)!==-1) { croom.splice(croom.indexOf(id),1); }				
+};
+
 function attachEvents(manager) {
 
   manager.on('connection', function(socket) {
@@ -153,12 +158,12 @@ function attachEvents(manager) {
       // remove socket
 	  rtc.sockets.splice(i, 1);
       // remove from rooms and send remove_peer_connected to all sockets in room
-      var room,croom;
+      var room;
       
       for (var key in rtc.rooms) {
 		  if (rtc.rooms.hasOwnProperty(key)) {
-			room = rtc.rooms[key]; croom = rtc.crooms[key];
-			if (croom && croom.indexOf(socket.id)!==-1) { croom.splice(croom.indexOf(socket.id),1); }				
+			room = rtc.rooms[key];
+			removeFromCompleteList(key,socket.id);
 			var exist = room?room.indexOf(socket.id):-1;
 			if (exist !== -1) {
 			  room.splice(exist, 1);
@@ -745,8 +750,7 @@ function attachEvents(manager) {
 					room : room.roomId
 				}, newsocket);
 			}
-			var croom = rtc.crooms[key];
-			if (croom && croom.indexOf(socket.id)!==-1) { croom.splice(croom.indexOf(socket.id),1); }				
+			removeFromCompleteList(room.roomId,socket.id);
 			rtc.fire('disconnect stream', socket);
 		});
 	});
