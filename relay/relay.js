@@ -14,7 +14,7 @@ var saveRProposal = function(p) {
 
 var sendProposal = function(room,origin,offers) {
 	if (offers && offers.length>0) {
-		logger.debug('Node '+relayId+' sending proposal in '+room+' to '+origin+' with \n'+util.inspect(offers));
+		logger.debug('Relay save proposal in '+room+' to '+origin);
 		saveRProposal({'data':{'room':room,'target':origin,'offers':offers}});
 	}
 };

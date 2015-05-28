@@ -22,6 +22,7 @@ rtc.sockets = [];
 
 rtc.rooms = {};
 rtc.roomsState = {};
+rtc.crooms = {};
 
 rtc.prerooms = {};
 
@@ -152,14 +153,15 @@ function attachEvents(manager) {
       // remove socket
 	  rtc.sockets.splice(i, 1);
       // remove from rooms and send remove_peer_connected to all sockets in room
-      var room;
+      var room,croom;
       
       for (var key in rtc.rooms) {
 		  if (rtc.rooms.hasOwnProperty(key)) {
-			room = rtc.rooms[key];
+			room = rtc.rooms[key]; croom = rtc.crooms[key];
+			if (croom && croom.indexOf(socket.id)!==-1) { croom.splice(croom.indexOf(socket.id),1); }				
 			var exist = room?room.indexOf(socket.id):-1;
 			if (exist !== -1) {
-			  room.splice(room.indexOf(socket.id), 1);
+			  room.splice(exist, 1);
 			  for (var j = 0; j < room.length; j+=1) {
 				var soc = rtc.getSocket(room[j]);
 				if (soc) { // This check is missing (bug)
@@ -190,6 +192,7 @@ function attachEvents(manager) {
   rtc.on('join_room', function(dataa, socketa) {
 	manager.rooms.checkLockOrPassword(dataa, socketa, function(data,socket) {
 		var roomList = rtc.rooms[data.room] || [];
+		var roomCompleteList = rtc.crooms[data.room] || [];
 		var roomStatus = rtc.roomsState [data.room] || {connections: {}, relay: false};
 		rtc.roomsState[data.room] = roomStatus;
 		
@@ -199,6 +202,9 @@ function attachEvents(manager) {
 			// Mark as valid
 			manager.rooms.markValid(data.room,socket.sessionid);
 		}
+		// Add others for relay
+		roomCompleteList.push(socket.id);
+		rtc.crooms[data.room] = roomCompleteList;
 
 		var connectionsId = sendNewPeerConnected(socket,roomList);
 		
@@ -739,6 +745,8 @@ function attachEvents(manager) {
 					room : room.roomId
 				}, newsocket);
 			}
+			var croom = rtc.crooms[key];
+			if (croom && croom.indexOf(socket.id)!==-1) { croom.splice(croom.indexOf(socket.id),1); }				
 			rtc.fire('disconnect stream', socket);
 		});
 	});
@@ -755,9 +763,12 @@ function attachEvents(manager) {
 	
 	rtc.on('move_room', function(data, socket){
 		var roomList = rtc.rooms[data.fromRoom];
+		var completeRoomList = rtc.crooms[data.fromRoom];
 		manager.rooms.checkOwner(socket.id, data.toRoom, function() {
 			rtc.rooms[data.toRoom] = roomList;
+			rtc.crooms[data.toRoom] = completeRoomList;
 			delete rtc.rooms[data.fromRoom];
+			delete rtc.crooms[data.fromRoom];
 			if (!roomList) { roomList = []; }
 			var toClose = [];
 			for ( var i = 0; i < roomList.length; i+=1) {

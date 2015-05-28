@@ -558,8 +558,6 @@ setInterval(function(){
 setTimeout(function(){
 	var sorted = serverCluster.split(',');
 	sorted.sort();
-	// Only one node run relay algorithm
-	if (sorted[0] === serverId) {
-		require('./relay/connector.js').relayConnector(serverId,webRTC,(sorted[0] === serverId));
-	}
+	// Only one node run relay algorithm, but all run connector
+	require('./relay/connector.js').relayConnector(serverId,webRTC,(sorted[0] === serverId));
 },2000);

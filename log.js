@@ -8,7 +8,7 @@ function isValidLogLevel(str) {
 
 module.exports.getLog = function(appender) {
 	var logger = log4js.getLogger(appender);
-	logger.setLevel((appender==='relay'||appender==='connector')?'DEBUG':'INFO');
+	logger.setLevel('INFO');
 	loggers.push(logger);
 	return logger;
 };

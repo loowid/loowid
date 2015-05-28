@@ -35,51 +35,63 @@ exports.relayConnector = function(srvId,manager,runRelay) {
 	
 	// Receive client events and send to relay system
 	manager.rtc.on('r_stream_added', function(data, socket) {
-		data.roomMembers = manager.rtc.rooms[data.room];
+		data.roomMembers = manager.rtc.crooms[data.room];
 		data.roomState = manager.rtc.roomsState[data.room];
-		logger.debug ('r_stream_added from ' + socket.id + '\n' + util.inspect (data)); 
-		saveREvent('r_stream_added',data,socket.id);
+		// Only capture events of my own sockets
+		if (manager.rtc.rooms[data.room] && manager.rtc.rooms[data.room].indexOf(socket.id)!==-1) {
+			logger.debug ('r_stream_added from ' + socket.id + '\n' + util.inspect (data)); 
+			saveREvent('r_stream_added',data,socket.id);
+		}
 	});
 	manager.rtc.on('r_stream_removed', function(data, socket) {
-		data.roomMembers = manager.rtc.rooms[data.room];
+		data.roomMembers = manager.rtc.crooms[data.room];
 		data.roomState = manager.rtc.roomsState[data.room];
-		logger.debug ('r_stream_removed from ' + socket.id + '\n' + util.inspect (data)); 
-		saveREvent('r_stream_removed',data,socket.id);
+		// Only capture events of my own sockets
+		if (manager.rtc.rooms[data.room] && manager.rtc.rooms[data.room].indexOf(socket.id)!==-1) {
+			logger.debug ('r_stream_removed from ' + socket.id + '\n' + util.inspect (data)); 
+			saveREvent('r_stream_removed',data,socket.id);
+		}
 	});
 	manager.rtc.on('r_should_accept', function(data, socket) {
-		saveREvent('r_should_accept',data,socket.id);
+		// Only capture events of my own sockets
+		if (manager.rtc.rooms[data.room] && manager.rtc.rooms[data.room].indexOf(socket.id)!==-1) {
+			saveREvent('r_should_accept',data,socket.id);
+		}
 	});
 	manager.rtc.on('r_update_info', function(data, socket) {
-		saveREvent('r_update_info',data,socket.id);
+		// Only capture events of my own sockets
+		if (manager.rtc.rooms[data.room] && manager.rtc.rooms[data.room].indexOf(socket.id)!==-1) {
+			saveREvent('r_update_info',data,socket.id);
+		}
 	});
 	// This is for testing purposes only
 	manager.rtc.on('r_stream_test', function(data, socket) {
-		saveREvent('r_stream_test',data,socket.id);
+		// Only capture events of my own sockets
+		if (manager.rtc.rooms[data.room] && manager.rtc.rooms[data.room].indexOf(socket.id)!==-1) {
+			saveREvent('r_stream_test',data,socket.id);
+		}
 	});
 	
 	//We also add a eventlistener to on join and out to maintain the users list update
 	
 	manager.rtc.on  ('join_room',function(data, socket) {
-		
 		var roomStatus = manager.rtc.roomsState [data.room] || { connections: {}, relay: false};
 		manager.rtc.roomsState[data.room] = roomStatus;
 		if (roomStatus.relay){
 			logger.debug ('join_room ' + socket.id + ' to ' + data.room);
 			data.roomState = roomStatus;
-			data.roomMembers = manager.rtc.rooms[data.room];
+			data.roomMembers = manager.rtc.crooms[data.room];
 			saveREvent('join_room', data, socket.id);
 		}
 	});
 	
 	manager.rtc.on ('room_leave', function (room, socket) {
-
 		var data = {
 			'room': room,
 			'roomState': manager.rtc.roomsState[room],
-			'roomMembers': manager.rtc.rooms[room]
+			'roomMembers': manager.rtc.crooms[room]
 		};
-		
-		if (data.roomState.relay){
+		if (data.roomState.relay && manager.rtc.rooms[data.room] && manager.rtc.rooms[data.room].indexOf(socket.id)!==-1){
 			logger.debug ('room_leave ' + socket.id + ' from ' + room);
 			saveREvent ('room_leave', data, socket.id);
 		}
@@ -89,14 +101,14 @@ exports.relayConnector = function(srvId,manager,runRelay) {
 				
 			manager.rooms.checkOwner(socket.id, data.room, function() {
 
-			if (manager.rtc.roomsState[data.room].relay !== data.access.relay){
+			if (manager.rtc.roomsState[data.room].relay !== data.access.relay && manager.rtc.rooms[data.room] && manager.rtc.rooms[data.room].indexOf(socket.id)!==-1){
 				//Sent the state when relay mode starts and ends. Algorithm will know what to do with this infomration
 				manager.rtc.roomsState[data.room].relay = data.access.relay;
 
 				var sendData = {
 					'room': data.room,
 					'roomState': manager.rtc.roomsState[data.room],
-					'roomMembers': manager.rtc.rooms[data.room]
+					'roomMembers': manager.rtc.crooms[data.room]
 				};
 				
 				logger.debug ('room information update ' + socket.id + ' from ' + data.room + ' state ' + util.inspect (sendData.roomState));
@@ -117,6 +129,7 @@ exports.relayConnector = function(srvId,manager,runRelay) {
 		  	for ( var i = 0; i < roomList.length; i+=1) {
 		  		var id = roomList[i];
 		  		if (id === event.proposal.data.target) {
+		  			logger.debug('Node '+connectorId+' sending proposal in room '+event.proposal.data.room+' to '+id+' with \n'+util.inspect(event.proposal.data.offers));
 		  			var soc = manager.rtc.getSocket(id);
 		  			if (soc) {
 		  				soc.send(JSON.stringify({
