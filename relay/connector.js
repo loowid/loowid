@@ -86,15 +86,18 @@ exports.relayConnector = function(srvId,manager,runRelay) {
 	});
 	
 	manager.rtc.on ('room_leave', function (room, socket) {
-		var data = {
-			'room': room,
-			'roomState': manager.rtc.roomsState[room],
-			'roomMembers': manager.rtc.crooms[room]
-		};
-		if (data.roomState && data.roomState.relay && manager.rtc.rooms[data.room] && manager.rtc.rooms[data.room].indexOf(socket.id)!==-1) {
-			logger.debug ('room_leave ' + socket.id + ' from ' + room);
-			saveREvent ('room_leave', data, socket.id);
-		}
+		// Ensure user is previously removed from complete list
+		setTimeout(function(){
+			var data = {
+				'room': room,
+				'roomState': manager.rtc.roomsState[room],
+				'roomMembers': manager.rtc.crooms[room]
+			};
+			if (data.roomState && data.roomState.relay && manager.rtc.rooms[data.room] && manager.rtc.rooms[data.room].indexOf(socket.id)!==-1) {
+				logger.debug ('room_leave ' + socket.id + ' from ' + room);
+				saveREvent ('room_leave', data, socket.id);
+			}
+		},100);
 	});
 	
 	manager.rtc.on('update_owner_data', function(data, socket) {
