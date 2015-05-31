@@ -91,7 +91,7 @@ exports.relayConnector = function(srvId,manager,runRelay) {
 			'roomState': manager.rtc.roomsState[room],
 			'roomMembers': manager.rtc.crooms[room]
 		};
-		if (data.roomState.relay && manager.rtc.rooms[data.room] && manager.rtc.rooms[data.room].indexOf(socket.id)!==-1){
+		if (data.roomState && data.roomState.relay && manager.rtc.rooms[data.room] && manager.rtc.rooms[data.room].indexOf(socket.id)!==-1) {
 			logger.debug ('room_leave ' + socket.id + ' from ' + room);
 			saveREvent ('room_leave', data, socket.id);
 		}
@@ -101,7 +101,9 @@ exports.relayConnector = function(srvId,manager,runRelay) {
 				
 			manager.rooms.checkOwner(socket.id, data.room, function() {
 
-			if (manager.rtc.roomsState[data.room].relay !== data.access.relay && manager.rtc.rooms[data.room] && manager.rtc.rooms[data.room].indexOf(socket.id)!==-1){
+			if (manager.rtc.roomsState[data.room] && data.access &&
+				manager.rtc.roomsState[data.room].relay !== data.access.relay && 
+				manager.rtc.rooms[data.room] && manager.rtc.rooms[data.room].indexOf(socket.id)!==-1) {
 				//Sent the state when relay mode starts and ends. Algorithm will know what to do with this infomration
 				manager.rtc.roomsState[data.room].relay = data.access.relay;
 

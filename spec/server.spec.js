@@ -183,7 +183,7 @@ describe('Main Server Tests', function() {
 	});
 	
 	// Test collection
-	var tests = ['init','lti_room','chat_talk','chat_video','change_log_level','new_room','join_room','chat_room','three_room',
+	var tests = ['init','lti_room','chat_talk','chat_oembed','change_log_level','new_room','join_room','chat_room','three_room',
 	             'multi_join_room','move_room','owner_leaves_room','viewer_leaves_room','blocked_room','blocked_chat',
 	             'private_room','permanent_room','edit_name_room','status_room','moderated_room','room_stats','relay_connector'];
 	

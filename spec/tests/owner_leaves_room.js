@@ -93,7 +93,8 @@ module.exports = function(utils) {
 					'room': utils.roomID,
 					'ownerName': 'Owner',
 					'ownerAvatar': 'img/heroe.png',
-					'status': 'OPENED'
+					'status': 'OPENED',
+					'access': {}
 				}
 	    	}));
 	    });
