@@ -91,28 +91,25 @@ exports.relayConnector = function(srvId,manager,runRelay) {
 			'roomState': manager.rtc.roomsState[room],
 			'roomMembers': manager.rtc.crooms[room]
 		};
-		if (data.roomState && data.roomState.relay && manager.rtc.rooms[data.room]) {
+		// Only raise in one server, no matter if no one else in the room (maybe in other nodes)
+		if (socket._events && data.roomState && data.roomState.relay) {
 			logger.debug ('room_leave ' + socket.id + ' from ' + room);
 			saveREvent ('room_leave', data, socket.id);
 		}
 	});
 	
 	manager.rtc.on('update_owner_data', function(data, socket) {
-				
-			manager.rooms.checkOwner(socket.id, data.room, function() {
 
-			if (manager.rtc.roomsState[data.room] && data.access &&
-				manager.rtc.roomsState[data.room].relay !== data.access.relay && 
-				manager.rtc.rooms[data.room] && manager.rtc.rooms[data.room].indexOf(socket.id)!==-1) {
+		manager.rooms.checkOwner(socket.id, data.room, function() {
+			manager.rtc.roomsState[data.room] = manager.rtc.roomsState[data.room] || {connections: {}, relay: false};
+			if (manager.rtc.roomsState[data.room].relay !== data.access.relay) {
 				//Sent the state when relay mode starts and ends. Algorithm will know what to do with this information
 				manager.rtc.roomsState[data.room].relay = data.access.relay;
-
 				var sendData = {
 					'room': data.room,
 					'roomState': manager.rtc.roomsState[data.room],
 					'roomMembers': manager.rtc.crooms[data.room]
 				};
-				
 				logger.debug ('room information update ' + socket.id + ' from ' + data.room + ' state ' + util.inspect (sendData.roomState));
 				saveREvent ('set_initial_state', sendData, socket.id);
 			}
