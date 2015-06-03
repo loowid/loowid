@@ -86,18 +86,15 @@ exports.relayConnector = function(srvId,manager,runRelay) {
 	});
 	
 	manager.rtc.on ('room_leave', function (room, socket) {
-		// Ensure user is previously removed from complete list
-		setTimeout(function(){
-			var data = {
-				'room': room,
-				'roomState': manager.rtc.roomsState[room],
-				'roomMembers': manager.rtc.crooms[room]
-			};
-			if (data.roomState && data.roomState.relay && manager.rtc.rooms[data.room] && manager.rtc.rooms[data.room].indexOf(socket.id)!==-1) {
-				logger.debug ('room_leave ' + socket.id + ' from ' + room);
-				saveREvent ('room_leave', data, socket.id);
-			}
-		},100);
+		var data = {
+			'room': room,
+			'roomState': manager.rtc.roomsState[room],
+			'roomMembers': manager.rtc.crooms[room]
+		};
+		if (data.roomState && data.roomState.relay && manager.rtc.rooms[data.room]) {
+			logger.debug ('room_leave ' + socket.id + ' from ' + room);
+			saveREvent ('room_leave', data, socket.id);
+		}
 	});
 	
 	manager.rtc.on('update_owner_data', function(data, socket) {
@@ -107,7 +104,7 @@ exports.relayConnector = function(srvId,manager,runRelay) {
 			if (manager.rtc.roomsState[data.room] && data.access &&
 				manager.rtc.roomsState[data.room].relay !== data.access.relay && 
 				manager.rtc.rooms[data.room] && manager.rtc.rooms[data.room].indexOf(socket.id)!==-1) {
-				//Sent the state when relay mode starts and ends. Algorithm will know what to do with this infomration
+				//Sent the state when relay mode starts and ends. Algorithm will know what to do with this information
 				manager.rtc.roomsState[data.room].relay = data.access.relay;
 
 				var sendData = {
@@ -134,9 +131,9 @@ exports.relayConnector = function(srvId,manager,runRelay) {
 		  	for ( var i = 0; i < roomList.length; i+=1) {
 		  		var id = roomList[i];
 		  		if (id === event.proposal.data.target) {
-		  			logger.debug('Node '+connectorId+' sending proposal in room '+event.proposal.data.room+' to '+id+' with \n'+util.inspect(event.proposal.data.offers));
 		  			var soc = manager.rtc.getSocket(id);
 		  			if (soc) {
+			  			logger.debug('Node '+connectorId+' sending proposal in room '+event.proposal.data.room+' to '+id+' with \n'+util.inspect(event.proposal.data.offers));
 		  				soc.send(JSON.stringify({
 		  					'eventName' : 'r_proposal',
 		  					'data': { 'offers' : event.proposal.data.offers }

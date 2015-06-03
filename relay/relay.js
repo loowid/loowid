@@ -16,6 +16,8 @@ var sendProposal = function(room,origin,offers) {
 	if (offers && offers.length>0) {
 		logger.debug('Relay save proposal in '+room+' to '+origin);
 		saveRProposal({'data':{'room':room,'target':origin,'offers':offers}});
+	} else {
+		logger.debug('No offers available for this member.');
 	}
 };
 
@@ -62,11 +64,13 @@ var isStreamingInProgress = function(connections) {
 };
 
 var updateOffers = function(id,newPeerId,connections) {
-	var offers = [];
+	var offers = []; var processed = [];
 	for (var k=0; connections && connections[id] && k<connections[id].length; k+=1) {
 		// Do not send offer to
-		if (connections[id][k].status === 'completed' && connections[id][k].produced && connections[id][k].origin !== newPeerId) {
+		if ((connections[id][k].status === 'completed' || connections[id][k].status === 'connected')  &&
+			 connections[id][k].origin !== newPeerId && processed.indexOf(connections[id][k].origin+':::'+connections[id][k].source) === -1) {
 			offers.push({'origin':connections[id][k].origin,'target':newPeerId,'mediatype':connections[id][k].source});
+			processed.push(connections[id][k].origin+':::'+connections[id][k].source);
 		}
 	}
 	return offers;
@@ -79,9 +83,12 @@ var processTreeUpdate = function(room,id,members,connections,isNew) {
 		var newPeer = isNew?id:getChildNode(parent,members);
 		// Skip sending recursive proposal
 		if (newPeer !== parent) {
+			logger.debug('Analyze parent for proposals: '+parent);
 			var offers = updateOffers(parent,newPeer,connections);
 			sendProposal(room,parent,offers);
 		}
+	} else {
+		logger.debug('Stream not in progress, nothing to do!!');
 	}
 };
 
