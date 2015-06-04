@@ -12,8 +12,9 @@ angular.module('mean.rooms').controller('RecordController', ['$scope', '$routePa
     var mediaService = new MediaService();
     var windowHandler = new WindowHandler();
     var userHandler = new UserHandler();
-    
-    uiHandler.isowner = true;
+	$scope.offers = [];
+
+	uiHandler.isowner = true;
     
     document.getElementById('noscript').style.display = 'none';
     
@@ -314,19 +315,27 @@ angular.module('mean.rooms').controller('RecordController', ['$scope', '$routePa
    	});
 
     // For testing purposes only
-    $scope.sendProposal = function() {
-    	var tgt = uiHandler.proposalTarget === '-1'?rtc._me:uiHandler.proposalTarget;
+    $scope.addProposal = function() {
     	var ori = uiHandler.proposalOrigin === '-1'?rtc._me:uiHandler.proposalOrigin;
     	var dst = uiHandler.proposalDestin === '-1'?rtc._me:uiHandler.proposalDestin;
-    	var data = {'eventName': 'r_stream_test',
+		
+		$scope.offers.push({'origin':ori,'target':dst,'mediatype':uiHandler.proposalType});
+       };
+	
+	$scope.sendProposals = function() {
+    	var tgt = uiHandler.proposalTarget === '-1'?rtc._me:uiHandler.proposalTarget;
+		
+		var data = {'eventName': 'r_stream_test',
    			 'data': {
 				 'room': $scope.global.roomId,
 				 'target': tgt,
-				 'offers':[{'origin':ori,'target':dst,'mediatype':uiHandler.proposalType}]
+				 'offers': $scope.offers
 			 }};
     	if (rtc.debug) { console.log(data); }
     	rtc._socket.send(JSON.stringify(data));
+		$scope.offers = [];
     };
+	
     
 }]).config(function($sceProvider) {
 	$sceProvider.enabled(true);

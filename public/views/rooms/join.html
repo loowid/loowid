@@ -262,9 +262,11 @@
 				<input type="radio" name="ptype" value="screen" ng-model="ui.proposalType"/>&nbsp;Screen&nbsp;&nbsp;
 				Origin: <select name="porigin" ng-model="ui.proposalOrigin"><option value="-1">{{ui.name}}</option><option data-ng-repeat="user in ui.users" value="{{user.connectionId}}">{{user.name}}</option></select>&nbsp;&nbsp;
 				Target: <select name="porigin" ng-model="ui.proposalDestin"><option value="-1">{{ui.name}}</option><option data-ng-repeat="user in ui.users" value="{{user.connectionId}}">{{user.name}}</option></select><br/>
+				<input type="button" value="Add Offer" ng-click="addProposal()"/>
 				<br/><hr/><br/>
-				<input type="button" value="Send Proposal" ng-click="sendProposal();"/>
+				<input type="button" value="Send Proposal" ng-click="sendProposals()"/>
 			</form>
+				<textarea >{{offers}}</textarea>
 		</div>
 </section>
 <div id="error" ng-class="errorClass" ng-click="hideError()"><div class="error"><h3 ng-bind-html="errorMessage"></h3></div></div>

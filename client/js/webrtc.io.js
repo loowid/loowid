@@ -271,7 +271,7 @@ function mergeConstraints(cons1, cons2) {
 				///This process is for produced connections
 				if (rtc.relay){
 					//Anounce to the server that an stream has been added
-					rtc.relayStreamAdded(origin,mediatype);
+					rtc.relayStreamAdded(rtc.me,origin,mediatype);
 				}else{
 					//Create connections and send streams to all participants
 					rtc.createPeerConnections(mediatype);
@@ -708,7 +708,7 @@ function mergeConstraints(cons1, cons2) {
 			var streamObj = rtc.streams[i];
 			if (streamObj.mediatype === mediatype){
 				if (rtc.relay){
-					rtc.relayStreamAdded(streamObj.origin,streamObj.mediatype);
+					rtc.relayStreamAdded(connectionId,streamObj.origin,streamObj.mediatype);
 				}else{
 					rtc.producedPeerConnections[connectionId][origin][mediatype].addStream(streamObj.mediastream);
 				}
@@ -869,33 +869,51 @@ function mergeConstraints(cons1, cons2) {
 		}
 	};
 	
-	rtc.removeStream = function (room,origin, mediatype){
+	rtc.removeStream = function (room,origin, mediatype,connectionId){
 	
 		var streams = (origin === rtc._me)? rtc.streams : rtc.receivedStreams;  
 		
 		//look for the stream to remove
-		var index = _.findIndex (streams,{'mediatype': mediatype, 'origin': origin});
+		var criteria = {'mediatype': mediatype, 'origin': origin};
+		if (connectionId){
+			criteria.connectionId = connectionId;
+		}	
+		var index = _.findIndex (streams,criteria);
 		
 		if (index > -1){
-			var stream = streams[index];
+			var mediasource = streams[index];
 
 			//Stop the stream
-			stream.mediastream.stop();
+			mediasource.mediastream.stop();
 			
 			//If the room is in relay mode we should notify this operation to the server
 			if (rtc.relay){
-				rtc.relayStreamRemoved (origin,mediatype);
-			}else{
-			//announceit to everybody
-				rtc.streamClosed(room,origin,mediatype);
+				rtc.relayStreamRemoved (mediasource.connectionId,mediasource.origin,mediasource.mediatype,mediasource.connectionId);
+			} else{
+				//announce it to everybody
+				rtc.streamClosed(room,mediasource.origin,mediasource.mediatype);
 			}
 			
-			rtc.dropPeerConnections (origin,mediatype);
-			
+			if (connectionId){
+				rtc.dropPeerConnection (connectionId,origin,mediatype,true);
+			}else{
+				rtc.dropPeerConnections (origin,mediatype);
+			}
 			
 			//get the stream out of the array
 			streams.splice(index, 1);   
 		}	
+	};
+	
+	rtc.replaceStream = function (mediasource){
+		for (var index in rtc.producedPeerConnections){
+			if (rtc.producedPeerConnections.hasOwnProperty(index)){
+				var posPC = rtc.producedPeerConnections[index];
+				if (posPC[mediasource.origin] && posPC[mediasource.origin][mediasource.mediatype]){
+					posPC[mediasource.origin][mediasource.mediatype].addStream (mediasource.mediastream);
+				}
+			}
+		}
 	};
 
 	rtc.dropPeerConnections = function (origin,mediatype){
@@ -1101,23 +1119,25 @@ function mergeConstraints(cons1, cons2) {
 	
 	rtc.relay = false;
 		
-	rtc.relayStreamAdded = function (origin,type){
+	rtc.relayStreamAdded = function (connectionId,origin,type){
 		rtc._socket.send(JSON.stringify({
 			'eventName': 'r_stream_added',
 			'data': {
 				'room': rtc.room,
 				'origin': origin,
+				'emmiter': connectionId,
 				'type':type
 			}
 		}));
 	};
 
-	rtc.relayStreamRemoved = function (origin,type){
+	rtc.relayStreamRemoved = function (connectionId,origin,type){
 		rtc._socket.send(JSON.stringify({
 			'eventName': 'r_stream_removed',
 			'data': {
 				'room': rtc.room,
 				'origin': origin,
+				'emmiter': connectionId,
 				'type':type
 			}
 		}));

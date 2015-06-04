@@ -1,6 +1,6 @@
 'use strict';
 /*global rtc: true */
-angular.module('mean.rooms').factory('MediaService',['Rooms','UIHandler',function(Rooms,UIHandler){
+angular.module('mean.rooms').factory('MediaService',['Rooms','UIHandler','_',function(Rooms,UIHandler,_){
 
 	var RATIO_4_3 = 0;
 	var RATIO_16_9 = 1;
@@ -53,7 +53,7 @@ angular.module('mean.rooms').factory('MediaService',['Rooms','UIHandler',functio
 
 				mediasource.initializingMedia = true;
 				rtc.createStream(source, mediasource.constraints, function(stream){
-					
+
 					mediasource.onclose = onclose;
 					mediasource.mediastream = stream;
 
@@ -63,10 +63,10 @@ angular.module('mean.rooms').factory('MediaService',['Rooms','UIHandler',functio
 						mediaElement.style.display = 'none';
 						mediaElement.setAttribute('autoplay','');
 						mediaElement.setAttribute('muted','');
-						
+
 						//Wait to start until 
 						rtc.attachStream (mediasource.mediastream,mediaElement);
-										
+
 						var windowOptions =
 							{
 								'mediaElement':mediaElement,
@@ -93,7 +93,7 @@ angular.module('mean.rooms').factory('MediaService',['Rooms','UIHandler',functio
 								'onmaximize': function (win){
 									var moveZone = document.getElementById('moveZone');
 									var finalHeight = (parseInt(moveZone.offsetHeight,10)-20);
-									
+
 									var videoELement = angular.element(mediaElement);
 									videoELement.addClass('maximized');
 									videoELement.css ('height', finalHeight +'px');
@@ -106,9 +106,9 @@ angular.module('mean.rooms').factory('MediaService',['Rooms','UIHandler',functio
 									}
 								}
 							};
-							
-							self.createVideoWindow($scope,windowHandler,windowOptions);
-						
+
+						self.createVideoWindow($scope,windowHandler,windowOptions);
+
 					}else if (mediasource.playtype === 'audio'){
 						mediasource.initializingMedia = false;
 						mediasource.recording = true;
@@ -167,15 +167,15 @@ angular.module('mean.rooms').factory('MediaService',['Rooms','UIHandler',functio
 
 		self.createVideoWindow = function ($scope,windowHandler,windowOptions){
 			if (windowOptions.mediaElement.currentTime < 0.01 || windowOptions.mediaElement.ended){
-					setTimeout (function (){
-						self.createVideoWindow ($scope,windowHandler,windowOptions);
-					},300);
+				setTimeout (function (){
+					self.createVideoWindow ($scope,windowHandler,windowOptions);
+				},300);
 			}else{
 				windowHandler.create ($scope,windowOptions);
 			}
-				
+
 		};
-		
+
 		self.stopRecording = function($scope,source){
 			var mediasource = this.mediasources[source];
 			if (mediasource.recording){
@@ -372,7 +372,7 @@ angular.module('mean.rooms').factory('MediaService',['Rooms','UIHandler',functio
 					});
 				}
 			};
-			
+
 			$scope.closeRemoteWindow = function(connectionId,origin){
 				for (var i=0; i< rtc.receivedStreams.length; i+=1){
 					var mediasource = rtc.receivedStreams[i];
@@ -384,7 +384,7 @@ angular.module('mean.rooms').factory('MediaService',['Rooms','UIHandler',functio
 					}
 				}
 			};
-			
+
 			$scope.openOEmbedFromService = function (oembed){
 				var htmlCode = oembed.html;
 				if (!htmlCode) {
@@ -410,8 +410,8 @@ angular.module('mean.rooms').factory('MediaService',['Rooms','UIHandler',functio
 
 			$scope.openIFrameService = function (wid,wtitle,wurl){
 				var iframe = '<iframe src="' + wurl +
-							 '" class="wframe" frameborder="0" ' + (wid?'id="'+wid+'" ':'') +
-							 'webkitallowfullscreen mozallowfullscreen allowfullscreen ></iframe>';
+					'" class="wframe" frameborder="0" ' + (wid?'id="'+wid+'" ':'') +
+					'webkitallowfullscreen mozallowfullscreen allowfullscreen ></iframe>';
 				var iframeElement = angular.element(iframe);
 				var windowOptions = {
 					'mediaElement': iframeElement,
@@ -431,225 +431,252 @@ angular.module('mean.rooms').factory('MediaService',['Rooms','UIHandler',functio
 			/*Declar media related events */
 			rtc.uniqueon('add remote stream', function(stream,connectionId,origin,mediatype){
 
+
+				//Look for an existing element
+
 				var mediasource = {};
 				mediasource.mediastream = stream;
 				mediasource.origin = origin;
 				mediasource.connectionId = connectionId;
 				mediasource.mediatype = mediatype;
 				mediasource.recording = true;
-
+				mediasource.playing = true;
+				
 				mediasource.playtype = self.mediasources[mediatype] ? self.mediasources[mediatype].playtype : 'unknow';
-				rtc.receivedStreams.push (mediasource); 
 				
 				if (rtc.relay){
 					//In this case we should anounce that relay has been added to our list and we are able to resend
-					rtc.relayStreamAdded(mediasource.origin,mediasource.mediatype);
+					rtc.relayStreamAdded(mediasource.connectionId,mediasource.origin,mediasource.mediatype);
 				}
 				
-				var streamId = connectionId + '_' + mediatype;
+				var existingSource = _.findWhere (rtc.receivedStreams, {'origin': origin, 'mediatype': mediatype});
+				//Set to true if that stream must be played now
+				if (existingSource){
+					mediasource.playing = false;
+					//Set the same window for this mediasource
+					mediasource.window = existingSource.window;
+				}
+				
+				rtc.receivedStreams.push (mediasource);
+				
+				if (mediasource.playtype === 'video' && mediasource.playing){
+					playVideoStream (mediasource);
+				}else if (mediasource.playing){
+					playAudioStream (mediasource);
+				}
+				uiHandler.safeApply($scope,function(){});
 
-				if (mediasource.playtype === 'video'){
-					mediasource.winratio = self.mediasources[mediatype].winratio;
-					mediasource.winscale = self.mediasources[mediatype].winscale;
-					var mediaElement = document.createElement('video');
-					mediaElement.setAttribute('id','remote_'+ streamId);
-					mediaElement.style.display = 'none';
-					mediaElement.setAttribute('autoplay','');
-					mediaElement.setAttribute('muted','');
-					rtc.attachStream (mediasource.mediastream,mediaElement);
+			});
 
-					var windowOptions = {
-						'mediaElement' :mediaElement,
-						'title': $scope.getUserName(origin),
-						'ratio': mediasource.winratio,
-						'scale': mediasource.winscale, 
-						'closeable': (uiHandler.isowner && uiHandler.access.moderated) ,
-						'onopen': function (win){
-							//Attach the window reference to the media source
-							mediasource.window = win;
+			var playVideoStream = function (mediasource){
+				var streamId = mediasource.origin + '_' + mediasource.mediatype;
 
-							mediaElement.style.display = '';
-							win.winHandler.resize (mediaElement.offsetWidth);
+				mediasource.winratio = self.mediasources[mediasource.mediatype].winratio;
+				mediasource.winscale = self.mediasources[mediasource.mediatype].winscale;
+				var mediaElement = document.createElement('video');
 
-							//Press play again for firefox
-							mediaElement.play();
+				mediaElement.setAttribute('id','remote_'+ streamId);
+				mediaElement.style.display = 'none';
+				mediaElement.setAttribute('autoplay','');
+				mediaElement.setAttribute('muted','');
+				rtc.attachStream (mediasource.mediastream,mediaElement);
 
-							uiHandler.safeApply($scope,function(){});
-						},
-						'onclose': function (win){
-							if (uiHandler.isowner && uiHandler.access.moderated ){
-								
-								if (win.closedByStream === undefined){
-									uiHandler.safeApply ($scope,function(){
-										$scope.askForStopSharing (connectionId,mediasource.mediatype);
-										win.closedByOwner = true;
-									});
-								}
+				var windowOptions = {
+					'mediaElement' :mediaElement,
+					'title': $scope.getUserName(mediasource.origin),
+					'ratio': mediasource.winratio,
+					'scale': mediasource.winscale, 
+					'closeable': (uiHandler.isowner && uiHandler.access.moderated) ,
+					'onopen': function (win){
+						//Attach the window reference to the media source
+						mediasource.window = win;
+
+						mediaElement.style.display = '';
+						win.winHandler.resize (mediaElement.offsetWidth);
+
+						//Press play again for firefox
+						mediaElement.play();
+
+						uiHandler.safeApply($scope,function(){});
+					},
+					'onclose': function (win){
+						if (uiHandler.isowner && uiHandler.access.moderated ){
+
+							if (win.closedByStream === undefined){
+								uiHandler.safeApply ($scope,function(){
+									$scope.askForStopSharing (mediasource.connectionId,mediasource.mediatype);
+									win.closedByOwner = true;
+								});
 							}
-						},
-						'onmaximize': function (win){
-							var moveZone = document.getElementById('moveZone');
-							var finalHeight = (parseInt(moveZone.offsetHeight,10)-20);
-
-							var videoELement = angular.element(mediaElement);
-							videoELement.addClass('maximized');
-							videoELement.css ('height', finalHeight +'px');
-						},
-						'onrestore': function (win){
-							var videoELement = angular.element(mediaElement);
-							videoELement.removeClass ('maximized');
-							videoELement.css ('height', '100%');
 						}
-					};
+					},
+					'onmaximize': function (win){
+						var moveZone = document.getElementById('moveZone');
+						var finalHeight = (parseInt(moveZone.offsetHeight,10)-20);
 
-					self.createVideoWindow($scope,windowHandler,windowOptions);
+						var videoELement = angular.element(mediaElement);
+						videoELement.addClass('maximized');
+						videoELement.css ('height', finalHeight +'px');
+					},
+					'onrestore': function (win){
+						var videoELement = angular.element(mediaElement);
+						videoELement.removeClass ('maximized');
+						videoELement.css ('height', '100%');
+					}
+				};
 
-			}else{ 
-						 var mediaElement2 = document.createElement('audio');
-			mediaElement2.setAttribute('id','remote_'+ streamId);
-			mediaElement2.style.display = 'none';
-			mediaElement2.setAttribute('autoplay','');
-			document.getElementById('remoteAudios').appendChild(mediaElement2);
-			rtc.attachStream(mediasource.mediastream,'remote_' + streamId);
-			//Press play again for firefox
-			mediaElement2.play();
-		}
-		uiHandler.safeApply($scope,function(){});
-	});
+				self.createVideoWindow($scope,windowHandler,windowOptions);
+			};
+			
 
+			var playAudioStream = function (mediasource){
+				var mediaElement = document.createElement('audio');
+				var streamId = mediasource.origin + '_' + mediasource.mediatype;
+				mediaElement.setAttribute('id','remote_'+ streamId);
+				mediaElement.style.display = 'none';
+				mediaElement.setAttribute('autoplay','');
+				document.getElementById('remoteAudios').appendChild(mediaElement);
+				rtc.attachStream(mediasource.mediastream,'remote_' + streamId);
+				//Press play again for firefox
+				mediaElement.play();	
+			};
+			
+			var replaceStream = function (mediasource){
+				var streamId = mediasource.origin + '_' + mediasource.mediatype;
+				var mediaElement = document.getElementById ('remote_' + streamId);
+				rtc.attachStream (mediasource.mediastream,mediaElement);	
+				mediaElement.play();
+			};
+			
+			
+			rtc.uniqueon('stream_closed',function(data){
 
-	rtc.uniqueon('stream_closed',function(data){
-
-		for (var i=0; i< rtc.receivedStreams.length; i+=1){
-			var mediasource = rtc.receivedStreams[i];
-			var streamId = mediasource.connectionId + '_' + mediasource.mediatype;
-		
-			if (mediasource.mediastream && mediasource.mediatype === data.mediatype && mediasource.origin === data.origin && mediasource.connectionId === data.connectionId){
-				rtc.dropPeerConnection(data.connectionId,data.origin,data.mediatype,false);
+				var originStreams = _.where (rtc.receivedStreams, {'origin': data.origin, 'mediatype': data.mediatype});
+				var mediasource = _.findWhere (originStreams, {'connectionId': data.connectionId});
 				
-				//If we removed the steram in relay mode we should notify to the server
-				if (rtc.relay){
-					rtc.relayStreamRemoved(mediasource.origin,mediasource.mediatype);
+				if (mediasource && mediasource.mediastream){
+					var streamId = mediasource.origin + '_' + mediasource.mediatype;
 					
-					//Lets announce to any posible client that we don't have the stream
-					rtc.removeStream (rtc.room,mediasource.origin,mediasource.mediatype);
+					rtc.dropPeerConnection(data.connectionId,data.origin,data.mediatype,false);
+
+					//If we removed the steram in relay mode we should notify to the server
+					if (rtc.relay){
+						rtc.relayStreamRemoved(mediasource.connectionId,mediasource.origin,mediasource.mediatype);
+					}												
+					
+					//Look for other streams
+					if (originStreams.length > 1){
+						var withoutStream = _.without(originStreams,mediasource);
+						var replacementStream = withoutStream[0];
+						replaceStream (replacementStream);
+						rtc.removeStream (rtc.room,mediasource.origin,mediasource.mediatype,mediasource.connectionId);
+					}else {
+						//Lets announce to any posible client that we don't have the stream
+						rtc.removeStream (rtc.room,mediasource.origin,mediasource.mediatype);
+						
+						//also look if the window is already closed
+						if (mediasource.playtype==='video'){
+							if (mediasource.window.closedByOwner === undefined){
+								mediasource.window.winHandler.close();
+								mediasource.window.closedByStream = true;
+							}
+						}else{
+							var el = document.getElementById('remote_' + streamId); 
+							el.parentNode.removeChild(el);
+							$scope.askForStopSharing (data.connectionId,mediasource.mediatype);
+						}
+					}
+
 				}
+			});
+
+			var removeReceivedStreams = function (connectionId) {
 				
-				//also look if the window is already closed
-				if (mediasource.playtype==='video'){
-					if (mediasource.window.closedByOwner === undefined){
-						mediasource.window.winHandler.close();
-						mediasource.window.closedByStream =true;
+				var originStreams = _.where (rtc.receivedStreams, {'connectionId': connectionId});
+				
+				if (originStreams && originStreams.length > 0){
+					for (var j = 0 ; j < originStreams.length ; j+=1){
+						var mediasource = originStreams [j];												   
+						rtc.fire ('stream_closed', {connectionId: mediasource.connectionId, origin: mediasource.origin, mediatype: mediasource.mediatype});
+					 }
+				}
+			};
+
+			rtc.uniqueon('disconnect stream',function(connectionId){
+
+				//If any body disconnects we try to remove possible streams windows
+				if (connectionId){
+					//we turn off all their streams 
+
+					for (var i = 0; i< uiHandler.users.length; i+=1){
+
+						if (connectionId === uiHandler.users[i].connectionId || connectionId === uiHandler.ownerConnectionId){
+							removeReceivedStreams(connectionId);
+							break;
+						}   
+					}
+
+				}
+			});
+
+			//Request sharing signaling events
+			rtc.uniqueon ('share_request',function (data){
+				//Someone rising hand
+				if (uiHandler.isowner){
+
+					uiHandler.safeApply ($scope,function (){
+						if (!uiHandler.modals) { uiHandler.modals = []; }
+
+						uiHandler.modals.push({'text': $scope.resourceBundle._('requestfor'+data.source,$scope.getUserName(data.id)),
+											   'yes': function (index){
+												   uiHandler.modals.splice(index,1);
+												   $scope.askForSharing(data.id,data.source);
+											   },
+											   'no': function (index){
+												   uiHandler.modals.splice(index,1);
+												   rtc.reportErrorToUser($scope.global.roomId,data.id,data.source);
+											   },
+											   'class':'modalform editable',
+											   'done':false,
+											   'avatar': $scope.getUser(data.id).avatar
+											  });	
+					});
+				}else{
+					$scope.startRecording(data.source);
+				}
+
+			}); 
+
+			//Define the behaviour of a stop_request is received because is sent by the own viewer
+			rtc.uniqueon('stop_request',function (data){
+				//Look for status to change the controls of the user
+				if (uiHandler.isowner){
+					if (uiHandler.userStatus[data.connectionId] &&  uiHandler.userStatus[data.connectionId][data.source]){
+						uiHandler.userStatus[data.connectionId][data.source] = false;	
 					}
 				}else{
-					var el = document.getElementById('remote_' + streamId); 
-					el.parentNode.removeChild(el);
-					$scope.askForStopSharing (data.connectionId,mediasource.mediatype);
+					if (data.connectionId === rtc._me){ // In that case he has to stop request take care with other requests
+						$scope.stopRecording(data.source);
+					}
 				}
 
-				rtc.receivedStreams.splice (i,1);
-				break;
-			}
-
-		}
-	});
-
-	var removeReceivedStreams = function(connectionId) {
-		for (var j = 0 ; j < rtc.receivedStreams.length ; j+=1){
-			var mediasource = rtc.receivedStreams [j];
-
-			if (mediasource.connectionId === connectionId){
-				var streamId = mediasource.connectionId + '_' + mediasource.mediatype;
-				rtc.dropPeerConnection(connectionId,mediasource.origin,mediasource.mediatype,false);
-
-				if (mediasource.playtype ==='video'){
-					mediasource.window.winHandler.close();
-				}else{
-					var el2 = document.getElementById('remote_'+streamId);
-					el2.parentNode.removeChild(el2);
-				}
-
-				rtc.receivedStreams.splice (j,1);
-				j-=1;
-			}
-		}
-	};
-
-	rtc.uniqueon('disconnect stream',function(connectionId){
-
-		//If any body disconnects we try to remove possible streams windows
-		if (connectionId){
-			//we turn off all their streams 
-
-			for (var i = 0; i< uiHandler.users.length; i+=1){
-
-				if (connectionId === uiHandler.users[i].connectionId || connectionId === uiHandler.ownerConnectionId){
-					removeReceivedStreams(connectionId);
-					break;
-				}   
-			}
-
-		}
-	});
-
-	//Request sharing signaling events
-	rtc.uniqueon ('share_request',function (data){
-		//Someone rising hand
-		if (uiHandler.isowner){
-
-			uiHandler.safeApply ($scope,function (){
-				if (!uiHandler.modals) { uiHandler.modals = []; }
-
-				uiHandler.modals.push({'text': $scope.resourceBundle._('requestfor'+data.source,$scope.getUserName(data.id)),
-									   'yes': function (index){
-										   uiHandler.modals.splice(index,1);
-										   $scope.askForSharing(data.id,data.source);
-									   },
-									   'no': function (index){
-										   uiHandler.modals.splice(index,1);
-										   rtc.reportErrorToUser($scope.global.roomId,data.id,data.source);
-									   },
-									   'class':'modalform editable',
-									   'done':false,
-									   'avatar': $scope.getUser(data.id).avatar
-									  });	
 			});
-		}else{
-			$scope.startRecording(data.source);
-		}
 
-	}); 
+			rtc.uniqueon('error_produced',function (data){
+				//Look for status to change the controls of the user
+				if (uiHandler.isowner && uiHandler.userStatus[data.connectionId] &&  uiHandler.userStatus[data.connectionId][data.origin]){
+					uiHandler.userStatus[data.connectionId][data.origin] = false;  
+					var errMessage = $scope.resourceBundle._(data.mediatype,$scope.getUserName(data.connectionId));
+					$scope.global.showError($scope,errMessage);
+				}else if (uiHandler.isowner){
+					var errMessage2 = $scope.getUserName(data.connectionId) + ' ' + $scope.resourceBundle['deny'+data.mediatype+'request'];
+					$scope.global.showError($scope,errMessage2);
+				}
 
-	//Define the behaviour of a stop_request is received because is sent by the own viewer
-	rtc.uniqueon('stop_request',function (data){
-		//Look for status to change the controls of the user
-		if (uiHandler.isowner){
-			if (uiHandler.userStatus[data.connectionId] &&  uiHandler.userStatus[data.connectionId][data.source]){
-				uiHandler.userStatus[data.connectionId][data.source] = false;	
-			}
-		}else{
-			if (data.connectionId === rtc._me){ // In that case he has to stop request take care with other requests
-				$scope.stopRecording(data.source);
-			}
-		}
+				uiHandler.safeApply($scope,function(){});
 
-	});
+			});	
 
-	rtc.uniqueon('error_produced',function (data){
-		//Look for status to change the controls of the user
-		if (uiHandler.isowner && uiHandler.userStatus[data.connectionId] &&  uiHandler.userStatus[data.connectionId][data.origin]){
-			uiHandler.userStatus[data.connectionId][data.origin] = false;  
-			var errMessage = $scope.resourceBundle._(data.mediatype,$scope.getUserName(data.connectionId));
-			$scope.global.showError($scope,errMessage);
-		}else if (uiHandler.isowner){
-			var errMessage2 = $scope.getUserName(data.connectionId) + ' ' + $scope.resourceBundle['deny'+data.mediatype+'request'];
-			$scope.global.showError($scope,errMessage2);
-		}
-
-		uiHandler.safeApply($scope,function(){});
-
-	});	
-
-};
-													 };
-													 }]);
+		};
+	};
+}]);
