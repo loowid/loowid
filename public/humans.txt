@@ -1,0 +1,88 @@
+ /* TEAM */
+ 	CEO, CTO, Co-founder: Alex Ballesté
+ 	Twitter: @sinmsinm
+ 	From: Lleida, Spain
+ 	
+ 	CEO, CTO, Co-founder: Juanjo Meroño
+ 	Twitter: @jjmerono
+ 	From: Murcia, Spain
+ 	
+	Web designer, UI Developer: Eduardo Rey
+	Twitter: @seduerey
+	From: Murcia, Spain
+
+/* THANKS */
+	Name: Angular, NodeJS, WebRTC, Friends & Family
+
+/* SITE */
+	Site Name: Look What I'm Doing (Loowid)
+	Site Url: https://www.loowid.com/
+	Last update: 2015/10/04
+	Language: Multilanguage
+	Twitter: @LooWIDCOM
+	Hosted on: OpenShift
+	Components: http://stackshare.io/loowid
+	
+	
+                              MNNmmddddddddddddddddmmmNNNMMMMMmmN                   
+                          MNmmddddddddddddddddddddddddddddddmdddmMMMMM                   
+                       MMNddddddddddddddddddddddddddddddddddddhhdNMMMMMMMNMM                   
+                     MMNdddddddddddddddddddddddddddddddddddddhyhdmMMMNmmmNMMMMMMm//                 
+                    MmdddddddddddhhhhhhhhhhhdddddddddddddddhhyyhdmmdddddddddmmNNMMd/:              
+                   NmddddddhhhhhhyyyyyyyyyyyyhhhdddddddddddhyyhddddddddddddddddddmNMMd:            
+                   MmddddhhhyyyyyyyyyyyyyyyyyyyyyhhddddddddhyhhddddddddddddddddddddddmNMd:          
+                  MmddddhhyyyyyyyyyyyyyyyyyyyyyyyyhhddddddhhhhdddddddddddddddddddddddddmMMh         
+              -:mMNdddhhyyyyyyyyyyyyyyyyyyyyyyyyyyyhhddddhhhddddddddddddddddddddddddddddmMMh        
+            -hNNNNmddhhyyyyyyyyyyysssssyyyyyyyyyyyyyhddddhhddddddddddddddddddddddddddddddNMN        
+           -mMNmddddhyyyyyyhyso+::------:+syyyyyyyyyhhdddddddddddhhhhhhddddddddddddddddddmMN        
+          -mMmdddddhhyyyyys+:--...........-+syyyyyyyhhdddddhyo+/::----:/+shddddddddddddddmMN        
+          mMNdddddhhyyyhy+:................./shyyyyyhdddhs/-..............:+hddddddddddddNMN        
+         .NMmdddddhyyyhs/-..................-+yhyyyhhddy/...................:sddddddddddmMN/        
+         mMMdddddhhyyyo:.....................:shyyyhdds-....................`.+dddddddddNMN         
+         NMNdddddhyyy+-......................-+yyyhdds-`.....................`.+dddddddmMN/         
+         NMNdddddhyy+-.......................-+yyhdds:`........................-sddddddmMN          
+         NMNddddhyho-........................:shhdds:...........................:hdddddmMN          
+         NMNddddhhs:........................-oyhhy+-...........................`-ydddddNMN          
+         NMNddddhy/........................:oyys+-.`...........................`-ydddddNMN          
+         NMNddddhs-.......................://:-................................`-ydddddmMN          
+         NMNdddhh/.................................`...........................`-ydddddmMN          
+         NMNdddhy:.................................`...........................`-ydddddmMN          
+         NMNdddds-.................................`...........................`-ydddddmMN          
+         NMNddddo-.......-.........................`..........................``-ydddddmMN          
+         NMmddddo-..--/+sso+:--....................`..................-:/+ss+/-.-ydddddmMN          
+        :NMmddddo-/oyhhhhhhhhhys+/:---.............`.``.````....-:/+ossyyyyyyyysosyhdddmMN          
+        NMNdddddhyhhhhhhhhhhhhhhhhhhyyso++//::::::-----:::/++oossyyyyyyyyyyyyyyyyyso+oymMN          
+        NMmdddhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyys+-oMN          
+        NMdyhhhhhhhhyyyhhhhhhdddhhhhhhhhhhhhhhhhhhhyyyyyyyyyyyyyyyyyyyyyyysssssssyyyyy++MN          
+        hMm/+hhhhdy:.`.....-:/+oosyhhhhhhhhhhhhhhhhyyyyyyyyyyyyyso++/:--...```../yyyyysoMN          
+         hMmohhhhhho-``          ``.-/osyhhhhhhhhhhyyyyyyyss+/-.``          ``.:syyyyyohMN          
+          hMmshhhhhhy/.`               `.-+yhhhhhhyyyyys+:.`              ``.-+syyyyyooMN:          
+           hMd+shhhhhhy+-.                 /ydhhhyyyyyyo-               ``.:+syyyyys/:mMh           
+           `mMy:/yhhhhhhhs+:.`        ``.:+yhhhhysssyyyyo/-.`       ```-:+syyyyyys+-.sMm`           
+            /NMo--/shhhhhhhhyo+/::-::/+syhhhhhyo:..-/syyyyyso/::--::/+osyyyyyyys/-../NMh            
+             hMN/...:+shhhhhhhhhhhhhhhhhhhhhy+:...``.-/syyyyyyyyyyyyyyyyyyyys+:..``-hMm`            
+             `mMh-....-:+syhhhhhhhhhhhhhhhs+-.....`..`.-/osyyyyyyyyyyyyyss+/-.`..`.+MN/             
+              +NM+.......--:/+oosssssoo+/:-.......`....`..-:/+ooosooo+/:-...`....`.yMm              
+               mMs-..............---..............`.......``...........``........`:mMm              
+               mMd-...............................`.............................`.+MN+              
+               dMN/...............................`.............................`-hMm               
+               .mMs-..............................`............................`./NNo               
+                mMm:..............................`............................`.yMm                
+                mMMo-.............................`...........................`./NNo                
+                mMMd:.............................`...........................`-yMm                 
+                mMMMo-............................`..........................`.+NNs                 
+                mMMMm/............................`...........................-dMd                  
+                mMMMMy-.............-.............`.........................`.sMm-                  
+                mMMMMMo-.............----..................................`./NMd                   
+                mMMMMMm/...............---------..`.........................-hMMd                   
+                mMMMMMMd/...................-----.`........................-yMMMd                   
+                mMMMMMMMms:.......................`......................-+dMMMMd                   
+                mMMMMMMMMMmo-.....................`.....................+dMMMMMMd                   
+                mMMMMMMMMMMMmo:...................`................`.-+dMMMMMMMMd                   
+                mMMMMMMMMMMMMMmy/-................`................:smMMMMMMMMMMd                   
+                mMMMMMMMMMMMMMMMNdo:..............`.............-+hNMMMMMMMMMMMMd                   
+                mMMMMMMMMMMMMMMMMMMNdo:-..........`......``..:ohNMMMMMMMMMMMMMMMd                   
+                mMMMMMMMMMMMMMMMMMMMMMMmhs+:-....`````..-/shmMMMMMMMMMMMMMMMMMMMd                   
+                mMMMMMMMMMMMMMMMMMMMMMMMMMMMNNddhhhhhdmNMMMMMMMMMMMMMMMMMMMMMMMMd     
+                
+              
