@@ -32,7 +32,7 @@ StatsSchema.statics = {
 		           messages: { $sum: '$messages' },
 		           count: { $sum: 1 }
 		        }
-		      }, { $sort : { _id: 1 } }
+		      }, { $sort : { '_id.year': 1, '_id.month': 1, '_id.day': 1 } }
     	]).exec(cb);
     },
     bytype: function(cb) {
