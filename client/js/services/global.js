@@ -1,4 +1,6 @@
 'use strict';
+/*global SpeechSynthesisUtterance: true */
+/*global speechSynthesis: true */
 angular.module('mean.system').factory('Global', [function() {
     var _this = this;
     _this._data = {
@@ -78,6 +80,25 @@ angular.module('mean.system').factory('Global', [function() {
         },
         getUrlPort:	function($location) {
     		return ($location.$$port===80 || $location.$$port===443)?'':':'+$location.$$port;
+    	},
+    	speechText: function(scope,readText) {
+    		try {
+    			var speechUtt = new SpeechSynthesisUtterance();
+    			speechUtt.rate = 1.0;
+    			// TODO: This should be the origin locale not the destination locale !!
+    			speechUtt.lang = navigator.userLanguage || navigator.language;
+    			// Get talk smart, do not read everything !!
+    			var t = readText;
+    			if (t.length>50) { t = t.substring(0,50)+';'+scope.resourceBundle.moretext; }
+    			speechUtt.text = t;
+    			speechSynthesis.speak(speechUtt);
+    		} catch(ex) {
+    			var audio = document.getElementById('audiotts')?document.getElementById('audiotts'):document.createElement('audio');
+    			audio.setAttribute('id', 'audiotts');
+    			audio.setAttribute('src', '/chat/talk?text=' + encodeURIComponent(readText));
+    			audio.load();
+    			audio.play();
+    		}
     	}
     };
 
