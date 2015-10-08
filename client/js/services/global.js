@@ -52,7 +52,7 @@ angular.module('mean.system').factory('Global', [function() {
         	}
         	return null;
         },
-        setupI18N: function(scope,rbundle,config) {
+        setupI18N: function(scope,rbundle,config,cb) {
         	if (scope.ui) {
         		scope.ui.supportedLocales = config.supportedLocales;
         		scope.ui.defaultLocale = config.defaultLocale;
@@ -71,6 +71,7 @@ angular.module('mean.system').factory('Global', [function() {
 	                			scope.resourceBundle[el] = resourceBundle[el];
 	                		}
 	                	}
+	                	if (cb) { cb(); }
 	                });
 	            });
         	}

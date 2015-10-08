@@ -3,7 +3,12 @@ angular.module('mean.stats').controller('StatsController',['$scope','Stats','Glo
 
 	$scope.global = Global;
 
-	$scope.global.setupI18N($scope,ngI18nResourceBundle,ngI18nConfig);
+	var initFn = {};
+	
+	$scope.global.setupI18N($scope,ngI18nResourceBundle,ngI18nConfig,function(){
+		Stats.rooms(initFn.processByDay);
+		Stats.roomsbytype(initFn.processByType);
+	});
 
 	var stopLoading = function() {
 		document.getElementById('noscript').style.display = 'none';
@@ -15,12 +20,11 @@ angular.module('mean.stats').controller('StatsController',['$scope','Stats','Glo
 
 	$scope.init = function(){
 
-
 		var roundNumber = function(num) {
 			return Math.round(num * 100) / 100;
 		};
 
-		Stats.rooms(function(list){
+		initFn.processByDay = function(list){
 			var labels = [];
 			var rooms = [];
 			var members = [];
@@ -35,15 +39,15 @@ angular.module('mean.stats').controller('StatsController',['$scope','Stats','Glo
 			$scope.series0 = [$scope.resourceBundle.roomsbyday,$scope.resourceBundle.membersbyday,$scope.resourceBundle.messagesbyroom];
 			$scope.data0 = [ rooms, members, messages ];
 			stopLoading();
-		});
-
+		}; 
+		
 		var getNameFor = function(obj) {
 			var first = (obj.permanent?$scope.resourceBundle.roomspermanent:$scope.resourceBundle.roomstemp);
 			first += '/'+(obj.access==='LINK'?$scope.resourceBundle.roomslink:$scope.resourceBundle.roomspass);
 			return first+'/'+(obj.moderated?$scope.resourceBundle.roomsmoderated:$scope.resourceBundle.roomsnomoderated);
 		};
 
-		Stats.roomsbytype(function(list){
+		initFn.processByType = function(list) {
 			var labels = [];
 			var rooms = [];
 			for (var k=0; k<list.length; k+=1) {
@@ -54,8 +58,8 @@ angular.module('mean.stats').controller('StatsController',['$scope','Stats','Glo
 			$scope.series1 = [$scope.resourceBundle.roomsbytype];
 			$scope.data1 = rooms;
 			stopLoading();
-		});
-
+		};
+		
 	};
 
 	$scope.initWebRTCStatistics = function() {
