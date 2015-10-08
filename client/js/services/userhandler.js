@@ -147,11 +147,7 @@ angular.module('mean.rooms').factory('UserHandler',['Rooms','UIHandler','Notific
 	        		if (uiHandler.newusers.length===1) {
 	        			readText = (uiHandler.newusers[0].status === 'CONNECTED')?$scope.resourceBundle._('joinroom',uiHandler.newusers[0].name):$scope.resourceBundle._('uleaveroom',uiHandler.newusers[0].name);
 	        		}
-	        		var audio = document.getElementById('audiotts')?document.getElementById('audiotts'):document.createElement('audio');
-	        		audio.setAttribute('id', 'audiotts');
-	        		audio.setAttribute('src', '/chat/talk?text=' + encodeURIComponent(readText));
-	        		audio.load();
-	        		audio.play();
+	        		$scope.global.speechText($scope,readText);
         		} else {
    					uiHandler.connNew = 'connected_now';
    					setTimeout(function(){ uiHandler.connNew = ''; uiHandler.safeApply($scope,function(){}); },3000);

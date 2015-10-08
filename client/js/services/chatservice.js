@@ -472,11 +472,7 @@ angular.module('mean.rooms').factory('ChatService',['$timeout','UIHandler','Room
 		    
 		    var sendAudioNotification = function(data) {
         		var readText = ($scope.connectedUsers()>1)?$scope.getUser(data.id).name+', '+data.text:data.text;
-        		var audio = document.getElementById('audiotts')?document.getElementById('audiotts'):document.createElement('audio');
-        		audio.setAttribute('id', 'audiotts');
-        		audio.setAttribute('src', '/chat/talk?text=' + encodeURIComponent(readText));
-        		audio.load();
-        		audio.play();
+        		$scope.global.speechText($scope,readText);
 		    };
 		    
 			rtc.uniqueon('chat_message',function(data){
