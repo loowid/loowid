@@ -82,17 +82,29 @@ angular.module('mean.system').factory('Global', [function() {
     		return ($location.$$port===80 || $location.$$port===443)?'':':'+$location.$$port;
     	},
     	speechText: function(scope,readText) {
-    		try {
+    		if ('speechSynthesis' in window) {
+    			 // Synthesis support. Make your web apps talk!
     			var speechUtt = new SpeechSynthesisUtterance();
+    			if (!scope.ui.speechEnabled) {
+    				speechUtt.onend = function() {
+    					scope.ui.speechEnabled = true;
+    					scope.ui.speechVoice = speechUtt.voice;
+    					scope.ui.speechVoiceList = speechSynthesis.getVoices().filter(function(voice){ return voice.lang.indexOf((navigator.userLanguage || navigator.language)+'-')>=0; });
+    				};
+    			} 
     			speechUtt.rate = 1.0;
     			// TODO: This should be the origin locale not the destination locale !!
     			speechUtt.lang = navigator.userLanguage || navigator.language;
+    			if (scope.ui.speechVoice) {
+    				speechUtt.voice = scope.ui.speechVoice;
+    			}
     			// Get talk smart, do not read everything !!
     			var t = readText;
     			if (t.length>50) { t = t.substring(0,50)+';'+scope.resourceBundle.moretext; }
     			speechUtt.text = t;
     			speechSynthesis.speak(speechUtt);
-    		} catch(ex) {
+    		} else {
+    			scope.ui.speechEnabled = false;
     			var audio = document.getElementById('audiotts')?document.getElementById('audiotts'):document.createElement('audio');
     			audio.setAttribute('id', 'audiotts');
     			audio.setAttribute('src', '/chat/talk?text=' + encodeURIComponent(readText));

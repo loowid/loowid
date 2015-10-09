@@ -411,6 +411,22 @@ angular.module('mean.rooms').factory('ChatService',['$timeout','UIHandler','Room
 	        	}
 	        };
 	        
+	        $scope.changeSpeechVoice = function() {
+        		for (var i = 0; i<$scope.ui.speechVoiceList.length; i+=1) {
+        			self.addNewMessage($scope,{id:$scope.global.bot,text:($scope.ui.speechVoiceList[i].default?':speaker: ':':sound: ')+$scope.ui.speechVoiceList[i].name,time:new Date()});
+        		}
+	        };
+	        
+	        $scope.changeSound = function($event) {
+	        	var choosedVoiceName = angular.element($event.target).parent().parent().next().children().html().substring(1);
+	        	for (var i = 0; i<$scope.ui.speechVoiceList.length; i+=1) {
+	        		if ($scope.ui.speechVoiceList[i].name === choosedVoiceName) {
+	        			$scope.ui.speechVoice = $scope.ui.speechVoiceList[i];
+	        			$scope.global.speechText($scope,choosedVoiceName);
+	        		}
+	        	}
+	        };
+	        
 	    	$scope.sendTyping = function() {
 			 	if (!uiHandler.isowner && uiHandler.passNeeded) {
 			 		chSrv.alertNotConected ($scope);
