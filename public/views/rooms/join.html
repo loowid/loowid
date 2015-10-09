@@ -255,6 +255,7 @@
 <aside id="chat" ng-class="ui.chatClass">
 	<span title="{{resourceBundle.titleOpenclosechat}}" class="toggler" ng-click="toggleChat()"><i class="fa fa-angle-double-right"></i></span>
 	<span title="{{resourceBundle.titleChatTip}}" class="chatTip" ng-click="chatTip()"><i class="twa twa-lg twa-information-source"></i></span>
+	<span title="{{ui.speechVoice.name}}" class="chatTip" ng-click="changeSpeechVoice()" ng-show="ui.speechEnabled"><i class="twa twa-lg twa-speaker"></i></span>
 	<form data-ng-submit="sendMessage()">
 	<fieldset id="chat_form">
 		<input type="text" data-ng-model="ui.messageText" id="text_chat" placeholder="{{resourceBundle.sendamessage}}" data-ng-change="sendTyping()" autofocus>
@@ -281,7 +282,7 @@
 	  				<span ng-repeat="item in sitem.list track by $index">
 		  				<a ng-show="item.type==='link'" href="{{item.to}}" target="_blank">{{item.text}}</a>
 		  				<span ng-show="item.type==='text'">{{item.text}}</span>
-	  					<span ng-show="item.type==='emoji'"><i title="{{item.base}}" ng-class="item.twaclass"></i></span>
+	  					<span ng-show="item.type==='emoji'"><i title="{{item.base}}" ng-class="item.twaclass" ng-click="item.base === ':sound:' && changeSound($event)"></i></span>
 	  				</span>
 	  			</p>
 				<div class="spinner" ng-show="msg.istyping">
