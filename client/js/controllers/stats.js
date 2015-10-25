@@ -190,29 +190,25 @@ angular.module('mean.stats').controller('StatsController',['$scope','Stats','Glo
 
 		var handleNode = function (node,key,username,userstatus,source,showDisconnected){
 
-			if (node === undefined && (showDisconnected || (!showDisconnected && userstatus==='CONNECTED'))) {
+			if (node === undefined) {
 				//If it's not in the list put it in
 				node = {
 					'id': key,
-					'label': username || key,
 					'size': 3,
 					'x': Math.random(),
-					'y': Math.random(),
-					'color': userstatus === 'CONNECTED' ? $scope.colors.userConnected : $scope.colors.userDisconnected
+					'y': Math.random()
 				};
 
-						graphs[source].nodes.push (node);
+				graphs[source].nodes.push (node);
+			}
 
-			}else if (node){
-				//we change the name in case user changed
+			//we change the name in case user changed
 
-				node.label = username || key;
-				node.color = userstatus === 'CONNECTED' ? $scope.colors.userConnected : $scope.colors.userDisconnected;
+			node.label = username || key;
+			node.color = userstatus === 'CONNECTED' ? $scope.colors.userConnected : $scope.colors.userDisconnected;
 
-				if (!showDisconnected && userstatus==='DISCONNECTED'){
-					graphs[source].nodes =	_.without (graphs[source].nodes,node);
-				}
-
+			if (!showDisconnected && userstatus==='DISCONNECTED'){
+				graphs[source].nodes =	_.without (graphs[source].nodes,node);
 			}
 		};
 
