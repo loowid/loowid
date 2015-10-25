@@ -193,7 +193,7 @@ function mergeConstraints(cons1, cons2) {
 	rtc.connect = function(server, room, password, reload) {
 		room = room || ''; // by default, join a room called the blank string
 		rtc._socket = new WebSocket(server);
-		rtc.room = room;		
+		rtc.room = room;
 		rtc._socket.onopen = function() {
 			//var sckt = this;
 			rtc.askForUpdateConfig = function (room){
@@ -203,7 +203,7 @@ function mergeConstraints(cons1, cons2) {
 						'room': room
 					}
 				}));
-			};	
+			};
 
 			rtc.on ('get_updated_config', function (data){
 				rtc.iceServers = data.iceServers;
@@ -211,9 +211,9 @@ function mergeConstraints(cons1, cons2) {
 
 				if (rtc.debug) { console.log ('serverList updated' + JSON.stringify (rtc.iceServers)); }
 				if (rtc.debug) { console.log ('extension id ' + rtc.chromeDesktopExtensionId); }
-			});	
+			});
 
-			rtc.askForUpdateConfig(); 	
+			rtc.askForUpdateConfig();
 
 
 			//Just connect to the room if you have a valid server list
@@ -236,7 +236,7 @@ function mergeConstraints(cons1, cons2) {
 				}else{
 					setTimeout (function (){
 						rtc.tryToConnect(troom,tpassword,treload);
-					},1000);	
+					},1000);
 				}
 			};
 
@@ -260,7 +260,7 @@ function mergeConstraints(cons1, cons2) {
 				rtc.fire('disconnect stream', id);
 				window.clearInterval (rtc.pingInterval);
 
-				//We had to alert with another signal ? 
+				//We had to alert with another signal ?
 				rtc.connections = {};
 				rtc.receivedPeerConnections = {};
 				rtc.producedPeerConnections = {};
@@ -284,7 +284,7 @@ function mergeConstraints(cons1, cons2) {
 
 			rtc.on('receive_ice_candidate', function(data) {
 				var candidate = new nativeRTCIceCandidate({'candidate': data.candidate, 'sdpMLineIndex': data.label});
-			
+
 				var peerConnections = data.produced ? rtc.receivedPeerConnections: rtc.producedPeerConnections;
 
 				if (!peerConnections[data.socketId]){
@@ -294,7 +294,7 @@ function mergeConstraints(cons1, cons2) {
 				//We store temporaly candidates
 				if (!peerConnections[data.socketId][data.mediatype]){
 					if (rtc.debug) { console.log ('Peer not ready, so storing ICE candidate for a while'); }
-					if (!peerConnections[data.socketId]['temp_'+data.mediatype]) { 
+					if (!peerConnections[data.socketId]['temp_'+data.mediatype]) {
 						peerConnections[data.socketId]['temp_'+data.mediatype] = [];
 					}
             		peerConnections[data.socketId]['temp_'+data.mediatype].push(candidate);
@@ -303,12 +303,12 @@ function mergeConstraints(cons1, cons2) {
 					peerConnections[data.socketId][data.mediatype].addIceCandidate(candidate,
 							function (){ if (rtc.debug) { console.log ('ICE candidate added'); } },
 							function (error) { if (rtc.debug) { console.log ('Error adding an ICE candidate ' + JSON.stringify (error)); } } );
-				
+
 				}
 
 				//Take care should send mediatype??
 				rtc.fire('receive ice candidate', candidate);
-				
+
 			});
 
 			rtc.on('new_peer_connected', function(data) {
@@ -321,7 +321,7 @@ function mergeConstraints(cons1, cons2) {
 						rtc.sendOffer (id,mediatype);
 						if (rtc.debug) { console.log ('Sending to ' + id + ' a ' + mediatype + 'offer'); }
 					},2000);
-				};  
+				};
 
 				for (var i = 0; i < rtc.streams.length; i+=1){
 					var stream = rtc.streams[i].mediastream;
@@ -337,7 +337,7 @@ function mergeConstraints(cons1, cons2) {
 			rtc.on('remove_peer_connected', function(data) {
 				var id = data.socketId;
 
-				//TODO disconnect stream -> disconnect user 
+				//TODO disconnect stream -> disconnect user
 				rtc.fire('disconnect stream', id);
 				delete rtc.dataChannels[id];
 
@@ -420,8 +420,8 @@ function mergeConstraints(cons1, cons2) {
 		//if (!peerConnections[id][mediatype]){
 		peerConnections[id][mediatype] = new PeerConnection({iceServers:rtc.iceServers}, config);
 		//}
-		
-		
+
+
 		var pc = peerConnections[id][mediatype];
 
 		pc.onicecandidate = function(event) {
@@ -522,9 +522,9 @@ function mergeConstraints(cons1, cons2) {
 
 		pc.createOffer(function(sessionDescription) {
 			//sessionDescription.sdp = preferOpus(sessionDescription.sdp);
-			
+
 			if (maxBitrate){
-				sessionDescription.sdp = changeBitrate(sessionDescription.sdp,maxBitrate); 
+				sessionDescription.sdp = changeBitrate(sessionDescription.sdp,maxBitrate);
 			}
 
 			pc.setLocalDescription(sessionDescription, function (){
@@ -538,7 +538,7 @@ function mergeConstraints(cons1, cons2) {
 						'requestId': requestId,
 						'token' : token
 					}
-				}));						 
+				}));
 			},
 		    function (){
 			   if (rtc.debug) { console.log ('Error setting the local description'); }
@@ -598,15 +598,15 @@ function mergeConstraints(cons1, cons2) {
 							}
 						}));
 					},function (){
-						if (rtc.debug) { console.log ('Error setting local description '); }	
+						if (rtc.debug) { console.log ('Error setting local description '); }
 					});
 					//TODO Unused variable!?
 					//var offer = pc.remoteDescription;
 				}, function (){
-					if (rtc.debug) { console.log ('Error creating the anwer '); }	
+					if (rtc.debug) { console.log ('Error creating the anwer '); }
 				}, sdpConstraints);
 			}, function (){
-				if (rtc.debug) { console.log ('Error setting retmote description '); }	
+				if (rtc.debug) { console.log ('Error setting retmote description '); }
 			});
 	};
 
@@ -626,8 +626,8 @@ function mergeConstraints(cons1, cons2) {
 					rtc.createPeerConnection(socketId,mediatype,true);
 					rtc.addStream(socketId,mediatype);
 					rtc.sendOffer(socketId,mediatype);
-				}						
-			},10000);
+				}
+			},15000);
 
 		},function (){
 			if (rtc.debug) { console.log ('Error setting remote description'); }
@@ -668,9 +668,9 @@ function mergeConstraints(cons1, cons2) {
 						options.video.mandatory.chromeMediaSourceId = sourceId;
 					}
 					startStream();
-				});	
+				});
 			}else{
-				startStream();	
+				startStream();
 			}
 
 
@@ -711,7 +711,7 @@ function mergeConstraints(cons1, cons2) {
 			while (queue.length > 0){
 				try {
 					var object = queue [0];
-					channel.send (JSON.stringify(object));  
+					channel.send (JSON.stringify(object));
 					queue.shift();
 				}catch (event){
 					//We got a network problem, maybe the buffer is full, lets try it later
@@ -719,20 +719,20 @@ function mergeConstraints(cons1, cons2) {
 					setTimeout(tfn,50);
 				}
 
-			}  
+			}
 
 		}else if (!rtc._events[eventName]){ //If we didn't register a on open method
 
 			//Just register one method to execute for id and mediatype
 			rtc.on(eventName, function (openedchannel){
-				//We can have multiple channels to open, we only send 
+				//We can have multiple channels to open, we only send
 				rtc.deleteEvent (eventName);
 				rtc.dataChannels[id][mediatypefile].state =  'ready';
 				rtc.sendMessage (id,mediatype,undefined,requestId,token);
 			});
 		}
 	};
-	
+
 	rtc.sendMessage = function (id,mediatype,message,requestId,token){
 
 		var mediatypefile = mediatype+'_'+requestId;
@@ -753,7 +753,7 @@ function mergeConstraints(cons1, cons2) {
 		if (state  === 'ready') {
 			pushMessage(id,mediatype,mediatypefile,requestId,token,channel,queue);
 		}
-		
+
 	};
 
 	rtc.createDataChannel = function(id,requestId,mediatypefile) {
@@ -779,7 +779,7 @@ function mergeConstraints(cons1, cons2) {
 
 		var channel;
 		try {
-			if (rtc.debug) { console.log('createDataChannel ' + id + ' ' + mediatypefile); } 
+			if (rtc.debug) { console.log('createDataChannel ' + id + ' ' + mediatypefile); }
 			channel = pc.createDataChannel(label, options);
 		} catch (error) {
 			if (rtc.debug) { console.log('seems that DataChannel is NOT actually supported!'); }
@@ -865,7 +865,7 @@ function mergeConstraints(cons1, cons2) {
 				rtc.streamClosed(room,mediatype);
 
 				//get the stream out of the array
-				rtc.streams.splice(i, 1);   
+				rtc.streams.splice(i, 1);
 
 				//delete stream;
 				rtc.numStreams-=1;
@@ -902,7 +902,7 @@ function mergeConstraints(cons1, cons2) {
 				'status':status,
 				'access':access
 			}
-		}));  
+		}));
 	};
 
 	/*Since there is no good way to get an event of stream closed it's necessary a announcement from emiter*/
@@ -914,7 +914,7 @@ function mergeConstraints(cons1, cons2) {
 				'room': roomId,
 				'mediatype':mediatype
 			}
-		}));  
+		}));
 	};
 
 
@@ -1074,7 +1074,7 @@ function setDefaultCodec(mLine, payload) {
 	for (var i = 0; i < elements.length; i+=1) {
 		if (index === 3) {// Format of media starts from the fourth.
 			newLine[index] = payload; // Put target payload to the first.
-			index+=1; 
+			index+=1;
 		}
 		if (elements[i] !== payload) {
 			newLine[index] = elements[i];
