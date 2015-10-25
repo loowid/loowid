@@ -268,6 +268,8 @@
    "chattip9": "Or your fauvorite code examples with {0}",
    "chattip10": "Check LooWID help to get the complete list of things that you can do {0}",
    "nomoretips": "No more tips to show",
-   "showchattips": "Chat tips"
-   
+   "showchattips": "Chat tips",
+   "showDisconnected": "Show disconnected",
+   "hideDisconnected": "Hide disconnected"
+
 }

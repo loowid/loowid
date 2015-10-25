@@ -35,8 +35,14 @@
 			<strong>{{resourceBundle.nodes}} </strong>
 			<nav class="toolbar">
 				<ul>
-					<li><p><i class="colorsquare" style="background-color: {{colors.userConnected}};" ></i><span class="title"> {{resourceBundle.connectedusers}}</span></p></li><li><p><i class="colorsquare" style="background-color: {{colors.userDisconnected}};" ></i> <span class="title"> {{resourceBundle.disconnectedusers}}</span></p></li>
-				</ul>	
+					<li>
+						<p>
+						<i class="colorsquare" style="background-color: {{colors.userConnected}};" ></i><span class="title"> {{resourceBundle.connectedusers}}</span></p></li><li><p><i class="colorsquare" style="background-color: {{colors.userDisconnected}};" ></i> <span class="title"> {{resourceBundle.disconnectedusers}}	</span>
+							(<a ng-hide="showDisconnected" ng-click="changeDisconnectedVisibility()">{{resourceBundle.showDisconnected}}</a>
+							<a ng-show="showDisconnected" ng-click="changeDisconnectedVisibility()">{{resourceBundle.hideDisconnected}}</a>)
+						</p>
+					</li>
+				</ul>
 			</nav>
 		</div>
 		<div class="legend">
@@ -44,11 +50,10 @@
 			<nav class="toolbar">
 				<ul>
 					<li ng-repeat="(id, rtcstatuscolor) in edgeColors"><p><i class="colorsquare" style="background-color: {{rtcstatuscolor}};" ></i><span class="title"> {{id}}</span></p></li>
-				</ul>	
+				</ul>
 			</nav>
 		</div>
-		
-		<hr/>
+
 		<br />
 	</section>
 </div>
