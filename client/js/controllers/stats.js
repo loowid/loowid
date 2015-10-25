@@ -4,7 +4,7 @@ angular.module('mean.stats').controller('StatsController',['$scope','Stats','Glo
 	$scope.global = Global;
 
 	var initFn = {};
-	
+
 	$scope.global.setupI18N($scope,ngI18nResourceBundle,ngI18nConfig,function(){
 		Stats.rooms(initFn.processByDay);
 		Stats.roomsbytype(initFn.processByType);
@@ -39,8 +39,8 @@ angular.module('mean.stats').controller('StatsController',['$scope','Stats','Glo
 			$scope.series0 = [$scope.resourceBundle.roomsbyday,$scope.resourceBundle.membersbyday,$scope.resourceBundle.messagesbyroom];
 			$scope.data0 = [ rooms, members, messages ];
 			stopLoading();
-		}; 
-		
+		};
+
 		var getNameFor = function(obj) {
 			var first = (obj.permanent?$scope.resourceBundle.roomspermanent:$scope.resourceBundle.roomstemp);
 			first += '/'+(obj.access==='LINK'?$scope.resourceBundle.roomslink:$scope.resourceBundle.roomspass);
@@ -59,7 +59,7 @@ angular.module('mean.stats').controller('StatsController',['$scope','Stats','Glo
 			$scope.data1 = rooms;
 			stopLoading();
 		};
-		
+
 	};
 
 	$scope.initWebRTCStatistics = function() {
@@ -95,6 +95,8 @@ angular.module('mean.stats').controller('StatsController',['$scope','Stats','Glo
 			'closed': 'rgb(0, 0, 0)'
 		};
 
+		$scope.showDisconnected = true;
+
 		var graphs={};
 
 		graphs.video = {
@@ -117,6 +119,11 @@ angular.module('mean.stats').controller('StatsController',['$scope','Stats','Glo
 			readWebRTCStats(true);
 		};
 
+		$scope.changeDisconnectedVisibility = function (){
+			$scope.showDisconnected=!$scope.showDisconnected;
+			readWebRTCStats(true);
+		};
+
 		var processData = function (list){
 			$scope.graphvideo = [];
 			$scope.graphscreen = [];
@@ -128,9 +135,7 @@ angular.module('mean.stats').controller('StatsController',['$scope','Stats','Glo
 
 			for (var key in list.webrtcStats){
 
-
 				if (list.webrtcStats.hasOwnProperty(key)){
-
 
 					var username , userstatus;
 
@@ -138,18 +143,17 @@ angular.module('mean.stats').controller('StatsController',['$scope','Stats','Glo
 						username = list.roomInfo.owner.name;
 						userstatus = list.roomInfo.owner.status;
 					}else{
-						var user = _.findWhere (list.roomInfo.guests, {connectionId: key});	
+						var user = _.findWhere (list.roomInfo.guests, {connectionId: key});
 						username = user ? user.name : key;
 						userstatus = user ? user.status : 'DISCONNECTED';
 					}
 
 					var peerList = list.webrtcStats[key];
 
-					addNodes (key,username,userstatus,peerList);
-
+					addNodes (key,username,userstatus,peerList,$scope.showDisconnected);
 					//Add the edges
 					addEdges (key,_.filter(peerList,function (peer){
-						return (peer.source === 'video' || peer.source === 'audio' || peer.source === 'screen') ;		
+						return (peer.source === 'video' || peer.source === 'audio' || peer.source === 'screen') ;
 					}));
 				}
 			}
@@ -165,7 +169,7 @@ angular.module('mean.stats').controller('StatsController',['$scope','Stats','Glo
 			});
 		};
 
-		var addNodes = function (key,username,userstatus,peerList){
+		var addNodes = function (key,username,userstatus,peerList,showDisconnected){
 			for (var sourceId in sources){
 				if (sources.hasOwnProperty (sourceId)){
 					var source = sources[sourceId];
@@ -176,17 +180,17 @@ angular.module('mean.stats').controller('StatsController',['$scope','Stats','Glo
 					if (sourceEdges){
 
 						//Look if the node is already in the list
-						var node = _.findWhere (graphs[source].nodes, {id: key});	
-						handleNode(node,key,username,userstatus,source);
+						var node = _.findWhere (graphs[source].nodes, {id: key});
+						handleNode(node,key,username,userstatus,source,showDisconnected);
 
 					}
 				}
 			}
 		};
 
-		var handleNode = function (node,key,username,userstatus,source){
+		var handleNode = function (node,key,username,userstatus,source,showDisconnected){
 
-			if (node === undefined){
+			if (node === undefined && (showDisconnected || (!showDisconnected && userstatus==='CONNECTED'))) {
 				//If it's not in the list put it in
 				node = {
 					'id': key,
@@ -196,11 +200,19 @@ angular.module('mean.stats').controller('StatsController',['$scope','Stats','Glo
 					'y': Math.random(),
 					'color': userstatus === 'CONNECTED' ? $scope.colors.userConnected : $scope.colors.userDisconnected
 				};
-				graphs[source].nodes.push (node);
-			}else{
+
+						graphs[source].nodes.push (node);
+
+			}else if (node){
 				//we change the name in case user changed
+
 				node.label = username || key;
 				node.color = userstatus === 'CONNECTED' ? $scope.colors.userConnected : $scope.colors.userDisconnected;
+
+				if (!showDisconnected && userstatus==='DISCONNECTED'){
+					graphs[source].nodes =	_.without (graphs[source].nodes,node);
+				}
+
 			}
 		};
 
@@ -210,7 +222,7 @@ angular.module('mean.stats').controller('StatsController',['$scope','Stats','Glo
 					var peerInfo = peerList[edgeKey];
 					if (peerInfo.produced && _.findWhere (graphs[peerInfo.source].nodes, {id: peerInfo.peerId})){
 						var edge = {
-							
+
 							id: 'ed_' +	key + '_' + peerInfo.peerId +'_' + peerInfo.source,
 							color: $scope.edgeColors[peerInfo.status],
 							source: key,
@@ -221,7 +233,7 @@ angular.module('mean.stats').controller('StatsController',['$scope','Stats','Glo
 						graphs[peerInfo.source].edges.push (edge);
 					}
 				}
-			}	
+			}
 		};
 
 		var readWebRTCStats = function (justonetime){
@@ -244,9 +256,6 @@ angular.module('mean.stats').controller('StatsController',['$scope','Stats','Glo
 		};
 
 		readWebRTCStats();
-
-
-	
 
 	};
 }]);
