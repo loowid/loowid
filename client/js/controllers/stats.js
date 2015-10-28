@@ -4,6 +4,7 @@ angular.module('mean.stats').controller('StatsController',['$scope','Stats','Glo
 	$scope.global = Global;
 
 	var initFn = {};
+	var refresher; //The timeout refresher
 
 	$scope.global.setupI18N($scope,ngI18nResourceBundle,ngI18nConfig,function(){
 		Stats.rooms(initFn.processByDay);
@@ -95,6 +96,8 @@ angular.module('mean.stats').controller('StatsController',['$scope','Stats','Glo
 			'closed': 'rgb(0, 0, 0)'
 		};
 
+
+
 		$scope.showDisconnected = true;
 
 		var graphs={};
@@ -122,6 +125,22 @@ angular.module('mean.stats').controller('StatsController',['$scope','Stats','Glo
 		$scope.changeDisconnectedVisibility = function (){
 			$scope.showDisconnected=!$scope.showDisconnected;
 			readWebRTCStats(true);
+		};
+
+		$scope.onStartDraggingNode = function (node){
+			if (refresher){
+				clearTimeout (refresher);
+			}
+		};
+
+		$scope.onEndDraggingNode = function (node){
+			//Update the node status
+			var toRenderNode = _.findWhere(graphs[$scope.selectedSource].nodes,{id: node.id});
+			toRenderNode.x = node.x;
+			toRenderNode.y = node.y;
+
+			//Re initialize the graph updater
+			readWebRTCStats (false);
 		};
 
 		var processData = function (list){
@@ -256,7 +275,7 @@ angular.module('mean.stats').controller('StatsController',['$scope','Stats','Glo
 			});
 
 			if (justonetime === undefined || !justonetime){
-				setTimeout (function (){
+					refresher = setTimeout (function (){
 					uiHandler.safeApply($scope,function(){
 						readWebRTCStats();
 					});

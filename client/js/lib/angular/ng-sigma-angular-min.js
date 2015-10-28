@@ -11,19 +11,21 @@
 				graph: '=',
 				width: '@',
 				height: '@',
-				releativeSizeNode: '='
+				releativeSizeNode: '=',
+				ondragstarts: '=',
+				ondragends: '='
 			},
 			link: function (scope, element, attrs) {
 				// Let's first initialize sigma:
-				
-				
+
+
 			var i,
 				s,
 				g = {
 				  nodes: [],
 				  edges: []
 				};
-  
+
 				s = new sigma({
 				  graph: g,
 				  renderer: {
@@ -32,11 +34,25 @@
 				  },
 				  settings: {
 					minArrowSize: 8,
-					mouseEnabled: false,
+					mouseEnabled: true,
 					 defaultLabelColor: '#FFF'
 				  }
 				});
-	
+
+				//Attach the drag events
+
+				var dragListener = sigma.plugins.dragNodes(s, s.renderers[0]);
+
+				dragListener.bind('startdrag', function(event) {
+						scope.ondragstarts (event.data.node);
+				});
+
+
+				dragListener.bind('dragend', function(event) {
+					scope.ondragends (event.data.node);
+				});
+
+
 				scope.$watch('graph', function(newVal,oldVal) {
 					s.graph.clear();
 					s.graph.read(scope.graph);
@@ -46,7 +62,7 @@
 						sigma.plugins.relativeSize(s, 2);
 					}
 				});
-	
+
 				scope.$watch('width', function(newVal,oldVal) {
 					element.children().css("width",scope.width);
 					s.refresh();
@@ -57,11 +73,12 @@
 					s.refresh();
 					window.dispatchEvent(new Event('resize'));//hack so that it will be shown instantly
 				});
-	
+
 				element.on('$destroy', function() {
 					s.graph.clear();
+					sigma.plugins.killDragNodes(s);
 				});
 			}
 		};
 	});
-})();	
+})();

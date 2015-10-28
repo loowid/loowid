@@ -18,15 +18,15 @@
 
 
 		<div class="grapharea" ng-show="selectedSource==='screen'">
-			<p ng-show="graphscreen.nodes.length > 0"><sigmajs  graph="graphscreen" width="100%" height="400px" releative-size-node="false"></sigmajs></p>
+			<p ng-show="graphscreen.nodes.length > 0"><sigmajs ondragstarts="onStartDraggingNode" ondragends="onEndDraggingNode" graph="graphscreen" width="100%" height="400px" releative-size-node="false"></sigmajs></p>
 			<p class="message" ng-hide="graphscreen.nodes.length > 0"><span>{{resourceBundle.dataconnectionunavailable}}</span></p>
 		</div>
 		<div class="grapharea" ng-show="selectedSource==='video'">
-			<p ng-show="graphvideo.nodes.length > 0"><sigmajs  graph="graphvideo" width="100%" height="400px" releative-size-node="false"> </sigmajs></p>
+			<p ng-show="graphvideo.nodes.length > 0"><sigmajs  ondragstarts="onStartDraggingNode" ondragends="onEndDraggingNode" graph="graphvideo" width="100%" height="400px" releative-size-node="false"> </sigmajs></p>
 			<p class="message" ng-hide="graphvideo.nodes.length > 0"><span>{{resourceBundle.dataconnectionunavailable}}</span></p>
 		</div>
 		<div class="grapharea" ng-show="selectedSource==='audio'">
-			<p ng-show="graphaudio.nodes.length > 0"><sigmajs  graph="graphaudio" width="100%" height="400px" releative-size-node="false"> </sigmajs></p>
+			<p ng-show="graphaudio.nodes.length > 0"><sigmajs  ondragstarts="onStartDraggingNode" ondragends="onEndDraggingNode" graph="graphaudio" width="100%" height="400px" releative-size-node="false"> </sigmajs></p>
 			<p class="message" ng-hide="graphaudio.nodes.length > 0"><span>{{resourceBundle.dataconnectionunavailable}}</span></p>
 		</div>
 <hr/>
