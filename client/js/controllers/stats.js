@@ -133,6 +133,22 @@ angular.module('mean.stats').controller('StatsController',['$scope','Stats','Glo
 			graphs.screen.edges = [];
 			graphs.audio.edges = [];
 
+			processNodes(list);
+			processEdges(list);
+
+
+			uiHandler.safeApply($scope,function(){
+				$scope.graphvideo.nodes = graphs.video.nodes;
+				$scope.graphvideo.edges = graphs.video.edges;
+				$scope.graphscreen.nodes = graphs.screen.nodes;
+				$scope.graphscreen.edges = graphs.screen.edges;
+				$scope.graphaudio.nodes = graphs.audio.nodes;
+				$scope.graphaudio.edges = graphs.audio.edges;
+
+			});
+		};
+
+		var processNodes = function(list){
 			for (var key in list.webrtcStats){
 
 				if (list.webrtcStats.hasOwnProperty(key)){
@@ -149,24 +165,10 @@ angular.module('mean.stats').controller('StatsController',['$scope','Stats','Glo
 					}
 
 					var peerList = list.webrtcStats[key];
-
 					addNodes (key,username,userstatus,peerList,$scope.showDisconnected);
-					//Add the edges
-					addEdges (key,_.filter(peerList,function (peer){
-						return (peer.source === 'video' || peer.source === 'audio' || peer.source === 'screen') ;
-					}));
+
 				}
 			}
-
-			uiHandler.safeApply($scope,function(){
-				$scope.graphvideo.nodes = graphs.video.nodes;
-				$scope.graphvideo.edges = graphs.video.edges;
-				$scope.graphscreen.nodes = graphs.screen.nodes;
-				$scope.graphscreen.edges = graphs.screen.edges;
-				$scope.graphaudio.nodes = graphs.audio.nodes;
-				$scope.graphaudio.edges = graphs.audio.edges;
-
-			});
 		};
 
 		var addNodes = function (key,username,userstatus,peerList,showDisconnected){
@@ -212,11 +214,23 @@ angular.module('mean.stats').controller('StatsController',['$scope','Stats','Glo
 			}
 		};
 
+		var processEdges = function (list){
+			//Add the edges
+			for (var key in list.webrtcStats){
+				if (list.webrtcStats.hasOwnProperty(key)){
+					var peerList = list.webrtcStats[key];
+					addEdges (key,_.filter(peerList,function (peer){
+						return (peer.source === 'video' || peer.source === 'audio' || peer.source === 'screen') ;
+					}));
+				}
+			}
+		};
+
 		var addEdges = function (key,peerList){
 			for (var edgeKey in peerList){
 				if (peerList.hasOwnProperty(edgeKey)){
 					var peerInfo = peerList[edgeKey];
-					if (peerInfo.produced && _.findWhere (graphs[peerInfo.source].nodes, {id: peerInfo.peerId})){
+					if (peerInfo.produced && _.findWhere (graphs[peerInfo.source].nodes, {id: peerInfo.peerId}) !== undefined && _.findWhere (graphs[peerInfo.source].nodes, {id: key}) !== undefined){
 						var edge = {
 
 							id: 'ed_' +	key + '_' + peerInfo.peerId +'_' + peerInfo.source,
