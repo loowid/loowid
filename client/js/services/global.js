@@ -87,9 +87,9 @@ angular.module('mean.system').factory('Global', [function() {
     			var speechUtt = new SpeechSynthesisUtterance();
     			if (!scope.ui.speechEnabled) {
     				speechUtt.onend = function() {
-    					scope.ui.speechEnabled = true;
     					scope.ui.speechVoice = speechUtt.voice;
     					scope.ui.speechVoiceList = speechSynthesis.getVoices().filter(function(voice){ return voice.lang.indexOf((navigator.userLanguage || navigator.language)+'-')>=0; });
+    					scope.ui.speechEnabled = (scope.ui.speechVoiceList.length > 0);
     				};
     			} 
     			speechUtt.rate = 1.0;
