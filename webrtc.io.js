@@ -11,7 +11,7 @@ _ = require('underscore');
 var lclient = new ServerList();
 var logger = require('./log.js').getLog('webrtc.io');
 
-lclient.registerMethod('getXirSysServers','https://api.xirsys.com:443/getIceServers','POST');
+lclient.registerMethod('getXirSysServers','https://service.xirsys.com/getIceServers','POST');
 
 // Used for callback publish and subscribe
 //if (typeof rtc === 'undefined') {
@@ -264,7 +264,7 @@ function attachEvents(manager) {
 	 
      if (process.env.XIRSYS_USER) {
 		 request.post(
-	            'https://api.xirsys.com/getIceServers', {
+	            'https://service.xirsys.com/getIceServers', {
 	            form: {
 	                domain: process.env.XIRSYS_DOMAIN,
 	                room: 'default',
