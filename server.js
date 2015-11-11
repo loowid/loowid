@@ -345,7 +345,7 @@ var getOEmbedEntryPoint = function(url,callback,errfn) {
 			var otherAtts = linkAtts[1] + ' ' + linkAtts[2];
 			var matches = /\s*href="([^"]*)"/g.exec(otherAtts);
 			if (matches) {
-				callback(matches[1]);
+				callback(matches[1].replace(/&amp;/g,'&'));
 			} else {
 				errfn({error:404});
 			}
@@ -363,7 +363,11 @@ var getOEmbedData = function(url,callback,error) {
 	var request = require('request');
 	request({headers:finalHeaders,url:url}, function (error, response, body) {
 	  if (!error && response.statusCode === 200) {
+		  try {
 			oembedData = JSON.parse(body);
+		  } catch (e) {
+			  // Wrong URL, ignore it !!
+		  }
 	  }
 	  callback(oembedData);
 	});
