@@ -424,7 +424,7 @@ angular.module('mean.rooms').factory('MediaService',['Rooms','UIHandler',functio
 				if (wid) {
 					setTimeout(function(){
 						document.getElementById(wid).className += ' wframemessage';
-					},3500);
+					},5000);
 				}
 			};
 

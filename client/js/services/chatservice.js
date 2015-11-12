@@ -115,7 +115,7 @@ angular.module('mean.rooms').factory('ChatService',['$timeout','UIHandler','Room
 		    		});
 		    		
 		    	},500);
-		    	list.push({type:'gdoc',fablack:true,title:$scope.resourceBundle.titleOpenGDocInWindow,id:docid,thumbnail:'/img/gslides.png'});
+		    	list.push({type:'edoc',fablack:true,title:$scope.resourceBundle.titleOpenGDocInWindow,id:docid,thumbnail:'/img/gslides.png'});
 	    	}
 	    };
 	    
@@ -131,13 +131,30 @@ angular.module('mean.rooms').factory('ChatService',['$timeout','UIHandler','Room
 		    		});
 		    		
 		    	},500);
-	    		list.push({type:'typeform',fawhite:true,title:$scope.resourceBundle.titleOpenTypeFormInWindow,id:docid,thumbnail:'/img/typeform.png'});
+	    		list.push({type:'edoc',fawhite:true,title:$scope.resourceBundle.titleOpenTypeFormInWindow,id:docid,thumbnail:'/img/typeform.png'});
+	    	}
+	    };
+
+	    this.processEtherpad = function($scope,txt,list) {
+	    	var matches = /(?:https:\/\/)?beta\.etherpad\.org\/p\/([^\s]+)/g.exec(txt);
+	    	if (matches) {
+	    		var doc = matches[1];
+		    	var docid = 'doc_'+doc+'_'+(new Date()).getTime()+Math.floor(Math.random()*100);
+		    	setTimeout(function(){
+		    		document.getElementById(docid).addEventListener('click',function(evt){
+		    			$scope.openIFrameService('i'+docid,$scope.resourceBundle.etherpad,'//beta.etherpad.org/p/'+doc+'?showControls=true&showChat=true&showLineNumbers=true&useMonospaceFont=false');
+		    			evt.preventDefault();
+		    		});
+		    		
+		    	},500);
+		    	list.push({type:'edoc',fawhite:true,title:$scope.resourceBundle.titleOpenEtherpadInWindow,id:docid,thumbnail:'/img/etherpad.png'});
 	    	}
 	    };
 	    
 	    this.addObjects = function($scope,txt,list) {
 	    	this.processTypeForm($scope,txt,list);
 	    	this.processGoogleDoc($scope,txt,list);
+	    	this.processEtherpad($scope,txt,list);
 	    	this.processOEmbedUrls($scope,txt,list);
 	    };
 	    
