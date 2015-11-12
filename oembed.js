@@ -5,7 +5,6 @@
 var OEmbedProviders = {
 	domains: [
 	         'vimeo.com',
-	         'flickr.com',
 	         'youtube.com',
 	         'codepen.io',
 	         'dailymotion.com',
@@ -18,8 +17,7 @@ var OEmbedProviders = {
 	         'soundcloud.com',
 	         'sketchfab.com',
 	         'vine.co',
-	         'collegehumor.com',
-	         'instagram.com'
+	         'collegehumor.com'
 	         ]
 };
 // This works in node and browser

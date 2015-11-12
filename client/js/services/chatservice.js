@@ -401,7 +401,7 @@ angular.module('mean.rooms').factory('ChatService',['$timeout','UIHandler','Room
 	    	var tipObjects = ['https://www.youtube.com/watch?v=7mWX_KLo7iA',':)',
 	    	                  'https://docs.google.com/presentation/d/1QSGn19Pg7EllzzsLj0pGdZOsEMRkgvgAgvP7YP_UvKQ/share',
 	    	                  ':heart:','https://vimeo.com/79834337','https://showroom.typeform.com/to/ggBJPd',
-	    	                  'https://www.flickr.com/photos/theenmoy/16747301848/in/explore-2015-03-26',
+	    	                  'https://soundcloud.com/forss/flickermood',
 	    	                  'http://www.ted.com/talks/amy_webb_how_i_hacked_online_dating',
 	    	                  'http://www.slideshare.net/um_mncs/en-20-minutos-charla-loowid',
 	    	                  'http://codepen.io/RomainJeff/pen/myRWeo','https://github.com/loowid/loowid/wiki'];
