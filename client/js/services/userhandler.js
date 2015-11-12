@@ -19,6 +19,29 @@ angular.module('mean.rooms').factory('UserHandler',['Rooms','UIHandler','Notific
 			uiHandler.status = uiHandler.isowner?'OPENED':'DISCONNECTED';
 			uiHandler.access = angular.copy($scope.global.access);
 		
+			uiHandler.getMiniClass = function(cl) {
+				// Calculate connected users
+				var cnt = 0;
+				for (var n=0; n<this.users.length; n+=1) {
+					if (this.users[n].status === 'CONNECTED') {
+						cnt += 1;
+					}
+				}
+				var addMini = '';
+				var element = document.getElementById('connected');
+				if (element.scrollHeight > element.clientHeight) {
+					element.setAttribute('data-members',cnt);
+					addMini = ' mini';
+				} else {
+					var dm = parseInt(element.getAttribute('data-members') || '0');
+					if (dm===0 || cnt<dm) {
+						element.setAttribute('data-members',0);
+					} else {
+						addMini = ' mini';
+					}
+				}
+				return cl + addMini;
+			};
 
 			$scope.changeName = function() {
 		        if (!$scope.editNameForm.$valid) { 

@@ -150,7 +150,7 @@
 		<input ng-show="false" type="file" id="userfiles_owner" name="ownerfiles[]" multiple />
 	</div>
 	<h2>{{resourceBundle.roomviewers}}</h2>
-	<div class="owner connected myself">
+	<div ng-class="ui.getMiniClass('owner connected myself')">
 		<img class="editable" ng-src="{{ui.avatar}}" ng-click="enableEditName()" title="{{resourceBundle.changemyidentity}}">
 		<div>
 			<h3>{{ui.name}}</h3>
@@ -163,7 +163,7 @@
 		</p>
 	</div>	
 	
-	<ul class="sharers connected">
+	<ul ng-class="ui.getMiniClass('sharers connected')">
 		<li data-ng-show="user.status == 'CONNECTED' && user.connectionId != ui.currentConnectionId" data-ng-repeat="user in ui.users"> 
 			<img ng-src="{{user.avatar}}" title="{{user.name}}"/>
 			<h3>{{user.name}}</h3>

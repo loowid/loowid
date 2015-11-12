@@ -163,7 +163,7 @@
 		<p class="user_title">{{resourceBundle.roomme}}</p>
 	</div>
 	<h2>{{resourceBundle.roomviewers}}</h2>
-	<ul class="sharers connected">
+	<ul ng-class="ui.getMiniClass('sharers connected')">
 		<li data-ng-show="user.status == 'CONNECTED'" data-ng-repeat="user in ui.users"> 
 			<img ng-src="{{user.avatar}}" title="{{user.name}}"/>
 			<h3>{{user.name}}</h3>

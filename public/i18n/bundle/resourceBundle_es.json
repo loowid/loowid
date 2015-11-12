@@ -127,7 +127,7 @@
     "p2pdesc": "LooWID utiliza comunicaciones punto a punto, esto significa que los flujos de vídeo son enviados de navegador a navegador. No se almacena nada en nuestros servidores. Además toda la información se encripta por SSL",
     "passwordincorrect": "Clave incorrecta!!",
     "passwordsend": "Verificando la clave",
-    "peopleconnected": "Personas conectadas:",
+    "peopleconnected": "Conectados:",
     "permanentReload": "Puede permanecer a la espera de que se conecte el propietario de la sala, o recargar para comprobar si la sala se activa",
     "permanentUrl": "No compartas este enlace con nadie, utilízalo para regresar a esta sala como propietario de la misma",
     "permanentroom": "Sala permanente",
