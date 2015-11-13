@@ -136,13 +136,14 @@ angular.module('mean.rooms').factory('ChatService',['$timeout','UIHandler','Room
 	    };
 
 	    this.processEtherpad = function($scope,txt,list) {
-	    	var matches = /(?:https:\/\/)?(?:beta\.etherpad\.org|etherpad\.udl\.cat)\/p\/([^\s]+)/g.exec(txt);
+	    	var matches = /(?:https?:\/\/)?(beta\.etherpad\.org|etherpad\.udl\.cat)\/p\/([^\s]+)/g.exec(txt);
 	    	if (matches) {
-	    		var doc = matches[1];
+	    		var host = matches[1];
+	    		var doc = matches[2];
 		    	var docid = 'doc_'+doc+'_'+(new Date()).getTime()+Math.floor(Math.random()*100);
 		    	setTimeout(function(){
 		    		document.getElementById(docid).addEventListener('click',function(evt){
-		    			$scope.openIFrameService('i'+docid,$scope.resourceBundle.etherpad,'//beta.etherpad.org/p/'+doc+'?showControls=true&showChat=true&showLineNumbers=true&useMonospaceFont=false');
+		    			$scope.openIFrameService('i'+docid,$scope.resourceBundle.etherpad,'//'+host+'/p/'+doc+'?showControls=true&showChat=true&showLineNumbers=true&useMonospaceFont=false');
 		    			evt.preventDefault();
 		    		});
 		    		
