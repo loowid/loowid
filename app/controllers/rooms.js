@@ -104,7 +104,7 @@ exports.room = function(req, res, next, id) {
 					}
 				}
 				var expireDate = new Date();
-				expireDate.setTime(expireDate.getTime()+(12*60*60*1000)); // 12 Hours of session token
+				expireDate.setTime(expireDate.getTime()+5000); // 5 seconds more just to login
 				room.alias.push({id: id, session: req.sessionID, owner: owner, timestamp: expireDate});
 				room.markModified('alias');
 			}
@@ -398,7 +398,8 @@ exports.editShared = function (req,res,next) {
 		room.access = req.body.access;
 		if (room.access.permanent) {
 			var expireDate = new Date();
-			expireDate.setTime(expireDate.getTime()+(12*60*60*1000)); // 12 Hours of session token
+			var tmout = Number(process.env.ROOM_TIMEOUT || 15);
+			expireDate.setTime(expireDate.getTime()+(tmout*24*60*60*1000)); // ROOM_TIMEOUT days of expiration date
 			room.alias.push({id: room.access.permanentkey, session: '', owner: true, timestamp: expireDate});
 			room.markModified('alias');
 		} else {
