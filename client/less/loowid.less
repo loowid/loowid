@@ -50,7 +50,7 @@ a{ color: @linkcolor; }
 
 body{
     font-family: "Noto Sans", sans-serif;
-    font-size: 13px;
+    font-size: 14px;
     background: @bgcolor;
     color: @textcolor;
     line-height: 1.55;
@@ -719,7 +719,6 @@ header{
 	background: lighten(@bgcolor, 20%);
 	.box-shadow(0 0 5px rgba(0,0,0,.25) );
 	overflow: auto;
-	a { font-size: 0.75em; }
 	h2{
 		font-size: 1.3em;
 		margin: 1.4em 0 0.35em 0;
@@ -922,13 +921,13 @@ header{
 .connected{
 	&.mini {
 		img {
-			width: 25px;
+			width: 32px;
 			margin: 0 0.5em 0 0 !important;
 		}
 		h3 {
-			font-size: 1.1em;
+			font-size: 1em;
 			float: left;
-			width: 60px;
+			padding: 0 0 0 0 !important;
 		}
 		&.myself {
 			h3 {
@@ -940,7 +939,8 @@ header{
 			display: none;
 		}	
 		.toolbar {
-			float: right;
+			float: left;
+			font-size: 1em;
 		}
 		li {
 			padding-top: 2px;
@@ -1091,6 +1091,9 @@ header{
 		.chatTip{
 			display: none;	
 		}
+	}
+	a { 
+		font-size: 0.75em;
 	}
 	.toggler{
 		right: 230px;
