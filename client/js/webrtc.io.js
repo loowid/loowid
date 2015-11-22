@@ -129,17 +129,14 @@ function mergeConstraints(cons1, cons2) {
 			return;
 		}
 
-
 		for (var i = 0, len = events.length; i < len; i+=1) {
 			events[i].apply(null, args);
 		}
 	};
 
-
 	// Reference to the lone PeerConnection instance.
 	rtc.producedPeerConnections = {};
 	rtc.receivedPeerConnections = {};
-
 
 	// Array of known peer socket ids
 	rtc.connections = [];
@@ -468,6 +465,7 @@ function mergeConstraints(cons1, cons2) {
 					}
 				}
 			};
+
 			tryStream();
 
 		};
@@ -483,6 +481,17 @@ function mergeConstraints(cons1, cons2) {
 					'room': rtc.room
 				}
 			}));
+
+			//Let 5 secs to ensure that connection is not recovered and try it
+			if (produced && (pc.iceConnectionState === 'disconnected' || pc.iceConnectionState === 'failed' )){
+						if (rtc.debug) { console.log ('The connection has been ' + pc.iceConnectionState ); }
+						setTimeout (function () {
+							if (pc && (pc.iceConnectionState === 'disconnected' || pc.iceConnectionState === 'failed' )){
+								pc.restartConnection();
+							}
+					},5000);
+				}
+
 			if (rtc.debug) { console.log ('User id: ' + id + ' changed : ' + pc.iceConnectionState +  ' mediatype' + mediatype); }
 		};
 
@@ -491,6 +500,23 @@ function mergeConstraints(cons1, cons2) {
 			rtc.addDataChannel(id, evt.channel,requestId,mediatype);
 		};
 
+		pc.restartConnection = function() {
+				if (rtc.debug) { console.log ('The connection still ' + pc.iceConnectionState ); }
+				for (var i = 0; i < rtc.streams.length; i+=1) {
+					var streamObj = rtc.streams[i];
+					if (streamObj.mediatype === mediatype){
+							//It already exists so let's try to connect this PeerConnection
+							if (rtc.debug) { console.log ('Sending a new connection '); }
+
+							rtc.createPeerConnection(id,mediatype,true);
+							if (rtc.addStream(id,mediatype)) {
+								rtc.sendOffer(id,mediatype);
+							} else {
+								rtc.dropPeerConnection(id,mediatype,true);
+							}
+					}
+				}
+			};
 		return pc;
 	};
 
@@ -624,12 +650,15 @@ function mergeConstraints(cons1, cons2) {
 
 					//Creamos una peer nueva
 					rtc.createPeerConnection(socketId,mediatype,true);
-					rtc.addStream(socketId,mediatype);
-					rtc.sendOffer(socketId,mediatype);
+					if (rtc.addStream(socketId,mediatype)){
+						rtc.sendOffer(socketId,mediatype);
+					}else {
+						rtc.dropPeerConnection(socketId,mediatype,true);
+					}
 				}
-			},15000);
+			}, 15000);
 
-		},function (){
+		},function () {
 			if (rtc.debug) { console.log ('Error setting remote description'); }
 		});
 
@@ -693,12 +722,17 @@ function mergeConstraints(cons1, cons2) {
 	};
 
 	rtc.addStream = function (connectionId,mediatype){
+		var streamAdded = false;
+
+
 		for (var i = 0; i < rtc.streams.length; i+=1) {
 			var streamObj = rtc.streams[i];
 			if (streamObj.mediatype === mediatype){
 				rtc.producedPeerConnections[connectionId][mediatype].addStream(streamObj.mediastream);
+				streamAdded = true;
 			}
 		}
+		return streamAdded;
 	};
 
 	var pushMessage = function(id,mediatype,mediatypefile,requestId,token,channel,queue) {
@@ -850,8 +884,8 @@ function mergeConstraints(cons1, cons2) {
 			if (mediatype === stream.mediatype){
 
 				//Stop the stream
-				stream.mediastream.stop();
-
+				var track = stream.mediastream.getTracks()[0];
+				track.stop();
 				//remove each peer connection where we had
 
 				for (var j=0; j < rtc.connections.length; j+=1 ){
@@ -1060,75 +1094,3 @@ function mergeConstraints(cons1, cons2) {
 
 
 }).call();
-
-/*
-function extractSdp(sdpLine, pattern) {
-	var result = sdpLine.match(pattern);
-	return (result && result.length === 2) ? result[1] : null;
-}
-
-function setDefaultCodec(mLine, payload) {
-	var elements = mLine.split(' ');
-	var newLine = [];
-	var index = 0;
-	for (var i = 0; i < elements.length; i+=1) {
-		if (index === 3) {// Format of media starts from the fourth.
-			newLine[index] = payload; // Put target payload to the first.
-			index+=1;
-		}
-		if (elements[i] !== payload) {
-			newLine[index] = elements[i];
-			index += 1;
-		}
-	}
-	return newLine.join(' ');
-}
-
-function removeCN(sdpLines, mLineIndex) {
-	var mLineElements = sdpLines[mLineIndex].split(' ');
-	// Scan from end for the convenience of removing an item.
-	for (var i = sdpLines.length - 1; i >= 0; i-=1) {
-		var payload = extractSdp(sdpLines[i], /a=rtpmap:(\d+) CN\/\d+/i);
-		if (payload) {
-			var cnPos = mLineElements.indexOf(payload);
-			if (cnPos !== -1) {
-				// Remove CN payload from m line.
-				mLineElements.splice(cnPos, 1);
-			}
-			// Remove CN line in sdp
-			sdpLines.splice(i, 1);
-		}
-	}
-
-	sdpLines[mLineIndex] = mLineElements.join(' ');
-	return sdpLines;
-}
-
-function preferOpus(sdp) {
-	var sdpLines = sdp.split('\r\n');
-	var mLineIndex = null;
-	// Search for m line.
-	for (var i = 0; i < sdpLines.length; i+=1) {
-		if (sdpLines[i].search('m=audio') !== -1) {
-			mLineIndex = i;
-			break;
-		}
-	}
-	if (mLineIndex === null) return sdp;
-
-	// If Opus is available, set it as the default in m line.
-	for (var j = 0; j < sdpLines.length; j+=1) {
-		if (sdpLines[j].search('opus/48000') !== -1) {
-			var opusPayload = extractSdp(sdpLines[j], /:(\d+) opus\/48000/i);
-			if (opusPayload) sdpLines[mLineIndex] = setDefaultCodec(sdpLines[mLineIndex], opusPayload);
-			break;
-		}
-	}
-
-	// Remove CN in m line and sdp.
-	sdpLines = removeCN(sdpLines, mLineIndex);
-
-	sdp = sdpLines.join('\r\n');
-	return sdp;
-}
-*/
