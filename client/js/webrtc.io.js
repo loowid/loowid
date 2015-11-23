@@ -642,13 +642,14 @@ function mergeConstraints(cons1, cons2) {
 		pc.setRemoteDescription(new nativeRTCSessionDescription(sdp),function (){
 			setTimeout(function(){
 				if (rtc.debug) { console.log('PCICE::::'+pc.iceConnectionState); }
-				if (pc.iceConnectionState === 'checking') {
+				if (pc.iceConnectionState === 'checking' || pc.iceConnectionState === 'disconnected') {
 					if (rtc.debug) { console.log('Seems that the state is stalled !!'); }
 
 					//Borramos la posible peer
 					rtc.dropPeerConnection(socketId,mediatype,true);
 
 					//Creamos una peer nueva
+
 					rtc.createPeerConnection(socketId,mediatype,true);
 					if (rtc.addStream(socketId,mediatype)){
 						rtc.sendOffer(socketId,mediatype);
@@ -886,6 +887,7 @@ function mergeConstraints(cons1, cons2) {
 				//Stop the stream
 				var track = stream.mediastream.getTracks()[0];
 				track.stop();
+
 				//remove each peer connection where we had
 
 				for (var j=0; j < rtc.connections.length; j+=1 ){
