@@ -29,16 +29,22 @@ angular.module('mean.stats').controller('StatsController',['$scope','Stats','Glo
 			var labels = [];
 			var rooms = [];
 			var members = [];
+			var maxmembers = [];
 			var messages = [];
 			for (var k=0; k<list.length; k+=1) {
 				labels.push($scope.resourceBundle.dateformat.replace('dd',list[k]._id.day).replace('mm',list[k]._id.month).replace('yyyy',list[k]._id.year));
 				rooms.push(list[k].count);
 				members.push(list[k].members);
+				maxmembers.push(list[k].maxmembers || 0);
 				messages.push(roundNumber(list[k].count>0?list[k].messages/list[k].count:0));
 			}
-			$scope.labels0 = labels;
-			$scope.series0 = [$scope.resourceBundle.roomsbyday,$scope.resourceBundle.membersbyday,$scope.resourceBundle.messagesbyroom];
-			$scope.data0 = [ rooms, members, messages ];
+			$scope.labelsl0 = labels;
+			$scope.seriesl0 = [$scope.resourceBundle.roomsbyday];
+			$scope.seriesl1 = [$scope.resourceBundle.membersbyday,$scope.resourceBundle.maxmembersbyroom];
+			$scope.seriesl2 = [$scope.resourceBundle.messagesbyroom];
+			$scope.datal0 = [ rooms ];
+			$scope.datal1 = [ members , maxmembers ];
+			$scope.datal2 = [ messages ];
 			stopLoading();
 		};
 
@@ -55,9 +61,9 @@ angular.module('mean.stats').controller('StatsController',['$scope','Stats','Glo
 				labels.push(getNameFor(list[k]._id));
 				rooms.push(list[k].count);
 			}
-			$scope.labels1 = labels;
-			$scope.series1 = [$scope.resourceBundle.roomsbytype];
-			$scope.data1 = rooms;
+			$scope.labelsp1 = labels;
+			$scope.seriesp1 = [$scope.resourceBundle.roomsbytype];
+			$scope.datap1 = rooms;
 			stopLoading();
 		};
 

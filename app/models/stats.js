@@ -29,6 +29,7 @@ StatsSchema.statics = {
 		        $group : {
 		           _id : { day: { $dayOfMonth: '$created' }, month: { $month: '$created' }, year: { $year: '$created' } },
 		           members: { $sum: '$members' },
+		           maxmembers: { $max: '$members' },
 		           messages: { $sum: '$messages' },
 		           count: { $sum: 1 }
 		        }
