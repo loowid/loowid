@@ -95,6 +95,7 @@
     "maxBitrate": "Bitrate d'emissió màxim (kbs)",
     "maxHeight": "Alçada màxima:",
     "maxWidth": "Amplada màxima:",
+    "maxmembersbyroom": "Màxim de participants en una sala",
     "membersbyday": "Participants per dia",
     "messagesbyroom": "Participants per sala",
     "metadesc": "LooWID - Compartir escriptori, vídeo o pantalla amb qui tu vulguis i mostrar el que estàs fent",

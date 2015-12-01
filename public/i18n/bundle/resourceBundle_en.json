@@ -140,6 +140,7 @@
    "modalno":"No",
    "modalok":"Ok",
    "modalcancel":"Cancel",
+   "maxmembersbyroom": "Max members per room",
    "tutorialok":"Ok",
    "tutorioalcancel":"Cancel",
    "tutorialyes":"Yes",
