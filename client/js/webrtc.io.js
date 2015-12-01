@@ -507,6 +507,7 @@ function mergeConstraints(cons1, cons2) {
 					if (streamObj.mediatype === mediatype){
 							//It already exists so let's try to connect this PeerConnection
 							if (rtc.debug) { console.log ('Sending a new connection '); }
+							rtc.dropPeerConnection (id,mediatype,true);
 
 							rtc.createPeerConnection(id,mediatype,true);
 							if (rtc.addStream(id,mediatype)) {
@@ -641,21 +642,10 @@ function mergeConstraints(cons1, cons2) {
 		var pc = rtc.producedPeerConnections[socketId][mediatype];
 		pc.setRemoteDescription(new nativeRTCSessionDescription(sdp),function (){
 			setTimeout(function(){
-				if (rtc.debug) { console.log('PCICE::::'+pc.iceConnectionState); }
-				if (pc.iceConnectionState === 'checking' || pc.iceConnectionState === 'disconnected') {
+				if (rtc.debug) { console.log('PCICE::::'+ pc.iceConnectionState); }
+				if (pc.iceConnectionState === 'checking') {
 					if (rtc.debug) { console.log('Seems that the state is stalled !!'); }
-
-					//Borramos la posible peer
-					rtc.dropPeerConnection(socketId,mediatype,true);
-
-					//Creamos una peer nueva
-
-					rtc.createPeerConnection(socketId,mediatype,true);
-					if (rtc.addStream(socketId,mediatype)){
-						rtc.sendOffer(socketId,mediatype);
-					}else {
-						rtc.dropPeerConnection(socketId,mediatype,true);
-					}
+						pc.restartConnection();
 				}
 			}, 15000);
 
