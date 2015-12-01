@@ -230,6 +230,10 @@ passport.deserializeUser(function(user, done) {
 
 var LTI_PATH = process.env.LTI_PATH || '/lti';
 
+var skipPath = function(path) {
+	return path === LTI_PATH || path === '/slack';
+};
+
 app.configure(function() {
 	// Passport Config
 	app.use(passport.initialize());
@@ -253,7 +257,7 @@ app.configure(function() {
 			req.headers.host = process.env.LTI_DOMAIN || req.headers.host;
 			logger.debug(req.protocol+'://'+req.headers.host+(req.port?':'+req.port:'')+'/'+req.url);
 		}
-		return (req.url === LTI_PATH)?next():csrf(req,res,next);
+		return skipPath(req.url)?next():csrf(req,res,next);
 	});
 	app.use(i18n.handle);
 	app.use(express.methodOverride());
@@ -330,6 +334,34 @@ app.get('/chat/talk',function(req, res) {
 	reqst.on('error', function(err) {
 	  logger.error('Talk translate error: ' + err.message);
 	});
+});
+
+
+// Allow to work with slash command /loowid
+app.post('/slack',function(req,res,next){
+	rooms.slackone(req,res,next,function(newroom){
+		var privateMessage = 'New :lock:<'+newroom.privateUrl+'|LooWID> room created, enjoy :sunglasses: !!';
+		var publicMessage = 'New :pushpin:<'+newroom.publicUrl+'|LooWID> room created by <@'+newroom.user+'>, enjoy :sunglasses: !!';
+		var attachment = 'you can access to this room during the next *:clock12:60 minutes*';
+		var request = require('request');
+		request.post({
+		  headers: {'content-type' : 'application/x-www-form-urlencoded'},
+		  url:     newroom.responseUrl,
+		  body:    JSON.stringify({ 'text': privateMessage, 'attachments': [ { 'text': '<@'+newroom.user+'> '+attachment, 'mrkdwn_in': [ 'text' ] } ] })
+		}, function(error, response, body){
+			if (!error && response.statusCode === 200) {
+				request.post({
+				  headers: {'content-type' : 'application/x-www-form-urlencoded'},
+				  url:     newroom.responseUrl,
+				  body:    JSON.stringify({ 'response_type': 'in_channel', 'text': publicMessage, 'attachments': [ { 'text': '<@channel> '+attachment, 'mrkdwn_in': [ 'text' ] } ] })
+				}, function(error, response, body){
+				  // No way to respond
+				});
+			}
+		});
+	});
+	// Immediate response to slack command
+	res.send();
 });
 
 var finalHeaders = {'User-Agent':'Mozilla/5.0 (Windows NT 6.0; rv:26.0) Gecko/20100101 Firefox/33.0'};
