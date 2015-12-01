@@ -245,6 +245,10 @@ var getUniqueRoomId = function(cb,err) {
 	Room.load(ucid,0,result);
 };
 
+var shouldBeDisconnected = function(req) {
+	return req.lti || req.slack;
+};
+
 // Session is regenerated for every room you create
 exports.createid = function(req, res, next) {
 	var _csrfSecret = req.session._csrfSecret;
@@ -272,7 +276,7 @@ exports.create = function(req, res, next) {
 	// Check the id is the same as previously created
 	if (req.session.roomId === req.body.roomId){
 		getUniqueRoomId(function(uniqueClaimId){
-			var acc = {shared:'LINK',title:req.body.title,keywords:[],passwd:makeId(),moderated:req.lti?true:false,chat:false,locked:false,permanent:false,permanentkey:uniqueClaimId};
+			var acc = {shared:'LINK',title:req.body.title,keywords:[],passwd:makeId(),moderated:false,chat:false,locked:false,permanent:false,permanentkey:uniqueClaimId};
 			var now = new Date();
 			var due = new Date();
 			var tmout = Number(process.env.ROOM_TIMEOUT || 15);
@@ -282,12 +286,12 @@ exports.create = function(req, res, next) {
 					{roomId: req.session.roomId, 
 					 created: now,
 					 dueDate: due,
-					 status: req.lti?'DISCONNECTED':'OPENED',
+					 status: shouldBeDisconnected(req)?'DISCONNECTED':'OPENED',
 					 access: acc,
 					 owner:
 					 	{name: req.body.name, 
 						 sessionid: req.sessionID,
-						 status:req.lti?'DISCONNECTED':'CONNECTED',
+						 status:shouldBeDisconnected(req)?'DISCONNECTED':'CONNECTED',
 						 connectionId: req.body.connectionId,
 						 avatar: req.body.avatar},
 					guests: [],
@@ -295,8 +299,17 @@ exports.create = function(req, res, next) {
 					chat: [],
 					alias: []
 			});
+			if (req.slack) {
+				var expireDate = new Date();
+				expireDate.setTime(expireDate.getTime()+(60*60*1000)); // One hour of expiration date
+				room.alias.push({id: room.access.permanentkey, session: '', owner: true, timestamp: expireDate});
+				room.markModified('alias');
+				room.access.permanent = true;
+				room.dueDate = expireDate;
+			}
 			if (req.lti) {
 				room.lticontext = req.lti;
+				room.access.moderated = true;
 			}
 			room.save(function(err) {
 				if (err) {
@@ -318,6 +331,56 @@ exports.create = function(req, res, next) {
 		next(error);
 	}
 };
+
+/*
+* Create a slack room
+*/
+
+exports.slackone = function(req, res, next, success) {
+	var usrNameField = 'user_name';
+	var chnNameField = 'channel_name';
+	var resUrlField = 'response_url';
+	var usrName = req.body[usrNameField];
+	var channelName = req.body[chnNameField];
+	var responseUrl = req.body[resUrlField];
+	var extraText = req.body.text;
+	if (responseUrl.indexOf(process.env.SLACK_HOOK_URL || 'https://hooks.slack.com/commands/') === 0) {
+		var request = require('request');
+		request.post({
+		  headers: {'content-type' : 'application/x-www-form-urlencoded'},
+		  url:     responseUrl,
+		  body:    JSON.stringify({ 'text': 'Preparing your *LooWID* room...' })
+		}, function(error, response, body){
+			if (!error && response.statusCode === 200) {
+				var wres = {
+					json: function(rid) {
+						req.slack = rid.id;
+						req.body = {
+							avatar: exports.getGravatarImg(usrName),
+							connectionId: '',
+							name: usrName,
+							roomId: rid.id,
+							title: extraText || '#'+channelName
+						};
+						var wcres = {
+							json: function(nroom) {
+								var loowidUrl = req.protocol+'://'+req.headers.host+(req.port?':'+req.port:'')+'/#!/r/';
+								// This is the owner url
+								var loowidPrivateUrl = loowidUrl+nroom.access.permanentkey+'/claim';
+								// This is the viewer url
+								var loowidPublicUrl = loowidUrl+nroom.roomId;
+								success({ 'user' : usrName , 'privateUrl': loowidPrivateUrl, 'publicUrl': loowidPublicUrl, 'responseUrl': responseUrl });
+							}
+						};
+						exports.create(req,wcres,next);
+					}
+				};
+				exports.createid(req,wres);
+			}
+		});
+	}
+};
+
 
 exports.getGravatarImg = function(email) {
 	var remail = email || '';
