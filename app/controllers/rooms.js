@@ -339,9 +339,11 @@ exports.create = function(req, res, next) {
 exports.slackone = function(req, res, next, success) {
 	var usrNameField = 'user_name';
 	var chnNameField = 'channel_name';
+	var chnIdField = 'channel_id';
 	var resUrlField = 'response_url';
 	var usrName = req.body[usrNameField];
 	var channelName = req.body[chnNameField];
+	var channelId = req.body[chnIdField];
 	var responseUrl = req.body[resUrlField];
 	var extraText = req.body.text;
 	if (responseUrl.indexOf(process.env.SLACK_HOOK_URL || 'https://hooks.slack.com/commands/') === 0) {
@@ -369,7 +371,7 @@ exports.slackone = function(req, res, next, success) {
 								var loowidPrivateUrl = loowidUrl+nroom.access.permanentkey+'/claim';
 								// This is the viewer url
 								var loowidPublicUrl = loowidUrl+nroom.roomId;
-								success({ 'user' : usrName , 'privateUrl': loowidPrivateUrl, 'publicUrl': loowidPublicUrl, 'responseUrl': responseUrl });
+								success({ 'user' : usrName , 'privateUrl': loowidPrivateUrl, 'publicUrl': loowidPublicUrl, 'responseUrl': responseUrl, 'channel': channelId });
 							}
 						};
 						exports.create(req,wcres,next);

@@ -342,18 +342,19 @@ app.post('/slack',function(req,res,next){
 	rooms.slackone(req,res,next,function(newroom){
 		var privateMessage = 'New :lock:<'+newroom.privateUrl+'|LooWID> room created, enjoy :sunglasses: !!';
 		var publicMessage = 'New :pushpin:<'+newroom.publicUrl+'|LooWID> room created by <@'+newroom.user+'>, enjoy :sunglasses: !!';
-		var attachment = 'you can access to this room during the next *:clock12:60 minutes*';
+		var attachmentPriv = '<@'+newroom.user+'> you can access to this room as owner during the next *:clock12:60 minutes*';
+		var attachmentPub = '<#'+newroom.channel+'> you can join to this room during the next *:clock12:60 minutes*';
 		var request = require('request');
 		request.post({
 		  headers: {'content-type' : 'application/x-www-form-urlencoded'},
 		  url:     newroom.responseUrl,
-		  body:    JSON.stringify({ 'text': privateMessage, 'attachments': [ { 'text': '<@'+newroom.user+'> '+attachment, 'mrkdwn_in': [ 'text' ] } ] })
+		  body:    JSON.stringify({ 'text': privateMessage, 'attachments': [ { 'text': attachmentPriv, 'mrkdwn_in': [ 'text' ] } ] })
 		}, function(error, response, body){
 			if (!error && response.statusCode === 200) {
 				request.post({
 				  headers: {'content-type' : 'application/x-www-form-urlencoded'},
 				  url:     newroom.responseUrl,
-				  body:    JSON.stringify({ 'response_type': 'in_channel', 'text': publicMessage, 'attachments': [ { 'text': '<@channel> '+attachment, 'mrkdwn_in': [ 'text' ] } ] })
+				  body:    JSON.stringify({ 'response_type': 'in_channel', 'text': publicMessage, 'attachments': [ { 'text': attachmentPub, 'mrkdwn_in': [ 'text' ] } ] })
 				}, function(error, response, body){
 				  // No way to respond
 				});
