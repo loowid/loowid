@@ -1,0 +1,50 @@
+#!/bin/sh
+
+# Utilities
+float_test () { 
+    awk 'END { exit ( !( '"$1"')); }' < /dev/null
+}
+# Slack advices
+function slack() {
+	curl -X POST --data-urlencode 'payload={"channel": "#general", "username": "monit", "text": "'"$1"'", "icon_emoji": ":warning:"}' https://hooks.slack.com/services/${OPENSHIFT_MONIT_SLACK_WEBHOOK} >/dev/null 2>&1
+}
+
+# Checking MONGODB Usage
+function checkMongoQuota() {
+	local usage=$(ssh ${OPENSHIFT_MONGODB_DB_GEAR_UUID}@${OPENSHIFT_MONGODB_DB_HOST} '"quota" -w 2>/dev/null' | grep '^.*/dev/' | awk '{printf "%3.1f", ($2 / $4 * 100)}');
+	if float_test "${usage:-0} > $1"; then
+		slack "Warning: Mongo in ${OPENSHIFT_APP_NAME} is using ${usage}% of disk quota";
+	fi;
+	local usage=$(ssh ${OPENSHIFT_MONGODB_DB_GEAR_UUID}@${OPENSHIFT_MONGODB_DB_HOST} '"quota" -w 2>/dev/null' | grep '^.*/dev/' | awk '{printf "%3.1f",  ($5 / $7 * 100)}');
+	if float_test "${usage:-0} > $2"; then
+		slack "Warning: Mongo in ${OPENSHIFT_APP_NAME} is using ${usage}% of inodes allowed";
+	fi;
+}
+
+# Checking NodeJS Usage
+function checkLocalQuota() {
+	local usage=$(quota -w 2>/dev/null| grep '^.*/dev/' | awk '{printf "%3.1f", ($2 / $4 * 100)}');
+	if float_test "${usage:-0} > $1"; then
+		slack "Warning: Gear ${OPENSHIFT_GEAR_UUID} of ${OPENSHIFT_APP_NAME} is using ${usage}% of disk quota";
+	fi;
+	local usage=$(quota -w 2>/dev/null| grep '^.*/dev/' | awk '{printf "%3.1f",  ($5 / $7 * 100)}');
+	if float_test "${usage:-0} > $2"; then
+		slack "Warning: Gear ${OPENSHIFT_GEAR_UUID} of ${OPENSHIFT_APP_NAME} is using ${usage}% of inodes allowed";
+	fi;
+	local memousage=$(awk "BEGIN{printf \"%i\", $(oo-cgroup-read memory.usage_in_bytes) / $(oo-cgroup-read memory.limit_in_bytes) * 100}");
+	if float_test "${memousage:-0} > $3"; then
+		slack "Warning: Gear ${OPENSHIFT_GEAR_UUID} of ${OPENSHIFT_APP_NAME} is using ${memousage}% of memory";
+	fi;	
+}
+
+# Checking WEB Active
+function checkWebStatus() {
+	local upweb=$(wget -O - https://${OPENSHIFT_GEAR_DNS}/ 2>/dev/null | grep 'loowidVersion' | wc -l);
+	if float_test "${upweb} == 0"; then
+		slack "Warning: Service ${OPENSHIFT_APP_NAME} is down!" 1>&2;
+	fi;
+}
+
+checkMongoQuota "${OPENSHIFT_MONIT_MONGOQUOTA}" "${OPENSHIFT_MONIT_INODEQUOTA}"
+checkLocalQuota "${OPENSHIFT_MONIT_NODEJSQUOTA}" "${OPENSHIFT_MONIT_INODEQUOTA}" "${OPENSHIFT_MONIT_MEMORYQUOTA}" 
+checkWebStatus
