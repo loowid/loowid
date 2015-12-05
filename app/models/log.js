@@ -6,7 +6,7 @@ var Schema = mongoose.Schema;
  * Log schema
  */
 
-var ttl = 3600 * 24 * 30; // Log expires after 30 days
+var ttl = 3600 * 24 * 15; // Log expires after 15 days
 
 var LogSchema = new Schema ({
 	serverId: String,
