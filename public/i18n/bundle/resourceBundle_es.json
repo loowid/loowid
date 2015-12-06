@@ -273,5 +273,13 @@
     "wintitlevideo": "Mi cámara web",
     "youarefired": "Has sido expulsado de la sala",
     "youmustacceptterms": "Debes aceptar los términos",
-    "yourbrowsernot": "Aún no damos soporte a tu navegador. Sigue cualquier novedad desde @LooWIDCom"
+    "yourbrowsernot": "Aún no damos soporte a tu navegador. Sigue cualquier novedad desde @LooWIDCom",
+    "titleScreenStatus": "La conexión del escritorio de {0} {1}",
+    "titleVideoStatus": "La conexión de la cámara web de {0} {1}",
+    "titleAudioStatus": "La conexión del audio de {0} {1}",
+    "titlestatestarting": "está comenzando",
+    "titlestatenegotiating": "está en negociación",
+    "titlestatestreaming": "está emitiendo",
+    "titlestatefailed": "ha fallado",
+    "titlestateended": "ha terminado"
 }

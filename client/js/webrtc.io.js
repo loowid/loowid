@@ -490,7 +490,9 @@ function mergeConstraints(cons1, cons2) {
 								pc.restartConnection();
 							}
 					},5000);
-				}
+			}
+
+			pc.propagateState();
 
 			if (rtc.debug) { console.log ('User id: ' + id + ' changed : ' + pc.iceConnectionState +  ' mediatype' + mediatype); }
 		};
@@ -498,6 +500,26 @@ function mergeConstraints(cons1, cons2) {
 		pc.ondatachannel = function(evt) {
 			if (rtc.debug) { console.log('data channel connecting ' + id); }
 			rtc.addDataChannel(id, evt.channel,requestId,mediatype);
+		};
+
+		pc.propagateState = function () {
+			//Update the state
+			var connState;
+
+			if (pc.iceConnectionState==='starting'){
+				connState = 'starting';
+			}else if (pc.iceConnectionState==='checking' ){
+				connState = 'negotiating';
+			}else if (pc.iceConnectionState==='completed' || pc.iceConnectionState === 'connected'){
+				connState = 'streaming';
+			}else if (pc.iceConnectionState === 'failed' && pc.iceConnectionState === 'disconnected'){
+				connState = 'failed';
+			} else if (pc.iceConnectionState === 'closed') {
+				connState = 'ended';
+			}
+
+			rtc.fire ('connection changed',
+				{'state': connState, 'userid': id, 'mediatype': mediatype, produced: produced});
 		};
 
 		pc.restartConnection = function() {
@@ -520,6 +542,7 @@ function mergeConstraints(cons1, cons2) {
 			};
 		return pc;
 	};
+
 
 	rtc.sendOffer = function(socketId,mediatype,maxBitrate,requestId,token) {
 		var pc = rtc.producedPeerConnections[socketId][mediatype];

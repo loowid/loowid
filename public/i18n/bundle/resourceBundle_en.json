@@ -273,6 +273,13 @@
    "nomoretips": "No more tips to show",
    "showchattips": "Chat tips",
    "showDisconnected": "Show disconnected",
-   "hideDisconnected": "Hide disconnected"
-
+   "hideDisconnected": "Hide disconnected",
+   "titleScreenStatus": "{0}'s screen connection is {1}'",
+   "titleVideoStatus": "{0}'s webcam connection is {1}'",
+   "titleAudioStatus": "{0}'s audio connection is {1}'",
+   "titlestatestarting": "starting",
+   "titlestatenegotiating": "negotiating",
+   "titlestatestreaming": "streaming",
+   "titlestatefailed": "failed",
+   "titlestateended": "ended"
 }

@@ -67,7 +67,7 @@
 			<p><input id="chgavatar" type="email" data-ng-model="ui.gravatar" class="input-lg" size="15"></p>
 			<p><input type="submit" style="position: absolute; left: -9999px; width: 1px; height: 1px;"/></p><!-- Needed to submit with enter key -->
 		</fieldset>
-	</form>	
+	</form>
 </div>
 <div id="modalformsbg" ng-show="ui.modals.length > 0" ></div>
 <div id="modalforms">
@@ -75,13 +75,13 @@
 		<li ng-repeat="modal in ui.modals" ng-class="modal.class">
 			<fieldset>
 				<p class="toolbar">
-					<a href="" ng-show="modal.ok" ng-click="modal.ok($index);">{{resourceBundle.modalok}}</a> 
+					<a href="" ng-show="modal.ok" ng-click="modal.ok($index);">{{resourceBundle.modalok}}</a>
 					<a href="" ng-show="modal.cancel" ng-click="modal.cancel($index);" class="warnedbtn">{{resourceBundle.modal.cancel}}</a>
 					<a href="" ng-show="modal.yes" ng-click="modal.yes($index);">{{resourceBundle.modalyes}}</a>
 					<a href="" ng-show="modal.no" ng-click="modal.no($index);" class="warnedbtn">{{resourceBundle.modalno}}</a>
 				</p>
 				<div ng-show="modal.avatar" class="avatar"><img ng-src="{{modal.avatar}}" /></div>
-				<h3 ng-bind-html="modal.text"></h3>					
+				<h3 ng-bind-html="modal.text"></h3>
 			</fieldset>
 		</li>
 	</ul>
@@ -92,13 +92,13 @@
 		<div class="tutorialform" style="top:{{tutorial.top}}px; left:{{tutorial.left}}px" >
 			<fieldset>
 				<div ng-show="tutorial.avatar" class="avatar"><img ng-src="{{tutorial.avatar}}" /></div>
-				<p ng-bind-html="tutorial.text"></p>	
-			
+				<p ng-bind-html="tutorial.text"></p>
+
 				<h4>
-					<a href="" ng-show="tutorial.ok" ng-click="tutorial.ok($index);">{{resourceBundle.tutorialok}}</a> 
+					<a href="" ng-show="tutorial.ok" ng-click="tutorial.ok($index);">{{resourceBundle.tutorialok}}</a>
 					<a href="" ng-show="tutorial.cancel" ng-click="tutorial.cancel($index);">{{resourceBundle.tutorial.cancel}}</a>
-					<a href="" ng-show="tutorial.previous" ng-click="tutorial.previous($index);">{{resourceBundle.tutorialprevious}}</a> 
-					<a href="" ng-show="tutorial.next" ng-click="tutorial.next($index);">{{resourceBundle.tutorialnext}}</a> 
+					<a href="" ng-show="tutorial.previous" ng-click="tutorial.previous($index);">{{resourceBundle.tutorialprevious}}</a>
+					<a href="" ng-show="tutorial.next" ng-click="tutorial.next($index);">{{resourceBundle.tutorialnext}}</a>
 					<a href="" ng-show="tutorial.yes" ng-click="tutorial.yes($index);">{{resourceBundle.tutorialyes}}</a>
 					<a href="" ng-show="tutorial.no" ng-click="tutorial.no($index);">{{resourceBundle.tutorialno}}</a></h4>
 			</fieldset>
@@ -107,7 +107,7 @@
 	</ul>
 </div>
 <div id="connecting" ng-class="ui.connNew">
-	<div class="connected" data-ng-repeat="user in ui.newusers"> 
+	<div class="connected" data-ng-repeat="user in ui.newusers">
 		<img ng-src="{{user.avatar}}"/>
 		<h3 ng-show="user.status=='CONNECTED'">{{user.name}} (+)</h3>
 		<h3 ng-show="user.status=='DISCONNECTED'">{{user.name}} (-)</h3>
@@ -125,17 +125,29 @@
 		<p class="user_title" data-ng-show="ui.status=='BROADCASTING'">{{resourceBundle.statusbroadcasting}}</p>
 		<p class="user_title" data-ng-show="ui.status=='STOPPED'">{{resourceBundle.statusstopped}}</p>
 		<p class="user_title" data-ng-show="ui.status=='DISCONNECTED'">{{resourceBundle.statusdisconnected}}</p>
+		<div class="statusBar" >
+			<div title= "{{resourceBundle._('titleScreenStatus',ui.name,resourceBundle['titlestate'+ui.connectionStatus.screen.in])}}" class="statusBtn {{ui.connectionStatus.screen.in}}">
+				<i class="fa fa-desktop"></i>
+			</div>
+			<div title= "{{resourceBundle._('titleVideoStatus',ui.name,resourceBundle['titlestate'+ui.connectionStatus.video.in])}}"  class="statusBtn {{ui.connectionStatus.video.in}}">
+				<i class="fa fa-video-camera"></i>
+			</div>
+			<div title= "{{resourceBundle._('titleAudioStatus',ui.name,resourceBundle['titlestate'+ui.connectionStatus.audio.in])}}"  class="statusBtn {{ui.connectionStatus.audio.in}}">
+				<i class="fa fa-microphone"></i>
+			</div>
+		</div>
+
 		<a title="{{resourceBundle._('titleSendfiles',ui.ownerName)}}" href="" ng-show="ui.status && ui.status!='DISCONNECTED' && !ui.access.moderated" ng-click="openFileDialog('owner');">
-		<i class="fa fa-cloud-upload"></i></a>	
+		<i class="fa fa-cloud-upload"></i></a>
 		<ul class="filelist">
 			<li data-ng-show="file.name!='' && !file.cleared" data-ng-repeat="file in ui.ownerFiles">
-				 
+
 				<div class="file_direction">
 					<i ng-show="file.direction=='upload'" class="fa fa-upload"></i>
 					<i ng-show="file.direction=='download'" class="fa fa-download"></i>
 				</div>
 				<div class="file_description {{file.canceled ? 'file_canceled' :''}}">
-					<span ng-hide="file.virtualURL"  class="file_name">{{file.name}}</span> 
+					<span ng-hide="file.virtualURL"  class="file_name">{{file.name}}</span>
 					<a target="_blank" ng-show="file.virtualURL" ng-href="{{file.virtualURL}}" download="{{file.name}}" class="file_name">{{file.name}}</a>
 					<span ng-show="file.completed < 100"  class="file_percent"> {{file.completed}}%</span>
 				</div>
@@ -143,10 +155,10 @@
 					<a title="{{resourceBundle._('titleCancelfile',file.name)}}" href="" ng-show="file.completed < 100 && !file.canceled" ng-click="cancelFile(ui.ownerConnectionId,file)"><i ng-show="file.completed < 100" class="fa fa-eject"  ></i>
 				 	<a title="{{resourceBundle._('titleClearfile',file.name)}}"  ng-show="file.completed >= 100 || file.canceled==true" href="" ng-click="file.cleared=true"><i class="fa fa-trash-o"></i></a>
 				</div>
-				
+
 			</li>
 		</ul>
-		
+
 		<input ng-show="false" type="file" id="userfiles_owner" name="ownerfiles[]" multiple />
 	</div>
 	<h2>{{resourceBundle.roomviewers}}</h2>
@@ -161,16 +173,27 @@
 			<a title="{{resourceBundle._('titleAskforsharevideo',ui.ownerName)}}" href="" ng-click="askForSharing(ui.ownerConnectionId,'video')"><i class="fa fa-video-camera"></i></a>
 			<a title="{{resourceBundle._('titleAskforshareaudio',ui.ownerName)}}" href="" ng-click="askForSharing(ui.ownerConnectionId,'audio')"><i class="fa fa-microphone"></i></a>
 		</p>
-	</div>	
-	
+	</div>
+
 	<ul ng-class="ui.getMiniClass('sharers connected')">
-		<li data-ng-show="user.status == 'CONNECTED' && user.connectionId != ui.currentConnectionId" data-ng-repeat="user in ui.users"> 
+		<li data-ng-show="user.status == 'CONNECTED' && user.connectionId != ui.currentConnectionId" data-ng-repeat="user in ui.users">
 			<img ng-src="{{user.avatar}}" title="{{user.name}}"/>
 			<h3>{{user.name}}</h3>
 			<p class="user_title">{{resourceBundle.roomviewer}}</p>
+			<div class="statusBar" >
+				<div title= "{{resourceBundle._('titleScreenStatus',user.name,resourceBundle['titlestate'+user.connectionStatus.screen.in])}}" class="statusBtn {{user.connectionStatus.screen.in}}">
+					<i class="fa fa-desktop"></i>
+				</div>
+				<div title= "{{resourceBundle._('titleVideoStatus',user.name,resourceBundle['titlestate'+user.connectionStatus.video.in])}}"  class="statusBtn {{user.connectionStatus.video.in}}">
+					<i class="fa fa-video-camera"></i>
+				</div>
+				<div title= "{{resourceBundle._('titleAudioStatus',user.name,resourceBundle['titlestate'+user.connectionStatus.audio.in])}}"  class="statusBtn {{user.connectionStatus.audio.in}}">
+					<i class="fa fa-microphone"></i>
+				</div>
+			</div>
 		</li>
 	</ul>
-	
+
 </aside>
 <section id="dashboard" ng-class="[ui.dashConn,ui.dashChat]">
 		<p id="minimizedPlace" ng-class="[ui.dashConn,ui.dashChat]" />
@@ -224,7 +247,7 @@
 	  <div class="bounce1"></div>
 	  <div class="bounce2"></div>
 	  <div class="bounce3"></div>
-	</div>	  			
+	</div>
 	  <ol id="chat_discussion" class="discussion" scroll-glue>
 	  	<li ng-class="msg.class" ng-repeat="msg in ui.messages">
 	  		<div class="avatar"><img ng-src="{{getUser(msg.id).avatar}}" /></div>
@@ -247,7 +270,7 @@
 				  <div class="bounce1"></div>
 				  <div class="bounce2"></div>
 				  <div class="bounce3"></div>
-				</div>	  			
+				</div>
 	  			<time datetime="{{msg.time}}">{{getUser(msg.id).name}} · {{timeAgo(msg.time)}}</time>
 	  		</div>
 	  	</li>

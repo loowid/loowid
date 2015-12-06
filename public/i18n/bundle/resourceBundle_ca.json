@@ -272,5 +272,13 @@
     "wintitlevideo": "La meva càmera",
     "youarefired": "Has estat expulsat de la sala",
     "youmustacceptterms": "Has d'acceptar els termes",
-    "yourbrowsernot": "Encara no donem suport al teu navegador. Segueix qualsevol novetat des @LooWIDCom"
+    "yourbrowsernot": "Encara no donem suport al teu navegador. Segueix qualsevol novetat des @LooWIDCom",
+    "titleScreenStatus": "La connexió de l'escriptori de {0} {1}",
+    "titleVideoStatus": "La connexió de la càmera web de {0} {1}",
+    "titleAudioStatus": "La connexió de l'audio de {0} {1}",
+    "titlestatestarting": "està començant",
+    "titlestatenegotiating": "s'està negociant",
+    "titlestatestreaming": "està emetent",
+    "titlestatefailed": "ha fallat",
+    "titlestateended": "ha acabat"
 }
