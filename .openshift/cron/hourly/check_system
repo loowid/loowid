@@ -8,12 +8,33 @@ float_test () {
 function slack() {
 	curl -X POST --data-urlencode 'payload={"channel": "#general", "username": "monit", "text": "'"$1"'", "icon_emoji": ":warning:"}' https://hooks.slack.com/services/${OPENSHIFT_MONIT_SLACK_WEBHOOK} >/dev/null 2>&1
 }
+# Mongo Query
+function mongoquery() {
+	mongo -u $OPENSHIFT_MONGODB_DB_USERNAME -p $OPENSHIFT_MONGODB_DB_PASSWORD --host $OPENSHIFT_MONGODB_DB_HOST --port $OPENSHIFT_MONGODB_DB_PORT $OPENSHIFT_APP_NAME --eval "$1" | tail -1
+}
+
+# Checking MONGODB Available
+function checkMongoUp() {
+	local mongoup=$(mongoquery "db.rooms.find().count();");
+	case $mongoup in
+    	''|*[!0-9]*) slack "Warning: Mongo is down in ${OPENSHIFT_APP_NAME}";
+			if float_test "${OPENSHIFT_MONIT_REPAIR} == 1"; then
+				slack "Restarting Mongo in ${OPENSHIFT_APP_NAME} automatically.";
+				ssh ${OPENSHIFT_MONGODB_DB_GEAR_UUID}@${OPENSHIFT_MONGODB_DB_HOST} '"ctl_all" restart 2>/dev/null 1>&2';
+			fi;;
+	esac
+}
 
 # Checking MONGODB Usage
 function checkMongoQuota() {
 	local usage=$(ssh ${OPENSHIFT_MONGODB_DB_GEAR_UUID}@${OPENSHIFT_MONGODB_DB_HOST} '"quota" -w 2>/dev/null' | grep '^.*/dev/' | awk '{printf "%3.1f", ($2 / $4 * 100)}');
 	if float_test "${usage:-0} > $1"; then
 		slack "Warning: Mongo in ${OPENSHIFT_APP_NAME} is using ${usage}% of disk quota";
+		if float_test "${OPENSHIFT_MONIT_REPAIR} == 1"; then
+			mongoquery "db.logs.remove({});db.sessions.remove({});db.repairDatabase();";
+			local newusage=$(ssh ${OPENSHIFT_MONGODB_DB_GEAR_UUID}@${OPENSHIFT_MONGODB_DB_HOST} '"quota" -w 2>/dev/null' | grep '^.*/dev/' | awk '{printf "%3.1f", ($2 / $4 * 100)}');
+			slack "Repaired: Mongo in ${OPENSHIFT_APP_NAME} now is using ${newusage}% of disk quota";
+		fi;
 	fi;
 	local usage=$(ssh ${OPENSHIFT_MONGODB_DB_GEAR_UUID}@${OPENSHIFT_MONGODB_DB_HOST} '"quota" -w 2>/dev/null' | grep '^.*/dev/' | awk '{printf "%3.1f",  ($5 / $7 * 100)}');
 	if float_test "${usage:-0} > $2"; then
@@ -42,9 +63,14 @@ function checkWebStatus() {
 	local upweb=$(wget -O - https://${OPENSHIFT_GEAR_DNS}/ 2>/dev/null | grep 'loowidVersion' | wc -l);
 	if float_test "${upweb} == 0"; then
 		slack "Warning: Service ${OPENSHIFT_APP_NAME} is down!" 1>&2;
+		if float_test "${OPENSHIFT_MONIT_REPAIR} == 1"; then
+			slack "Restarting ${OPENSHIFT_APP_NAME} automatically.";
+			ctl_all restart 
+		fi;
 	fi;
 }
 
+checkMongoUp
 checkMongoQuota "${OPENSHIFT_MONIT_MONGOQUOTA}" "${OPENSHIFT_MONIT_INODEQUOTA}"
 checkLocalQuota "${OPENSHIFT_MONIT_NODEJSQUOTA}" "${OPENSHIFT_MONIT_INODEQUOTA}" "${OPENSHIFT_MONIT_MEMORYQUOTA}" 
 checkWebStatus
