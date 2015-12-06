@@ -11,6 +11,11 @@ html
 		#letsencrypt(style='padding-left:10px;padding-top:10px')
 			h1
 				b Look what I'm doing - Let's Encrypt !!
+			h2 Type this command to generate your certificate
+			div(style='padding-left:10px;padding-top:10px')
+				b ./letsencrypt-auto --agree-dev-preview -d your-domain --server https://acme-v01.api.letsencrypt.org/directory -a manual auth -v --debug
+			div(style='padding-left:10px;padding-top:10px')
+				i Now full this form with the values required by let's encrypt
 			form(name='letsencryptform', action='acme-challenge-new', method='post', style='padding-left:10px;padding-top:10px')
 				input(type='hidden',name='_csrf',value='#{token}')
 				label 
@@ -22,5 +27,6 @@ html
 				input(type='text',name='filecontent',value='',size='100')
 				br
 				input(type='submit',value='Send')
+
 				
 	
