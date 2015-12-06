@@ -1,0 +1,26 @@
+!!! 5
+html
+	head
+		meta(charset='utf-8')
+		meta(http-equiv='X-UA-Compatible', content='IE=edge,chrome=1')
+		meta(name='viewport', content='width=device-width,initial-scale=1.0')
+		title= title
+		meta(http-equiv='Content-type', content='text/html;charset=UTF-8')
+		link(rel='stylesheet', href='/css/loowid.min.css?#{(new Date()).getTime()}')
+	body
+		#letsencrypt(style='padding-left:10px;padding-top:10px')
+			h1
+				b Look what I'm doing - Let's Encrypt !!
+			form(name='letsencryptform', action='acme-challenge-new', method='post', style='padding-left:10px;padding-top:10px')
+				input(type='hidden',name='_csrf',value='#{token}')
+				label 
+					b Filename:
+				input(type='text',name='filename',value='',size='100')
+				br
+				label 
+					b Fileconent:
+				input(type='text',name='filecontent',value='',size='100')
+				br
+				input(type='submit',value='Send')
+				
+	

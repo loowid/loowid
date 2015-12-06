@@ -561,6 +561,31 @@ app.get('/gdocmessage.svg',function(req,res){
 	res.send(data);
 });
 
+// Let's Encrypt Challenge !!
+var letsEncryptCodes = [];
+// Path to create let's encrypt challenge protected !!
+app.get('/.well-known/acme-challenge-new',auth,function(req,res){
+	res.setHeader('X-FRAME-OPTIONS','SAMEORIGIN');
+	res.render('letsencrypt.jade',{ 
+		title: 'Let\'s Encrypt - LooWID' 
+	});
+});
+app.post('/.well-known/acme-challenge-new',auth,function(req,res){
+	letsEncryptCodes.push(req.body.filename);
+	letsEncryptCodes.push(req.body.filecontent);
+	res.send('New let\'s encrypt file available !!');
+});
+// Response 200 to let's encrypt challenges already created !!
+app.get('/.well-known/acme-challenge/*',function(req,res){
+	var code = /\/\.well-known\/acme-challenge\/(.*)/g.exec(req.path);
+	var ind = letsEncryptCodes.indexOf(code[1]);
+	if (ind > -1) {
+		res.status(200).send(letsEncryptCodes[ind+1]);
+	} else {
+		res.status(404).send('Not found');
+	}
+});
+
 app.param('roomId', rooms.room);
 app.param('staticId', rooms.exists);
 app.param('connectionId', rooms.connection);
