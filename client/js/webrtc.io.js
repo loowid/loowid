@@ -515,7 +515,7 @@ function mergeConstraints(cons1, cons2) {
 			}else if (pc.iceConnectionState === 'failed' && pc.iceConnectionState === 'disconnected'){
 				connState = 'failed';
 			} else if (pc.iceConnectionState === 'closed') {
-				connState = ' ended';
+				connState = 'ended';
 			}
 
 			rtc.fire ('connection changed',
