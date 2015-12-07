@@ -921,7 +921,7 @@ header{
 	&.mini {
 		img {
 			width: 32px;
-			margin: 0 0.5em 0 0 !important;
+			margin: 0 .1em .3em 0 !important;
 		}
 		h3 {
 			font-size: 1em;
@@ -932,6 +932,7 @@ header{
 			h3 {
 				margin-top: 0.4em;
 				margin-left: -0.2em;
+				padding: .2em 0 0 .4em !important;
 			}
 		}
 		.user_title {
@@ -944,12 +945,23 @@ header{
 		li {
 			padding-top: 2px;
 		}
+		.statusBar {
+			margin: -5px 2px 0 0;
+		    .statusBtn{
+				float: left;
+				min-width: 10px;
+				max-height: 10px;
+				i {
+					font-size: .6em;
+				}
+			}
+		}
 	}
 	img{
 		float: left;
-		margin: 0 0.5em 0 0;
+		margin: 0 .1em .3em 0;
 		max-width: 48px;
-		.border-radius(48px);
+		.border-radius(5px);
 		&.editable{
 			cursor: pointer;
 		}
@@ -967,45 +979,48 @@ header{
   .statusBar{
     position: relative;
     display: inline-block;
-
+	float: left;
+	margin: 0 2px 0 0;
     .statusBtn{
-      float: left;
-      min-width: 15px;
-      text-align: center;
-      display: none;
-
-	&.starting{
-	  color: #cccccc;
-	  display: block;
-	  animation: pulse 1s ease-out;
-	  animation-iteration-count: infinite;
-	  -webkit-animation: pulse 1s ease-out;
-	  -webkit-animation-iteration-count: infinite;
-	}
-	&.negotiating{
-	  color: #ff9900;
-	  display: block;
-	  animation: pulse 1s ease-out;
-	  animation-iteration-count: infinite;
-	  -webkit-animation: pulse 1s ease-out;
-	  -webkit-animation-iteration-count: infinite;
-	  opacity: 0.0
-	}
-	&.streaming{
-	    color: #008041;
-	    display: block;
-	}
-	&.failed{
-	  color: #BF360C;
-	  display: block;
-	}
-	&.ended {
-	  color: #CCCCCC;
-	  display: block;
-	}
-	i{
-	  font-size: 0.8em;
-	}
+		float: left;
+		min-width: 15px;
+		max-height: 15px;
+		text-align: center;
+		clear: both;
+		display: block;
+		visibility: hidden;
+		&.starting{
+		  color: #cccccc;
+		  visibility: visible;
+		  animation: pulse 1s ease-out;
+		  animation-iteration-count: infinite;
+		  -webkit-animation: pulse 1s ease-out;
+		  -webkit-animation-iteration-count: infinite;
+		}
+		&.negotiating{
+		  color: #ff9900;
+		  visibility: visible;
+		  animation: pulse 1s ease-out;
+		  animation-iteration-count: infinite;
+		  -webkit-animation: pulse 1s ease-out;
+		  -webkit-animation-iteration-count: infinite;
+		  opacity: 0.0
+		}
+		&.streaming{
+		    color: #008041;
+		    visibility: visible;
+		}
+		&.failed{
+		  color: #BF360C;
+		  visibility: visible;
+		}
+		&.ended {
+		  color: #CCCCCC;
+		  visibility: visible;
+		}
+		i{
+		  font-size: 0.8em;
+		}
     }
   }
 
@@ -1035,12 +1050,13 @@ header{
 		h3{
 			font-weight: bold;
 			color: @linkcolor;
+			padding: .9em 0 0 .4em;
 		}
 		img {
 			border: 2px solid @linkcolor;
 			position: relative;
 			right: 2px;
-			.border-radius(5px);
+			.border-radius(48px);
 		}
 	}
 	ul.filelist{
@@ -1083,9 +1099,6 @@ header{
 	}
 	.sharers, .watchers{
 		width: 100%;
-		img{
-			margin: 0.4em 0.5em 0 0;
-		}
 		h3{
 			padding: 5px 0 0 0;
 		}

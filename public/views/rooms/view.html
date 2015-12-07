@@ -120,23 +120,22 @@
 	<div class="owner connected">
 		<p class="user_title room_owner">{{resourceBundle.roomowner}}</p>
 		<img ng-src="{{ui.ownerAvatar}}" title="{{ui.ownerName}}"/>
+		<div class="statusBar" >
+			<div title= "{{resourceBundle._('titleAudioStatus',ui.name,resourceBundle['titlestate'+ui.connectionStatus.audio.in])}}"  class="statusBtn {{ui.connectionStatus.audio.in}}">
+				<i class="fa fa-microphone"></i>
+			</div>
+			<div title= "{{resourceBundle._('titleVideoStatus',ui.name,resourceBundle['titlestate'+ui.connectionStatus.video.in])}}"  class="statusBtn {{ui.connectionStatus.video.in}}">
+				<i class="fa fa-video-camera"></i>
+			</div>
+			<div title= "{{resourceBundle._('titleScreenStatus',ui.name,resourceBundle['titlestate'+ui.connectionStatus.screen.in])}}" class="statusBtn {{ui.connectionStatus.screen.in}}">
+				<i class="fa fa-desktop"></i>
+			</div>
+		</div>
 		<h3>{{ui.ownerName}}</h3>
 		<p class="user_title" data-ng-show="ui.status=='OPENED'">{{resourceBundle.statusopen}}</p>
 		<p class="user_title" data-ng-show="ui.status=='BROADCASTING'">{{resourceBundle.statusbroadcasting}}</p>
 		<p class="user_title" data-ng-show="ui.status=='STOPPED'">{{resourceBundle.statusstopped}}</p>
 		<p class="user_title" data-ng-show="ui.status=='DISCONNECTED'">{{resourceBundle.statusdisconnected}}</p>
-		<div class="statusBar" >
-			<div title= "{{resourceBundle._('titleScreenStatus',ui.name,resourceBundle['titlestate'+ui.connectionStatus.screen.in])}}" class="statusBtn {{ui.connectionStatus.screen.in}}">
-				<i class="fa fa-desktop"></i>
-			</div>
-			<div title= "{{resourceBundle._('titleVideoStatus',ui.name,resourceBundle['titlestate'+ui.connectionStatus.video.in])}}"  class="statusBtn {{ui.connectionStatus.video.in}}">
-				<i class="fa fa-video-camera"></i>
-			</div>
-			<div title= "{{resourceBundle._('titleAudioStatus',ui.name,resourceBundle['titlestate'+ui.connectionStatus.audio.in])}}"  class="statusBtn {{ui.connectionStatus.audio.in}}">
-				<i class="fa fa-microphone"></i>
-			</div>
-		</div>
-
 		<a title="{{resourceBundle._('titleSendfiles',ui.ownerName)}}" href="" ng-show="ui.status && ui.status!='DISCONNECTED' && !ui.access.moderated" ng-click="openFileDialog('owner');">
 		<i class="fa fa-cloud-upload"></i></a>
 		<ul class="filelist">
@@ -165,9 +164,8 @@
 	<div ng-class="ui.getMiniClass('owner connected myself')">
 		<img class="editable" ng-src="{{ui.avatar}}" ng-click="enableEditName()" title="{{resourceBundle.changemyidentity}}">
 		<div>
-			<h3>{{ui.name}}</h3>
+			<h3 title="{{ui.name}}">{{ui.name}}</h3>
 		</div>
-		<p class="user_title">{{resourceBundle.roomme}}</p>
 		<p class="toolbar" ng-show="ui.access.moderated && ui.status && ui.status!='DISCONNECTED'">
 			<a title="{{resourceBundle._('titleAskforsharescreen',ui.ownerName)}}" href="" ng-click="askForSharing(ui.ownerConnectionId,'screen')"><i class="fa fa-desktop"></i></a>
 			<a title="{{resourceBundle._('titleAskforsharevideo',ui.ownerName)}}" href="" ng-click="askForSharing(ui.ownerConnectionId,'video')"><i class="fa fa-video-camera"></i></a>
@@ -178,19 +176,18 @@
 	<ul ng-class="ui.getMiniClass('sharers connected')">
 		<li data-ng-show="user.status == 'CONNECTED' && user.connectionId != ui.currentConnectionId" data-ng-repeat="user in ui.users">
 			<img ng-src="{{user.avatar}}" title="{{user.name}}"/>
-			<h3>{{user.name}}</h3>
-			<p class="user_title">{{resourceBundle.roomviewer}}</p>
 			<div class="statusBar" >
-				<div title= "{{resourceBundle._('titleScreenStatus',user.name,resourceBundle['titlestate'+user.connectionStatus.screen.in])}}" class="statusBtn {{user.connectionStatus.screen.in}}">
-					<i class="fa fa-desktop"></i>
+				<div title= "{{resourceBundle._('titleAudioStatus',user.name,resourceBundle['titlestate'+user.connectionStatus.audio.in])}}"  class="statusBtn {{user.connectionStatus.audio.in}}">
+					<i class="fa fa-microphone"></i>
 				</div>
 				<div title= "{{resourceBundle._('titleVideoStatus',user.name,resourceBundle['titlestate'+user.connectionStatus.video.in])}}"  class="statusBtn {{user.connectionStatus.video.in}}">
 					<i class="fa fa-video-camera"></i>
 				</div>
-				<div title= "{{resourceBundle._('titleAudioStatus',user.name,resourceBundle['titlestate'+user.connectionStatus.audio.in])}}"  class="statusBtn {{user.connectionStatus.audio.in}}">
-					<i class="fa fa-microphone"></i>
+				<div title= "{{resourceBundle._('titleScreenStatus',user.name,resourceBundle['titlestate'+user.connectionStatus.screen.in])}}" class="statusBtn {{user.connectionStatus.screen.in}}">
+					<i class="fa fa-desktop"></i>
 				</div>
 			</div>
+			<h3 title="{{user.name}}">{{user.name}}</h3>
 		</li>
 	</ul>
 
