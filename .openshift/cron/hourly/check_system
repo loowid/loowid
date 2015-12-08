@@ -33,7 +33,7 @@ function checkMongoUp() {
     	''|*[!0-9]*) slack "Warning: Mongo is down in ${OPENSHIFT_APP_NAME}";
 			if float_test "${OPENSHIFT_MONIT_REPAIR} > 0"; then
 				slack "Restarting Mongo in ${OPENSHIFT_APP_NAME} automatically.";
-				ssh ${OPENSHIFT_MONGODB_DB_GEAR_UUID}@${OPENSHIFT_MONGODB_DB_HOST} '"ctl_all" restart 2>/dev/null 1>&2';
+				ssh ${OPENSHIFT_MONGODB_DB_GEAR_UUID}@${OPENSHIFT_MONGODB_DB_HOST} '"gear" restart 2>/dev/null 1>&2';
 			fi;;
 	esac
 }
@@ -80,7 +80,7 @@ function checkWebStatus() {
 		slack "Warning: Service ${OPENSHIFT_APP_NAME} is down!" 1>&2;
 		if float_test "${OPENSHIFT_MONIT_REPAIR} > 0"; then
 			slack "Restarting ${OPENSHIFT_APP_NAME} automatically.";
-			ctl_all restart 
+			gear restart 
 		fi;
 	fi;
 }
