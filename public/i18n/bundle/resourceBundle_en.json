@@ -274,12 +274,15 @@
    "showchattips": "Chat tips",
    "showDisconnected": "Show disconnected",
    "hideDisconnected": "Hide disconnected",
-   "titleScreenStatus": "{0}'s screen connection is {1}'",
-   "titleVideoStatus": "{0}'s webcam connection is {1}'",
-   "titleAudioStatus": "{0}'s audio connection is {1}'",
+   "titleScreenStatus": "{0}'s screen connection is {1}",
+   "titleVideoStatus": "{0}'s webcam connection is {1}",
+   "titleAudioStatus": "{0}'s audio connection is {1}",
    "titlestatestarting": "starting",
    "titlestatenegotiating": "negotiating",
    "titlestatestreaming": "streaming",
    "titlestatefailed": "failed",
-   "titlestateended": "ended"
+   "titlestateended": "ended",
+   "titleScreenStatusOut": "Your screen connection to {0} is {1}",
+   "titleVideoStatusOut": "Your webcam connection to {0} is {1}",
+   "titleAudioStatusOut": "Your audio connection to {0} is {1}"
 }

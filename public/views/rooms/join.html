@@ -165,6 +165,17 @@
 				<ul ng-class="ui.getMiniClass('sharers connected')">
 					<li data-ng-show="user.status == 'CONNECTED'" data-ng-repeat="user in ui.users">
 						<img ng-src="{{user.avatar}}" title="{{user.name}}" />
+						<div class="statusOutBar {{user.connectionStatus.audio.out}} {{user.connectionStatus.video.out}} {{user.connectionStatus.screen.out}}">
+							<div title="{{resourceBundle._('titleAudioStatusOut',user.name,resourceBundle['titlestate'+user.connectionStatus.audio.out])}}" class="statusOutBtn {{user.connectionStatus.audio.out}}">
+								<i class="fa fa-microphone"></i>
+							</div>
+							<div title= "{{resourceBundle._('titleVideoStatusOut',user.name,resourceBundle['titlestate'+user.connectionStatus.video.out])}}"  class="statusOutBtn {{user.connectionStatus.video.out}}">
+								<i class="fa fa-video-camera"></i>
+							</div>
+							<div title= "{{resourceBundle._('titleScreenStatusOut',user.name,resourceBundle['titlestate'+user.connectionStatus.screen.out])}}" class="statusOutBtn {{user.connectionStatus.screen.out}}">
+								<i class="fa fa-desktop"></i>
+							</div>
+						</div>
 						<div class="statusBar" >
 							<div title= "{{resourceBundle._('titleAudioStatus',user.name,resourceBundle['titlestate'+user.connectionStatus.audio.in])}}"  class="statusBtn {{user.connectionStatus.audio.in}}">
 								<i class="fa fa-microphone"></i>

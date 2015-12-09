@@ -120,6 +120,17 @@
 	<div class="owner connected">
 		<p class="user_title room_owner">{{resourceBundle.roomowner}}</p>
 		<img ng-src="{{ui.ownerAvatar}}" title="{{ui.ownerName}}"/>
+		<div class="statusOutBar {{ui.connectionStatus.audio.out}} {{ui.connectionStatus.video.out}} {{ui.connectionStatus.screen.out}}" >
+			<div title= "{{resourceBundle._('titleAudioStatusOut',ui.name,resourceBundle['titlestate'+ui.connectionStatus.audio.out])}}"  class="statusOutBtn {{ui.connectionStatus.audio.out}}">
+				<i class="fa fa-microphone"></i>
+			</div>
+			<div title= "{{resourceBundle._('titleVideoStatusOut',ui.name,resourceBundle['titlestate'+ui.connectionStatus.video.out])}}"  class="statusOutBtn {{ui.connectionStatus.video.out}}">
+				<i class="fa fa-video-camera"></i>
+			</div>
+			<div title= "{{resourceBundle._('titleScreenStatusOut',ui.name,resourceBundle['titlestate'+ui.connectionStatus.screen.out])}}" class="statusOutBtn {{ui.connectionStatus.screen.out}}">
+				<i class="fa fa-desktop"></i>
+			</div>
+		</div>
 		<div class="statusBar" >
 			<div title= "{{resourceBundle._('titleAudioStatus',ui.name,resourceBundle['titlestate'+ui.connectionStatus.audio.in])}}"  class="statusBtn {{ui.connectionStatus.audio.in}}">
 				<i class="fa fa-microphone"></i>
@@ -176,6 +187,17 @@
 	<ul ng-class="ui.getMiniClass('sharers connected')">
 		<li data-ng-show="user.status == 'CONNECTED' && user.connectionId != ui.currentConnectionId" data-ng-repeat="user in ui.users">
 			<img ng-src="{{user.avatar}}" title="{{user.name}}"/>
+			<div class="statusOutBar {{user.connectionStatus.audio.out}} {{user.connectionStatus.video.out}} {{user.connectionStatus.screen.out}}" >
+				<div title= "{{resourceBundle._('titleAudioStatusOut',user.name,resourceBundle['titlestate'+user.connectionStatus.audio.out])}}"  class="statusOutBtn {{user.connectionStatus.audio.out}}">
+					<i class="fa fa-microphone"></i>
+				</div>
+				<div title= "{{resourceBundle._('titleVideoStatusOut',user.name,resourceBundle['titlestate'+user.connectionStatus.video.out])}}"  class="statusOutBtn {{user.connectionStatus.video.out}}">
+					<i class="fa fa-video-camera"></i>
+				</div>
+				<div title= "{{resourceBundle._('titleScreenStatusOut',user.name,resourceBundle['titlestate'+user.connectionStatus.screen.out])}}" class="statusOutBtn {{user.connectionStatus.screen.out}}">
+					<i class="fa fa-desktop"></i>
+				</div>
+			</div>
 			<div class="statusBar" >
 				<div title= "{{resourceBundle._('titleAudioStatus',user.name,resourceBundle['titlestate'+user.connectionStatus.audio.in])}}"  class="statusBtn {{user.connectionStatus.audio.in}}">
 					<i class="fa fa-microphone"></i>

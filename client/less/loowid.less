@@ -932,7 +932,7 @@ header{
 			h3 {
 				margin-top: 0.4em;
 				margin-left: -0.2em;
-				padding: .2em 0 0 .4em !important;
+				padding: 0 0 0 .4em !important;
 			}
 		}
 		.user_title {
@@ -956,6 +956,15 @@ header{
 				}
 			}
 		}
+		.statusOutBar {
+			font-size: 0.6em;
+			margin-top: 20px;
+			width: 33px;
+			.border-radius(6px);
+		    .statusOutBtn{
+		    	margin-left: 1px;
+			}
+		}
 	}
 	img{
 		float: left;
@@ -976,53 +985,101 @@ header{
 		width: 110px;
 		white-space: nowrap;
 	}
-  .statusBar{
-    position: relative;
-    display: inline-block;
-	float: left;
-	margin: 0 2px 0 0;
-    .statusBtn{
+  	.statusBar{
+	    position: relative;
+	    display: inline-block;
 		float: left;
-		min-width: 15px;
-		max-height: 15px;
-		text-align: center;
-		clear: both;
-		display: block;
-		visibility: hidden;
-		&.starting{
-		  color: #cccccc;
-		  visibility: visible;
-		  animation: pulse 1s ease-out;
-		  animation-iteration-count: infinite;
-		  -webkit-animation: pulse 1s ease-out;
-		  -webkit-animation-iteration-count: infinite;
-		}
-		&.negotiating{
-		  color: #ff9900;
-		  visibility: visible;
-		  animation: pulse 1s ease-out;
-		  animation-iteration-count: infinite;
-		  -webkit-animation: pulse 1s ease-out;
-		  -webkit-animation-iteration-count: infinite;
-		  opacity: 0.0
-		}
-		&.streaming{
-		    color: #008041;
-		    visibility: visible;
-		}
-		&.failed{
-		  color: #BF360C;
-		  visibility: visible;
-		}
-		&.ended {
-		  color: #CCCCCC;
-		  visibility: visible;
-		}
-		i{
-		  font-size: 0.8em;
-		}
-    }
-  }
+		margin: 0 2px 0 0;
+	    .statusBtn{
+			float: left;
+			min-width: 15px;
+			max-height: 15px;
+			text-align: center;
+			clear: both;
+			display: block;
+			visibility: hidden;
+			&.starting{
+			  color: #cccccc;
+			  visibility: visible;
+			  animation: pulse 1s ease-out;
+			  animation-iteration-count: infinite;
+			  -webkit-animation: pulse 1s ease-out;
+			  -webkit-animation-iteration-count: infinite;
+			}
+			&.negotiating{
+			  color: #ff9900;
+			  visibility: visible;
+			  animation: pulse 1s ease-out;
+			  animation-iteration-count: infinite;
+			  -webkit-animation: pulse 1s ease-out;
+			  -webkit-animation-iteration-count: infinite;
+			  opacity: 0.0
+			}
+			&.streaming{
+			    color: #008041;
+			    visibility: visible;
+			}
+			&.failed{
+			  color: #BF360C;
+			  visibility: visible;
+			}
+			&.ended {
+			  color: #CCCCCC;
+			  visibility: visible;
+			}
+			i{
+			  font-size: 0.8em;
+			}
+	    }
+  	}
+  	.statusOutBar {
+  	    visibility: hidden;
+	    float: left;
+	    position: absolute;
+	    width: 48px;
+	    background-color: white;
+	    .border-radius(12px);
+	    margin-top: 35px;
+	    height: 15px;
+	    font-size: 0.75em;
+	    &.starting,&.negotiating,&.streaming,&failed,&.ended {
+	    	visibility: visible;
+	    }
+	    .statusOutBtn {
+		    display: inline-block;
+		    margin-left: 0.3em;
+		    visibility: hidden;
+			&.starting{
+			  color: #cccccc;
+			  visibility: visible;
+			  animation: pulse 1s ease-out;
+			  animation-iteration-count: infinite;
+			  -webkit-animation: pulse 1s ease-out;
+			  -webkit-animation-iteration-count: infinite;
+			}
+			&.negotiating{
+			  color: #ff9900;
+			  visibility: visible;
+			  animation: pulse 1s ease-out;
+			  animation-iteration-count: infinite;
+			  -webkit-animation: pulse 1s ease-out;
+			  -webkit-animation-iteration-count: infinite;
+			  opacity: 0.0
+			}
+			&.streaming{
+		      color: #008041;
+			  visibility: visible;
+			}
+			&.failed{
+			  color: #BF360C;
+			  visibility: visible;
+			}
+			&.ended {
+			  color: #CCCCCC;
+			  visibility: visible;
+			}
+	    }
+	}  	
 
 	.user_title{
 		color: @maincolor;
@@ -1050,7 +1107,7 @@ header{
 		h3{
 			font-weight: bold;
 			color: @linkcolor;
-			padding: .9em 0 0 .4em;
+			padding: .2em 0 0 .4em;
 		}
 		img {
 			border: 2px solid @linkcolor;

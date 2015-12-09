@@ -280,5 +280,8 @@
     "titlestatenegotiating": "s'està negociant",
     "titlestatestreaming": "està emetent",
     "titlestatefailed": "ha fallat",
-    "titlestateended": "ha acabat"
+    "titlestateended": "ha acabat",
+    "titleScreenStatusOut": "La teva connexió de l'escriptori cap a {0} {1}",
+    "titleVideoStatusOut": "La teva connexió de la càmera web cap a {0} {1}",
+    "titleAudioStatusOut": "La teva connexió de l'audio cap a {0} {1}"
 }

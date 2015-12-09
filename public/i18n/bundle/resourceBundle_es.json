@@ -281,5 +281,9 @@
     "titlestatenegotiating": "está en negociación",
     "titlestatestreaming": "está emitiendo",
     "titlestatefailed": "ha fallado",
-    "titlestateended": "ha terminado"
+    "titlestateended": "ha terminado",
+    "titleScreenStatusOut": "Tu conexión del escritorio hacia {0} {1}",
+    "titleVideoStatusOut": "Tu conexión de la cámara web hacia {0} {1}",
+    "titleAudioStatusOut": "Tu conexión del audio hacia {0} {1}"
+    
 }
