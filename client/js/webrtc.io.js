@@ -288,6 +288,8 @@ function mergeConstraints(cons1, cons2) {
 					peerConnections [data.socketId]= {};
 				}
 
+				//In case that many errors receivce just accept relay candidates
+
 				//We store temporaly candidates
 				if (!peerConnections[data.socketId][data.mediatype]){
 					if (rtc.debug) { console.log ('Peer not ready, so storing ICE candidate for a while'); }
@@ -423,6 +425,18 @@ function mergeConstraints(cons1, cons2) {
 
 		pc.onicecandidate = function(event) {
 			if (event.candidate && event.candidate.candidate) {
+
+				//Filter and
+				if (peerConnections[id].resetCount && peerConnections[id].resetCount > 2) {
+						if (rtc.debug) { console.log ('Filtering the ice candidates'); }
+						if(event.candidate.candidate.match(/candidate.*typ host/g)) {
+							return;
+						}
+						if (event.candidate.candidate.match(/candidate.*typ srflx/g)){
+							return;
+						}
+				}
+
 				if (rtc.debug) { console.log ('Sending an ICE candidate'); }
 				rtc._socket.send(JSON.stringify({
 					'eventName': 'send_ice_candidate',
@@ -523,7 +537,15 @@ function mergeConstraints(cons1, cons2) {
 		};
 
 		pc.restartConnection = function() {
+
 				if (rtc.debug) { console.log ('The connection still ' + pc.iceConnectionState ); }
+
+				if (!rtc.producedPeerConnections[id].resetCount) {
+					rtc.producedPeerConnections[id].resetCount = 1;
+				}else {
+					rtc.producedPeerConnections[id].resetCount+=1;
+				}
+
 				for (var i = 0; i < rtc.streams.length; i+=1) {
 					var streamObj = rtc.streams[i];
 					if (streamObj.mediatype === mediatype){
@@ -636,7 +658,11 @@ function mergeConstraints(cons1, cons2) {
 						var storedIceCandidate = rtc.receivedPeerConnections[socketId]['temp_'+mediatype][i];
 						pc.addIceCandidate(storedIceCandidate,sfn,ffn);
 					}
+
+					delete rtc.receivedPeerConnections [socketId]['temp_'+mediatype];
 				}
+
+
 				pc.createAnswer(function(sessionDescription) {
 					pc.setLocalDescription(sessionDescription, function (){
 						rtc._socket.send(JSON.stringify({
@@ -883,9 +909,12 @@ function mergeConstraints(cons1, cons2) {
 				peerConnections[connectionId][mediatype].close();
 				delete peerConnections[connectionId][mediatype];
 			}
+
+			/* We will conserve the peerConnection status to handle previous erros.
 			if (!(peerConnections[connectionId].audio || peerConnections[connectionId].video || peerConnections[connectionId].screen)){
 				delete peerConnections[connectionId];
 			}
+			*/
 		}
 	};
 
