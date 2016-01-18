@@ -93,25 +93,33 @@ var httpServer = null;
 
 try {
 	
-	var prvf = process.env.PRIVATE_KEY || 'private.pem';
-	var pubf = process.env.PUBLIC_KEY || 'public.pem';	
-
-	if (!isRunningTests()) {
+	var credentials = {};
+	var certificateAvailable = true;
+	
+	try {
+		var fs = require('fs');
+		// Generado con http://www.cert-depot.com/
+		var privateKey = fs.readFileSync(process.env.PRIVATE_KEY || 'private.pem','utf-8');
+		var certificate = fs.readFileSync(process.env.PUBLIC_KEY || 'public.pem','utf-8');
+		var credentials = {
+			key : privateKey,
+			cert : certificate
+		};
+	} catch (ex) {
+		logger.warn(ex.message);
+		certificateAvailable = false;
+	}
+	
+	if (!isRunningTests() && certificateAvailable) {
 	
 		proxy = httpProxy.createProxyServer({
 			target: 'http://localhost',
-			ssl: {
-			 key: fs.readFileSync(prvf, 'utf8'),
-			 cert: fs.readFileSync(pubf, 'utf8')
-			},
+			ssl: credentials,
 			ws:true,
 			secure:true
 		});
 		
-		httpServer = https.createServer({
-			key: fs.readFileSync(prvf, 'utf8'),
-			cert: fs.readFileSync(pubf, 'utf8')
-		}, function(req, res){
+		httpServer = https.createServer(credentials, function(req, res){
 			var tg = findStickyServer(req);
 			proxy.web(req, res, {target:tg}, function(){
 				removeBackend(tg);
