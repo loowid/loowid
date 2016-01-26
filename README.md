@@ -31,9 +31,11 @@ Wiki Documentation | Vote us !! | Bitnami Contest
 
 ## Docker
 
-  Too many steps to install? Don't worry LooWID is also dockerized !!
+  Too many steps to install? Don't worry LooWID is also dockerized !! If you have docker and docker-compose installed you can just type:
   
-  https://github.com/loowid/loowid-docker
+    docker-compose up
+
+  This will bring up a copy of MongoDB and LooWID in 2 containers and you can access LooWID on https://{docker-ip/}
   
 ## Development
 

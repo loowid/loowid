@@ -1,0 +1,13 @@
+loowid:
+  build: .
+  environment:
+    - MONGOHQ_URL=mongodb://mongodb/loowid
+  links:
+    - mongodb
+  ports:
+    - "443:443"
+  
+mongodb:
+  image: mongo:2.6.11
+  command: mongod --smallfiles
+  
