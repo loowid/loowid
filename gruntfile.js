@@ -33,7 +33,7 @@ module.exports = function(grunt) {
 	var checkMongoOff = function() {
 	    var mongodb = getGruntOption('mongodb','on');
 	    // Do not run mongo in openshift environment
-	    if (process.env.OPENSHIFT_NODEJS_PORT || mongodb==='off') {
+	    if (process.env.OPENSHIFT_NODEJS_PORT || process.env.MONGOHQ_URL || mongodb==='off') {
 	    	grunt.config.data.concurrent.prod.tasks.splice(0,1);
 	    	grunt.config.data.concurrent.default.tasks.splice(0,1);
 	    	grunt.config.data.concurrent.cluster.tasks.splice(0,1);
