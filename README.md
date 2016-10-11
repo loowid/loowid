@@ -39,7 +39,7 @@ Wiki Documentation | Vote us !! | Bitnami Contest
   
 ## Development
 
-  Follow the same steps but chage steps 5 and following:
+  Follow the same steps but change steps 5 and following:
   
   5. `npm install -g grunt-cli`
  
