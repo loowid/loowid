@@ -2,7 +2,7 @@
 //Stats service used for stats REST endpoint
 angular.module('mean.stats').factory('Stats', ['$resource', function($resource) {
 	
-	var stats = $resource('/stats/:roomId/:cmd', 
+	var stats = $resource('/stats/:roomId/:cmd/:pageId', 
     	{roomId:'@id'},
     	{
     		rooms: {method: 'GET', params:{cmd: 'rooms'}, isArray: true},
@@ -12,8 +12,8 @@ angular.module('mean.stats').factory('Stats', ['$resource', function($resource) 
 	
 	var statsFactory = {};
 	
-	statsFactory.rooms = function(cb) {
-		stats.rooms({},cb);
+	statsFactory.rooms = function(pageId,cb) {
+		stats.rooms({pageId:pageId},cb);
 	};
 
 	statsFactory.roomsbytype = function(cb) {

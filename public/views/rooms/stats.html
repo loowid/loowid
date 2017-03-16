@@ -1,6 +1,11 @@
 <div id="home" data-ng-controller="StatsController" data-ng-init="init()">
 	<section id="starred">
-		<h1>{{resourceBundle.statistics}}</h1>
+		<h1 class="maintitle">{{resourceBundle.statistics}}</h1>
+		<div class="arrow">
+			<p title="{{resourceBundle.tutorialprevious}}"  ng-show="hasPreviousPage()" ng-click="previousPage()"><i class="fa fa-arrow-left"></i></p>
+			<p ng-show="hasPreviousPage() || hasNextPage()">{{getCurrentPage()}}</p>
+			<p title="{{resourceBundle.tutorialnext}}"  ng-show="hasNextPage()" ng-click="nextPage()"><i class="fa fa-arrow-right"></i></p>
+		</div>
 		<div class="inner">
 			<hr/><br/>
 			<canvas id="line0" class="chart chart-line" data="datal0" labels="labelsl0" legend="true" series="seriesl0"></canvas>

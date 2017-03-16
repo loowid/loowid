@@ -301,7 +301,7 @@ app.configure(function() {
 	});
 	// Statistics service
 	app.get('/stats/:roomId/webrtcstats',auth,stats.webrtcstats);
-	app.get('/stats/rooms',auth,stats.byday);
+	app.get('/stats/rooms/:pageId',auth,stats.byday);
 	app.get('/stats/roomsbytype',auth,stats.bytype);
 	// LTI Routes
 	app.post(LTI_PATH,passport.authenticate('lti',{
@@ -586,6 +586,10 @@ app.get('/.well-known/acme-challenge/*',function(req,res){
 	}
 });
 
+app.param('pageId', function(req, res, next, id) { 
+	req.pageId = id;
+	next(); 
+});
 app.param('roomId', rooms.room);
 app.param('staticId', rooms.exists);
 app.param('connectionId', rooms.connection);

@@ -71,7 +71,7 @@ exports.byday = function(req,res,next) {
 		} else {
 			next(err);
 		}
-	});
+	},req.pageId);
 };
 
 exports.bytype = function(req,res,next) {

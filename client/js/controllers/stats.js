@@ -4,10 +4,13 @@ angular.module('mean.stats').controller('StatsController',['$scope','Stats','Glo
 	$scope.global = Global;
 
 	var initFn = {};
+	var currentPage = 1;
+	var pageSize = 60;
+	var lastPageSize = 0;
 	var refresher; //The timeout refresher
 
 	$scope.global.setupI18N($scope,ngI18nResourceBundle,ngI18nConfig,function(){
-		Stats.rooms(initFn.processByDay);
+		Stats.rooms(currentPage,initFn.processByDay);
 		Stats.roomsbytype(initFn.processByType);
 	});
 
@@ -18,6 +21,26 @@ angular.module('mean.stats').controller('StatsController',['$scope','Stats','Glo
 	var sources = ['video','screen','audio'];
 
 	$scope.selectedSource = 'video';
+
+	$scope.getCurrentPage = function () { return currentPage; };
+
+	$scope.hasNextPage = function () {
+		return lastPageSize === pageSize;
+	};
+
+	$scope.hasPreviousPage = function() {
+		return currentPage > 1;
+	};
+
+	$scope.nextPage = function() {
+		currentPage += 1;
+		Stats.rooms(currentPage,initFn.processByDay);
+	};
+
+	$scope.previousPage = function() {
+		currentPage -= 1;
+		Stats.rooms(currentPage,initFn.processByDay);
+	};
 
 	$scope.init = function(){
 
@@ -31,6 +54,8 @@ angular.module('mean.stats').controller('StatsController',['$scope','Stats','Glo
 			var members = [];
 			var maxmembers = [];
 			var messages = [];
+			lastPageSize = list.length;
+			if (lastPageSize===0) { currentPage -=1; }
 			for (var k=0; k<list.length; k+=1) {
 				labels.push($scope.resourceBundle.dateformat.replace('dd',list[k]._id.day).replace('mm',list[k]._id.month).replace('yyyy',list[k]._id.year));
 				rooms.push(list[k].count);
