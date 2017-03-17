@@ -64,7 +64,7 @@
     "footerText": "LooWID 2015",
     "gdocmessage": "El documento no existe o debes autenticarte para verlo.",
     "googledoc": "Documento Google",
-    "etherpad" : "Documento Etherpad",
+    "etherpad": "Documento Etherpad",
     "gototheroom": "Volver a la sala",
     "gravatarclose": "Cerrar",
     "gravataremail": "Correo electrónico de gravatar",
@@ -285,5 +285,4 @@
     "titleScreenStatusOut": "Tu conexión del escritorio hacia {0} {1}",
     "titleVideoStatusOut": "Tu conexión de la cámara web hacia {0} {1}",
     "titleAudioStatusOut": "Tu conexión del audio hacia {0} {1}"
-    
 }
