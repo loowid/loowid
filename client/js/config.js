@@ -20,13 +20,13 @@ window.app.config(['$routeProvider',
     	}).when ('/about-desktop-sharing',{
             templateUrl: 'views/rooms/about-desktop-sharing.html'
         }).when ('/tos_en',{
-            templateUrl: 'views/rooms/tos_en.html' 
+            templateUrl: 'views/rooms/tos_en.html'
         }).when ('/tos_es',{
-            templateUrl: 'views/rooms/tos_es.html' 
+            templateUrl: 'views/rooms/tos_es.html'
         }).when ('/tos_ca',{
-            templateUrl: 'views/rooms/tos_ca.html' 
+            templateUrl: 'views/rooms/tos_ca.html'
         }).when ('/desktop_cap',{
-            templateUrl: 'views/desktop_cap.html' 
+            templateUrl: 'views/desktop_cap.html'
 		}).when('/', {
                 templateUrl: 'views/rooms/create.html'
         }).otherwise({
@@ -47,7 +47,7 @@ window.app.value('ngI18nConfig', {
     //defaultLocale should be in lowercase and is required!!
     defaultLocale:'en',
     //supportedLocales is required - all locales should be in lowercase!!
-    supportedLocales:['en', 'es', 'ca', 'de', 'ru','hu'],
+    supportedLocales:['en', 'es', 'ca', 'de', 'ru', 'hu', 'nl'],
     //without leading and trailing slashes, default is i18n
     basePath:'i18n/bundle',
     //default is false

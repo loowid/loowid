@@ -3,7 +3,7 @@
  * Module dependencies.
  * node server -> Run standalone port 80 and 443 (or cloud port)
  * node server [nport] -> Run below proxy port [nport]
- * 
+ *
  */
 /*global escape: true */
 /*global unescape: true */
@@ -35,7 +35,7 @@ i18n.init({
 	saveMissing : true,
 	debug : false,
 	fallbackLng : 'en',
-	supportedLngs : [ 'en', 'es', 'ca', 'de','ru','hu' ],
+	supportedLngs : [ 'en', 'es', 'ca', 'de', 'ru', 'hu', 'nl' ],
 	resGetPath : 'public/i18n/bundle/__ns_____lng__.json',
 	ns : 'resourceBundle'
 });
@@ -97,7 +97,7 @@ webRTC.rtc.fire = function(eventName,_) {
 	fireOrig.apply(null,args);
 	if (args.length===3 && isClustered && eventName!=='ping' && eventName!=='update_server_config') {
 		logger.debug('Distributing['+args[2].id+']: '+eventName);
-		wsevents.addEvent(serverId,eventName,args[1],args[2]);  
+		wsevents.addEvent(serverId,eventName,args[1],args[2]);
 	} else {
 		logger.debug('Non distributed: '+eventName);
 	}
@@ -123,7 +123,7 @@ wsevents.initListener(serverId,function(event) {
 	if (event.eventName==='startup' || event.eventName==='shutdown') {
 		setupServer(event);
 	} else {
-		// Fire if it is from another server 
+		// Fire if it is from another server
 		if (event.eventServer!==serverId) {
 			logger.debug('Catched['+event.socket.id+']: '+event.eventName);
 			var args = [];
@@ -239,11 +239,11 @@ app.configure(function() {
 	app.use(passport.initialize());
 	app.use(passport.session());
 	app.use(express.cookieParser());
-	//app.use(express.session({secret:'Secret'}));	
+	//app.use(express.session({secret:'Secret'}));
 	app.use(express.session({
 		store:new MongoStore({'mongoose_connection':mongoose.connection},function(){logger.info('Session store connected !!');}),
 		cookie: { maxAge : null }, // Browser-Session Cookie
-		key:'jsessionid', 
+		key:'jsessionid',
 		secret:sessionSecret}));
 	app.use(express.bodyParser());
 	var csrf = express.csrf();
@@ -268,7 +268,7 @@ app.configure(function() {
 		next();
 	});
 	express.logger.token('sessionid', function(req){
-		return req.cookies.jsessionid; 
+		return req.cookies.jsessionid;
 	});
 	express.logger.token('ip', function(request) {
 	   var retval = '';
@@ -283,7 +283,7 @@ app.configure(function() {
 	      retval = request.socket.socket.remoteAddress;
 	   }
 	   return retval;
-	 
+
 	});
 	app.use(express.logger({stream:{write:function(str){
 		// Write log info only when DB is connected
@@ -566,8 +566,8 @@ var letsEncryptCodes = [];
 // Path to create let's encrypt challenge protected !!
 app.get('/.well-known/acme-challenge-new',auth,function(req,res){
 	res.setHeader('X-FRAME-OPTIONS','SAMEORIGIN');
-	res.render('letsencrypt.jade',{ 
-		title: 'Let\'s Encrypt - LooWID' 
+	res.render('letsencrypt.jade',{
+		title: 'Let\'s Encrypt - LooWID'
 	});
 });
 app.post('/.well-known/acme-challenge-new',auth,function(req,res){
@@ -586,9 +586,9 @@ app.get('/.well-known/acme-challenge/*',function(req,res){
 	}
 });
 
-app.param('pageId', function(req, res, next, id) { 
+app.param('pageId', function(req, res, next, id) {
 	req.pageId = id;
-	next(); 
+	next();
 });
 app.param('roomId', rooms.room);
 app.param('staticId', rooms.exists);
@@ -619,4 +619,3 @@ setInterval(function(){
 	    stats.saveStats();
 	}
 },1000*60*60*6);
-
