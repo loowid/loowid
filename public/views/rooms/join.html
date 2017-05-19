@@ -167,13 +167,13 @@
 						<img ng-src="{{user.avatar}}" title="{{user.name}}" />
 						<div class="statusOutBar {{showStatusBar(user)}} {{user.hideBarStatus}}">
 							<div title="{{resourceBundle._('titleAudioStatusOut',user.name,resourceBundle['titlestate'+user.connectionStatus.audio.out])}}" class="statusOutBtn {{user.connectionStatus.audio.out}}">
-								<i class="fa fa-microphone"></i>
+								<i class="fa fa-volume-up"></i>
 							</div>
 							<div title= "{{resourceBundle._('titleVideoStatusOut',user.name,resourceBundle['titlestate'+user.connectionStatus.video.out])}}"  class="statusOutBtn {{user.connectionStatus.video.out}}">
-								<i class="fa fa-video-camera"></i>
+								<i class="fa fa-eye"></i>
 							</div>
 							<div title= "{{resourceBundle._('titleScreenStatusOut',user.name,resourceBundle['titlestate'+user.connectionStatus.screen.out])}}" class="statusOutBtn {{user.connectionStatus.screen.out}}">
-								<i class="fa fa-desktop"></i>
+								<i class="fa fa-laptop"></i>
 							</div>
 						</div>
 						<div class="statusBar" >
