@@ -120,7 +120,7 @@
 	<div class="owner connected">
 		<p class="user_title room_owner">{{resourceBundle.roomowner}}</p>
 		<img ng-src="{{ui.ownerAvatar}}" title="{{ui.ownerName}}"/>
-		<div class="statusOutBar {{ui.connectionStatus.audio.out}} {{ui.connectionStatus.video.out}} {{ui.connectionStatus.screen.out}}" >
+		<div class="statusOutBar {{showStatusBar(ui)}} {{ui.hideBarStatus}}" >
 			<div title= "{{resourceBundle._('titleAudioStatusOut',ui.name,resourceBundle['titlestate'+ui.connectionStatus.audio.out])}}"  class="statusOutBtn {{ui.connectionStatus.audio.out}}">
 				<i class="fa fa-microphone"></i>
 			</div>
@@ -187,7 +187,7 @@
 	<ul ng-class="ui.getMiniClass('sharers connected')">
 		<li data-ng-show="user.status == 'CONNECTED' && user.connectionId != ui.currentConnectionId" data-ng-repeat="user in ui.users">
 			<img ng-src="{{user.avatar}}" title="{{user.name}}"/>
-			<div class="statusOutBar {{user.connectionStatus.audio.out}} {{user.connectionStatus.video.out}} {{user.connectionStatus.screen.out}}" >
+			<div class="statusOutBar {{showStatusBar(user)}} {{user.hideBarStatus}}" >
 				<div title= "{{resourceBundle._('titleAudioStatusOut',user.name,resourceBundle['titlestate'+user.connectionStatus.audio.out])}}"  class="statusOutBtn {{user.connectionStatus.audio.out}}">
 					<i class="fa fa-microphone"></i>
 				</div>
