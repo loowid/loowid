@@ -1,48 +1,48 @@
 'use strict';
 /*global rtc: true */
-angular.module('mean.rooms').controller('RecordController', ['$scope', '$routeParams', '$location', 'Global','Rooms','$timeout','ngI18nResourceBundle','ngI18nConfig','$cookieStore','$sce','FileService','ChatService','MediaService','WindowHandler','UserHandler','UIHandler',function ($scope, $routeParams, $location, Global, Rooms, $timeout,ngI18nResourceBundle, ngI18nConfig, $cookieStore,$sce,FileService,ChatService,MediaService,WindowHandler,UserHandler,UIHandler) {    
+angular.module('mean.rooms').controller('RecordController', ['$scope', '$routeParams', '$location', 'Global','Rooms','$timeout','ngI18nResourceBundle','ngI18nConfig','$cookieStore','$sce','FileService','ChatService','MediaService','WindowHandler','UserHandler','UIHandler',function ($scope, $routeParams, $location, Global, Rooms, $timeout,ngI18nResourceBundle, ngI18nConfig, $cookieStore,$sce,FileService,ChatService,MediaService,WindowHandler,UserHandler,UIHandler) {
 
 	var uiHandler = UIHandler;
 	$scope.global = Global;
 	$scope.ui = uiHandler;
-	
+
     var room = new Rooms({});
     var fileService = new FileService();
     var chatService = new ChatService();
     var mediaService = new MediaService();
     var windowHandler = new WindowHandler();
     var userHandler = new UserHandler();
-    
+
     uiHandler.isowner = true;
-    
+
     document.getElementById('noscript').style.display = 'none';
-    
+
     //We had three objects stream to handle the diferent stream sources webcam/screen
-	
+
 	uiHandler.connNew = '';
 	uiHandler.connectedClass = '';
 	uiHandler.chatClass = '';
 	uiHandler.dashConn = '';
 	uiHandler.dashChat = '';
-	
+
 	uiHandler.shareDesktopStatus='unknown';
-	
+
 	// Handle error
 	uiHandler.errorClass = '';
 	uiHandler.errorMessage = '';
 
 	$scope.global.setupI18N($scope,ngI18nResourceBundle,ngI18nConfig);
-	
+
     //Controles de salao
 
 	$scope.hideError = function() {
 		$scope.global.hideError($scope);
 	};
-	
+
     window.onfocus = function() {
     	uiHandler.focused = true;
     };
-    
+
     window.onblur = function() {
     	uiHandler.focused = false;
     };
@@ -89,22 +89,22 @@ angular.module('mean.rooms').controller('RecordController', ['$scope', '$routePa
                     uiHandler.safeApply ($scope,function(){
                         uiHandler.modals.splice(index,1);
                     });
-                    
+
                     fUser();
                 },
                 'no': function (index){
                     uiHandler.safeApply ($scope,function(){
                         uiHandler.modals.splice(index,1);
                     });
-                        
+
                 },
                 'class':'modalform editable',
                 'done':false,
                 'avatar': $scope.getUser(users[0]).avatar
-            }); 
+            });
         });
     };
-    
+
     $scope.sharePermanentUrl = function(value) {
     	uiHandler.sharePermanentUrl(value,this);
     };
@@ -143,7 +143,7 @@ angular.module('mean.rooms').controller('RecordController', ['$scope', '$routePa
                         uiHandler.safeApply ($scope,function(){
                             uiHandler.modals.splice(index,1);
                         });
-                        
+
                         leaveFn();
                     },
                     'no': function (index){
@@ -157,7 +157,7 @@ angular.module('mean.rooms').controller('RecordController', ['$scope', '$routePa
                     },
                     'class':'modalform editable',
                     'done':false
-                }); 
+                });
             });
         }
     };
@@ -175,7 +175,7 @@ angular.module('mean.rooms').controller('RecordController', ['$scope', '$routePa
  	$scope.init = function (){
     	var rid = $location.search().r || $routeParams.roomId;
 
-    	uiHandler.roomId = $scope.global.roomId = rid;	
+    	uiHandler.roomId = $scope.global.roomId = rid;
     	uiHandler.screenurl = $scope.getScreenUrl();
 
 		// Show Timeout CountDown
@@ -192,12 +192,43 @@ angular.module('mean.rooms').controller('RecordController', ['$scope', '$routePa
             uiHandler.countDown = (days>9?days:'0'+days) + ' ' + $scope.resourceBundle.days + ' ' +  (hours>9?hours:'0'+hours)+ ' ' + $scope.resourceBundle.hours +' '+(mins>9?mins:'0'+mins)+ ' ' + $scope.resourceBundle.minutes + ' '+(secs>9?secs:'0'+secs)+ ' ' + $scope.resourceBundle.seconds;
 			uiHandler.safeApply($scope,function(){});
 		},1000);
-		
+
+		$scope.showStatusBar = function (user) {
+				if (!user.hideBarStatus) {
+					user.hideBarStatus ='';
+				}
+
+				if (user.connectionStatus) {
+
+					user.currentConnectionStatus = user.connectionStatus.audio.out +
+						user.connectionStatus.video.out +
+						user.connectionStatus.screen.out;
+
+					if (!user.lastConnectionStatus || user.lastConnectionStatus !== user.currentConnectionStatus) {
+						user.lastConnectionStatus = user.currentConnectionStatus;
+
+						if (user.hideConnectionStatus) {
+							$timeout.cancel(user.hideConnectionStatus);
+						}
+
+						user.hideConnectionStatus = $timeout (function () {
+								user.hideBarStatus = 'hideBar';
+								delete user.hideConnectionStatus;
+						},5000,true);
+
+						user.hideBarStatus = '';
+					}
+
+					return 'shown';
+				}
+
+				return 'notshown';
+		};
 
 		//look if who is selecting the room is valid
 		room.isRoomAvailable(uiHandler.roomId, function(result){
 			uiHandler.roomStatus = result.status;
-    
+
             //Initialize userHandler options
             userHandler.init ($scope);
 
@@ -205,7 +236,7 @@ angular.module('mean.rooms').controller('RecordController', ['$scope', '$routePa
 				 	//$scope.global.sessionclosed=true;
 				 	if (result.owner) {
 				 		room.joinPass($scope.global.roomId,'',true);
-			            
+
                         var joinUsr = room.join($scope.global.roomId,function(results){
                         	uiHandler.roomStatus = 'active';
 						 	$scope.global.sessionclosed=false;
@@ -233,7 +264,7 @@ angular.module('mean.rooms').controller('RecordController', ['$scope', '$routePa
 		                        }
 		   					});
 			            });
-			            
+
                         uiHandler.name = joinUsr.name;
                         uiHandler.avatar = joinUsr.avatar;
                         uiHandler.gravatar = joinUsr.gravatar;
@@ -244,7 +275,7 @@ angular.module('mean.rooms').controller('RecordController', ['$scope', '$routePa
                         if (window.innerWidth <= 800 ){
                             $scope.toggleConnected();
                         }
-                        
+
 				 	} else {
 				 		// Probably is a viewer trying to use join url
 				 		$location.path('r/'+$scope.global.roomId);
@@ -260,7 +291,7 @@ angular.module('mean.rooms').controller('RecordController', ['$scope', '$routePa
    						chatService.init ($scope,results.chat);
                         if (window.innerWidth <= 800 ){
                         	// Let user see welcome message
-                            setTimeout(function(){ 
+                            setTimeout(function(){
                             	$scope.toggleConnected();
                             	$scope.toggleChat();
                             },1800);
@@ -280,26 +311,26 @@ angular.module('mean.rooms').controller('RecordController', ['$scope', '$routePa
 			}
 		});
 
-      
+
         fileService.init ($scope);
 		windowHandler.init ($scope);
         mediaService.init ($scope,windowHandler);
-  
+
         angular.element(document).ready(function () {
         	if (window.addthis && window.addthis.layers && window.addthis.layers.refresh) {
         		window.addthis.layers.refresh();
         	}
         });
-        
+
     };
-    
+
     $scope.$on('$routeUpdate', function(a,b,c){
     	if (($location.search().r || $routeParams.roomId) !== $scope.global.roomId) {
     		// Do not touch the url
     		$scope.roomLeave(true);
     	}
     });
-    
+
     $scope.$on('$locationChangeStart',function(evt, absNewUrl, absOldUrl) {
     	var ind = absOldUrl.indexOf('?');
     	var last = ind>0?ind:absOldUrl.length;
@@ -312,7 +343,7 @@ angular.module('mean.rooms').controller('RecordController', ['$scope', '$routePa
     	}
     	$scope.global.previousPath = absOldUrl.substring(absOldUrl.indexOf('/#!/')+4,last);
    	});
-    
+
 }]).config(function($sceProvider) {
 	$sceProvider.enabled(true);
 }).directive('ngEscape', function () {

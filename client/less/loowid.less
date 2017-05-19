@@ -1052,8 +1052,16 @@ header{
 	    margin-top: 35px;
 	    height: 15px;
 	    font-size: 0.75em;
-	    &.starting,&.negotiating,&.streaming,&failed,&.ended {
+	    &.shown {
 	    	visibility: visible;
+        &.hideBar {
+            opacity:0;
+            -webkit-transition: opacity .25s ease-in-out .0s;
+            transition: opacity .25s ease-in-out .0s;
+          &:hover {
+            opacity: 1;
+          }
+        }
 	    }
 	    .statusOutBtn {
 		    display: inline-block;
@@ -1089,7 +1097,7 @@ header{
 			  visibility: visible;
 			}
 	    }
-	}  	
+	}
 
 	.user_title{
 		color: @maincolor;
