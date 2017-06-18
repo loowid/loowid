@@ -284,5 +284,16 @@
    "titlestateended": "ended",
    "titleScreenStatusOut": "Your screen connection to {0} is {1}",
    "titleVideoStatusOut": "Your webcam connection to {0} is {1}",
-   "titleAudioStatusOut": "Your audio connection to {0} is {1}"
+   "titleAudioStatusOut": "Your audio connection to {0} is {1}",
+   "startRecordingSession": "Start recording",
+   "stopRecordingSession": "Stop recording",
+   "readyRecord": "Your session was recorded successfully {0}",
+   "readyRecordShow": "See recording",
+   "cantRecord": "Your browser does not support recording, please user recent version of <strong>Chrome</strong> to be able to record the session.",
+   "noRecordAudioAvailable": "There is no audio available to record, share any microphone before start the recording.",
+   "noStreamRecordAvailable": "There is no screen available to record.",
+   "recordStream0": "Video and audio",
+   "recordStream1": "Video only",
+   "recordStream2": "Audio only",
+   "titleChangeStream": "Change session recording mode."
 }

@@ -285,5 +285,17 @@
     "titleVideoStatusOut": "La teva connexió de la càmera web cap a {0} {1}",
     "titleAudioStatusOut": "La teva connexió de l'audio cap a {0} {1}",
     "etherpad": "Document Etherpad",
-    "titleOpenEtherpadInWindow": "Obre aquest document etherpad en una finestra de LooWID"
+    "titleOpenEtherpadInWindow": "Obre aquest document etherpad en una finestra de LooWID",
+    "startRecordingSession": "Iniciar la gravació",
+    "stopRecordingSession": "Aturar la gravació",
+    "readyRecord": "La seva sessió es va gravar bé {0}",
+    "readyRecordShow": "Veure la gravació",
+    "cantRecord": "El teu navegador no suporta gravació multimèdia, utilitza una versió actual de <strong> Chrome </ strong> per gravar la teva sessió.",
+    "noRecordAudioAvailable": "No hi ha cap àudio disponible, comparteix algun micròfon abans de començar a gravar.",
+    "noStreamRecordAvailable": "No hi ha vídeo disponible per gravar.",
+    "recordStream0": "Vídeo i àudio",
+    "recordStream1": "Només vídeo",
+    "recordStream2": "Només audio",
+    "titleChangeStream": "Canviar la manera de gravació de la sala."
+    
 }
