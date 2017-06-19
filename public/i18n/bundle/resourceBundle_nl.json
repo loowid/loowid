@@ -284,5 +284,16 @@
     "titlestateended": "beëindigd",
     "titleScreenStatusOut": "Uw schermverbinding met {0} is {1}",
     "titleVideoStatusOut": "Uw webcamverbinding met {0} is {1}",
-    "titleAudioStatusOut": "Uw audioverbinding met {0} is {1}"
+    "titleAudioStatusOut": "Uw audioverbinding met {0} is {1}",
+    "startRecordingSession": "Opname starten",
+    "stopRecordingSession": "Opname stoppen",
+    "readyRecord": "Uw sessie is succesvol opgenomen {0}",
+    "readyRecordShow": "Opname bekijken",
+    "cantRecord": "Uw browser ondersteunt geen opname. Gebruik de meest recente versie van <strong>Chrome</strong> als u de sessie wilt opnemen.",
+    "noRecordAudioAvailable": "Er is geen audio beschikbaar voor opname; deel een microfoon voordat u begint met opnemen.",
+    "noStreamRecordAvailable": "Er is geen scherm beschikbaar voor opname.",
+    "recordStream0": "Video en audio",
+    "recordStream1": "Alleen video",
+    "recordStream2": "Alleen audio",
+    "titleChangeStream": "Wijzig de sessie-opnamemodus."
 }
