@@ -305,14 +305,40 @@
 								<div class="messages">
 									<p ng-repeat="sitem in msg.list track by $index">
 										<span ng-repeat="obj in sitem.embed track by $index">
-											<span ng-show="obj.type==='edoc'" class="edoc"><a id="{{obj.id}}" href="#"><img title="{{obj.title}}" ng-src="{{obj.thumbnail}}"/><i title="{{obj.title}}" ng-class="{'fa':true,'fa-caret-square-o-right':true,'black':obj.fablack,'white':obj.fawhite}"></i></a></span>
+											<span ng-show="obj.type==='edoc'" class="edoc">
+												<a id="{{obj.id}}" href="#">
+												<img title="{{obj.title}}" ng-src="{{obj.thumbnail}}"/>
+												<i title="{{obj.title}}" ng-class="{'fa':true,'thicon':true,'fa-caret-square-o-right':true,'black':obj.fablack,'white':obj.fawhite}">
+												</i>
+												<span ng-show="obj.link">{{obj.link}}</span>
+
+											</a>
+											&nbsp;
+											<a ng-show="obj.link" href="{{obj.link}}" target="_blank">
+												<i title="{{resourceBundle.titleOpenNewTab}}" class="fa fa-external-link"> </i>
+											</a>
+										</span>
 											<span ng-show="obj.type==='oembed'">
 												<span ng-show="obj.loading" class="spinner"><span class="bounce1"></span><span class="bounce2"></span><span class="bounce3"></span></span>
-												<span ng-show="obj.ready" class="evideo"><a id="{{obj.idv}}" href="#"><img title="{{obj.title}}" ng-src="{{obj.thumbnail}}" width="100%" height="100%"  data-videoid="{{obj.videoid}}"/><i title="{{obj.title}}" class="fa fa-play-circle"></i></a></span>
+												<span ng-show="obj.ready" class="evideo">
+													<a id="{{obj.idv}}" href="#">
+														<img title="{{obj.title}}" ng-src="{{obj.thumbnail}}" width="100%" height="100%"  data-videoid="{{obj.videoid}}"/>
+														<i title="{{obj.title}}" class="thicon fa fa-play-circle"></i>
+														<span ng-show="obj.link">{{obj.link}}</span>
+													</a>
+													&nbsp;
+
+													<a ng-show="obj.link" href="{{obj.link}}" target="_blank">
+														<i title="{{resourceBundle.titleOpenNewTab}}" class="fa fa-external-link"> </i>
+													</a>
+												</span>
+
 											</span>
 										</span>
 										<span ng-repeat="item in sitem.list track by $index">
-											<a ng-show="item.type==='link' && !item.download" href="{{item.to}}" target="_blank">{{item.text}}</a>
+											<a ng-show="item.type==='link' && sitem.embed.length <=0 && !item.download" href="{{item.to}}" target="_blank">
+												<span> {{item.text}}</span>
+											</a>
 											<a ng-show="item.type==='link' && item.download" href="{{item.to}}" download="{{item.filename}}">{{item.text}}</a>
 											<span ng-show="item.type==='text'">{{item.text}}</span>
 											<span ng-show="item.type==='emoji'"><i title="{{item.base}}" ng-class="item.twaclass" ng-click="item.base === ':sound:' && changeSound($event)"></i></span>

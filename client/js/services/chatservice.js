@@ -10,7 +10,7 @@ angular.module('mean.rooms').factory('ChatService',['$timeout','UIHandler','Room
 		var room = new Rooms({});
 
 		this.oembedData = {};
-		
+
 		this.formatDate = function($scope,t,fm) {
 		   var yyyy = t.getFullYear().toString();
 		   var mm = (t.getMonth()+1).toString();
@@ -26,7 +26,7 @@ angular.module('mean.rooms').factory('ChatService',['$timeout','UIHandler','Room
 		   			.replace('mi',(mi[1]?mi:'0'+mi[0]));
 		   return fm?dm+' '+tm:tm;
 		};
-		
+
 	    this.timeAgo = function($scope,t) {
 	        var t2 = (new Date()).getTime();
 	        var t1 = t.getTime();
@@ -38,14 +38,14 @@ angular.module('mean.rooms').factory('ChatService',['$timeout','UIHandler','Room
         		return (secs>30)?$scope.resourceBundle.lessthanaminute:$scope.resourceBundle.justnow;
 	        }
 	    };
-	    
+
 	    this.longTimeAgo = function(newTime,lastTime) {
 	        var t2 = newTime.getTime();
 	        var t1 = lastTime.getTime();
 	        var secs =  parseInt((t2-t1)/(1000));
 	        return secs>15;
 	    };
-	    
+
 	    this.getOEmbedData = function(url,callb) {
 	    	var retrieve = $http({
 	    			method:'post',
@@ -61,7 +61,7 @@ angular.module('mean.rooms').factory('ChatService',['$timeout','UIHandler','Room
 	        	callb(null);
 	        });
 	    };
-	    
+
 	    this.processOEmbedUrl = function($scope,url,list) {
 			var realUniqueId = 'embed_'+(new Date()).getTime()+Math.floor(Math.random()*100);
 			var miObj = {type:'oembed',idv:realUniqueId,loading:true,ready:false};
@@ -73,6 +73,7 @@ angular.module('mean.rooms').factory('ChatService',['$timeout','UIHandler','Room
 					miObj.title = $scope.resourceBundle._('titleOpenVideoInWindow',oembed.title);
 					var thumbUrl = oembed[thumb] || oembed.thumbnail;
 					miObj.thumbnail = thumbUrl?thumbUrl:'';
+					miObj.link = url;
 					//miObj.videoid = video.id;
 					setTimeout(function(){
 						document.getElementById(realUniqueId).addEventListener ('click',function (event){
@@ -87,7 +88,7 @@ angular.module('mean.rooms').factory('ChatService',['$timeout','UIHandler','Room
 	    	});
 			list.push(miObj);
 	    };
-	    
+
 	    this.getOEmbedProvidersRegExp = function() {
 	    	var domains = '';
 	    	for (var d=0;d<OEmbedProviders.domains.length;d+=1) {
@@ -95,14 +96,14 @@ angular.module('mean.rooms').factory('ChatService',['$timeout','UIHandler','Room
 	    	}
 	    	return new RegExp('(^|^https?://)('+domains+')/.+','g');
 	    };
-	    
+
 	    this.processOEmbedUrls = function($scope,txt,list) {
 	    	var matches = self.getOEmbedProvidersRegExp().exec(txt);
 	    	if (matches) {
 	    		self.processOEmbedUrl($scope,txt,list);
 	    	}
 	    };
-	    
+
 	    this.processGoogleDoc = function($scope,txt,list) {
 	    	var matches = /(?:https:\/\/)?docs\.google\.com\/presentation\/d\/([^\/\s]+)\/[^\s]+/g.exec(txt);
 	    	if (matches) {
@@ -113,12 +114,12 @@ angular.module('mean.rooms').factory('ChatService',['$timeout','UIHandler','Room
 		    			$scope.openIFrameService('i'+docid,$scope.resourceBundle.googledoc,'//docs.google.com/presentation/d/'+doc+'/embed?start=false&loop=false&delayms=3000');
 		    			evt.preventDefault();
 		    		});
-		    		
+
 		    	},500);
-		    	list.push({type:'edoc',fablack:true,title:$scope.resourceBundle.titleOpenGDocInWindow,id:docid,thumbnail:'/img/gslides.png'});
+		    	list.push({type:'edoc',fablack:true,title:$scope.resourceBundle.titleOpenGDocInWindow,id:docid,thumbnail:'/img/gslides.png', link: txt});
 	    	}
 	    };
-	    
+
 	    this.processTypeForm = function($scope,txt,list) {
 	    	var matches = /(?:https:\/\/)?[^\.]+\.typeform\.com\/to\/([^\s]+)/g.exec(txt);
 	    	if (matches) {
@@ -129,9 +130,9 @@ angular.module('mean.rooms').factory('ChatService',['$timeout','UIHandler','Room
 		    			$scope.openIFrameService('if'+docid,$scope.resourceBundle.typeform,'//showroom.typeform.com/to/'+doc);
 		    			evt.preventDefault();
 		    		});
-		    		
+
 		    	},500);
-	    		list.push({type:'edoc',fawhite:true,title:$scope.resourceBundle.titleOpenTypeFormInWindow,id:docid,thumbnail:'/img/typeform.png'});
+	    		list.push({type:'edoc',fawhite:true,title:$scope.resourceBundle.titleOpenTypeFormInWindow,id:docid,thumbnail:'/img/typeform.png', link: txt});
 	    	}
 	    };
 
@@ -146,20 +147,20 @@ angular.module('mean.rooms').factory('ChatService',['$timeout','UIHandler','Room
 		    			$scope.openIFrameService('i'+docid,$scope.resourceBundle.etherpad,'//'+host+'/p/'+doc+'?showControls=true&showChat=true&showLineNumbers=true&useMonospaceFont=false');
 		    			evt.preventDefault();
 		    		});
-		    		
+
 		    	},500);
-		    	list.push({type:'edoc',fawhite:true,title:$scope.resourceBundle.titleOpenEtherpadInWindow,id:docid,thumbnail:'/img/etherpad.png'});
+		    	list.push({type:'edoc',fawhite:true,title:$scope.resourceBundle.titleOpenEtherpadInWindow,id:docid,thumbnail:'/img/etherpad.png',link: txt });
 	    	}
 	    };
-	    
+
 	    this.addObjects = function($scope,txt,list) {
 	    	this.processTypeForm($scope,txt,list);
 	    	this.processGoogleDoc($scope,txt,list);
 	    	this.processEtherpad($scope,txt,list);
 	    	this.processOEmbedUrls($scope,txt,list);
 	    };
-	    
-	    this.getAllSelectors = function() { 
+
+	    this.getAllSelectors = function() {
 	        var ret = [];
 	        for(var i = 0; i < document.styleSheets.length; i+=1) {
 	        	try {
@@ -176,7 +177,7 @@ angular.module('mean.rooms').factory('ChatService',['$timeout','UIHandler','Room
 	        return ret;
 	    };
 
-	    this.selectorExists = function(selector) { 
+	    this.selectorExists = function(selector) {
 	        var selectors = this.getAllSelectors();
 	        for(var i = 0; i < selectors.length; i+=1) {
 	            if(selectors[i] === selector) {
@@ -185,7 +186,7 @@ angular.module('mean.rooms').factory('ChatService',['$timeout','UIHandler','Room
 	        }
 	        return false;
 	    };
-	    
+
 		this.emoticonsData = {
 				'<3':'heart',
 				':o)':'monkey_face',
@@ -234,7 +235,7 @@ angular.module('mean.rooms').factory('ChatService',['$timeout','UIHandler','Room
 				':o':'open_mouth',
 				':-o':'open_mouth'
 			};
-		
+
 		this.getEmoticonsRegExp = function() {
 			var pattern = '';
 			for (var e in this.emoticonsData) {
@@ -244,11 +245,11 @@ angular.module('mean.rooms').factory('ChatService',['$timeout','UIHandler','Room
 			}
 			return new RegExp('(^|\\s)('+pattern.substring(0,pattern.length-1)+')(\\s|$)','g');
 		};
-		
+
 	    this.emoticonItems = function($scope,txt,list) {
 	    	var matches = txt.match(this.getEmoticonsRegExp());
 	    	if (matches) {
-	    		var mtxt = txt; 
+	    		var mtxt = txt;
 	    		for (var i=0; i<matches.length; i+=1) {
 	    			var ind = mtxt.indexOf(matches[i]);
 	    			var pre = mtxt.substring(0,ind);
@@ -271,11 +272,11 @@ angular.module('mean.rooms').factory('ChatService',['$timeout','UIHandler','Room
 	    		list.push({type:'text',text:txt});
 	    	}
 	    };
-	    
+
 	    this.emojiItems = function($scope,txt,list) {
 	    	var matches = txt.match(/\:[a-z0-9\_\+\-]+\:/g);
 	    	if (matches) {
-	    		var mtxt = txt; 
+	    		var mtxt = txt;
 	    		for (var i=0; i<matches.length; i+=1) {
 	    			var ind = mtxt.indexOf(matches[i]);
 	    			var pre = mtxt.substring(0,ind);
@@ -298,12 +299,12 @@ angular.module('mean.rooms').factory('ChatService',['$timeout','UIHandler','Room
 	    		this.emoticonItems($scope,txt,list);
 	    	}
 	    };
-	    
+
 	    this.addItems = function($scope,txt,list) {
     		var slinks = [], embeds = [];
 	    	var matches = txt.match(/(((https?:\/\/)?(((?!-)[A-Za-z0-9-:]{1,63}[@]{0,1}[A-Za-z0-9-]*(?!-)\.)+[A-Za-z]{2,6})(:\d+)?(\/([-\w/_\.\,]*(\?\S+)?)?)*)(#\S*)?(?!@))/g);
 	    	if (matches) {
-	    		var mtxt = txt; 
+	    		var mtxt = txt;
 	    		for (var i=0; i<matches.length; i+=1) {
 	    			var ind = mtxt.indexOf(matches[i]);
 	    			var pre = mtxt.substring(0,ind);
@@ -327,14 +328,14 @@ angular.module('mean.rooms').factory('ChatService',['$timeout','UIHandler','Room
 	    	}
     		list.push({list:slinks,embed:embeds});
 	    };
-	    
+
 	    this.addToQueue = function(data) {
 	    	if (!uiHandler.messageQueue) {
 	    		uiHandler.messageQueue = [];
 	    	}
 	    	uiHandler.messageQueue.push(data);
 	    };
-	    
+
 	    this.processQueue = function() {
 	    	if (uiHandler.messageQueue) {
 	    		for (var j=0; j<uiHandler.messageQueue.length; j+=1) {
@@ -343,7 +344,7 @@ angular.module('mean.rooms').factory('ChatService',['$timeout','UIHandler','Room
 	    		uiHandler.messageQueue = [];
 	    	}
 	    };
-	    
+
 	    this.addNewMessage = function($scope,data) {
 	        var msgTime = new Date(data.time);
 	        var messageIndex = uiHandler.messages.length-1;
@@ -360,7 +361,7 @@ angular.module('mean.rooms').factory('ChatService',['$timeout','UIHandler','Room
 	        	uiHandler.messages.push(m);
 	        } else {
 	        	if (!data.text) {
-	        		uiHandler.messages[messageIndex].istyping = true;	
+	        		uiHandler.messages[messageIndex].istyping = true;
 	        	} else {
 	        		uiHandler.messages[messageIndex].istyping = false;
 	        		this.addItems($scope,data.text,uiHandler.messages[messageIndex].list);
@@ -382,22 +383,22 @@ angular.module('mean.rooms').factory('ChatService',['$timeout','UIHandler','Room
 	    		$timeout(function(){ self.checkTypingIcons(); },2000);
 	    	}
 	    };
-	    
+
 	    this.alertChatStatus = function ($scope,accessChat){
 			this.addNewMessage($scope,{id:$scope.global.bot,text:$scope.resourceBundle['chat'+(accessChat)],time:new Date()});
 	    };
-	    
+
 	    this.alertNotConnected = function ($scope){
 	    	this.addNewMessage($scope,{id:$scope.global.bot,text:$scope.resourceBundle.notconnected,time:new Date()});
 	    };
-    
+
 	    this.init = function($scope,chatmessages){
-			
+
 	    	var chSrv = this;
-	    	
+
 	    	uiHandler.messages = [];
 	    	uiHandler.audible = true;
-	    	
+
 	    	var tips = 0;
 	    	var tipObjects = ['https://www.youtube.com/watch?v=7mWX_KLo7iA',':)',
 	    	                  'https://docs.google.com/presentation/d/1QSGn19Pg7EllzzsLj0pGdZOsEMRkgvgAgvP7YP_UvKQ/share',
@@ -410,8 +411,8 @@ angular.module('mean.rooms').factory('ChatService',['$timeout','UIHandler','Room
 	    	$scope.enableAudio = function() {
 	    		uiHandler.audible = !uiHandler.audible;
     		};
-	    	
-	        $scope.toggleChat = function() { 
+
+	        $scope.toggleChat = function() {
 	        	uiHandler.chatClass=(uiHandler.chatClass==='collapsed')?'':'collapsed';
 	        	uiHandler.dashChat=(uiHandler.chatClass==='collapsed')?'chat_collapsed':'';
 	        };
@@ -428,13 +429,13 @@ angular.module('mean.rooms').factory('ChatService',['$timeout','UIHandler','Room
 		        	tips += 1;
 	        	}
 	        };
-	        
+
 	        $scope.changeSpeechVoice = function() {
         		for (var i = 0; i<$scope.ui.speechVoiceList.length; i+=1) {
         			self.addNewMessage($scope,{id:$scope.global.bot,text:($scope.ui.speechVoiceList[i].default?':speaker: ':':sound: ')+$scope.ui.speechVoiceList[i].name,time:new Date()});
         		}
 	        };
-	        
+
 	        $scope.changeSound = function($event) {
 	        	var choosedVoiceName = angular.element($event.target).parent().parent().next().children().html().substring(1);
 	        	for (var i = 0; i<$scope.ui.speechVoiceList.length; i+=1) {
@@ -444,7 +445,7 @@ angular.module('mean.rooms').factory('ChatService',['$timeout','UIHandler','Room
 	        		}
 	        	}
 	        };
-	        
+
 	    	$scope.sendTyping = function() {
 			 	if (!uiHandler.isowner && uiHandler.passNeeded) {
 			 		chSrv.alertNotConected ($scope);
@@ -458,7 +459,7 @@ angular.module('mean.rooms').factory('ChatService',['$timeout','UIHandler','Room
 				 	}
 			 	}
 	    	};
-	    	
+
 		    //Control de chat
 		    $scope.sendMessage = function() {
 			 	if (!uiHandler.isowner && uiHandler.passNeeded) {
@@ -470,7 +471,7 @@ angular.module('mean.rooms').factory('ChatService',['$timeout','UIHandler','Room
 			 		uiHandler.messageText = '';
 			 	}
 		    };
-		    
+
 		    angular.element(document.querySelector('#chat_discussion')).on('scroll', function(evt) {
 		    	if (!evt.target.scrollTop && uiHandler.chatPage>0 && !uiHandler.chatLoading) {
 		    		uiHandler.chatLoading = true;
@@ -478,7 +479,7 @@ angular.module('mean.rooms').factory('ChatService',['$timeout','UIHandler','Room
 				    	room.chatPage($scope.global.roomId,uiHandler.chatPage,function(rdo){
 				    		var previousMessages = uiHandler.messages;
 				    		uiHandler.chatPage = rdo.page;
-				    		uiHandler.messages = []; 
+				    		uiHandler.messages = [];
 				    		for (var i=0; i<rdo.chat.length; i+=1) {
 				    			self.addNewMessage($scope,rdo.chat[i]);
 				    		}
@@ -503,12 +504,12 @@ angular.module('mean.rooms').factory('ChatService',['$timeout','UIHandler','Room
 	   	        	if (uiHandler.chatClass!=='') { $scope.toggleChat(); }
 	   	        });
 		    };
-		    
+
 		    var sendAudioNotification = function(data) {
         		var readText = ($scope.connectedUsers()>1)?$scope.getUser(data.id).name+', '+data.text:data.text;
         		$scope.global.speechText($scope,readText);
 		    };
-		    
+
 			rtc.uniqueon('chat_message',function(data){
 				if (uiHandler.chatLoading) {
 					self.addToQueue(data);
@@ -549,7 +550,7 @@ angular.module('mean.rooms').factory('ChatService',['$timeout','UIHandler','Room
 			    },1000);
 			    $timeout(function(){ self.checkTypingIcons(); },2000);
 			}
-			
+
 		};
 	};
 }]);
