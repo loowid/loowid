@@ -295,7 +295,7 @@
     "recordStream0": "Vídeo y audio",
     "recordStream1": "Sólo vídeo",
     "recordStream2": "Sólo audio",
-    "titleChangeStream": "Cambiar el modo de grabación de la sala."
-    
+    "titleChangeStream": "Cambiar el modo de grabación de la sala.",
+	"download": "Descargar grabación"
     
 }
