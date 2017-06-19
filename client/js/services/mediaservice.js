@@ -1,9 +1,14 @@
 'use strict';
 /*global rtc: true */
+/*global MediaRecorder: true */
+/*global MediaStream: true */
+/*global getScreenId: true */
 angular.module('mean.rooms').factory('MediaService',['Rooms','UIHandler',function(Rooms,UIHandler){
 
 	var RATIO_4_3 = 0;
 	var RATIO_16_9 = 1;
+	var getUserMedia = (navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia || navigator.msGetUserMedia);
+	var AudioContext = window.AudioContext || window.webkitAudioContext;
 
 	return function (){
 
@@ -210,6 +215,7 @@ angular.module('mean.rooms').factory('MediaService',['Rooms','UIHandler',functio
 			uiHandler.currentResolution = 0;
 			uiHandler.showResolutionMenu = false;	
 			uiHandler.isMuted = false;	
+			uiHandler.isRecordingSession = false;
 			uiHandler.modals = [];
 			uiHandler.tutorials = [];
 			uiHandler.canShareDesktop = (navigator.webkitGetUserMedia!==undefined);
@@ -230,8 +236,6 @@ angular.module('mean.rooms').factory('MediaService',['Rooms','UIHandler',functio
 					break;
 				}
 			}
-
-
 			//Launcher events	
 			$scope.muteAudio = function (){
 				uiHandler.isMuted = true; 
@@ -249,6 +253,192 @@ angular.module('mean.rooms').factory('MediaService',['Rooms','UIHandler',functio
 				}   
 			};
 
+			$scope.changeToRecordStream  = function (index){
+				uiHandler.currentRecordStream = index;
+			};
+
+			uiHandler.currentRecordStream = uiHandler.canShareDesktop?0:2;
+			
+			$scope.startRecordingSession = function () {
+				
+				var recordVideo = uiHandler.currentRecordStream === 0 || uiHandler.currentRecordStream === 1;
+				var recordAudio = uiHandler.currentRecordStream === 0 || uiHandler.currentRecordStream === 2;
+				
+				if (!MediaStream || !MediaRecorder) {
+					$scope.showDesktopAlertMessage($scope.resourceBundle.cantRecord);
+					return;
+				}
+
+				var getMixedAudio = function() {
+					var audioReady = false;
+					if (recordAudio) {
+						uiHandler.audioContext = new AudioContext();
+						uiHandler.mixedAudio = uiHandler.audioContext.createMediaStreamDestination();
+						// Add remote audio
+						for (var i=0; i<self.receivedStreams.length; i+=1) {
+							if (self.receivedStreams[i].type==='audio') {
+								audioReady = true;
+								uiHandler.audioContext.createMediaStreamSource(self.receivedStreams[i].stream).connect(uiHandler.mixedAudio);
+							}
+						}
+						// Add local audio
+						if (self.mediasources.audio.stream) {
+							audioReady = true;
+							uiHandler.audioContext.createMediaStreamSource(self.mediasources.audio.stream).connect(uiHandler.mixedAudio);
+						}
+					}
+					return audioReady;
+				};
+				
+				var recordingScreen = function(stream) {
+					uiHandler.screenStream = stream;
+					var options = {mimeType: 'video/webm;codecs=vp8', bitsPerSecond: 1024 * 1024};
+					uiHandler.recordedBlobs = [];
+
+					var onstop = function() {
+						uiHandler.isRecordingSession = false;
+						window.clearInterval(uiHandler.recordTimeInterval);
+						if (uiHandler.screenStream) {
+							uiHandler.screenStream.getTracks()[0].stop();
+						}
+					};
+					
+					var mixedStream = new MediaStream();
+
+					var audioReady = getMixedAudio();
+					// Add mixed audio
+					if (audioReady && recordAudio) {
+						uiHandler.mixedAudio.stream.getAudioTracks().forEach(function(track) { mixedStream.addTrack(track); });
+					} else {
+						if (recordAudio) {
+							$scope.showDesktopAlertMessage($scope.resourceBundle.noRecordAudioAvailable);
+							onstop();
+							return;
+						}
+					}
+
+					// Add local screen
+					if (recordVideo) {
+						stream.getVideoTracks().forEach(function(track) { mixedStream.addTrack(track); });
+					}
+					
+					uiHandler.mediaRecorder = new MediaRecorder(mixedStream, options);
+					uiHandler.mediaRecorder.onstop = onstop;
+					uiHandler.mediaRecorder.ondataavailable = function(event){
+						if (event.data && event.data.size > 0) {
+							uiHandler.recordedBlobs.push(event.data);
+						}
+						/* AutoSave Every Minute
+						if (uiHandler.recordedBlobs.length>0 && uiHandler.recordedBlobs.length%60 === 0) {
+							var blob = new Blob(uiHandler.recordedBlobs, {type: 'video/webm;codecs=vp8'});
+							var url = window.URL.createObjectURL(blob);
+							var a = document.createElement('a');
+							a.style.display = 'none';
+							a.href = url;
+							a.download = 'record'+Math.round(uiHandler.recordedBlobs.length/10)+'.webm';
+							document.body.appendChild(a);
+							a.click();
+							setTimeout(function() {
+								document.body.removeChild(a);
+								window.URL.revokeObjectURL(url);
+							}, 100);
+						}
+						*/
+					};
+					uiHandler.mediaRecorder.start(1000); // collect 1s of data
+					uiHandler.isRecordingSession = true;
+					uiHandler.recordTime = '00:00:00';
+					uiHandler.recordTimeMillis = (new Date()).getTime();
+					uiHandler.recordTimeInterval = setInterval(function(){
+						var diff = (new Date()).getTime() - uiHandler.recordTimeMillis;
+						var seconds=Math.floor((diff/1000)%60);
+						var minutes=Math.floor((diff/(1000*60))%60);
+						var hours=Math.floor((diff/(1000*60*60))%24);						
+						uiHandler.recordTime = (hours<10?'0':'') + hours + ':' + (hours<10?'0':'') + minutes + ':' + (seconds<10?'0':'') + seconds;
+					},1000);
+					
+					if (recordVideo) {
+						// Take screenshot to use as thumbnail
+					    var canvas = document.createElement('canvas');
+					    var video = document.createElement('video');
+						video.autoplay = true;
+						video.srcObject = stream;
+						var w,h,ratio;
+						video.addEventListener('loadedmetadata',function(){
+							 ratio=video.videoWidth/video.videoHeight;
+							 w=video.videoWidth-100;
+							 h=parseInt(w/ratio,10);
+							 canvas.width=w;
+							 canvas.height=h;
+						},false);
+						var context = canvas.getContext('2d');
+						setTimeout(function(){
+							context.fillRect(0,0,w,h);
+						    context.drawImage(video,0,0,w,h);
+						    uiHandler.recordImageUrl = canvas.toDataURL('image/jpeg');
+						},500);
+					} else {
+						uiHandler.recordImageUrl = '/img/audio.png';
+					}
+
+				};
+				
+				var getScreenStream = function(mediatype,options) {
+
+					if (getUserMedia) {
+						var startStream = function (){
+							getUserMedia.call(navigator, options, function(stream) {
+								recordingScreen(stream);
+							}, function(error) {
+								$scope.showDesktopAlertMessage($scope.resourceBundle.noStreamRecordAvailable);
+								return;
+							});
+						};
+
+						if (mediatype === 'screen'){
+							getScreenId(rtc.chromeDesktopExtensionId,function (error, sourceId, screenConstraints) {
+								if (error) {
+									$scope.showDesktopAlertMessage($scope.resourceBundle.noStreamRecordAvailable);
+									return;
+								}
+								if (!error && sourceId) {
+									options.video.mandatory.chromeMediaSource = 'desktop';
+									options.video.mandatory.chromeMediaSourceId = sourceId;
+								}
+								startStream();
+							});
+						}else{
+							startStream();
+						}
+
+
+					} else {
+						console.log('webRTC is not yet supported in this browser.');
+					}
+				};
+				
+				if (recordVideo) {
+					getScreenStream('screen',self.mediasources.screen.constraints);
+				} else {
+					recordingScreen();
+				}
+				
+			};
+			
+			$scope.stopRecordingSession = function () {
+				uiHandler.mediaRecorder.stop();
+				var recordBlobs = new Blob(uiHandler.recordedBlobs, {type: 'video/webm;codecs=vp8'});
+				var recordUrl = window.URL.createObjectURL(recordBlobs);
+				uiHandler.messages.push({'class':'other',
+                        'id': $scope.global.bot,
+                        'time': new Date(),
+                        'istyping': false,
+                        'list':[{list:[{type:'text',text:$scope.resourceBundle._('readyRecord',uiHandler.recordTime)},
+                                {type:'blob',
+                        		 url: recordUrl,
+                        		 thumbnail: uiHandler.recordImageUrl,
+                        		 title:$scope.resourceBundle._('recordStream'+uiHandler.currentRecordStream)}]}]});
+			};
 
 			$scope.changeToResolution  = function (index){
 				if (self.resolutions[index]){
@@ -290,11 +480,12 @@ angular.module('mean.rooms').factory('MediaService',['Rooms','UIHandler',functio
 									);
 			};
 
-			$scope.showDesktopAlertMessage = function(){
+			$scope.showDesktopAlertMessage = function(msgText){
+				var alertMessage = msgText || $scope.resourceBundle.justchrome; 
 				uiHandler.safeApply ($scope,function (){
 					if (!uiHandler.tutorials) { uiHandler.tutorials = []; }
 
-					uiHandler.tutorials.push({'text': $scope.resourceBundle.justchrome,
+					uiHandler.tutorials.push({'text': alertMessage,
 											  'ok': function (index){
 												  uiHandler.tutorials.splice(index,1);
 											  },
@@ -385,6 +576,19 @@ angular.module('mean.rooms').factory('MediaService',['Rooms','UIHandler',functio
 				}
 			};
 			
+			$scope.openBlob = function(url,title,thumb) {
+				var htmlCode = '<video src="'+url+'" poster="'+thumb+'" controls style="width:100%;"></video>';
+				var angularElement = angular.element(htmlCode);
+				var windowOptions = {
+					'mediaElement': angularElement,
+					'title': title,
+					'ratio': RATIO_16_9,
+					'scale': 0.5,
+					'closeable': true	
+				};
+				windowHandler.create ($scope,windowOptions);
+			};
+			
 			$scope.openOEmbedFromService = function (oembed){
 				var htmlCode = oembed.html;
 				if (!htmlCode) {
@@ -440,6 +644,9 @@ angular.module('mean.rooms').factory('MediaService',['Rooms','UIHandler',functio
 
 				mediasource.playtype = self.mediasources[mediatype] ? self.mediasources[mediatype].playtype : 'unknow';
 				self.receivedStreams.push (mediasource); 
+				if (uiHandler.isRecordingSession && mediasource.type === 'audio') {
+					uiHandler.audioContext.createMediaStreamSource(mediasource.stream).connect(uiHandler.mixedAudio);
+				}
 
 				var streamId = connectionId + '_' + mediatype;
 

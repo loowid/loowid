@@ -46,6 +46,18 @@
 					<p title="{{resourceBundle.titleMute}}"  ng-click="muteAudio()" ng-hide="ui.isMuted"><i class="fa fa-times"></i> <span class="title">{{resourceBundle.mutemainbar}}</span></p>
 					<p title="{{resourceBundle.titleUnmute}}"  ng-click="unmuteAudio()" ng-show="ui.isMuted"><i class="fa fa-volume-up"></i> <span class="title">{{resourceBundle.unmutemainbar}}</span></p>
 				</li>
+				<li id="recording">
+					<p title="{{resourceBundle.startRecordingSession}}"  ng-click="startRecordingSession()" ng-hide="ui.isRecordingSession"><i class="fa fa-circle"></i> <span class="title">{{resourceBundle.startRecordingSession}}</span></p>
+					<p title="{{resourceBundle.stopRecordingSession}}"  ng-click="stopRecordingSession()" ng-show="ui.isRecordingSession" ng-mouseenter="ui.showTime=true" ng-mouseleave="ui.showTime=false"><i class="fa fa-stop"></i> <span class="title">{{resourceBundle.stopRecordingSession}}</span> <span class="title" ng-show="ui.showTime">{{ui.recordTime}}</span></p>
+				</li>
+				<li id="dropdown" ng-click="ui.showRecordMenu=!ui.showRecordMenu"	>
+					<p title="{{resourceBundle.titleChangeStream}}" ng-hide="ui.isRecordingSession" class="down" ><i class="fa fa-sort-down"></i> <span class="title"></span></p>
+					<ul ng-show="!ui.isRecordingSession && ui.showRecordMenu" class="resolutionlist">
+						<li ng-show="ui.canShareDesktop"><p ng-click="changeToRecordStream(0)"><span>{{resourceBundle.recordStream0}}</span><i ng-show="ui.currentRecordStream==0" class ="fa fa-circle"></i></p></li>
+						<li ng-show="ui.canShareDesktop"><p ng-click="changeToRecordStream(1)"><span>{{resourceBundle.recordStream1}}</span><i ng-show="ui.currentRecordStream==1" class ="fa fa-circle"></i></p></li>
+						<li><p ng-click="changeToRecordStream(2)"><span>{{resourceBundle.recordStream2}}</span><i ng-show="ui.currentRecordStream==2" class ="fa fa-circle"></i></p></li>
+					</ul>
+				</li>
 			</ul>
 		</nav>
 
@@ -303,6 +315,7 @@
 											<a ng-show="item.type==='link'" href="{{item.to}}" target="_blank">{{item.text}}</a>
 											<span ng-show="item.type==='text'">{{item.text}}</span>
 											<span ng-show="item.type==='emoji'"><i title="{{item.base}}" ng-class="item.twaclass" ng-click="item.base === ':sound:' && changeSound($event)"></i></span>
+											<span ng-show="item.type==='blob'" class="evideo"><a ng-click="openBlob(item.url,item.title,item.thumbnail)"><img title="{{item.title}}" ng-src="{{item.thumbnail}}" width="100%" height="100%"  data-videoid="{{item.videoid}}"/><i title="{{item.title}}" class="fa fa-play-circle"></i></a></span>
 										</span>
 									</p>
 									<div class="spinner" ng-show="msg.istyping">
