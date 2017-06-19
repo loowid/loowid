@@ -295,5 +295,6 @@
    "recordStream0": "Video and audio",
    "recordStream1": "Video only",
    "recordStream2": "Audio only",
-   "titleChangeStream": "Change session recording mode."
+   "titleChangeStream": "Change session recording mode.",
+   "download": "Download recording"
 }

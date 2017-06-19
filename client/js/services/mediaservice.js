@@ -433,11 +433,17 @@ angular.module('mean.rooms').factory('MediaService',['Rooms','UIHandler',functio
                         'id': $scope.global.bot,
                         'time': new Date(),
                         'istyping': false,
-                        'list':[{list:[{type:'text',text:$scope.resourceBundle._('readyRecord',uiHandler.recordTime)},
-                                {type:'blob',
-                        		 url: recordUrl,
-                        		 thumbnail: uiHandler.recordImageUrl,
-                        		 title:$scope.resourceBundle._('recordStream'+uiHandler.currentRecordStream)}]}]});
+                        'list':[{list:[
+                                  {type:'text',text:$scope.resourceBundle._('readyRecord',uiHandler.recordTime)},
+                                  {type:'blob',
+                        		   url: recordUrl,
+                        		   thumbnail: uiHandler.recordImageUrl,
+                        		   title:$scope.resourceBundle._('recordStream'+uiHandler.currentRecordStream)},
+                        		  {type:'link',
+                        		   to: recordUrl,
+                        		   download: true,
+                        		   filename: 'loowid-'+$scope.global.roomId+'-'+(new Date()).getTime()+'.webm',
+                        		   text:$scope.resourceBundle.download}]}]});
 			};
 
 			$scope.changeToResolution  = function (index){

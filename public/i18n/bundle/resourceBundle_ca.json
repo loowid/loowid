@@ -296,6 +296,7 @@
     "recordStream0": "Vídeo i àudio",
     "recordStream1": "Només vídeo",
     "recordStream2": "Només audio",
-    "titleChangeStream": "Canviar la manera de gravació de la sala."
+    "titleChangeStream": "Canviar la manera de gravació de la sala.",
+    "download": "Descarregar gravació"
     
 }
