@@ -284,5 +284,18 @@
     "titlestateended": "ha terminado",
     "titleScreenStatusOut": "Tu conexión del escritorio hacia {0} {1}",
     "titleVideoStatusOut": "Tu conexión de la cámara web hacia {0} {1}",
-    "titleAudioStatusOut": "Tu conexión del audio hacia {0} {1}"
+    "titleAudioStatusOut": "Tu conexión del audio hacia {0} {1}",
+    "startRecordingSession": "Comenzar a grabar",
+    "stopRecordingSession": "Finalizar grabación",
+    "readyRecord": "Tu sesión se ha grabado con éxito {0}",
+    "readyRecordShow": "Ver la grabación",
+    "cantRecord": "Tu navegador no soporta grabación multimedia, utiliza una versión actual de <strong>Chrome</strong> para grabar tu sessión.",
+    "noRecordAudioAvailable": "No hay ningun audio disponible, comparte algún micrófono antes de empezar a grabar.",
+    "noStreamRecordAvailable": "No hay vídeo disponible para grabar.",
+    "recordStream0": "Vídeo y audio",
+    "recordStream1": "Sólo vídeo",
+    "recordStream2": "Sólo audio",
+    "titleChangeStream": "Cambiar el modo de grabación de la sala."
+    
+    
 }
