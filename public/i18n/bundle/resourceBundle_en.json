@@ -257,6 +257,7 @@
    "titleOpenTypeFormInWindow": "Open this Typeform in a LooWID window",
    "titleOpenGDocInWindow": "Open this Google document in a LooWID window",
    "titleOpenEtherpadInWindow": "Open this etherpad document in a LooWID window",
+   "titleOpenNewTab": "Open in a new tab",
    "titleChatTip": "Show chat tips",
    "chattipmore": "Show more tips by clicking {0}",
    "chattip0": "You can add YouTube URLs like this {0}",
