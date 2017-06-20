@@ -143,9 +143,9 @@
 			</div>
 		</div>
 		<h3>{{ui.ownerName}}</h3>
-		<p class="user_title" data-ng-show="ui.status=='OPENED'">{{resourceBundle.statusopen}}</p>
-		<p class="user_title" data-ng-show="ui.status=='BROADCASTING'">{{resourceBundle.statusbroadcasting}}</p>
-		<p class="user_title" data-ng-show="ui.status=='STOPPED'">{{resourceBundle.statusstopped}}</p>
+		<p class="user_title" data-ng-show="ui.status.startsWith('OPENED')">{{resourceBundle.statusopen}}<span ng-show="ui.status.endsWith('RECORDING')"> [<i class="fa fa-circle fa-blink" title="{{resourceBundle.statusrecording}}"></i>]</span></p>
+		<p class="user_title" data-ng-show="ui.status.startsWith('BROADCASTING')">{{resourceBundle.statusbroadcasting}}<span ng-show="ui.status.endsWith('RECORDING')"> [<i class="fa fa-circle fa-blink" title="{{resourceBundle.statusrecording}}"></i>]</span></p>
+		<p class="user_title" data-ng-show="ui.status.startsWith('STOPPED')">{{resourceBundle.statusstopped}}<span ng-show="ui.status.endsWith('RECORDING')"> [<i class="fa fa-circle fa-blink" title="{{resourceBundle.statusrecording}}"></i>]</span></p>
 		<p class="user_title" data-ng-show="ui.status=='DISCONNECTED'">{{resourceBundle.statusdisconnected}}</p>
 		<a title="{{resourceBundle._('titleSendfiles',ui.ownerName)}}" href="" ng-show="ui.status && ui.status!='DISCONNECTED' && !ui.access.moderated" ng-click="openFileDialog('owner');">
 		<i class="fa fa-cloud-upload"></i></a>
@@ -233,7 +233,7 @@
 		<article class="creator_message" data-ng-show="ui.joinable==false && ui.locked==true">
 			<h1>{{resourceBundle.roomislocked}}</h1>
 		</article>
-		<article class="creator_message" data-ng-show="ui.joinable==true && ui.status!='BROADCASTING'">
+		<article class="creator_message" data-ng-show="ui.joinable==true && !ui.status.startsWith('BROADCASTING')">
 		    <h1 data-ng-show="!isValidBrowser()">{{resourceBundle.browsernotsupported}}</h1>
 			<div data-ng-show="isValidBrowser()">
 				<h1>{{resourceBundle.welcomeloowidbox}}</h1>

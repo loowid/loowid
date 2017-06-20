@@ -297,6 +297,7 @@
     "recordStream1": "Només vídeo",
     "recordStream2": "Només audio",
     "titleChangeStream": "Canviar la manera de gravació de la sala.",
-    "download": "Descarregar gravació"
+    "download": "Descarregar gravació",
+    "statusrecording": "La sessió està sent gravada pel propietari de la sala."
     
 }

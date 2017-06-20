@@ -296,6 +296,6 @@
     "recordStream1": "Sólo vídeo",
     "recordStream2": "Sólo audio",
     "titleChangeStream": "Cambiar el modo de grabación de la sala.",
-	"download": "Descargar grabación"
-    
+	"download": "Descargar grabación",
+    "statusrecording": "La sesión está siendo grabada por el propietario de la sala."
 }

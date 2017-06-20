@@ -11,6 +11,20 @@
           animation: fa-spin 1s infinite steps(8);
 }
 
+.@{fa-css-prefix}-blink {
+   -webkit-animation: fa-blink 3s infinite;
+   -moz-animation: fa-blink 3s infinite;
+   -ms-animation: fa-blink 3s infinite;
+   -o-animation: fa-blink 3s infinite;
+   animation: fa-blink 3s infinite;
+}
+
+@keyframes fa-blink {
+     0% { opacity: 1; }
+     50% { opacity: 0.2; }
+     100% { opacity: 1; }
+ }
+
 @-webkit-keyframes fa-spin {
   0% {
     -webkit-transform: rotate(0deg);
