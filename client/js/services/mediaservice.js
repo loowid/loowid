@@ -345,7 +345,7 @@ angular.module('mean.rooms').factory('MediaService',['Rooms','UIHandler',functio
 						}
 						*/
 					};
-					uiHandler.mediaRecorder.start(1000); // collect 1s of data
+					uiHandler.mediaRecorder.start(100); // collect 100ms of data
 					uiHandler.isRecordingSession = true;
 					uiHandler.recordTime = '00:00:00';
 					uiHandler.recordTimeMillis = (new Date()).getTime();
