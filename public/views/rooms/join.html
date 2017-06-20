@@ -342,7 +342,7 @@
 											<a ng-show="item.type==='link' && item.download" href="{{item.to}}" download="{{item.filename}}">{{item.text}}</a>
 											<span ng-show="item.type==='text'">{{item.text}}</span>
 											<span ng-show="item.type==='emoji'"><i title="{{item.base}}" ng-class="item.twaclass" ng-click="item.base === ':sound:' && changeSound($event)"></i></span>
-											<span ng-show="item.type==='blob'" class="evideo"><a ng-click="openBlob(item.url,item.title,item.thumbnail)"><img title="{{item.title}}" ng-src="{{item.thumbnail}}" width="100%" height="100%"  data-videoid="{{item.videoid}}"/><i title="{{item.title}}" class="fa fa-play-circle"></i></a></span>
+											<span ng-show="item.type==='blob'" class="evideo"><a ng-click="openBlob(item.url,item.title,item.thumbnail)" href="#"><img title="{{item.title}}" ng-src="{{item.thumbnail}}" width="100%" height="100%"  data-videoid="{{item.videoid}}"/><i title="{{item.title}}" class="fa thicon fa-play-circle"></i></a></span>
 										</span>
 									</p>
 									<div class="spinner" ng-show="msg.istyping">
