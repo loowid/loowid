@@ -295,5 +295,7 @@
     "recordStream0": "Video en audio",
     "recordStream1": "Alleen video",
     "recordStream2": "Alleen audio",
-    "titleChangeStream": "Wijzig de sessie-opnamemodus."
+    "titleChangeStream": "Wijzig de sessie-opnamemodus.",
+    "titleOpenNewTab": "Openen op nieuw tabblad",
+    "download": "Opname downloaden"
 }
