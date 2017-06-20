@@ -297,5 +297,6 @@
     "recordStream2": "Alleen audio",
     "titleChangeStream": "Wijzig de sessie-opnamemodus.",
     "titleOpenNewTab": "Openen op nieuw tabblad",
-    "download": "Opname downloaden"
+    "download": "Opname downloaden",
+    "statusrecording": "Deze sessie wordt opgenomen door de kamereigenaar."
 }
