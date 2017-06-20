@@ -380,6 +380,13 @@ angular.module('mean.rooms').factory('MediaService',['Rooms','UIHandler',functio
 					} else {
 						uiHandler.recordImageUrl = '/img/audio.png';
 					}
+					
+					 room.changeRoomStatus($scope.global.roomId,uiHandler.status+'-RECORDING',function(){
+						 //Refresh the view to restore the button state          
+						 uiHandler.status = uiHandler.status+'-RECORDING';
+						 rtc.updateOwnerData ($scope.global.roomId,uiHandler.name,uiHandler.avatar,uiHandler.status,uiHandler.access);
+					 });
+					
 
 				};
 				
@@ -450,6 +457,11 @@ angular.module('mean.rooms').factory('MediaService',['Rooms','UIHandler',functio
                         		   download: true,
                         		   filename: 'loowid-'+$scope.global.roomId+'-'+(new Date()).getTime()+'.webm',
                         		   text:$scope.resourceBundle.download}]}]});
+				 room.changeRoomStatus($scope.global.roomId,uiHandler.status.substring(0,uiHandler.status.indexOf('-')),function(){
+					 //Refresh the view to restore the button state          
+					 uiHandler.status = uiHandler.status.substring(0,uiHandler.status.indexOf('-'));
+					 rtc.updateOwnerData ($scope.global.roomId,uiHandler.name,uiHandler.avatar,uiHandler.status,uiHandler.access);
+				 });
 			};
 
 			$scope.changeToResolution  = function (index){

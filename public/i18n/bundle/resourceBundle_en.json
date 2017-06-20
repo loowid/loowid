@@ -297,5 +297,6 @@
    "recordStream1": "Video only",
    "recordStream2": "Audio only",
    "titleChangeStream": "Change session recording mode.",
-   "download": "Download recording"
+   "download": "Download recording",
+   "statusrecording": "The session is being recorded by the owner of the room."
 }
