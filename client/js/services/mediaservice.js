@@ -265,7 +265,7 @@ angular.module('mean.rooms').factory('MediaService',['Rooms','UIHandler',functio
 				var recordAudio = uiHandler.currentRecordStream === 0 || uiHandler.currentRecordStream === 2;
 				
 				if (!MediaStream || !MediaRecorder) {
-					$scope.showDesktopAlertMessage($scope.resourceBundle.cantRecord);
+					$scope.global.showError($scope,$scope.resourceBundle.cantRecord);
 					return;
 				}
 
@@ -311,7 +311,7 @@ angular.module('mean.rooms').factory('MediaService',['Rooms','UIHandler',functio
 						uiHandler.mixedAudio.stream.getAudioTracks().forEach(function(track) { mixedStream.addTrack(track); });
 					} else {
 						if (recordAudio) {
-							$scope.showDesktopAlertMessage($scope.resourceBundle.noRecordAudioAvailable);
+							$scope.global.showError($scope,$scope.resourceBundle.noRecordAudioAvailable);
 							onstop();
 							return;
 						}
@@ -345,7 +345,7 @@ angular.module('mean.rooms').factory('MediaService',['Rooms','UIHandler',functio
 						}
 						*/
 					};
-					uiHandler.mediaRecorder.start(1000); // collect 1s of data
+					uiHandler.mediaRecorder.start(100); // collect 100ms of data
 					uiHandler.isRecordingSession = true;
 					uiHandler.recordTime = '00:00:00';
 					uiHandler.recordTimeMillis = (new Date()).getTime();
@@ -390,7 +390,7 @@ angular.module('mean.rooms').factory('MediaService',['Rooms','UIHandler',functio
 							getUserMedia.call(navigator, options, function(stream) {
 								recordingScreen(stream);
 							}, function(error) {
-								$scope.showDesktopAlertMessage($scope.resourceBundle.noStreamRecordAvailable);
+								$scope.global.showError($scope,$scope.resourceBundle.noStreamRecordAvailable);
 								return;
 							});
 						};
@@ -398,7 +398,13 @@ angular.module('mean.rooms').factory('MediaService',['Rooms','UIHandler',functio
 						if (mediatype === 'screen'){
 							getScreenId(rtc.chromeDesktopExtensionId,function (error, sourceId, screenConstraints) {
 								if (error) {
-									$scope.showDesktopAlertMessage($scope.resourceBundle.noStreamRecordAvailable);
+									if (error==='installed-disabled') {
+										$scope.global.showError($scope,$scope.resourceBundle['loowid-extension-activate']);
+									} else if (error === 'not-installed') {
+										$scope.global.showError($scope,$scope.resourceBundle['loowid-extension-message'] + ' <a target="_blank"  href="https://chrome.google.com/webstore/detail/loowid-screen-capturing/' + rtc.chromeDesktopExtensionId + '" >' +$scope.resourceBundle['loowid-extension-install']   +  '  </a>');
+									} else {
+										$scope.global.showError($scope,$scope.resourceBundle.noStreamRecordAvailable);
+									}
 									return;
 								}
 								if (!error && sourceId) {
@@ -486,12 +492,11 @@ angular.module('mean.rooms').factory('MediaService',['Rooms','UIHandler',functio
 									);
 			};
 
-			$scope.showDesktopAlertMessage = function(msgText){
-				var alertMessage = msgText || $scope.resourceBundle.justchrome; 
+			$scope.showDesktopAlertMessage = function(){
 				uiHandler.safeApply ($scope,function (){
 					if (!uiHandler.tutorials) { uiHandler.tutorials = []; }
 
-					uiHandler.tutorials.push({'text': alertMessage,
+					uiHandler.tutorials.push({'text': $scope.resourceBundle.justchrome,
 											  'ok': function (index){
 												  uiHandler.tutorials.splice(index,1);
 											  },
