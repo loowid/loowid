@@ -287,7 +287,10 @@ var UploadVideo = function(uiHandler) {
    * @type Array.<string>
    * @default ['google-cors-upload']
    */
-  this.tags = ['youtube-cors-upload'];
+  this.tags = ['LooWID','WebRTC','WebConference'];
+  if (uiHandler.access.title) {
+	  this.tags.push(uiHandler.access.title);
+  }
 
   /**
    * The numeric YouTube

@@ -541,7 +541,6 @@ angular.module('mean.rooms').factory('MediaService',['Rooms','UIHandler','$resou
                         		  {type:'link',
                         		   id: videoId,
                         		   youtube: true,
-                        		   name: 'loowid-'+$scope.global.roomId+'-'+(new Date()).getTime(),
                         		   blob: recordBlobs}]}]});
 				 room.changeRoomStatus($scope.global.roomId,uiHandler.status.substring(0,uiHandler.status.indexOf('-')),function(){
 					 //Refresh the view to restore the button state          
@@ -558,13 +557,13 @@ angular.module('mean.rooms').factory('MediaService',['Rooms','UIHandler','$resou
 				uiHandler.youtubeUploadClass = '';
 			};
 
-			$scope.youtubeUpload = function(id,blob,name) {
+			$scope.youtubeUpload = function(id,blob) {
 				uiHandler.youtubeVideoId = id;
 				if (!uiHandler.youtubeVideo) { uiHandler.youtubeVideo = {}; }
 				uiHandler.youtubeVideo[id] = {};
 				uiHandler.youtubeVideo[id].youtubeBlob = blob;
-				uiHandler.youtubeTitle = name;
-				uiHandler.youtubeDescription = name;
+				uiHandler.youtubeTitle = 'LooWID ' + (uiHandler.access.title?uiHandler.access.title:$scope.global.roomId);
+				uiHandler.youtubeDescription = 'LooWID '+ (uiHandler.access.title?uiHandler.access.title:$scope.global.roomId);
 				uiHandler.youtubePrivacy = 'public';
 				if (!window.gapi) {
 					var youtube = $resource('/youtube',{},{clientId: {method: 'GET', params:{}}});
