@@ -293,6 +293,33 @@ angular.module('mean.rooms').factory('MediaService',['Rooms','UIHandler','$resou
 					return audioReady;
 				};
 				
+				var drawConnectedUsers = function(myCanvas,WIDTH,HEIGHT) {
+					var conn = document.getElementById('connected');
+					var nameList = conn.getElementsByTagName('h3');
+					var imgList = conn.getElementsByTagName('img');
+					var width = 0; var height = 0; var maxHeight = 0;
+		            for (var j=0; j<imgList.length; j+=1) {
+		            	// Only connected users
+		            	if (imgList[j].offsetParent) {
+			            	if (width + imgList[j].width > WIDTH) {
+			            		width = 0; height += maxHeight + 20;
+			            	}
+			            	if (imgList[j].height > maxHeight) { maxHeight = imgList[j].height; }
+			            	myCanvas.drawImage(imgList[j],width,height,imgList[j].width,imgList[j].height);
+			            	myCanvas.font='8px Arial';
+			            	myCanvas.fillStyle = 'rgb(0, 0, 0)';
+			            	var finalText = nameList[j].textContent;
+			            	var textWidth = myCanvas.measureText(finalText).width;
+			            	while (textWidth > imgList[j].width) {
+			            		finalText = finalText.substring(0,finalText.length-6)+'...';
+			            		textWidth = myCanvas.measureText(finalText).width;
+			            	}
+			            	myCanvas.fillText(finalText,width,height+imgList[j].height+10);
+			            	width += imgList[j].width + 10;
+		            	}
+		            }
+				};
+				
 				var recordingScreen = function(stream) {
 					uiHandler.screenStream = stream;
 					var options = {mimeType: 'video/webm;codecs=vp8', bitsPerSecond: 1024 * 1024};
@@ -341,6 +368,7 @@ angular.module('mean.rooms').factory('MediaService',['Rooms','UIHandler','$resou
 						  myCanvas.fillStyle = 'rgb(255, 255, 255)';
 						  myCanvas.fillRect(0, 0, WIDTH, HEIGHT);
 						  myCanvas.drawImage(img,WIDTH-img.width,HEIGHT-img.height);
+						  drawConnectedUsers(myCanvas,WIDTH,HEIGHT);
 						  myCanvas.lineWidth = 2;
 						  myCanvas.strokeStyle = 'rgb(0, 0, 0)';
 						  myCanvas.beginPath();

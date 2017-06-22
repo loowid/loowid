@@ -211,7 +211,7 @@
 				<h1>{{resourceBundle.peopleconnected}}</h1>
 				<div class="owner connected myself">
 					<p class="user_title room_owner">{{resourceBundle.roomowner}}</p>
-					<img class="editable" ng-src="{{ui.avatar}}" ng-click="enableEditName()" title="{{resourceBundle.changemyidentity}}">
+					<img crossorigin="Anonymous" class="editable" ng-src="{{ui.avatar}}" ng-click="enableEditName()" title="{{resourceBundle.changemyidentity}}">
 					<div>
 						<h3 title="{{ui.name}}">{{ui.name}}</h3>
 					</div>
@@ -219,7 +219,7 @@
 				<h2>{{resourceBundle.roomviewers}}</h2>
 				<ul ng-class="ui.getMiniClass('sharers connected')">
 					<li data-ng-show="user.status == 'CONNECTED'" data-ng-repeat="user in ui.users">
-						<img ng-src="{{user.avatar}}" title="{{user.name}}" />
+						<img crossorigin="Anonymous" ng-src="{{user.avatar}}" title="{{user.name}}" />
 						<div class="statusOutBar {{showStatusBar(user)}} {{user.hideBarStatus}}">
 							<div title="{{resourceBundle._('titleAudioStatusOut',user.name,resourceBundle['titlestate'+user.connectionStatus.audio.out])}}" class="statusOutBtn {{user.connectionStatus.audio.out}}">
 								<i class="fa fa-volume-up"></i>
