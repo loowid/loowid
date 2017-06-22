@@ -298,7 +298,7 @@
     "recordStream2": "Només audio",
     "titleChangeStream": "Canviar la manera de gravació de la sala.",
     "download": "Descarregar gravació",
-    "statusrecording": "La sessió està sent gravada pel propietari de la sala."
+    "statusrecording": "La sessió està sent gravada pel propietari de la sala.",
     "youtubeoauth": "Autentica't a google amb el teu canal de youtube per pujar la gravació.",
     "youtubeupload": "Pujar",
     "youtubetitle": "Títol",
@@ -313,5 +313,5 @@
     "youtubeuploadedtranscoding": "Pujada completada, youtube està codificant el vídeo ...",
     "youtubetranscodingfailed": "Error codificant el vídeo.",
     "youtubeuploadtitle": "Envia la teva gravació a youtube."
-    
+
 }
