@@ -13,50 +13,51 @@
 		<nav class="toolbar">
 			<ul>
 
-				<li id="share_screen" ng-hide="ui.canShareDesktop">
-					<p title="{{resourceBundle.titleSharedesktop}}" ng-click="showDesktopAlertMessage()"><i class="fa fa-desktop"></i> <span class="title">{{resourceBundle.sharedesktopmainbar}}</span></p>
+				<li id="share_screen" class="barbutton" ng-hide="ui.canShareDesktop">
+					<div title="{{resourceBundle.titleSharedesktop}}" ng-click="showDesktopAlertMessage()"><i class="fa fa-desktop"></i> <span class="title">{{resourceBundle.sharedesktopmainbar}}</span></div>
 				</li>
-				<li id="share_screen" ng-show="ui.canShareDesktop">
-					<p title="{{resourceBundle.titleSharedesktop}}" ng-hide="isRecording('screen') || isInitializingMedia('screen')" ng-click="startRecording('screen')"><i class="fa fa-desktop"></i> <span class="title">{{resourceBundle.sharedesktopmainbar}}</span></p>
-					<p ng-show="isInitializingMedia('screen')"><i class="fa fa-desktop"></i> <span class="title">{{resourceBundle.initcapture}}</span></p>
+				<li id="share_screen" class="barbutton" ng-show="ui.canShareDesktop">
+					<div title="{{resourceBundle.titleSharedesktop}}" ng-hide="isRecording('screen') || isInitializingMedia('screen')" ng-click="startRecording('screen')"><i class="fa fa-desktop"></i> <span class="title">{{resourceBundle.sharedesktopmainbar}}</span></div>
+					<div ng-show="isInitializingMedia('screen')"><i class="fa fa-desktop"></i> <span class="title">{{resourceBundle.initcapture}}</span></div>
+					<div title="{{resourceBundle.titleStopsharedesktop}}" ng-show="isRecording('screen')" ng-click="stopRecording('screen')"><i class="tachado activo">/</i><i class="fa fa-desktop activo"></i><span class="title">{{resourceBundle.stopsharedesktopmainbar}}</span></div>
 
+					<div class="dropdown" ng-show="ui.canShareDesktop" ng-click="ui.showResolutionMenu=!ui.showResolutionMenu"	>
+						<div title="{{resourceBundle.titleChangeresolution}}" ng-hide="isRecording('screen') || isInitializingMedia('screen')" class="down" ><i class="fa fa-sort-down"></i> <span class="title"></span></div>
+						<ul ng-show="!isRecording('screen') && ui.showResolutionMenu" class="resolutionlist">
+							<li  data-ng-repeat="resolution in ui.resolutions" >
+								<p ng-click="changeToResolution($index)"><span>{{resolution.x}}</span> x <span> {{resolution.y}}</span><i ng-show="ui.currentResolution==$index" class ="fa fa-circle"></i></p>
+							</li>
+						</ul>
+					</div>
+				</li>
 
-					<p title="{{resourceBundle.titleStopsharedesktop}}" ng-show="isRecording('screen')" ng-click="stopRecording('screen')"><i class="tachado activo">/</i><i class="fa fa-desktop activo"></i><span class="title">{{resourceBundle.stopsharedesktopmainbar}}</span></p>
-				</li>
-				<li id="dropdown" ng-show="ui.canShareDesktop" ng-click="ui.showResolutionMenu=!ui.showResolutionMenu"	>
-					<p title="{{resourceBundle.titleChangeresolution}}" ng-hide="isRecording('screen') || isInitializingMedia('screen')" class="down" ><i class="fa fa-sort-down"></i> <span class="title"></span></p>
-					<ul ng-show="!isRecording('screen') && ui.showResolutionMenu" class="resolutionlist">
-						<li  data-ng-repeat="resolution in ui.resolutions" >
-							<p ng-click="changeToResolution($index)"><span>{{resolution.x}}</span> x <span> {{resolution.y}}</span><i ng-show="ui.currentResolution==$index" class ="fa fa-circle"></i></p>
-						</li>
-					</ul>
-				</li>
-				<li id="share_webcam">
+				<li id="share_webcam" class="barbutton">
 					<p  title="{{resourceBundle.titleSharevideo}}" ng-hide="isRecording('video') || isInitializingMedia('video') " ng-click="startRecording('video')"><i class="fa fa-video-camera"></i> <span class="title">{{resourceBundle.sharewebcammainbar}}</span></p>
 					<p ng-show="isInitializingMedia('video')"><i class="fa fa-video-camera"></i> <span class="title">{{resourceBundle.initcapture}}</span></p>
 					<p title="{{resourceBundle.titleStopsharevideo}}"  ng-show="isRecording('video')" ng-click="stopRecording('video')"><i class="tachado activo">/</i><i class="fa fa-video-camera activo"></i> <span class="title">{{resourceBundle.stopsharewebcammainbar}}</span></p>
 				</li>
-				<li id="share_audio">
+				<li id="share_audio" class="barbutton">
 					<p title="{{resourceBundle.titleShareaudio}}"ng-hide="isRecording('audio')  || isInitializingMedia('audio')" ng-click="startRecording('audio')"><i class="fa fa-microphone"></i> <span class="title">{{resourceBundle.shareaudiobar}}</span></p>
 					<p ng-show="isInitializingMedia('audio')"><i class="fa fa-micophone"></i> <span class="title">{{resourceBundle.initcapture}}</span></p>
 					<p title="{{resourceBundle.titleStopshareaudio}}"  ng-show="isRecording('audio')" ng-click="stopRecording('audio')"><i class="tachado activo">/</i><i class="fa fa-microphone activo"></i> <span class="title">{{resourceBundle.stopshareaudiobar}}</span></p>
 				</li>
 
-				<li id="mute_audio" ng-show="isRecording('audio')">
+				<li id="mute_audio" class="barbutton" ng-show="isRecording('audio')">
 					<p title="{{resourceBundle.titleMute}}"  ng-click="muteAudio()" ng-hide="ui.isMuted"><i class="fa fa-times"></i> <span class="title">{{resourceBundle.mutemainbar}}</span></p>
 					<p title="{{resourceBundle.titleUnmute}}"  ng-click="unmuteAudio()" ng-show="ui.isMuted"><i class="fa fa-volume-up"></i> <span class="title">{{resourceBundle.unmutemainbar}}</span></p>
 				</li>
-				<li id="recording">
-					<p title="{{resourceBundle.startRecordingSession}}"  ng-click="startRecordingSession()" ng-hide="ui.isRecordingSession"><i class="fa fa-circle"></i> <span class="title">{{resourceBundle.startRecordingSession}}</span></p>
-					<p title="{{resourceBundle.stopRecordingSession}}"  ng-click="stopRecordingSession()" ng-show="ui.isRecordingSession" ng-mouseenter="ui.showTime=true" ng-mouseleave="ui.showTime=false"><i class="fa fa-stop"></i> <span class="title">{{resourceBundle.stopRecordingSession}}</span> <span class="title" ng-show="ui.showTime">{{ui.recordTime}}</span></p>
-				</li>
-				<li id="dropdown" ng-click="ui.showRecordMenu=!ui.showRecordMenu"	>
-					<p title="{{resourceBundle.titleChangeStream}}" ng-hide="ui.isRecordingSession" class="down" ><i class="fa fa-sort-down"></i> <span class="title"></span></p>
-					<ul ng-show="!ui.isRecordingSession && ui.showRecordMenu" class="resolutionlist">
-						<li ng-show="ui.canShareDesktop"><p ng-click="changeToRecordStream(0)"><span>{{resourceBundle.recordStream0}}</span><i ng-show="ui.currentRecordStream==0" class ="fa fa-circle"></i></p></li>
-						<li ng-show="ui.canShareDesktop"><p ng-click="changeToRecordStream(1)"><span>{{resourceBundle.recordStream1}}</span><i ng-show="ui.currentRecordStream==1" class ="fa fa-circle"></i></p></li>
-						<li><p ng-click="changeToRecordStream(2)"><span>{{resourceBundle.recordStream2}}</span><i ng-show="ui.currentRecordStream==2" class ="fa fa-circle"></i></p></li>
-					</ul>
+				<li id="recording" class="barbutton">
+					<div title="{{resourceBundle.startRecordingSession}}"  ng-click="startRecordingSession()" ng-hide="ui.isRecordingSession"><i class="fa fa-circle"></i> <span class="title">{{resourceBundle.startRecordingSession}}</span></div>
+					<div title="{{resourceBundle.stopRecordingSession}}"  ng-click="stopRecordingSession()" ng-show="ui.isRecordingSession" ng-mouseenter="ui.showTime=true" ng-mouseleave="ui.showTime=false"><i class="fa fa-stop"></i> <span class="title">{{resourceBundle.stopRecordingSession}}</span> <span class="title" ng-show="ui.showTime">{{ui.recordTime}}</span></div>
+
+					<div class="dropdown" ng-click="ui.showRecordMenu=!ui.showRecordMenu"	>
+						<div title="{{resourceBundle.titleChangeStream}}" ng-hide="ui.isRecordingSession" class="down" ><i class="fa fa-sort-down"></i> <span class="title"></span></div>
+						<ul ng-show="!ui.isRecordingSession && ui.showRecordMenu" class="resolutionlist">
+							<li ng-show="ui.canShareDesktop"><p ng-click="changeToRecordStream(0)"><span>{{resourceBundle.recordStream0}}</span><i ng-show="ui.currentRecordStream==0" class ="fa fa-circle"></i></p></li>
+							<li ng-show="ui.canShareDesktop"><p ng-click="changeToRecordStream(1)"><span>{{resourceBundle.recordStream1}}</span><i ng-show="ui.currentRecordStream==1" class ="fa fa-circle"></i></p></li>
+							<li><p ng-click="changeToRecordStream(2)"><span>{{resourceBundle.recordStream2}}</span><i ng-show="ui.currentRecordStream==2" class ="fa fa-circle"></i></p></li>
+						</ul>
+					</div>
 				</li>
 			</ul>
 		</nav>

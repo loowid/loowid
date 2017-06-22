@@ -9,34 +9,38 @@
 	</div>
 	<nav class="toolbar">
 		<ul>
-			<li id="share_screen" ng-hide="ui.canShareDesktop || ui.access.moderated">
+			<li id="share_screen" class="barbutton" ng-hide="ui.canShareDesktop || ui.access.moderated">
 				<p title="{{resourceBundle.titleSharedesktop}}"  ng-click="showDesktopAlertMessage()"><i class="fa fa-desktop"></i> <span class="title">{{resourceBundle.sharedesktopmainbar}}</span></p>
 			</li>
-			<li id="share_screen" ng-show="ui.canShareDesktop">
-				<p title="{{resourceBundle.titleSharedesktop}}" ng-hide="isRecording('screen') || ui.access.moderated  || isInitializingMedia('screen') " ng-click="startRecording('screen')"><i class="fa fa-desktop"></i> <span class="title">{{resourceBundle.sharedesktopmainbar}}</span></p>
-				<p ng-show="isInitializingMedia('screen')"><i class="fa fa-desktop"></i> <span class="title">{{resourceBundle.initcapture}}</span></p>
-				<p title="{{resourceBundle.titleStopsharedesktop}}"  ng-show="isRecording('screen')" ng-click="stopRecording('screen')"><i class="tachado activo">/</i><i class="fa fa-desktop activo"></i> <span class="title">{{resourceBundle.stopsharedesktopmainbar}}</span></p>
+			<li id="share_screen" class="barbutton" ng-show="ui.canShareDesktop">
+				<div title="{{resourceBundle.titleSharedesktop}}" ng-hide="isRecording('screen') || ui.access.moderated  || isInitializingMedia('screen') " ng-click="startRecording('screen')"><i class="fa fa-desktop"></i> <span class="title">{{resourceBundle.sharedesktopmainbar}}</span></div>
+				<div ng-show="isInitializingMedia('screen')"><i class="fa fa-desktop"></i> <span class="title">{{resourceBundle.initcapture}}</span></div>
+				<div title="{{resourceBundle.titleStopsharedesktop}}"  ng-show="isRecording('screen')" ng-click="stopRecording('screen')"><i class="tachado activo">/</i><i class="fa fa-desktop activo"></i> <span class="title">{{resourceBundle.stopsharedesktopmainbar}}</span></div>
+
+				<div class="dropdown" id="dropdown"  ng-show="ui.canShareDesktop && !ui.access.moderated  || isInitializingMedia('screen') " ng-click="ui.showResolutionMenu=!ui.showResolutionMenu"	>
+					<div title="{{resourceBundle.titleChangeresolution}}" ng-hide="isRecording('screen') || ui.access.moderated || isInitializingMedia('screen')" ><i class="fa fa-sort-down"></i> <span class="title"></span></div>
+					<ul ng-show="!isRecording('screen') && ui.showResolutionMenu && !ui.access.moderated" class="resolutionlist">
+						<li  data-ng-repeat="resolution in ui.resolutions" >
+							<p ng-click="changeToResolution($index)"><span>{{resolution.x}}</span> x <span> {{resolution.y}}</span><i ng-show="ui.currentResolution==$index" class ="fa fa-circle"></i></p>
+						</li>
+					</ul>
+				</div>
+
+
 			</li>
-			<li id="dropdown"  ng-show="ui.canShareDesktop && !ui.access.moderated  || isInitializingMedia('screen') " ng-click="ui.showResolutionMenu=!ui.showResolutionMenu"	>
-				<p title="{{resourceBundle.titleChangeresolution}}" ng-hide="isRecording('screen') || ui.access.moderated || isInitializingMedia('screen')" ><i class="fa fa-sort-down"></i> <span class="title"></span></p>
-				<ul ng-show="!isRecording('screen') && ui.showResolutionMenu && !ui.access.moderated" class="resolutionlist">
-					<li  data-ng-repeat="resolution in ui.resolutions" >
-						<p ng-click="changeToResolution($index)"><span>{{resolution.x}}</span> x <span> {{resolution.y}}</span><i ng-show="ui.currentResolution==$index" class ="fa fa-circle"></i></p>
-					</li>
-				</ul>
-			</li>
-			<li id="share_webcam">
+
+			<li id="share_webcam" class="barbutton">
 				<p title="{{resourceBundle.titleSharevideo}}" ng-hide="isRecording('video') || ui.access.moderated  || isInitializingMedia('video') " ng-click="startRecording('video')"><i class="fa fa-video-camera"></i> <span class="title">{{resourceBundle.sharewebcammainbar}}</span></p>
 				<p ng-show="isInitializingMedia('video')"><i class="fa fa-video-camera"></i> <span class="title">{{resourceBundle.initcapture}}</span></p>
 				<p title="{{resourceBundle.titleStopsharevideo}}"  ng-show="isRecording('video')" ng-click="stopRecording('video')"><i class="tachado activo">/</i><i class="fa fa-video-camera activo"></i> <span class="title">{{resourceBundle.stopsharewebcammainbar}}</span></p>
 			</li>
-			<li id="share_audio">
+			<li id="share_audio" class="barbutton">
 				<p title="{{resourceBundle.titleShareaudio}}"  ng-hide="isRecording('audio') || ui.access.moderated || isInitializingMedia('audio')" ng-click="startRecording('audio')"><i class="fa fa-microphone"></i> <span class="title">{{resourceBundle.shareaudiobar}}</span></p>
 				<p ng-show="isInitializingMedia('audio')"><i class="fa fa-micophone"></i> <span class="title">{{resourceBundle.initcapture}}</span></p>
 				<p title="{{resourceBundle.titleStopshareaudio}}"  ng-show="isRecording('audio')" ng-click="stopRecording('audio')"><i class="tachado activo">/</i><i class="fa fa-microphone activo"></i> <span class="title">{{resourceBundle.stopshareaudiobar}}</span></p>
 			</li>
 
-			<li id="mute_audio" ng-show="isRecording('audio')">
+			<li id="mute_audio" ng-show="isRecording('audio')" class="barbutton">
 				<p title="{{resourceBundle.titleMute}}"  ng-click="muteAudio()" ng-hide="ui.isMuted"><i class="fa fa-volume-off"></i> <span class="title">{{resourceBundle.mutemainbar}}</span></p>
 				<p title="{{resourceBundle.titleUnmute}}" ng-click="unmuteAudio()" ng-show="ui.isMuted"><i class="fa fa-volume-up"></i> <span class="title">{{resourceBundle.unmutemainbar}}</span></p>
 			</li>
