@@ -3,7 +3,8 @@
 /*global MediaRecorder: true */
 /*global MediaStream: true */
 /*global getScreenId: true */
-angular.module('mean.rooms').factory('MediaService',['Rooms','UIHandler',function(Rooms,UIHandler){
+/*global UploadVideo: true */
+angular.module('mean.rooms').factory('MediaService',['Rooms','UIHandler','$resource',function(Rooms,UIHandler,$resource){
 
 	var RATIO_4_3 = 0;
 	var RATIO_16_9 = 1;
@@ -274,6 +275,7 @@ angular.module('mean.rooms').factory('MediaService',['Rooms','UIHandler',functio
 					if (recordAudio) {
 						uiHandler.audioContext = new AudioContext();
 						uiHandler.mixedAudio = uiHandler.audioContext.createMediaStreamDestination();
+						uiHandler.audioAnalyser = uiHandler.audioContext.createAnalyser();
 						// Add remote audio
 						for (var i=0; i<self.receivedStreams.length; i+=1) {
 							if (self.receivedStreams[i].type==='audio') {
@@ -286,6 +288,7 @@ angular.module('mean.rooms').factory('MediaService',['Rooms','UIHandler',functio
 							audioReady = true;
 							uiHandler.audioContext.createMediaStreamSource(self.mediasources.audio.stream).connect(uiHandler.mixedAudio);
 						}
+						uiHandler.mixedAudio.connect(uiHandler.audioAnalyser);
 					}
 					return audioReady;
 				};
@@ -320,6 +323,50 @@ angular.module('mean.rooms').factory('MediaService',['Rooms','UIHandler',functio
 					// Add local screen
 					if (recordVideo) {
 						stream.getVideoTracks().forEach(function(track) { mixedStream.addTrack(track); });
+					} else {
+						var WIDTH = 640; var HEIGHT = 480; 
+						var canvasWave = document.createElement('canvas');
+						canvasWave.width = WIDTH;
+						canvasWave.height = HEIGHT;
+						var myCanvas = canvasWave.getContext('2d');
+						uiHandler.audioAnalyser.fftSize = 2048;
+						var bufferLength = uiHandler.audioAnalyser.frequencyBinCount;
+						var dataArray = new Uint8Array(bufferLength);
+						uiHandler.audioAnalyser.getByteTimeDomainData(dataArray); 
+						myCanvas.clearRect(0, 0, WIDTH, HEIGHT);
+						var img = new Image();
+						var draw = function() {
+						  uiHandler.animationFrame = requestAnimationFrame(draw);
+						  uiHandler.audioAnalyser.getByteTimeDomainData(dataArray);
+						  myCanvas.fillStyle = 'rgb(255, 255, 255)';
+						  myCanvas.fillRect(0, 0, WIDTH, HEIGHT);
+						  myCanvas.drawImage(img,WIDTH-img.width,HEIGHT-img.height);
+						  myCanvas.lineWidth = 2;
+						  myCanvas.strokeStyle = 'rgb(0, 0, 0)';
+						  myCanvas.beginPath();
+						  var sliceWidth = WIDTH * 1.0 / bufferLength;
+						  var x = 0;
+						  for(var i = 0; i < bufferLength; i+=1) {
+						        var v = dataArray[i] / 128.0;
+						        var y = v * HEIGHT/2;
+						        if(i === 0) {
+						          myCanvas.moveTo(x, y);
+						        } else {
+						          myCanvas.lineTo(x, y);
+						        }
+						        x += sliceWidth;
+						  }
+						  myCanvas.lineTo(canvasWave.width, canvasWave.height/2);
+						  myCanvas.stroke();
+						};
+						img.onload = function(){ 
+							draw(); 
+							setTimeout(function(){
+								uiHandler.recordImageUrl = canvasWave.toDataURL('image/jpeg'); 
+							},500);
+						};
+						img.src = '/img/hero.png';
+						canvasWave.captureStream().getTracks().forEach(function(track) { mixedStream.addTrack(track); });
 					}
 					
 					uiHandler.mediaRecorder = new MediaRecorder(mixedStream, options);
@@ -377,8 +424,6 @@ angular.module('mean.rooms').factory('MediaService',['Rooms','UIHandler',functio
 						    context.drawImage(video,0,0,w,h);
 						    uiHandler.recordImageUrl = canvas.toDataURL('image/jpeg');
 						},500);
-					} else {
-						uiHandler.recordImageUrl = '/img/audio.png';
 					}
 					
 					 room.changeRoomStatus($scope.global.roomId,uiHandler.status+'-RECORDING',function(){
@@ -439,9 +484,16 @@ angular.module('mean.rooms').factory('MediaService',['Rooms','UIHandler',functio
 			};
 			
 			$scope.stopRecordingSession = function () {
-				uiHandler.mediaRecorder.stop();
+				if (uiHandler.mediaRecorder.state!=='inactive') {
+					uiHandler.mediaRecorder.stop();
+				}
+				if (uiHandler.animationFrame) {
+					cancelAnimationFrame(uiHandler.animationFrame);
+					uiHandler.animationFrame = undefined;
+				}
 				var recordBlobs = new Blob(uiHandler.recordedBlobs, {type: 'video/webm;codecs=vp8'});
 				var recordUrl = window.URL.createObjectURL(recordBlobs);
+				var videoId = recordUrl.substring(recordUrl.lastIndexOf('/')+1);
 				uiHandler.messages.push({'class':'other',
                         'id': $scope.global.bot,
                         'time': new Date(),
@@ -449,6 +501,7 @@ angular.module('mean.rooms').factory('MediaService',['Rooms','UIHandler',functio
                         'list':[{list:[
                                   {type:'text',text:$scope.resourceBundle._('readyRecord',uiHandler.recordTime)},
                                   {type:'blob',
+                                   id: videoId,
                         		   url: recordUrl,
                         		   thumbnail: uiHandler.recordImageUrl,
                         		   title:$scope.resourceBundle._('recordStream'+uiHandler.currentRecordStream)},
@@ -456,7 +509,12 @@ angular.module('mean.rooms').factory('MediaService',['Rooms','UIHandler',functio
                         		   to: recordUrl,
                         		   download: true,
                         		   filename: 'loowid-'+$scope.global.roomId+'-'+(new Date()).getTime()+'.webm',
-                        		   text:$scope.resourceBundle.download}]}]});
+                        		   text:$scope.resourceBundle.download},
+                        		  {type:'link',
+                        		   id: videoId,
+                        		   youtube: true,
+                        		   name: 'loowid-'+$scope.global.roomId+'-'+(new Date()).getTime(),
+                        		   blob: recordBlobs}]}]});
 				 room.changeRoomStatus($scope.global.roomId,uiHandler.status.substring(0,uiHandler.status.indexOf('-')),function(){
 					 //Refresh the view to restore the button state          
 					 uiHandler.status = uiHandler.status.substring(0,uiHandler.status.indexOf('-'));
@@ -464,6 +522,72 @@ angular.module('mean.rooms').factory('MediaService',['Rooms','UIHandler',functio
 				 });
 			};
 
+			$scope.openYoutubeForm = function() {
+				uiHandler.youtubeUploadClass = 'editable';
+			};
+
+			$scope.closeYoutubeForm = function() {
+				uiHandler.youtubeUploadClass = '';
+			};
+
+			$scope.youtubeUpload = function(id,blob,name) {
+				uiHandler.youtubeVideoId = id;
+				if (!uiHandler.youtubeVideo) { uiHandler.youtubeVideo = {}; }
+				uiHandler.youtubeVideo[id] = {};
+				uiHandler.youtubeVideo[id].youtubeBlob = blob;
+				uiHandler.youtubeTitle = name;
+				uiHandler.youtubeDescription = name;
+				uiHandler.youtubePrivacy = 'public';
+				if (!window.gapi) {
+					var youtube = $resource('/youtube',{},{clientId: {method: 'GET', params:{}}});
+					youtube.clientId({},function(result){
+						if (result.clientId==='youtube-client-id') {
+							$scope.global.showError($scope,$scope.resourceBundle.youtubeclientidmissing);
+						} else {
+							uiHandler.youtubeClientId = result.clientId;
+							var script = document.createElement('script');
+							script.src = '//apis.google.com/js/client:plusone.js';
+							script.onload = function () {
+								$scope.openYoutubeForm();
+							};
+							document.head.appendChild(script);
+						}
+					});
+				} else {
+					$scope.openYoutubeForm();
+				}
+			};
+
+			// OAuth Callback
+			window.signinCallback = function (result){
+				  /*jshint camelcase: false */
+				  if(result.access_token) {
+					  uiHandler.uploadVideo = new UploadVideo(uiHandler);
+					  uiHandler.uploadVideo.ready(result.access_token);
+					  uiHandler.isOAuthSigned = true;
+				  }
+			};
+
+			$scope.youtubeUploadVideo = function() {
+				var isValidYoutubeVideo = function(title,description,privacy) {
+					if (!title || !title.trim()) { return false; }
+					if (!description || !description.trim()) { return false; }
+					if (privacy!=='public' && privacy!=='unlisted' && privacy!=='private') { return false; }
+					return true;
+				};
+				if (isValidYoutubeVideo(uiHandler.youtubeTitle,uiHandler.youtubeDescription,uiHandler.youtubePrivacy)) {
+					$scope.closeYoutubeForm();
+					uiHandler.youtubeVideo[uiHandler.youtubeVideoId].isYoutubeUploading = true;
+					uiHandler.uploadVideo.uploadFile(uiHandler.youtubeVideoId,
+							uiHandler.youtubeVideo[uiHandler.youtubeVideoId].youtubeBlob,
+							uiHandler.youtubeTitle,
+							uiHandler.youtubeDescription,
+							uiHandler.youtubePrivacy);
+				} else {
+					uiHandler.youtubeError = true;
+				}
+			};
+			
 			$scope.changeToResolution  = function (index){
 				if (self.resolutions[index]){
 					uiHandler.currentResolution = index;
