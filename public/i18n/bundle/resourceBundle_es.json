@@ -297,5 +297,20 @@
     "recordStream2": "Sólo audio",
     "titleChangeStream": "Cambiar el modo de grabación de la sala.",
 	"download": "Descargar grabación",
-    "statusrecording": "La sesión está siendo grabada por el propietario de la sala."
+    "statusrecording": "La sesión está siendo grabada por el propietario de la sala.",
+    "youtubeoauth": "Autentícate en google con tu canal de youtube para subir la grabación.",
+    "youtubeupload": "Subir",
+    "youtubetitle": "Título",
+    "youtubedescription": "Descripción",
+    "youtubeprivacy": "Privacidad",
+    "youtubepublic": "Público",
+    "youtubeunlisted": "No listado",
+    "youtubeprivate": "Privado",
+    "youtubechannel": "Canal",
+    "youtubeclientidmissing": "Debes configurar un id de cliente en el servidor de loowid para la API de Youtube.",
+    "youtubemandatory": "Debes rellenar todos los campos del formulario.",
+    "youtubeuploadedtranscoding": "Subida completada, youtube está codificando el video...",
+    "youtubetranscodingfailed": "Error codificando el vídeo.",
+    "youtubeuploadtitle": "Envía tu grabación a youtube."
+    
 }

@@ -365,6 +365,10 @@ app.post('/slack',function(req,res,next){
 	res.send();
 });
 
+app.get('/youtube',function(req,res){
+	res.send({clientId:process.env.LOOWID_YOUTUBE_CLIENTID || 'youtube-client-id'});
+});
+
 var finalHeaders = {'User-Agent':'Mozilla/5.0 (Windows NT 6.0; rv:26.0) Gecko/20100101 Firefox/33.0'};
 
 /* Discover oembed services */
