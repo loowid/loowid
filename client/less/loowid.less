@@ -1291,6 +1291,13 @@ header{
 	}
 	a {
 		font-size: 0.75em;
+		cursor: pointer;
+	}
+	a.youtube {
+		font-size: 2em;
+		color: #cc181e;
+		float: right;
+		cursor: pointer;
 	}
 	.toggler{
 		right: 230px;
@@ -1485,7 +1492,7 @@ header{
   }
 }
 
-#editName, #editAccess, #editResolution, #modalforms .modalform, #tutorialforms .tutorialform {
+#editName, #editAccess, #editResolution, #modalforms .modalform, #tutorialforms .tutorialform, #youtubeUpload {
 	position: absolute;
 	.transition(all 1s ease );
 	margin: 50px auto;
@@ -1665,6 +1672,30 @@ header{
 	left: 84px;
 	&.editable{
 		top: -8px;
+	}
+}
+
+#youtubeUpload{
+	left: 64px;
+	&.editable{
+		top: -8px;
+	}
+	img {
+		width: 48px;
+		float: left;
+		margin-right: 10px;
+	}
+	#disclaimer {
+		font-size: 0.75em;
+		margin-bottom: 20px;
+	}
+	#channel {
+		display: block;
+	}
+	.error {
+		background: darkred;
+		color: white;
+		padding-left: 10px;
 	}
 }
 

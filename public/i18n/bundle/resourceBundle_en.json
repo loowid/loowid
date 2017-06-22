@@ -304,5 +304,19 @@
    "recordStream2": "Audio only",
    "titleChangeStream": "Change session recording mode.",
    "download": "Download recording",
-   "statusrecording": "The session is being recorded by the owner of the room."
+   "statusrecording": "The session is being recorded by the owner of the room.",
+   "youtubeoauth": "Login google with your youtube's channel account to upload your recording.",
+   "youtubeupload": "Upload",
+   "youtubetitle": "Title",
+   "youtubedescription": "Description",
+   "youtubeprivacy": "Privacy status",
+   "youtubepublic": "Public",
+   "youtubeunlisted": "Unlisted",
+   "youtubeprivate": "Private",
+   "youtubechannel": "Channel",
+   "youtubeclientidmissing": "You must configure loowid server with a valid Youtube Client API Id",
+   "youtubemandatory": "You must fill all the fields.",
+   "youtubeuploadedtranscoding": "Upload complete, youtube is transcoding your video...",
+   "youtubetranscodingfailed": "Error transcondig video.",
+   "youtubeuploadtitle": "Send your recording to youtube."
 }

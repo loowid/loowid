@@ -134,7 +134,50 @@
 				</li>
 			</ul>
 		</div>
-
+		<div id="youtubeUpload" ng-class="ui.youtubeUploadClass">
+			<fieldset>
+				<p class="toolbar">
+					<a href="" ng-click="youtubeUploadVideo()" ng-show="ui.isOAuthSigned">{{resourceBundle.youtubeupload}}</a>
+					<a href="" ng-click="closeYoutubeForm()" class="close warnedbtn">{{resourceBundle.accessclose}}</a>
+				</p>
+				<div ng-hide="ui.isOAuthSigned">
+					<p>{{resourceBundle.youtubeoauth}}</p>
+					<span id="signinButton">
+					  <span
+					    class="g-signin"
+					    data-callback="signinCallback"
+					    data-clientid="{{ui.youtubeClientId}}"
+					    data-cookiepolicy="single_host_origin"
+					    data-scope="https://www.googleapis.com/auth/youtube.upload https://www.googleapis.com/auth/youtube">
+					  </span>
+					</span>
+				</div>
+			    <div ng-show="ui.isOAuthSigned">
+			      <p>
+			        <img ng-src="{{ui.youtubeChannelThumb}}">
+			        <label id="channel">{{resourceBundle.youtubechannel}}:</label>
+			        <span>{{ui.youtubeChannelName}}</span>
+			      </p>
+			      <p>
+			        <label for="title">{{resourceBundle.youtubetitle}}:</label>
+			        <input id="title" type="text" ng-model="ui.youtubeTitle">
+			      </p>
+			      <p>
+			        <label for="description">{{resourceBundle.youtubedescription}}:</label><br/>
+			        <textarea id="description" ng-model="ui.youtubeDescription" cols="55" rows="5"></textarea>
+			      </p>
+			      <p>
+			        <label for="privacy-status">{{resourceBundle.youtubeprivacy}}:</label>
+			        <select id="privacy-status" ng-model="ui.youtubePrivacy">
+			          <option value="public">{{resourceBundle.youtubepublic}}</option>
+			          <option value="unlisted">{{resourceBundle.youtubeunlisted}}</option>
+			          <option value="private">{{resourceBundle.youtubeprivate}}</option>
+			        </select>
+			      </p>
+				  <p class="error" ng-show="ui.youtubeError">{{resourceBundle.youtubemandatory}}</p>
+			      <p id="disclaimer">By uploading a video, you certify that you own all rights to the content or that you are authorized by the owner to make the content publicly available on YouTube, and that it otherwise complies with the YouTube Terms of Service located at <a href="http://www.youtube.com/t/terms" target="_blank">http://www.youtube.com/t/terms</a></p>
+			</fieldset>
+		</div>
 		<div id="tutorialforms">
 			<ul>
 				<li ng-repeat="tutorial in ui.tutorials" >
@@ -169,7 +212,7 @@
 				<h1>{{resourceBundle.peopleconnected}}</h1>
 				<div class="owner connected myself">
 					<p class="user_title room_owner">{{resourceBundle.roomowner}}</p>
-					<img class="editable" ng-src="{{ui.avatar}}" ng-click="enableEditName()" title="{{resourceBundle.changemyidentity}}">
+					<img crossorigin="Anonymous" class="editable" ng-src="{{ui.avatar}}" ng-click="enableEditName()" title="{{resourceBundle.changemyidentity}}">
 					<div>
 						<h3 title="{{ui.name}}">{{ui.name}}</h3>
 					</div>
@@ -177,7 +220,7 @@
 				<h2>{{resourceBundle.roomviewers}}</h2>
 				<ul ng-class="ui.getMiniClass('sharers connected')">
 					<li data-ng-show="user.status == 'CONNECTED'" data-ng-repeat="user in ui.users">
-						<img ng-src="{{user.avatar}}" title="{{user.name}}" />
+						<img crossorigin="Anonymous" ng-src="{{user.avatar}}" title="{{user.name}}" />
 						<div class="statusOutBar {{showStatusBar(user)}} {{user.hideBarStatus}}">
 							<div title="{{resourceBundle._('titleAudioStatusOut',user.name,resourceBundle['titlestate'+user.connectionStatus.audio.out])}}" class="statusOutBtn {{user.connectionStatus.audio.out}}">
 								<i class="fa fa-volume-up"></i>
@@ -341,9 +384,28 @@
 												<span> {{item.text}}</span>
 											</a>
 											<a ng-show="item.type==='link' && item.download" href="{{item.to}}" download="{{item.filename}}">{{item.text}}</a>
+											<a ng-show="item.type==='link' && item.youtube" ng-click="youtubeUpload(item.id,item.blob)" class="youtube" title="{{resourceBundle.youtubeuploadtitle}}"><i class="fa fa-youtube-square"></i></a>
 											<span ng-show="item.type==='text'">{{item.text}}</span>
 											<span ng-show="item.type==='emoji'"><i title="{{item.base}}" ng-class="item.twaclass" ng-click="item.base === ':sound:' && changeSound($event)"></i></span>
-											<span ng-show="item.type==='blob'" class="evideo"><a ng-click="openBlob(item.url,item.title,item.thumbnail)" href="#"><img title="{{item.title}}" ng-src="{{item.thumbnail}}" width="100%" height="100%"  data-videoid="{{item.videoid}}"/><i title="{{item.title}}" class="fa thicon fa-play-circle"></i></a></span>
+											<span ng-show="item.type==='blob'" class="evideo">
+												<a ng-click="openBlob(item.url,item.title,item.thumbnail)">
+													<img title="{{item.title}}" ng-src="{{item.thumbnail}}" width="100%" height="100%"  data-videoid="{{item.videoid}}"/>
+													<i title="{{item.title}}" class="fa thicon fa-play-circle"></i>
+												</a>
+												<span ng-show="ui.youtubeVideo[item.id].isYoutubeUploading">
+													<progress max="{{ui.youtubeVideo[item.id].youtubeProgressMax}}" value="{{ui.youtubeVideo[item.id].youtubeProgressValue}}"></progress>
+													<span>{{ui.youtubeVideo[item.id].youtubeProgressPct}}%</span>
+												</span>
+												<span ng-show="ui.youtubeVideo[item.id].isYoutubeUploaded">
+													<span>{{resourceBundle.youtubeuploadedtranscoding}}</span>
+												</span>
+												<span ng-show="ui.youtubeVideo[item.id].isYoutubeTranscodingFailed">
+													<span>{{resourceBundle.youtubetranscodingfailed}}</span>
+												</span>
+												<span ng-show="ui.youtubeVideo[item.id].isYoutubeTranscoded">
+													<a href="#" ng-click="openOEmbedFromService({url:ui.youtubeVideo[item.id].youtubeVideoUrl})">{{ui.youtubeVideo[item.id].youtubeVideoUrlText}}</a>
+												</span>
+											</span>
 										</span>
 									</p>
 									<div class="spinner" ng-show="msg.istyping">
