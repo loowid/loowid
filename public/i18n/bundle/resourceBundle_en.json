@@ -155,10 +155,10 @@
    "qneedprofile":"Do I need a profile?",
    "needprofilehelp":"You just need a profile if you want to get paid",
    "textsheader":"You have much more information in our main page but, to begin with, in LooWID you can:",
-   "textsitemsharefile":"Send files to your guests without being registered anywhere",
-   "textitemsrecord": "Record your room session directly to your computer or share it to YouTube",
+   "textsitemsharefile":"Send files to your guests without being registered anywhere.",
+   "textitemsrecord": "Record your room session directly to your computer or share it to YouTube.",
    "textitemsetherpad": "Share notes in a pad in which people will be able to write down together.",
-   "textintemstypeform": "Show the <a href='https://www.typeform.com/' target='blank'> TypeForm</a> pretty forms to ask questions to attendees. ",
+   "textintemstypeform": "Show the <a href='https://www.typeform.com/' target='blank'> TypeForm</a> pretty forms to ask questions to attendees.",
    "textitemsvideos": "Watch videos from YouTube or Vimeo all together.",
    "textslink" : "You can access all the information you need from <a href='https://github.com/loowid/loowid/wiki/How-to-use-it/How-to-use-it'>here</a>, in our public <a href='https://github.com/loowid/loowid/wiki'>wiki</a>",
    "audiodesc": "Use LooWID in your audio communications. You can use it in your podcast interviews and get the best audio quality.",
@@ -305,7 +305,7 @@
    "titleChangeStream": "Change session recording mode.",
    "download": "Download recording",
    "statusrecording": "The session is being recorded by the owner of the room.",
-   "youtubeoauth": "Login google with your youtube's channel account to upload your recording.",
+   "youtubeoauth": "Login google with your YouTube's channel account to upload your recording.",
    "youtubeupload": "Upload",
    "youtubetitle": "Title",
    "youtubedescription": "Description",
@@ -316,7 +316,7 @@
    "youtubechannel": "Channel",
    "youtubeclientidmissing": "You must configure loowid server with a valid Youtube Client API Id",
    "youtubemandatory": "You must fill all the fields.",
-   "youtubeuploadedtranscoding": "Upload complete, youtube is transcoding your video...",
+   "youtubeuploadedtranscoding": "Upload complete, YouTube is transcoding your video...",
    "youtubetranscodingfailed": "Error transcondig video.",
-   "youtubeuploadtitle": "Send your recording to youtube."
+   "youtubeuploadtitle": "Send your recording to YouTube."
 }
