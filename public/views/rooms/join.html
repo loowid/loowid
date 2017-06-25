@@ -48,7 +48,7 @@
 				</li>
 				<li id="recording" class="barbutton">
 					<div title="{{resourceBundle.startRecordingSession}}"  ng-click="startRecordingSession()" ng-hide="ui.isRecordingSession"><i class="fa fa-circle"></i> <span class="title">{{resourceBundle.startRecordingSession}}</span></div>
-					<div title="{{resourceBundle.stopRecordingSession}}"  ng-click="stopRecordingSession()" ng-show="ui.isRecordingSession" ng-mouseenter="ui.showTime=true" ng-mouseleave="ui.showTime=false"><i class="fa fa-stop"></i> <span class="title">{{resourceBundle.stopRecordingSession}}</span> <span class="title" ng-show="ui.showTime">{{ui.recordTime}}</span></div>
+					<div title="{{resourceBundle.stopRecordingSession}}"  ng-click="stopRecordingSession()" ng-show="ui.isRecordingSession" ng-mouseenter="ui.showTime=true" ng-mouseleave="ui.showTime=false"><i class="recording fa fa-stop"></i> <span class="title">{{resourceBundle.stopRecordingSession}}</span> <span class="title" ng-show="ui.showTime">{{ui.recordTime}}</span></div>
 
 					<div class="dropdown" ng-click="ui.showRecordMenu=!ui.showRecordMenu"	>
 						<div title="{{resourceBundle.titleChangeStream}}" ng-hide="ui.isRecordingSession" class="down" ><i class="fa fa-sort-down"></i> <span class="title"></span></div>
@@ -174,8 +174,9 @@
 			          <option value="private">{{resourceBundle.youtubeprivate}}</option>
 			        </select>
 			      </p>
-				  <p class="error" ng-show="ui.youtubeError">{{resourceBundle.youtubemandatory}}</p>
+				  	<p class="error" ng-show="ui.youtubeError">{{resourceBundle.youtubemandatory}}</p>
 			      <p id="disclaimer">By uploading a video, you certify that you own all rights to the content or that you are authorized by the owner to make the content publicly available on YouTube, and that it otherwise complies with the YouTube Terms of Service located at <a href="http://www.youtube.com/t/terms" target="_blank">http://www.youtube.com/t/terms</a></p>
+					</div>
 			</fieldset>
 		</div>
 		<div id="tutorialforms">
@@ -208,85 +209,96 @@
 				</div>
 			</div>
 			<aside id="connected" ng-class="ui.connectedClass">
-				<span title="{{resourceBundle.titleOpencloseconnections}}" class="toggler" ng-click="toggleConnected()"><i class="fa fa-angle-double-left"></i></span>
-				<h1>{{resourceBundle.peopleconnected}}</h1>
-				<div class="owner connected myself">
-					<p class="user_title room_owner">{{resourceBundle.roomowner}}</p>
-					<img crossorigin="Anonymous" class="editable" ng-src="{{ui.avatar}}" ng-click="enableEditName()" title="{{resourceBundle.changemyidentity}}">
-					<div>
-						<h3 title="{{ui.name}}">{{ui.name}}</h3>
+				<span title="{{resourceBundle.titleOpencloseconnections}}" class="toggler" ng-click="toggleConnected()"><i class="fa fa-angle-left"></i></span>
+				<!-- <h1>{{resourceBundle.peopleconnected}}</h1>-->
+				<div class="owner connected myself " ng-class="ui.getMiniClass('sharers connected')">
+					<div class="member">
+						<div class="userleft">
+							<img crossorigin="Anonymous"  ng-src="{{ui.avatar}}">
+						</div>
+						<div class="userright">
+							<h3 title="{{ui.name}}">{{ui.name}}</h3>
+							<p class="room_owner">{{resourceBundle.roomowner}}</p>
+							<a class="mechange" href="" title="{{resourceBundle.changemyidentity}}" ng-click="enableEditName()">
+								<i class="fa fa-edit"></i>
+							</a>
+						</div>
 					</div>
 				</div>
-				<h2>{{resourceBundle.roomviewers}}</h2>
+				<!-- <h2>{{resourceBundle.roomviewers}}</h2> -->
 				<ul ng-class="ui.getMiniClass('sharers connected')">
-					<li data-ng-show="user.status == 'CONNECTED'" data-ng-repeat="user in ui.users">
-						<img crossorigin="Anonymous" ng-src="{{user.avatar}}" title="{{user.name}}" />
-						<div class="statusOutBar {{showStatusBar(user)}} {{user.hideBarStatus}}">
-							<div title="{{resourceBundle._('titleAudioStatusOut',user.name,resourceBundle['titlestate'+user.connectionStatus.audio.out])}}" class="statusOutBtn {{user.connectionStatus.audio.out}}">
-								<i class="fa fa-volume-up"></i>
+					<li data-ng-show="user.status == 'CONNECTED'" class="member viewer" data-ng-repeat="user in ui.users">
+						<div class="userleft">
+							<img crossorigin="Anonymous" ng-src="{{user.avatar}}" title="{{user.name}}" />
+							<div class="statusOutBar {{showStatusBar(user)}} {{user.hideBarStatus}}">
+								<div title="{{resourceBundle._('titleAudioStatusOut',user.name,resourceBundle['titlestate'+user.connectionStatus.audio.out])}}" class="statusOutBtn {{user.connectionStatus.audio.out}}">
+									<i class="fa fa-volume-up"></i>
+								</div>
+								<div title= "{{resourceBundle._('titleVideoStatusOut',user.name,resourceBundle['titlestate'+user.connectionStatus.video.out])}}"  class="statusOutBtn {{user.connectionStatus.video.out}}">
+									<i class="fa fa-eye"></i>
+								</div>
+								<div title= "{{resourceBundle._('titleScreenStatusOut',user.name,resourceBundle['titlestate'+user.connectionStatus.screen.out])}}" class="statusOutBtn {{user.connectionStatus.screen.out}}">
+									<i class="fa fa-laptop"></i>
+								</div>
 							</div>
-							<div title= "{{resourceBundle._('titleVideoStatusOut',user.name,resourceBundle['titlestate'+user.connectionStatus.video.out])}}"  class="statusOutBtn {{user.connectionStatus.video.out}}">
-								<i class="fa fa-eye"></i>
-							</div>
-							<div title= "{{resourceBundle._('titleScreenStatusOut',user.name,resourceBundle['titlestate'+user.connectionStatus.screen.out])}}" class="statusOutBtn {{user.connectionStatus.screen.out}}">
-								<i class="fa fa-laptop"></i>
+							<div class="statusBar" >
+								<div title= "{{resourceBundle._('titleAudioStatus',user.name,resourceBundle['titlestate'+user.connectionStatus.audio.in])}}"  class="statusBtn {{user.connectionStatus.audio.in}}">
+									<i class="fa fa-microphone"></i>
+								</div>
+								<div title= "{{resourceBundle._('titleVideoStatus',user.name,resourceBundle['titlestate'+user.connectionStatus.video.in])}}"  class="statusBtn {{user.connectionStatus.video.in}}">
+									<i class="fa fa-video-camera"></i>
+								</div>
+								<div title= "{{resourceBundle._('titleScreenStatus',user.name,resourceBundle['titlestate'+user.connectionStatus.screen.in])}}" class="statusBtn {{user.connectionStatus.screen.in}}">
+									<i class="fa fa-desktop"></i>
+								</div>
 							</div>
 						</div>
-						<div class="statusBar" >
-							<div title= "{{resourceBundle._('titleAudioStatus',user.name,resourceBundle['titlestate'+user.connectionStatus.audio.in])}}"  class="statusBtn {{user.connectionStatus.audio.in}}">
-								<i class="fa fa-microphone"></i>
-							</div>
-							<div title= "{{resourceBundle._('titleVideoStatus',user.name,resourceBundle['titlestate'+user.connectionStatus.video.in])}}"  class="statusBtn {{user.connectionStatus.video.in}}">
-								<i class="fa fa-video-camera"></i>
-							</div>
-							<div title= "{{resourceBundle._('titleScreenStatus',user.name,resourceBundle['titlestate'+user.connectionStatus.screen.in])}}" class="statusBtn {{user.connectionStatus.screen.in}}">
-								<i class="fa fa-desktop"></i>
-							</div>
+						<div class="userright">
+							<h3 title="{{user.name}}">{{user.name}}</h3>
+							<p class="toolbar" ng-show="global.access.moderated">
+
+								<a title="{{resourceBundle._('titleAskforscreen',user.name)}}" href="" ng-hide="ui.userStatus[user.connectionId]['screen']" ng-click="askForSharing(user.connectionId,'screen')"><i class="fa fa-desktop"></i></a>
+								<a title="{{resourceBundle._('titleAskforstopscreen',user.name)}}" href="" ng-show="ui.userStatus[user.connectionId]['screen']" ng-click="closeRemoteWindow(user.connectionId,'screen')"><i class="fa fa-times"></i></a>
+
+								<a title="{{resourceBundle._('titleAskforvideo',user.name)}}" href="" ng-hide="ui.userStatus[user.connectionId]['video']"ng-click="askForSharing(user.connectionId,'video')"><i class="fa fa-video-camera"></i></a>
+								<a title="{{resourceBundle._('titleAskforstopvideo',user.name)}}" href="" ng-show="ui.userStatus[user.connectionId]['video']"ng-click="closeRemoteWindow(user.connectionId,'video')"><i class="fa fa-times"></i></a>
+
+								<a title="{{resourceBundle._('titleAskforaudio',user.name)}}" href=""  ng-hide="ui.userStatus[user.connectionId]['audio'] "   ng-click="askForSharing(user.connectionId,'audio')"><i class="fa fa-microphone"></i></a>
+								<a title="{{resourceBundle._('titleAskforstopaudio',user.name)}}" href=""  ng-show="ui.userStatus[user.connectionId]['audio']"   ng-click="askForStopSharing(user.connectionId,'audio')"><i class="fa fa-times"></i></a>
+
+								<a title="{{resourceBundle._('titleSendfiles',user.name)}}" href="" ng-click="openFileDialog($index);"><i class="fa fa-cloud-upload"></i></a>
+								<a title="{{resourceBundle._('titleFireuser',user.name)}}" href="" ng-click="fireUser($index)"><i class="fa fa-sign-out"> </i></a>
+							</p>
+							<p class="toolbar" ng-hide="global.access.moderated">
+								<a title="{{resourceBundle._('titleSendfiles',user.name)}}" href="" ng-click="openFileDialog($index);"><i class="fa fa-cloud-upload"></i></a>
+								<a title="{{resourceBundle._('titleFireuser',user.name)}}" href="" ng-click="fireUser($index)" class="warnedbtn"><i class="fa fa-sign-out"> </i></a>
+							</p>
+							<input ng-show="false" type="file" id="userfiles_{{$index}}" name="{{$index}}files[]" multiple />
+
+							<ul class="filelist">
+								<li data-ng-show="file.name!='' && !file.cleared" data-ng-repeat="file in user.files">
+
+									<div class="file_direction">
+										<i ng-show="file.direction=='upload'" class="fa fa-upload"></i>
+										<i ng-show="file.direction=='download'" class="fa fa-download"></i>
+									</div>
+
+									<div class="file_description {{file.canceled ? 'file_canceled' :''}}">
+										<span ng-hide="file.virtualURL"  class="file_name">{{file.name}}</span>
+										<a target="_blank" ng-show="file.virtualURL" ng-href="{{file.virtualURL}}" download="{{file.name}}" class="file_name">{{file.name}}</a>
+										<span ng-show="file.completed < 100  && !file.canceled" class="file_percent"> {{file.completed}}%</span>
+									</div>
+
+									<span ng-show="file.completed==101 && !file.canceled"><!--Rebuilding...--></span>
+
+									<div class="file_actions">
+										<a title="{{resourceBundle._('titleCancelfile',file.name)}}" href="" ng-show="file.completed < 100 && !file.canceled"ng-click="cancelFile(user.connectionId,file)"><i ng-show="file.completed < 100" class="fa fa-eject"  ></i></a>
+
+										<a title="{{resourceBundle._('titleClearfile',file.name)}}" ng-show="file.completed >= 100 || file.canceled==true" href="" ng-click="file.cleared=true"><i class="fa fa-trash-o"></i></a>
+									</div>
+								</li>
+							</ul>
 						</div>
-						<h3 title="{{user.name}}">{{user.name}}</h3>
-						<p class="toolbar" ng-show="global.access.moderated">
-
-							<a title="{{resourceBundle._('titleAskforscreen',user.name)}}" href="" ng-hide="ui.userStatus[user.connectionId]['screen']" ng-click="askForSharing(user.connectionId,'screen')"><i class="fa fa-desktop"></i></a>
-							<a title="{{resourceBundle._('titleAskforstopscreen',user.name)}}" href="" ng-show="ui.userStatus[user.connectionId]['screen']" ng-click="closeRemoteWindow(user.connectionId,'screen')"><i class="fa fa-times"></i></a>
-
-							<a title="{{resourceBundle._('titleAskforvideo',user.name)}}" href="" ng-hide="ui.userStatus[user.connectionId]['video']"ng-click="askForSharing(user.connectionId,'video')"><i class="fa fa-video-camera"></i></a>
-							<a title="{{resourceBundle._('titleAskforstopvideo',user.name)}}" href="" ng-show="ui.userStatus[user.connectionId]['video']"ng-click="closeRemoteWindow(user.connectionId,'video')"><i class="fa fa-times"></i></a>
-
-							<a title="{{resourceBundle._('titleAskforaudio',user.name)}}" href=""  ng-hide="ui.userStatus[user.connectionId]['audio'] "   ng-click="askForSharing(user.connectionId,'audio')"><i class="fa fa-microphone"></i></a>
-							<a title="{{resourceBundle._('titleAskforstopaudio',user.name)}}" href=""  ng-show="ui.userStatus[user.connectionId]['audio']"   ng-click="askForStopSharing(user.connectionId,'audio')"><i class="fa fa-times"></i></a>
-
-							<a title="{{resourceBundle._('titleSendfiles',user.name)}}" href="" ng-click="openFileDialog($index);"><i class="fa fa-cloud-upload"></i></a>
-							<a title="{{resourceBundle._('titleFireuser',user.name)}}" href="" ng-click="fireUser($index)"><i class="fa fa-sign-out"> </i></a>
-						</p>
-						<p class="toolbar" ng-hide="global.access.moderated">
-							<a title="{{resourceBundle._('titleSendfiles',user.name)}}" href="" ng-click="openFileDialog($index);"><i class="fa fa-cloud-upload"></i></a>
-							<a title="{{resourceBundle._('titleFireuser',user.name)}}" href="" ng-click="fireUser($index)" class="warnedbtn"><i class="fa fa-sign-out"> </i></a>
-						</p>
-						<input ng-show="false" type="file" id="userfiles_{{$index}}" name="{{$index}}files[]" multiple />
-
-						<ul class="filelist">
-							<li data-ng-show="file.name!='' && !file.cleared" data-ng-repeat="file in user.files">
-
-								<div class="file_direction">
-									<i ng-show="file.direction=='upload'" class="fa fa-upload"></i>
-									<i ng-show="file.direction=='download'" class="fa fa-download"></i>
-								</div>
-
-								<div class="file_description {{file.canceled ? 'file_canceled' :''}}">
-									<span ng-hide="file.virtualURL"  class="file_name">{{file.name}}</span>
-									<a target="_blank" ng-show="file.virtualURL" ng-href="{{file.virtualURL}}" download="{{file.name}}" class="file_name">{{file.name}}</a>
-									<span ng-show="file.completed < 100  && !file.canceled" class="file_percent"> {{file.completed}}%</span>
-								</div>
-
-								<span ng-show="file.completed==101 && !file.canceled"><!--Rebuilding...--></span>
-
-								<div class="file_actions">
-									<a title="{{resourceBundle._('titleCancelfile',file.name)}}" href="" ng-show="file.completed < 100 && !file.canceled"ng-click="cancelFile(user.connectionId,file)"><i ng-show="file.completed < 100" class="fa fa-eject"  ></i></a>
-
-									<a title="{{resourceBundle._('titleClearfile',file.name)}}" ng-show="file.completed >= 100 || file.canceled==true" href="" ng-click="file.cleared=true"><i class="fa fa-trash-o"></i></a>
-								</div>
-							</li>
-						</ul>
 					</li>
 				</ul>
 
@@ -329,7 +341,7 @@
 				</section>
 				<div id="error" ng-class="errorClass" ng-click="hideError()"><div class="error"><h3 ng-bind-html="errorMessage"></h3></div></div>
 				<aside id="chat" ng-class="ui.chatClass">
-					<span title="{{resourceBundle.titleOpenclosechat}}" class="toggler" ng-click="toggleChat()"><i class="fa fa-angle-double-right"></i></span>
+					<span title="{{resourceBundle.titleOpenclosechat}}" class="toggler" ng-click="toggleChat()"><i class="fa fa-angle-right"></i></span>
 					<span title="{{resourceBundle.titleChatTip}}" class="chatTip" ng-click="chatTip()"><i class="twa twa-lg twa-information-source"></i></span>
 					<span title="{{ui.speechVoice.name}}" class="chatTip" ng-click="changeSpeechVoice()" ng-show="ui.speechEnabled"><i class="twa twa-lg twa-speaker"></i></span>
 					<form data-ng-submit="sendMessage()">
