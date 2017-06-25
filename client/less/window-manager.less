@@ -223,7 +223,7 @@
     padding: 0px;
     height: 30px;
 	min-height: 30px;
-    background-color: #b12e00;
+    background-color: @titlecolor;
     border: 0;
     overflow: hidden;
 }
@@ -312,7 +312,7 @@
     display: inline-block;
     border: 0;
     background-repeat: no-repeat;
-    background-color: #365d98;
+    background-color: darken(@titlecolor,20%);
     color: #fff;
     margin: 0;
     margin-left: 3px;
@@ -422,11 +422,11 @@
 
 
 .wmWindow.resizing .wmWindowBox, .wmWindow.moving .wmWindowBox{
-	background-color: #4c4c4c;
+	background-color: @titlecolor;
 }
 
 .wmWindow.resizing .wmWindowBox div.wmTitleBar, .wmWindow.moving .wmWindowBox div.wmTitleBar{
-	background-color: #c13e10;
+	background-color: lighten(@titlecolor, 10%);
 }
 
 .wmWindow.opening {
@@ -456,7 +456,7 @@
 		min-width: 0px;
 		min-height: 0px;
 	}
-	
+
 }
 
 .wmWindow.minimizing .wmWindowBox div.wmTitleBar, .wmWindow.buttonized .wmWindowBox div.wmTitleBar{
@@ -465,7 +465,7 @@
 
 .minimizedWindowBtn{
 	display: none;
-	
+
 	&.active{
 		display: block;
 		-webkit-animation: appear .4s 1 ease-out forwards;
@@ -487,7 +487,7 @@
 		.border-radius( 64px );
 		cursor: pointer;
 		margin-top: 5px;
-	
+
 		&.btn_0 {
 			background:  #009688;
 		}

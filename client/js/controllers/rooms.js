@@ -1,23 +1,23 @@
 'use strict';
 angular.module('mean.rooms').controller('RoomsController', ['$scope', '$routeParams', '$location', 'Global', 'Rooms','$timeout', 'ngI18nResourceBundle','ngI18nConfig','$document','UIHandler', function ($scope, $routeParams, $location, Global, Rooms, $timeout,ngI18nResourceBundle, ngI18nConfig, $document, UIHandler) {
-	
+
 	var uiHandler = UIHandler;
 	$scope.ui = uiHandler;
     $scope.global = Global;
     $scope.ui.question = 'none';
 
     document.getElementById('noscript').style.display = 'none';
-    
+
     var room = new Rooms({});
-    
+
     $scope.global.setupI18N($scope,ngI18nResourceBundle,ngI18nConfig);
-    
+
     uiHandler.liveRooms = [];
     uiHandler.liveRoomsCurrent = 0;
     $scope.gotoRoom = function(id) {
     	$location.path('r/' + id);
     };
-    
+
     $scope.create = function() {
 		if ($scope.termsaccepted || $scope.isRoomAvailable()){
 
@@ -25,7 +25,7 @@ angular.module('mean.rooms').controller('RoomsController', ['$scope', '$routePar
 		  document.getElementById('home').style.display = 'none';
 		  $scope.global.sessionclosed = false;
 		  if ($scope.isRoomAvailable()) {
-			   $location.path('r/' + $scope.global.roomId + '/join');   
+			   $location.path('r/' + $scope.global.roomId + '/join');
 		  }else {
 			   uiHandler.creating=true;
 			   room.create(uiHandler.name,uiHandler.hero,function(id,gav,av,acc,dueDate){
@@ -34,7 +34,7 @@ angular.module('mean.rooms').controller('RoomsController', ['$scope', '$routePar
 				   $scope.global.avatar = av;
 				   $scope.global.access = acc;
 				   $scope.global.gravatar = gav;
-				   $scope.global.roomDueDate = dueDate; 
+				   $scope.global.roomDueDate = dueDate;
 			       uiHandler.permanenturl = $location.$$protocol+ '://'+ $location.$$host + $scope.global.getUrlPort($location) +  '/#!/r/' + $scope.global.access.permanentkey + '/claim';
 				   $location.path('r/' + id + '/join');
 			   });
@@ -54,7 +54,7 @@ angular.module('mean.rooms').controller('RoomsController', ['$scope', '$routePar
       document.getElementById('noscript').style.display = '';
       document.getElementById('home').style.display = 'none';
       $scope.global.sessionclosed = false;
-       
+
 	   room.claimforroom ($scope.global.roomId,function(rdo){
            uiHandler.creating=true;
            $scope.global.name = uiHandler.name;
@@ -78,7 +78,7 @@ angular.module('mean.rooms').controller('RoomsController', ['$scope', '$routePar
 	   uiHandler.name = u.name;
 	   uiHandler.hero = u.hero;
    };
-   
+
    $scope.join = function() {
        var roomId = $scope.global.roomId;
        var po = ($location.$$port===80 || $location.$$port===443)?'':':'+$location.$$port;
@@ -100,7 +100,13 @@ angular.module('mean.rooms').controller('RoomsController', ['$scope', '$routePar
    };
 
    $scope.init = function(){
+
+		 	$timeout(function () {
+				$scope.loaded = 'loaded';
+			},1000);
    };
+
+
 
 
 }]);
