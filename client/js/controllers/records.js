@@ -169,7 +169,7 @@ angular.module('mean.rooms').controller('RecordController', ['$scope', '$routePa
 	};
 
 	$scope.getScreenUrl = function() {
-		return $location.$$protocol+ '://'+ $location.$$host + $scope.global.getUrlPort($location) + '/#!/r/' + $scope.global.roomId;
+		return $location.$$protocol+ '://'+ $location.$$host + $scope.global.getUrlPort($location) + '/r/' + $scope.global.roomId;
 	};
 
  	$scope.init = function (){
