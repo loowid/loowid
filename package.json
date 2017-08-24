@@ -1,7 +1,7 @@
 {
   "name": "loowid",
   "description": "Loowid - Share your webcam, audio and screen easy.",
-  "version": "2.0.0",
+  "version": "2.0.x",
   "private": false,
   "author": "juanjo alex edu",
   "repository": {
