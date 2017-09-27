@@ -149,13 +149,13 @@ var safeUriString = uristring;
 if (process.env.OPENSHIFT_MONGODB_DB_PASSWORD) {
 	uristring = process.env.OPENSHIFT_MONGODB_DB_USERNAME + ':' +
 			process.env.OPENSHIFT_MONGODB_DB_PASSWORD + '@' +
-			process.env.OPENSHIFT_MONGODB_DB_HOST + ':' +
-			process.env.OPENSHIFT_MONGODB_DB_PORT + '/' +
+			process.env.MONGODB_SERVICE_HOST + ':' +
+			process.env.MONGODB_SERVICE_PORT + '/' +
 			process.env.OPENSHIFT_APP_NAME;
 	// Safe string for log purposes
 	safeUriString = process.env.OPENSHIFT_MONGODB_DB_USERNAME + ':*****@' +
-			process.env.OPENSHIFT_MONGODB_DB_HOST + ':' +
-			process.env.OPENSHIFT_MONGODB_DB_PORT + '/' +
+			process.env.MONGODB_SERVICE_HOST + ':' +
+			process.env.MONGODB_SERVICE_PORT + '/' +
 			process.env.OPENSHIFT_APP_NAME;
 }
 
