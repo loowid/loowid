@@ -288,7 +288,6 @@
     "titleOpenEtherpadInWindow": "Obre aquest document etherpad en una finestra de LooWID",
     "startRecordingSession": "Inicia la gravació",
     "stopRecordingSession": "Atura la gravació",
-    "pauseRecordingSession": "Pausa la gravació",
     "pauseRecordingSession": "Reprende la gravació",
     "undoDelete": "Desfer l'eliminació",
     "readyRecord": "La teva sessió es s'ha gravat correctament {0}",
@@ -327,5 +326,6 @@
     "audiohead": "Àudio",
     "videohead": "Vídeo",
     "desktophead": "Captura d'escriptori",
-    "titleOpenNewTab": "Obre en una nova pestanya"
+    "titleOpenNewTab": "Obre en una nova pestanya",
+    "resumeRecordingSession": "Reprendre la gravació"
 }
