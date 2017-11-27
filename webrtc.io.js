@@ -3,15 +3,11 @@
 /*global unescape: true */
 var WebSocketServer = require('ws').Server,
 signature = require( 'cookie-signature' ),prefix = 's:',
-ServerList = require('node-rest-client').Client,
-request = require('request'),
+crypto = require('crypto'),
 _ = require('underscore');
 
 //Create a service definition for externar servers list
-var lclient = new ServerList();
 var logger = require('./log.js').getLog('webrtc.io');
-
-lclient.registerMethod('getXirSysServers','https://service.xirsys.com/getIceServers','POST');
 
 // Used for callback publish and subscribe
 //if (typeof rtc === 'undefined') {
@@ -35,22 +31,13 @@ rtc.on = function(eventName, callback) {
 
 rtc.iceSERVERS = function() {
     return {
-      'iceServers': [{
-        'url': 'stun:stun.l.google.com:19302'
-      },
+      'iceServers': [
     	{url:'stun:stun.l.google.com:19302'},
-		{url:'stun:stun1.l.google.com:19302'},
-		{url:'stun:stun2.l.google.com:19302'},
-		{url:'stun:stun3.l.google.com:19302'},
-		{url:'stun:stun4.l.google.com:19302'},
-		{
-			'credential': 'numbloowid',
-			'host': 'numb.viagenie.ca',
-			'protocol': 'turn',
-			'url': 'turn:numb.viagenie.ca',
-			'username': 'loowid@gmail.com'
-		}    
-      ]
+  		{url:'stun:stun1.l.google.com:19302'},
+  		{url:'stun:stun2.l.google.com:19302'},
+  		{url:'stun:stun3.l.google.com:19302'},
+  		{url:'stun:stun4.l.google.com:19302'}
+  	  ]
     };
 };
 
@@ -76,7 +63,7 @@ function getSocketUrl(req) {
 
 function getSessionId(req,secret) {
     var list = {}, rc = req.headers.cookie;
-    if (rc) { 
+    if (rc) {
     	rc.split(';').forEach(function( cookie ) {
     		var parts = cookie.split('=');
     		list[parts.shift().trim()] = unescape(parts.join('='));
@@ -153,7 +140,7 @@ function attachEvents(manager) {
 	  rtc.sockets.splice(i, 1);
       // remove from rooms and send remove_peer_connected to all sockets in room
       var room;
-      
+
       for (var key in rtc.rooms) {
 		  if (rtc.rooms.hasOwnProperty(key)) {
 			room = rtc.rooms[key];
@@ -174,7 +161,7 @@ function attachEvents(manager) {
 			  room = key; // This line is missing (bug)
 			  break;
 			}
-		  }  
+		  }
       }
       // we are leaved the room so lets notify about that
 	  rtc.fire('room_leave', room, socket);
@@ -192,7 +179,7 @@ function attachEvents(manager) {
 		var roomList = rtc.rooms[data.room] || [];
 		var roomStatus = rtc.statusList [data.room] || {};
 		rtc.statusList[data.room] = roomStatus;
-		
+
 		if (socket._events) {
 			roomList.push(socket.id);
 			rtc.rooms[data.room] = roomList;
@@ -201,7 +188,7 @@ function attachEvents(manager) {
 		}
 
 		var connectionsId = sendNewPeerConnected(socket,roomList);
-		
+
 		if (socket._events) {
 			// send new peer a list of all prior peers
 			socket.send(JSON.stringify({
@@ -226,61 +213,73 @@ function attachEvents(manager) {
 		}), errorFn);
 	});
   });
-	
- //We receives a request to get a STUN/TURN server list updated	
- rtc.on ('update_server_config', function (data,socket){
-	
-	 var handlePost = function (error, response, body) {
-        var iceServers;
-		if (!error && response.statusCode === 200) {
-            logger.debug(body);
-			var pdata = JSON.parse(body);
-			if (pdata.d){
-				iceServers = pdata.d.iceServers;
-			}else{
-			  	iceServers = rtc.iceSERVERS().iceServers;
-			  	logger.error('Error parsing server list. Returning default ice servers.');
-			}
-        } else {
-			iceServers = rtc.iceSERVERS().iceServers;
-			if (response || body) { 
-				logger.error ('Error connecting to get servers ['+error+']: ' + response  + '\n' + body);
-			} else {
-				logger.debug('Returning default ice servers.');
-			}
-		}
-			
-		//Send the correct list
-		var cextid = process.env.CEXTID || 'ocegbggnlgopmchofgnbjhgpljlchlpl';
 
-		socket.send (JSON.stringify ({
-				'eventName':'get_updated_config',
-				'data':{
-					'iceServers': iceServers,
-					'chromeDesktopExtensionId' : cextid
-				}
-			}), errorFn);
-     };
-	 
-     if (process.env.XIRSYS_USER) {
-		 request.post(
-	            'https://service.xirsys.com/getIceServers', {
-	            form: {
-	                domain: process.env.XIRSYS_DOMAIN,
-	                room: 'default',
-	                application: 'default',
-	                ident: process.env.XIRSYS_USER,
-	                secret: process.env.XIRSYS_SECRET,
-	                secure: 1
-	            }
-	        },handlePost);
+ //We receives a request to get a STUN/TURN server list updated
+ rtc.on ('update_server_config', function (data,socket){
+
+   var setICEConfig = function (iceconfig) {
+     var iceServers;
+
+     if (iceconfig) { //If there is a COTurn Add it to the list
+       var coturn = {
+         'credential': iceconfig.password,
+         'host': process.env.COTURN_SERVER ,
+         'protocol': 'turn',
+         'url': 'turn:' + process.env.COTURN_SERVER,
+         'username': iceconfig.username
+       };
+
+       iceServers = rtc.iceSERVERS().iceServers;
+
+       if (process.env.COTURN_EXCLUSIVE) {
+         iceServers = [coturn];
+         logger.debug('Returning COTURN ice server in exclusive mode.');
+       } else {
+         logger.debug('Returning COTURN ice server in additon to the default list');
+         iceServers.push (coturn);
+       }
+
      } else {
-    	 handlePost('Default');
+       iceServers = rtc.iceSERVERS().iceServers;
+       logger.debug('Returning default ice servers.');
      }
-	 
-	 
+
+     //Send the correct list
+     var cextid = process.env.CEXTID || 'ocegbggnlgopmchofgnbjhgpljlchlpl';
+
+     socket.send (JSON.stringify ({
+       'eventName':'get_updated_config',
+       'data':{
+         'iceServers': iceServers,
+         'chromeDesktopExtensionId' : cextid
+       }
+     }), errorFn);
+   };
+
+   //Look for the coturn server environment variables. If set then try to generate a config.
+   if (process.env.COTURN_AUTH_SECRET && process.env.COTURN_AUTH_USERNAME && process.env.COTURN_SERVER) {
+
+     var hours = process.env.COTURN_AUTH_HOURS || 24;
+     var unixTimeStamp = parseInt(Date.now()/1000) + parseInt(hours) * 3600,   // this credential would be valid for the next 24 hours
+     username = [unixTimeStamp, process.env.COTURN_AUTH_USERNAME].join(':'),
+     password,
+     hmac = crypto.createHmac('sha1', process.env.COTURN_AUTH_SECRET);
+     hmac.setEncoding('base64');
+     hmac.write(username);
+     hmac.end();
+     password = hmac.read();
+
+     setICEConfig ({
+       username: username,
+       password: password
+     });
+
+   } else {
+     setICEConfig();
+   }
+
  });
-	
+
   //Receive ICE candidates and send to the correct socket
   rtc.on('send_ice_candidate', function(data, socket) {
 	  logger.debug('send_ice_candidate');
@@ -591,7 +590,7 @@ function attachEvents(manager) {
 	    // inform the user you ask to screen share
 	    if (soc) {
 	      soc.send(JSON.stringify({
-	        'eventName' : 'files request completed', 
+	        'eventName' : 'files request completed',
 	        'data' : {
 	          'requestId': data.requestId,
 	          'token' : data.token,
@@ -610,7 +609,7 @@ function attachEvents(manager) {
 	    // inform the user you ask to screen share
 	    if (soc) {
 	      soc.send(JSON.stringify({
-	        'eventName' : 'files request error', 
+	        'eventName' : 'files request error',
 	        'data' : {
 	          'requestId': data.requestId,
 	          'token' : data.token,
@@ -644,7 +643,7 @@ function attachEvents(manager) {
 	    logger.error('Alert: someone is trying to cancel a file without permission');
 	  });
 	});
-  
+
 	rtc.on('error_to_owner', function(data, socket) {
 		var roomList = rtc.rooms[data.room] || [];
 		for ( var i = 0; i < roomList.length; i+=1) {
@@ -704,7 +703,7 @@ function attachEvents(manager) {
 					status : 'DISCONNECTED',
 					room : room.roomId,
 					access: {
-				    	shared: room.access.shared,       	
+				    	shared: room.access.shared,
 				    	title: room.access.title,
 				       	moderated: room.access.moderated,
 				        chat: room.access.chat,
@@ -729,7 +728,7 @@ function attachEvents(manager) {
 		}), errorFn);
 		soc.close();
 	};
-	
+
 	rtc.on('move_room', function(data, socket){
 		var roomList = rtc.rooms[data.fromRoom];
 		manager.rooms.checkOwner(socket.id, data.toRoom, function() {
@@ -768,13 +767,13 @@ function attachEvents(manager) {
 			logger.error('Alert: a non owner is trying to move room');
 		});
 	});
-	
+
 	rtc.on('rtc_status_update', function(data, socket){
-		
+
 		var roomStatus = rtc.statusList[data.room] || {};
 		var userConnectionsList = roomStatus[socket.id] || [];
 		var connection = _.findWhere (userConnectionsList, { peerId: data.peerId, source: data.source, produced: data.produced });
-		
+
 		if (connection === undefined){
 			connection = {
 				peerId: data.peerId,
@@ -782,15 +781,15 @@ function attachEvents(manager) {
 				source: data.source,
 				produced: data.produced
 			};
-			
+
 			userConnectionsList.push (connection);
 		}
-		
+
 		connection.status = data.status;
 		roomStatus[socket.id] = userConnectionsList;
 		rtc.statusList[data.room] = roomStatus;
 	});
-		
+
 
 	var sendStop = function(data, socket) {
 		var roomList = rtc.rooms[data.room] || [];
@@ -829,12 +828,12 @@ function attachEvents(manager) {
 	});
 
 	// More events... here
-	
+
 }
 
 module.exports.listen = function(server) {
   var manager;
-  if (typeof server === 'number') { 
+  if (typeof server === 'number') {
     manager = new WebSocketServer({
         port: server
       });
