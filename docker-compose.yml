@@ -1,13 +1,66 @@
-loowid:
-  build: .
-  environment:
-    - MONGOHQ_URL=mongodb://mongodb/loowid
-  links:
-    - mongodb
-  ports:
-    - "443:443"
-  
-mongodb:
-  image: mongo:2.6.11
-  command: mongod --smallfiles
-  
+version: "2"
+services:
+  nginx:
+    image: jwilder/nginx-proxy:alpine
+    ports:
+     - "80:80"
+     - "443:443"
+    volumes:
+     - /etc/nginx/vhost.d
+     - /usr/share/nginx/html
+     - /server/certs:/etc/nginx/certs
+     - /var/run/docker.sock:/tmp/docker.sock:ro
+  letsencrypt:
+    image: jrcs/letsencrypt-nginx-proxy-companion
+    volumes:
+     - /var/run/docker.sock:/var/run/docker.sock:ro
+    volumes_from:
+     - nginx
+  loowid:
+    image: loowid/loowid
+    build:
+      context: .
+      dockerfile: Dockerfile
+    expose:
+     - "443"
+    environment:
+       - OPENSHIFT_MONGODB_DB_PASSWORD=password
+       - OPENSHIFT_MONGODB_DB_HOST=mongodb
+       - OPENSHIFT_MONGODB_DB_USERNAME=user
+       - OPENSHIFT_MONGODB_DB_PORT=27017
+       - OPENSHIFT_NODEJS_PORT=443
+       - OPENSHIFT_NODEJS_IP=0.0.0.0
+       - OPENSHIFT_APP_NAME=loowid
+       - ADMIN_PASSWORD=password
+       - ADMIN_USERNAME=user
+       - CEXTID=ocegbggnlgopmchofgnbjhgpljlchlpl
+       - LOOWID_YOUTUBE_CLIENTID=xxxxxx
+       - LTI_KEY=key
+       - LTI_OWNER_ROLES=rol1,rol2,rol3
+       - LTI_SECRET=secret
+       - WS_PORT=443
+       - COTURN_AUTH_SECRET=secret
+       - COTURN_AUTH_USERNAME=user
+       - COTURN_SERVER=yourdomain:8443
+       - COTURN_AUTH_HOURS=4
+       - COTURN_EXCLUSIVE=false
+       - VIRTUAL_HOST=yourdomain
+       - LETSENCRYPT_HOST=yourdomain
+       - LETSENCRYPT_EMAIL=your@email.com
+    links:
+     - mongodb
+  mongodb:
+    image: mongo:2.6.11
+    volumes: 
+     - /data/db:/data/db
+    expose:
+      - "27017"
+    command: ["mongod", "--noprealloc", "--smallfiles", "--auth"]
+  coturn:
+    image: loowid/docker-webrtc-turnserver
+    build: 
+      context: .
+      dockerfile: Dockerfile-turn
+    volumes:
+      - /data/db:/srv 
+    network_mode: "host"
