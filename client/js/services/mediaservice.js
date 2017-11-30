@@ -310,12 +310,12 @@ angular.module('mean.rooms').factory('MediaService',['Rooms','UIHandler','$resou
 			            	myCanvas.fillStyle = 'rgb(0, 0, 0)';
 			            	var finalText = nameList[j].textContent;
 			            	var textWidth = myCanvas.measureText(finalText).width;
-			            	while (textWidth > imgList[j].width) {
+			            	while (textWidth > imgList[j].width && finalText.length > 6) {
 			            		finalText = finalText.substring(0,finalText.length-6)+'...';
 			            		textWidth = myCanvas.measureText(finalText).width;
 			            	}
 			            	myCanvas.fillText(finalText,width,height+imgList[j].height+10);
-			            	width += imgList[j].width + 10;
+							width += imgList[j].width + 10;
 		            	}
 		            }
 				};
