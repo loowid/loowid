@@ -280,15 +280,15 @@ angular.module('mean.rooms').factory('MediaService',['Rooms','UIHandler','$resou
 						for (var i=0; i<self.receivedStreams.length; i+=1) {
 							if (self.receivedStreams[i].type==='audio') {
 								audioReady = true;
-								uiHandler.audioContext.createMediaStreamSource(self.receivedStreams[i].stream).connect(uiHandler.mixedAudio);
+								uiHandler.audioContext.createMediaStreamSource(self.receivedStreams[i].stream).connect(uiHandler.audioAnalyser);
 							}
 						}
 						// Add local audio
 						if (self.mediasources.audio.stream) {
 							audioReady = true;
-							uiHandler.audioContext.createMediaStreamSource(self.mediasources.audio.stream).connect(uiHandler.mixedAudio);
+							uiHandler.audioContext.createMediaStreamSource(self.mediasources.audio.stream).connect(uiHandler.audioAnalyser);
 						}
-						uiHandler.mixedAudio.connect(uiHandler.audioAnalyser);
+						uiHandler.audioAnalyser.connect(uiHandler.mixedAudio);
 					}
 					return audioReady;
 				};
@@ -356,7 +356,7 @@ angular.module('mean.rooms').factory('MediaService',['Rooms','UIHandler','$resou
 						canvasWave.width = WIDTH;
 						canvasWave.height = HEIGHT;
 						var myCanvas = canvasWave.getContext('2d');
-						uiHandler.audioAnalyser.fftSize = 2048;
+						uiHandler.audioAnalyser.fftSize = 256;
 						var bufferLength = uiHandler.audioAnalyser.frequencyBinCount;
 						var dataArray = new Uint8Array(bufferLength);
 						uiHandler.audioAnalyser.getByteTimeDomainData(dataArray); 
@@ -364,28 +364,26 @@ angular.module('mean.rooms').factory('MediaService',['Rooms','UIHandler','$resou
 						var img = new Image();
 						var draw = function() {
 						  uiHandler.animationFrame = requestAnimationFrame(draw);
-						  uiHandler.audioAnalyser.getByteTimeDomainData(dataArray);
+						  uiHandler.audioAnalyser.getByteFrequencyData(dataArray);
 						  myCanvas.fillStyle = 'rgb(255, 255, 255)';
 						  myCanvas.fillRect(0, 0, WIDTH, HEIGHT);
 						  myCanvas.drawImage(img,WIDTH-img.width,HEIGHT-img.height);
 						  drawConnectedUsers(myCanvas,WIDTH,HEIGHT);
-						  myCanvas.lineWidth = 2;
-						  myCanvas.strokeStyle = 'rgb(0, 0, 0)';
-						  myCanvas.beginPath();
-						  var sliceWidth = WIDTH * 1.0 / bufferLength;
-						  var x = 0;
+						  myCanvas.font = 'bold 40px Arial';
+						  myCanvas.textBaseline = 'bottom';
+						  myCanvas.fillStyle = '#4b829a';
+						  myCanvas.fillText('LooWID Recording', 10, HEIGHT-35);
+						  myCanvas.font = 'italic 20px Arial';
+						  myCanvas.fillText(new Date(), 10, HEIGHT - 15);
+						  var barWidth = (WIDTH / bufferLength) * 2.5;
+						  var barHeight;
+						  var x = 0;						  
 						  for(var i = 0; i < bufferLength; i+=1) {
-						        var v = dataArray[i] / 128.0;
-						        var y = v * HEIGHT/2;
-						        if(i === 0) {
-						          myCanvas.moveTo(x, y);
-						        } else {
-						          myCanvas.lineTo(x, y);
-						        }
-						        x += sliceWidth;
+							barHeight = dataArray[i]/2;
+							myCanvas.fillStyle = 'rgb(' + (barHeight+100) + ',50,50)';
+							myCanvas.fillRect(x,HEIGHT-img.height-barHeight,barWidth,barHeight);
+							x += barWidth + 1;
 						  }
-						  myCanvas.lineTo(canvasWave.width, canvasWave.height/2);
-						  myCanvas.stroke();
 						};
 						img.onload = function(){ 
 							draw(); 
