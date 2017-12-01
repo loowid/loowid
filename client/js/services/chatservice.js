@@ -302,7 +302,7 @@ angular.module('mean.rooms').factory('ChatService',['$timeout','UIHandler','Room
 
 	    this.addItems = function($scope,txt,list) {
     		var slinks = [], embeds = [];
-	    	var matches = txt.match(/(((https?:\/\/)?(((?!-)[A-Za-z0-9-:]{1,63}[@]{0,1}[A-Za-z0-9-]*(?!-)\.)+[A-Za-z]{2,6})(:\d+)?(\/([-\w/_\.\,]*(\?\S+)?)?)*)(#\S*)?(?!@))/g);
+	    	var matches = txt.match(/((([A-Za-z]{3,9}:(?:\/\/)?)(?:[\-;:&=\+\$,\w]+@)?[A-Za-z0-9\.\-]+|(?:www\.|[\-;:&=\+\$,\w]+@)[A-Za-z0-9\.\-]+)((?:\/[\+~%\/\.\w\-_]*)?\??(?:[\-\+=&;%@\.\w_]*)#?(?:[\.\!\/\\\w]*))?)/g);
 	    	if (matches) {
 	    		var mtxt = txt;
 	    		for (var i=0; i<matches.length; i+=1) {
