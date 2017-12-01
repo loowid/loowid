@@ -1,7 +1,0 @@
-#
-# Build Turn Server Image
-#
-FROM       doeasy/docker-webrtc-turnserver:latest
-
-MAINTAINER loowid <loowid@gmail.com>
-

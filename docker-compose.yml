@@ -57,10 +57,7 @@ services:
       - "27017"
     command: ["mongod", "--noprealloc", "--smallfiles", "--auth"]
   coturn:
-    image: loowid/docker-webrtc-turnserver
-    build: 
-      context: .
-      dockerfile: Dockerfile-turn
+    image: spreed/turnserver
     volumes:
       - /data/db:/srv 
     network_mode: "host"
