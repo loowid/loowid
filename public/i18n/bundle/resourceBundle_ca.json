@@ -288,6 +288,8 @@
     "titleOpenEtherpadInWindow": "Obre aquest document etherpad en una finestra de LooWID",
     "startRecordingSession": "Inicia la gravació",
     "stopRecordingSession": "Atura la gravació",
+    "pauseRecordingSession": "Pausa la gravació",
+    "pauseRecordingSession": "Reprende la gravació",
     "readyRecord": "La teva sessió es s'ha gravat correctament {0}",
     "readyRecordShow": "Veure la gravació",
     "cantRecord": "El teu navegador no suporta gravació de mitjans, utilitza una versió més actual de <strong> Chrome </ strong> per a gravar la teva sessió.",
