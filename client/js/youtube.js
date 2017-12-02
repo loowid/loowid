@@ -425,7 +425,8 @@ UploadVideo.prototype.pollForVideoStatus = function(uploadId) {
         	this.uiHandler.youtubeVideo[uploadId].isYoutubeUploaded = false;
         	this.uiHandler.youtubeVideo[uploadId].youtubeVideoUrl = 'https://www.youtube.com/embed/'+this.videoId+'?feature=oembed';
         	this.uiHandler.youtubeVideo[uploadId].youtubeVideoUrlText = 'https://www.youtube.com/watch?v='+this.videoId;
-        	this.uiHandler.youtubeVideo[uploadId].isYoutubeTranscoded = true;
+          this.uiHandler.youtubeVideo[uploadId].isYoutubeTranscoded = true;
+          this.uiHandler.saveYoutubeUrl(uploadId,this.uiHandler.youtubeVideo[uploadId].youtubeVideoUrl,this.uiHandler.youtubeVideo[uploadId].youtubeVideoUrlText);
             break;
           // All other statuses indicate a permanent transcoding failure.
           default:

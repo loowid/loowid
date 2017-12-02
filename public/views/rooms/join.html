@@ -398,7 +398,7 @@
 												<span> {{item.text}}</span>
 											</a>
 											<a ng-show="item.type==='link' && item.download" href="{{item.to}}" download="{{item.filename}}">{{item.text}}</a>
-											<a ng-show="item.type==='link' && item.youtube" ng-click="youtubeUpload(item.id,item.blob)" class="youtube" title="{{resourceBundle.youtubeuploadtitle}}"><i class="fa fa-youtube-square"></i></a>
+											<a ng-show="item.type==='link' && item.youtube" ng-click="youtubeUpload(item.id,item.url)" class="youtube" title="{{resourceBundle.youtubeuploadtitle}}"><i class="fa fa-youtube-square"></i></a>
 											<span ng-show="item.type==='text'">{{item.text}}</span>
 											<span ng-show="item.type==='emoji'"><i title="{{item.base}}" ng-class="item.twaclass" ng-click="item.base === ':sound:' && changeSound($event)"></i></span>
 											<span ng-show="item.type==='blob'" class="evideo">
@@ -418,6 +418,9 @@
 												</span>
 												<span ng-show="ui.youtubeVideo[item.id].isYoutubeTranscoded">
 													<a href="#" ng-click="openOEmbedFromService({url:ui.youtubeVideo[item.id].youtubeVideoUrl})">{{ui.youtubeVideo[item.id].youtubeVideoUrlText}}</a>
+												</span>
+												<span ng-show="item.youtube">
+													<a href="#" ng-click="openOEmbedFromService({url:item.youtubeOEmbed})">{{item.youtube}}</a>
 												</span>
 											</span>
 										</span>

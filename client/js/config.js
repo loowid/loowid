@@ -42,6 +42,9 @@ window.app.config(['$locationProvider',
     }
 ]);
 
+window.app.config(['$compileProvider', function ($compileProvider) {
+    $compileProvider.aHrefSanitizationWhitelist(/^\s*(https?|ftp|mailto|filesystem):/);
+}]);
 
 window.app.value('ngI18nConfig', {
     //defaultLocale should be in lowercase and is required!!
