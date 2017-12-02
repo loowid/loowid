@@ -322,5 +322,7 @@
     "youtubemandatory": "U moet alle velden invullen.",
     "youtubeuploadedtranscoding": "Uploaden voltooid; YouTube is uw video aan het transcoderen...",
     "youtubetranscodingfailed": "Fout bij transcoderen van video.",
-    "youtubeuploadtitle": "Verstuur uw opname naar YouTube."
+    "youtubeuploadtitle": "Verstuur uw opname naar YouTube.",
+    "pauseRecordingSession": "Opname pauzeren",
+    "resumeRecordingSession": "Opname hervatten"
 }
