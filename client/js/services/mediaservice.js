@@ -375,21 +375,34 @@ angular.module('mean.rooms').factory('MediaService',['Rooms','UIHandler','$resou
 			// Show Recordings Available
 			setTimeout(function(){ showRecordingsOnChat(); },3000);
 
-			uiHandler.autoSaveRecording = function(data) {
+			uiHandler.autoSaveRecording = function(data,ev) {
 				var initFileSystem = function(fs) {
 					fs.root.getDirectory('loowid', {create: true}, function(dirEntry) {
 						dirEntry.createReader().readEntries(function(results){
 							if (rtc.debug) { console.log('Recordings available:'); console.log(results); }
 						});
-						fs.root.getFile('loowid/recording-'+$scope.global.roomId+'-'+getRecordingCount($scope.global.roomId)+'.webm', {create: true}, function(fileEntry) {
-							addNewRecording($scope.global.roomId,fileEntry.name,fileEntry.toURL());
+						var lastRecording = getLastRecording($scope.global.roomId);
+						var lastUrl = (lastRecording && ev.altKey)?lastRecording.url:'filesystem:https://localhost/temporary/unknown';
+						window.resolveLocalFileSystemURL(lastUrl,function(fileEntry){
 							fileEntry.createWriter(function(fileWriter) {
-									fileWriter.onwriteend = function(e) { };
-									fileWriter.onerror = function(e) { console.log('FileSystem Write Failed: ' + e.toString()); };
-									uiHandler.fileWriter = fileWriter;
-									uiHandler.saveData(data,true);
+								fileWriter.onwriteend = function(e) { };
+								fileWriter.onerror = function(e) { console.log('FileSystem Write Failed: ' + e.toString()); };
+								uiHandler.fileWriter = fileWriter;
+								var timeParts = lastRecording.time.split(':');
+								uiHandler.recordTimeMillisOffset = (+timeParts[0] * (60000 * 60)) + (+timeParts[1] * 60000) + (+timeParts[2] * 1000);
+								uiHandler.saveData(data,false);
 							}, errorHandler);
-						}, errorHandler);
+						},function(){
+							fs.root.getFile('loowid/recording-'+$scope.global.roomId+'-'+getRecordingCount($scope.global.roomId)+'.webm', {create: true}, function(fileEntry) {
+								addNewRecording($scope.global.roomId,fileEntry.name,fileEntry.toURL());
+								fileEntry.createWriter(function(fileWriter) {
+										fileWriter.onwriteend = function(e) { };
+										fileWriter.onerror = function(e) { console.log('FileSystem Write Failed: ' + e.toString()); };
+										uiHandler.fileWriter = fileWriter;
+										uiHandler.saveData(data,true);
+								}, errorHandler);
+							}, errorHandler);
+						});
 					}, errorHandler);
 				};
 				uiHandler.saveData = function(bytes,newfile) {
@@ -409,8 +422,8 @@ angular.module('mean.rooms').factory('MediaService',['Rooms','UIHandler','$resou
 				}
 			};
 
-			$scope.startRecordingSession = function () {
-				
+			$scope.startRecordingSession = function ($event) {
+
 				var recordVideo = uiHandler.currentRecordStream === 0 || uiHandler.currentRecordStream === 1;
 				var recordAudio = uiHandler.currentRecordStream === 0 || uiHandler.currentRecordStream === 2;
 				
@@ -559,7 +572,7 @@ angular.module('mean.rooms').factory('MediaService',['Rooms','UIHandler','$resou
 					};
 					uiHandler.mediaRecorder.ondataavailable = function(event){
 						if (event.data && event.data.size > 0) {
-							uiHandler.autoSaveRecording(event.data);
+							uiHandler.autoSaveRecording(event.data,$event);
 						}
 					};
 					uiHandler.mediaRecorder.start(100); // collect 100ms of data
@@ -574,6 +587,7 @@ angular.module('mean.rooms').factory('MediaService',['Rooms','UIHandler','$resou
 							var minutes=Math.floor((diff/(1000*60))%60);
 							var hours=Math.floor((diff/(1000*60*60))%24);						
 							uiHandler.recordTime = (hours<10?'0':'') + hours + ':' + (hours<10?'0':'') + minutes + ':' + (seconds<10?'0':'') + seconds;
+							saveRecordingTime($scope.global.roomId,uiHandler.recordTime);
 						}
 					},1000);
 					
