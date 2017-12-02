@@ -217,6 +217,7 @@ angular.module('mean.rooms').factory('MediaService',['Rooms','UIHandler','$resou
 			uiHandler.showResolutionMenu = false;	
 			uiHandler.isMuted = false;	
 			uiHandler.isRecordingSession = false;
+			uiHandler.isPauseRecordingSession = false; 
 			uiHandler.modals = [];
 			uiHandler.tutorials = [];
 			uiHandler.canShareDesktop = (navigator.webkitGetUserMedia!==undefined);
@@ -327,6 +328,7 @@ angular.module('mean.rooms').factory('MediaService',['Rooms','UIHandler','$resou
 
 					var onstop = function() {
 						uiHandler.isRecordingSession = false;
+						uiHandler.isPauseRecordingSession = false;
 						window.clearInterval(uiHandler.recordTimeInterval);
 						if (uiHandler.screenStream) {
 							uiHandler.screenStream.getTracks()[0].stop();
@@ -397,6 +399,14 @@ angular.module('mean.rooms').factory('MediaService',['Rooms','UIHandler','$resou
 					
 					uiHandler.mediaRecorder = new MediaRecorder(mixedStream, options);
 					uiHandler.mediaRecorder.onstop = onstop;
+					uiHandler.mediaRecorder.onpause = function() { 
+						uiHandler.isPauseRecordingSession = true;
+						uiHandler.recordTimeMillisOffset += (new Date()).getTime() - uiHandler.recordTimeMillis;
+					};
+					uiHandler.mediaRecorder.onresume = function() { 
+						uiHandler.isPauseRecordingSession = false; 
+						uiHandler.recordTimeMillis = (new Date()).getTime();
+					};
 					uiHandler.mediaRecorder.ondataavailable = function(event){
 						if (event.data && event.data.size > 0) {
 							uiHandler.recordedBlobs.push(event.data);
@@ -422,12 +432,15 @@ angular.module('mean.rooms').factory('MediaService',['Rooms','UIHandler','$resou
 					uiHandler.isRecordingSession = true;
 					uiHandler.recordTime = '00:00:00';
 					uiHandler.recordTimeMillis = (new Date()).getTime();
+					uiHandler.recordTimeMillisOffset = 0;
 					uiHandler.recordTimeInterval = setInterval(function(){
-						var diff = (new Date()).getTime() - uiHandler.recordTimeMillis;
-						var seconds=Math.floor((diff/1000)%60);
-						var minutes=Math.floor((diff/(1000*60))%60);
-						var hours=Math.floor((diff/(1000*60*60))%24);						
-						uiHandler.recordTime = (hours<10?'0':'') + hours + ':' + (hours<10?'0':'') + minutes + ':' + (seconds<10?'0':'') + seconds;
+						if (!uiHandler.isPauseRecordingSession) {
+							var diff = (new Date()).getTime() - uiHandler.recordTimeMillis + uiHandler.recordTimeMillisOffset;
+							var seconds=Math.floor((diff/1000)%60);
+							var minutes=Math.floor((diff/(1000*60))%60);
+							var hours=Math.floor((diff/(1000*60*60))%24);						
+							uiHandler.recordTime = (hours<10?'0':'') + hours + ':' + (hours<10?'0':'') + minutes + ':' + (seconds<10?'0':'') + seconds;
+						}
 					},1000);
 					
 					if (recordVideo) {
@@ -509,6 +522,14 @@ angular.module('mean.rooms').factory('MediaService',['Rooms','UIHandler','$resou
 				
 			};
 			
+			$scope.pauseRecordingSession = function () {
+				uiHandler.mediaRecorder.pause();
+			};
+
+			$scope.resumeRecordingSession = function () {
+				uiHandler.mediaRecorder.resume();
+			};
+
 			$scope.stopRecordingSession = function () {
 				if (uiHandler.mediaRecorder.state!=='inactive') {
 					uiHandler.mediaRecorder.stop();
