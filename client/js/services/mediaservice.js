@@ -276,6 +276,8 @@ angular.module('mean.rooms').factory('MediaService',['Rooms','UIHandler','$resou
 			
 			var requestFileSystem = getRequestFileSystem();
 
+			uiHandler.isPauseEnabled = requestFileSystem !== undefined;
+
 			var errorHandler = function (e) {
 				var msg = '';
 				switch (e.code) {

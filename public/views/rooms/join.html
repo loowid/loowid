@@ -48,7 +48,7 @@
 				</li>
 				<li id="recording" class="barbutton">
 					<div title="{{resourceBundle.startRecordingSession}}"  ng-click="startRecordingSession($event)" ng-hide="ui.isRecordingSession"><i class="fa fa-circle"></i> <span class="title">{{resourceBundle.startRecordingSession}}</span></div>
-					<div title="{{resourceBundle.pauseRecordingSession}}"  ng-click="pauseRecordingSession()" ng-show="ui.isRecordingSession && !ui.isPauseRecordingSession"><i class="recording fa fa-pause"></i> </div>
+					<div title="{{resourceBundle.pauseRecordingSession}}"  ng-click="pauseRecordingSession()" ng-show="ui.isRecordingSession && !ui.isPauseRecordingSession && ui.isPauseEnabled"><i class="recording fa fa-pause"></i> </div>
 					<div title="{{resourceBundle.resumeRecordingSession}}"  ng-click="resumeRecordingSession()" ng-show="ui.isPauseRecordingSession"><i class="recording fa fa-play"></i> </div>
 					<div title="{{resourceBundle.stopRecordingSession}}"  ng-click="stopRecordingSession()" ng-show="ui.isRecordingSession" ng-mouseenter="ui.showTime=true" ng-mouseleave="ui.showTime=false"><i class="recording fa fa-stop"></i> <span class="title">{{resourceBundle.stopRecordingSession}}</span> <span class="title" ng-show="ui.showTime">{{ui.recordTime}}</span></div>
 
