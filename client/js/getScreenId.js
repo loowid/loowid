@@ -12,9 +12,9 @@
 
 (function() {
     window.getScreenId = function(extensionid,callback) {
-       
+
 		this.extensionId = extensionid;
-        
+
 		if (!!navigator.mozGetUserMedia) {
             callback(null, 'firefox', {
                 video: {
@@ -34,7 +34,7 @@
                 if (event.data.chromeMediaSourceId === 'PermissionDeniedError') {
                     callback('permission-denied');
                 } else {
-                	callback(null, event.data.chromeMediaSourceId, getScreenConstraints(null, event.data.chromeMediaSourceId));
+                    callback(null, event.data.chromeMediaSourceId, getScreenConstraints(null, event.data.chromeMediaSourceId));
                 }
             }
 
@@ -42,12 +42,14 @@
                 callback(event.data.chromeExtensionStatus, null, getScreenConstraints(event.data.chromeExtensionStatus));
             }
 
-            // this event listener is no more needed
-            window.removeEventListener('message', onIFrameCallback);
+            if (event.data.chromeExtensionStatus || event.data.chromeMediaSourceId) {
+              // this event listener is no more needed
+              window.removeEventListener('message', onIFrameCallback);
+            }
         }
-        
+
         window.addEventListener('message', onIFrameCallback);
-        
+
     };
 
     var getScreenConstraints = function(error, sourceId) {
@@ -85,7 +87,7 @@
     iframe.onload = function() {
         iframe.isLoaded = true;
     };
-    
+
 	iframe.src = '/desktop_cap.html';
     iframe.style.display = 'none';
     (document.body || document.documentElement).appendChild(iframe);
