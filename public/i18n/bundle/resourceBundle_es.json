@@ -43,6 +43,7 @@
     "dataconnectionunavailable": "No hay datos de conexiones conexiones",
     "dateformat": "dd/mm/yyyy",
     "days": "días",
+    "deleteRecord": "Eliminar grabación",
     "deniedaudio": "{0} ha rechazado tu petición para compartir su micrófono",
     "deniedscreen": "{0} ha rechazado tu petición para compartir su escritorio",
     "deniedvideo": "{0} ha rechazado tu petición para compartir su cámara web",

@@ -397,7 +397,8 @@
 											<a ng-show="item.type==='link' && sitem.embed.length <=0 && !item.download" href="{{item.to}}" target="_blank">
 												<span> {{item.text}}</span>
 											</a>
-											<a ng-show="item.type==='link' && item.download" href="{{item.to}}" download="{{item.filename}}">{{item.text}}</a>
+											<a ng-show="item.type==='link' && item.delete" href="#" ng-click="removeRecording(item.to)">{{item.text}}</a>
+											<a ng-show="item.type==='link' && item.download" href="{{item.to}}" download="{{item.filename}}" class="download"><span>{{item.text}}</span></a>
 											<a ng-show="item.type==='link' && item.youtube" ng-click="youtubeUpload(item.id,item.url)" class="youtube" title="{{resourceBundle.youtubeuploadtitle}}"><i class="fa fa-youtube-square"></i></a>
 											<span ng-show="item.type==='text'">{{item.text}}</span>
 											<span ng-show="item.type==='emoji'"><i title="{{item.base}}" ng-class="item.twaclass" ng-click="item.base === ':sound:' && changeSound($event)"></i></span>

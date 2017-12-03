@@ -300,6 +300,7 @@
     "recordStream2": "Només àudio",
     "titleChangeStream": "Canviar la mode de gravació de la sala.",
     "download": "Descarrega la gravació",
+    "deleteRecord": "Eliminar la gravació",
     "statusrecording": "La sessió està sent gravada pel propietari de la sala.",
     "youtubeoauth": "Autentica't a Google amb el teu canal de YouTube per carregar la gravació.",
     "youtubeupload": "Carrega",

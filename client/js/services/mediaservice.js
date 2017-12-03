@@ -311,9 +311,13 @@ angular.module('mean.rooms').factory('MediaService',['Rooms','UIHandler','$resou
 				return roomRecordings;
 			};
 
-			var getRecordingCount = function(roomId) {
-				var roomRecordings = getRoomRecordings(roomId);
-				return roomRecordings.recordings.length;
+			var getNewItemId = function(n) {
+				var text = '';
+				var possible = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+				for( var i=0; i < (n||7); i+=1 ) {
+					text += possible.charAt(Math.floor(Math.random() * possible.length));
+				}
+				return text;
 			};
 
 			var getAllRecordings = function(roomId) {
@@ -390,10 +394,11 @@ angular.module('mean.rooms').factory('MediaService',['Rooms','UIHandler','$resou
 								uiHandler.fileWriter = fileWriter;
 								var timeParts = lastRecording.time.split(':');
 								uiHandler.recordTimeMillisOffset = (+timeParts[0] * (60000 * 60)) + (+timeParts[1] * 60000) + (+timeParts[2] * 1000);
+								removeVideoMessage(lastUrl);
 								uiHandler.saveData(data,false);
 							}, errorHandler);
 						},function(){
-							fs.root.getFile('loowid/recording-'+$scope.global.roomId+'-'+getRecordingCount($scope.global.roomId)+'.webm', {create: true}, function(fileEntry) {
+							fs.root.getFile('loowid/recording-'+$scope.global.roomId+'-'+getNewItemId(3)+'.webm', {create: true}, function(fileEntry) {
 								addNewRecording($scope.global.roomId,fileEntry.name,fileEntry.toURL());
 								fileEntry.createWriter(function(fileWriter) {
 										fileWriter.onwriteend = function(e) { };
@@ -420,6 +425,28 @@ angular.module('mean.rooms').factory('MediaService',['Rooms','UIHandler','$resou
 				} else {
 					uiHandler.saveData(data);
 				}
+			};
+
+			var removeVideoMessage = function(url) {
+				uiHandler.messages.forEach(function(m,i){
+					if (m.class==='other' && m.id === $scope.global.bot && m.list.length === 1) {
+						var obj = m.list[0].list.find(function(item){ return item.type==='blob' && item.url === url; });
+						if (obj) {
+							uiHandler.messages.splice(i,1);
+						}
+					}
+				});
+			};
+
+			$scope.removeRecording = function(url) {
+				window.resolveLocalFileSystemURL(url,function(fileEntry){
+					fileEntry.remove(function(){
+						purgeRecordings();
+						removeVideoMessage(url);
+					},errorHandler);
+				},function(){ 
+					console.log('File not found.');
+				});
 			};
 
 			$scope.startRecordingSession = function ($event) {
@@ -704,6 +731,10 @@ angular.module('mean.rooms').factory('MediaService',['Rooms','UIHandler','$resou
                         		   download: true,
                         		   filename: 'loowid-'+videoId,
                         		   text:$scope.resourceBundle.download},
+								  {type:'link',
+                        		   to: recordUrl,
+                        		   delete: true,
+                        		   text:$scope.resourceBundle.deleteRecord},
 								  {type:'link',
                         	   	   id: videoId,
                         	   	   youtube: true,
