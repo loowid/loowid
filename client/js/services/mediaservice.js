@@ -361,9 +361,13 @@ angular.module('mean.rooms').factory('MediaService',['Rooms','UIHandler','$resou
 				uiHandler.loowidRecordings = uiHandler.loowidRecordings.filter(function(item){ return item.roomId===$scope.global.roomId || item.recordings.length>0; });
 				uiHandler.loowidRecordings.forEach(function(r){
 					r.recordings.forEach(function(f){
-						window.resolveLocalFileSystemURL(f.url,function(){/* file exists */},function(){ f.missing = true; });
+						window.resolveLocalFileSystemURL(f.url,
+							function(){/* file exists */},
+							function(){ 
+								f.missing = true; 
+								r.recordings = r.recordings.filter(function(item){ return !item.missing; });
+							});
 					});
-					r.recordings = r.recordings.filter(function(item){ return !item.missing; });
 				});
 				// Save in local storage every change
 				$scope.$watch(function(){
@@ -394,7 +398,7 @@ angular.module('mean.rooms').factory('MediaService',['Rooms','UIHandler','$resou
 								uiHandler.fileWriter = fileWriter;
 								var timeParts = lastRecording.time.split(':');
 								uiHandler.recordTimeMillisOffset = (+timeParts[0] * (60000 * 60)) + (+timeParts[1] * 60000) + (+timeParts[2] * 1000);
-								removeVideoMessage(lastUrl);
+								removeVideoMessage(lastUrl,true);
 								uiHandler.saveData(data,false);
 							}, errorHandler);
 						},function(){
@@ -427,26 +431,62 @@ angular.module('mean.rooms').factory('MediaService',['Rooms','UIHandler','$resou
 				}
 			};
 
-			var removeVideoMessage = function(url) {
+			var removeVideoMessage = function(url,undo) {
 				uiHandler.messages.forEach(function(m,i){
 					if (m.class==='other' && m.id === $scope.global.bot && m.list.length === 1) {
-						var obj = m.list[0].list.find(function(item){ return item.type==='blob' && item.url === url; });
+						var obj = m.list[0].list.find(function(item){ return (item.type==='blob' && item.url === url) || (item.type==='link' && item.undo && item.to === url); });
 						if (obj) {
-							uiHandler.messages.splice(i,1);
+							if (obj.type==='blob') {
+								if (undo) {
+									uiHandler.messages.splice(i,1);
+								} else {
+									uiHandler.messages[i] = {'class':'other',
+										'id': $scope.global.bot,
+										'time': new Date(),
+										'istyping': false,
+										'list':[{list:[
+											{type:'link',
+											undo: true,
+											timeout: setTimeout(function(){ realRemoveRecording(url); },2000),
+											text:$scope.resourceBundle.undoDelete,
+											to: url}]}]};
+								}
+							} else {
+								clearTimeout(obj.timeout);
+								if (undo) {
+									var allRecordings = getAllRecordings($scope.global.roomId);
+									var myRecording = allRecordings.find(function(item){ return item.url === url; });
+									if (myRecording) { 
+										showRecordingOnChat(myRecording,true,i); 
+									} else {
+										uiHandler.messages.splice(i,1);
+									}
+								} else {
+									uiHandler.messages.splice(i,1);
+								}
+							}
 						}
 					}
 				});
 			};
 
-			$scope.removeRecording = function(url) {
+			var realRemoveRecording = function(url) {
 				window.resolveLocalFileSystemURL(url,function(fileEntry){
 					fileEntry.remove(function(){
-						purgeRecordings();
 						removeVideoMessage(url);
+						purgeRecordings();
 					},errorHandler);
 				},function(){ 
 					console.log('File not found.');
 				});
+			};
+
+			$scope.undoRemoveRecording = function(url) {
+				removeVideoMessage(url,true);
+			};
+
+			$scope.removeRecording = function(url) {
+				removeVideoMessage(url);
 			};
 
 			$scope.startRecordingSession = function ($event) {
@@ -705,7 +745,7 @@ angular.module('mean.rooms').factory('MediaService',['Rooms','UIHandler','$resou
 				uiHandler.mediaRecorder.resume();
 			};
 
-			var showRecordingOnChat = function(myRecording) {
+			var showRecordingOnChat = function(myRecording,onindex,index) {
 				var recordUrl = myRecording.url;
 				var videoId = myRecording.id;
 				var recordImageUrl = myRecording.img;
@@ -713,7 +753,7 @@ angular.module('mean.rooms').factory('MediaService',['Rooms','UIHandler','$resou
 				var recordType = myRecording.type;
 				var recordYoutubeOEmbed = myRecording.youtubeOEmbed;
 				var recordYoutube = myRecording.youtube;
-				uiHandler.messages.push({'class':'other',
+				var obj = {'class':'other',
                         'id': $scope.global.bot,
                         'time': new Date(),
                         'istyping': false,
@@ -738,7 +778,13 @@ angular.module('mean.rooms').factory('MediaService',['Rooms','UIHandler','$resou
 								  {type:'link',
                         	   	   id: videoId,
                         	   	   youtube: true,
-                        		   url: recordUrl}]}]});
+								   url: recordUrl}]}]};
+			    if (onindex) {
+					uiHandler.messages[index] = obj;
+				} else {
+					uiHandler.messages.push(obj);
+				}
+								   
 			};
 
 			var showRecordingsOnChat = function(last) {

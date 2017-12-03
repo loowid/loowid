@@ -308,6 +308,7 @@
    "titleChangeStream": "Change session recording mode.",
    "download": "Download recording",
    "statusrecording": "The session is being recorded by the owner of the room.",
+   "undoDelete": "Undo delete",
    "youtubeoauth": "Login google with your YouTube's channel account to upload your recording.",
    "youtubeupload": "Upload",
    "youtubetitle": "Title",
