@@ -353,7 +353,12 @@ angular.module('mean.rooms').factory('MediaService',['Rooms','UIHandler','$resou
 			var saveRecordingThumbnail = function(roomId,data) {
 				if (requestFileSystem) {
 					var allRoomRecordings = getAllRecordings(roomId);
-					allRoomRecordings[allRoomRecordings.length-1].img = data;
+					if (allRoomRecordings[allRoomRecordings.length-1]) {
+						allRoomRecordings[allRoomRecordings.length-1].img = data;
+					} else {
+						// Wait for the recording
+						setTimeout(function(){ saveRecordingThumbnail(roomId,data); },500);
+					}
 				} else {
 					uiHandler.recordImageUrl = data;
 				}
@@ -362,7 +367,9 @@ angular.module('mean.rooms').factory('MediaService',['Rooms','UIHandler','$resou
 			var saveRecordingTime = function(roomId,data) {
 				if (window.requestFileSystem) {
 					var allRoomRecordings = getAllRecordings(roomId);
-					allRoomRecordings[allRoomRecordings.length-1].time = data;
+					if (allRoomRecordings[allRoomRecordings.length-1]) {
+						allRoomRecordings[allRoomRecordings.length-1].time = data;
+					}
 				}
 			};
 
@@ -870,6 +877,11 @@ angular.module('mean.rooms').factory('MediaService',['Rooms','UIHandler','$resou
 							};
 						} else {
 							myLastRecording = getLastRecording($scope.global.roomId);
+							if (!myLastRecording) {
+								setTimeout(function(){
+									showRecordingsOnChat(last);
+								},500);
+							}
 						}
 						showRecordingOnChat(myLastRecording);
 					} else {
