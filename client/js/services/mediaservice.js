@@ -4,8 +4,11 @@
 /*global MediaStream: true */
 /*global getScreenId: true */
 /*global UploadVideo: true */
+/*global FileError: true*/
 angular.module('mean.rooms').factory('MediaService',['Rooms','UIHandler','$resource',function(Rooms,UIHandler,$resource){
 
+	var LOOWID_FOLDER = 'loowid';
+	var LOOWID_FILESYSTEM_SIZE = 1024; // 1KB
 	var RATIO_4_3 = 0;
 	var RATIO_16_9 = 1;
 	var getUserMedia = (navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia || navigator.msGetUserMedia);
@@ -260,9 +263,291 @@ angular.module('mean.rooms').factory('MediaService',['Rooms','UIHandler','$resou
 			};
 
 			uiHandler.currentRecordStream = uiHandler.canShareDesktop?0:2;
+
+			var getResolveLocalFileSystem = function() {
+				return window.resolveLocalFileSystemURL || window.webkitResolveLocalFileSystemURL;
+			};
+
+			var resolveLocalFileSystemURL = getResolveLocalFileSystem();
+
+			var getRequestFileSystem = function() {
+				return window.requestFileSystem || window.webkitRequestFileSystem;
+			};
 			
-			$scope.startRecordingSession = function () {
-				
+			var requestFileSystem = getRequestFileSystem();
+
+			uiHandler.isPauseEnabled = requestFileSystem !== undefined;
+
+			var errorHandler = function (e) {
+				var msg = '';
+				switch (e.code) {
+				  case FileError.QUOTA_EXCEEDED_ERR:
+					msg = 'QUOTA_EXCEEDED_ERR';
+					break;
+				  case FileError.NOT_FOUND_ERR:
+					msg = 'NOT_FOUND_ERR';
+					break;
+				  case FileError.SECURITY_ERR:
+					msg = 'SECURITY_ERR';
+					break;
+				  case FileError.INVALID_MODIFICATION_ERR:
+					msg = 'INVALID_MODIFICATION_ERR';
+					break;
+				  case FileError.INVALID_STATE_ERR:
+					msg = 'INVALID_STATE_ERR';
+					break;
+				  default:
+					msg = 'Unknown Error';
+					break;
+				}
+				console.log('FileSystemError: ' + msg);
+			};
+
+			var getRoomFilePrefix = function(roomId) {
+				return 'recording-'+roomId+'-';
+			};
+
+			var getLoowidRecordings = function() {
+				var loowidRecordings = (typeof(Storage)!=='undefined')?localStorage.loowidRecordings:null;
+				if (loowidRecordings) { 
+					loowidRecordings = JSON.parse(loowidRecordings);
+				} else {
+					loowidRecordings = [];
+				}
+				return loowidRecordings;				
+			};
+			
+			uiHandler.loowidRecordings = getLoowidRecordings();
+
+			var getRoomRecordings = function(roomId,empty) {
+				var roomRecordings = uiHandler.loowidRecordings.find(function(item) { return item.roomId === roomId; });
+				if (!roomRecordings && !empty) {
+					roomRecordings = {
+						roomId: roomId,
+						recordings: []
+					};
+					uiHandler.loowidRecordings.push(roomRecordings);
+				}
+				return roomRecordings;
+			};
+
+			var getNewItemId = function(roomId) {
+				var lastRecording = getLastRecording(roomId);
+				return lastRecording?lastRecording.id.replace(getRoomFilePrefix(roomId),'').replace('.webm','')-0+1:0;
+			};
+
+			var getAllRecordings = function(roomId) {
+				var roomRecordings = getRoomRecordings(roomId);
+				return roomRecordings.recordings;
+			};
+
+			var getLastRecording = function(roomId) {
+				var allRecordings = getAllRecordings(roomId);
+				return allRecordings[allRecordings.length-1];
+			};
+
+			var addNewRecording = function(roomId,name,url) {
+				var roomRecordings = getRoomRecordings(roomId);
+				var newRecording = { id: name, url: url, type: uiHandler.currentRecordStream };
+				roomRecordings.recordings.push(newRecording);
+			};
+
+			var saveRecordingThumbnail = function(roomId,data) {
+				if (requestFileSystem) {
+					var allRoomRecordings = getAllRecordings(roomId);
+					if (allRoomRecordings[allRoomRecordings.length-1]) {
+						allRoomRecordings[allRoomRecordings.length-1].img = data;
+					} else {
+						// Wait for the recording
+						setTimeout(function(){ saveRecordingThumbnail(roomId,data); },500);
+					}
+				} else {
+					uiHandler.recordImageUrl = data;
+				}
+			};
+
+			var saveRecordingTime = function(roomId,data) {
+				if (window.requestFileSystem) {
+					var allRoomRecordings = getAllRecordings(roomId);
+					if (allRoomRecordings[allRoomRecordings.length-1]) {
+						allRoomRecordings[allRoomRecordings.length-1].time = data;
+					}
+				}
+			};
+
+			var handleFilesystem = function(ev) {
+				if (requestFileSystem) {
+					requestFileSystem(window.TEMPORARY, LOOWID_FILESYSTEM_SIZE, function(fs){
+						fs.root.getDirectory(LOOWID_FOLDER, {create: true}, function(dirEntry) {
+							if (!ev.altKey) {
+								/* List files in filesystem with shift */
+								dirEntry.createReader().readEntries(function(results){
+									console.log('Recordings available:'); 
+									console.log(results);
+								});
+							} else {
+								/* Remove all files in filesystem with alt+shift */
+								dirEntry.removeRecursively(function() {
+									console.log('Directory removed.');
+									purgeRecordings();
+								}, errorHandler);
+							}
+						});
+					}, errorHandler);
+				} else {
+					console.log('Filesystem API not available.');
+				}
+			};
+
+			uiHandler.saveYoutubeUrl = function(videoId,oembed,url) {
+				var allRoomRecordings = getAllRecordings($scope.global.roomId);
+				allRoomRecordings.find(function(item){
+					if (item.id === videoId) {
+						item.youtubeOEmbed = oembed;
+						item.youtube = url;
+					}
+				});
+			};
+
+			var purgeRecordings = function() {
+				uiHandler.loowidRecordings = uiHandler.loowidRecordings.filter(function(item){ return item.roomId===$scope.global.roomId || item.recordings.length>0; });
+				uiHandler.loowidRecordings.forEach(function(r){
+					r.recordings.forEach(function(f){
+						resolveLocalFileSystemURL(f.url,
+							function(){/* file exists */},
+							function(){ 
+								f.missing = true; 
+								r.recordings = r.recordings.filter(function(item){ return !item.missing; });
+							});
+					});
+				});
+				// Save in local storage every change
+				$scope.$watch(function(){
+					return JSON.stringify(uiHandler.loowidRecordings);
+				}, function(){
+					if (typeof(Storage)!=='undefined') { localStorage.loowidRecordings = JSON.stringify(uiHandler.loowidRecordings); }
+				});
+			};
+
+			// Remove missing files from localstorage
+			purgeRecordings();
+			
+			// Show Recordings Available
+			setTimeout(function(){ showRecordingsOnChat(); },3000);
+
+			uiHandler.autoSaveRecording = function(data,ev) {
+				var initFileSystem = function(fs) {
+					fs.root.getDirectory(LOOWID_FOLDER, {create: true}, function(dirEntry) {
+						dirEntry.createReader().readEntries(function(results){
+							if (rtc.debug) { console.log('Recordings available:'); console.log(results); }
+						});
+						var lastRecording = getLastRecording($scope.global.roomId);
+						var lastUrl = (lastRecording && ev.altKey)?lastRecording.url:'filesystem:https://localhost/temporary/unknown';
+						resolveLocalFileSystemURL(lastUrl,function(fileEntry){
+							fileEntry.createWriter(function(fileWriter) {
+								fileWriter.onwriteend = function(e) { };
+								fileWriter.onerror = function(e) { console.log('FileSystem Write Failed: ' + e.toString()); };
+								uiHandler.fileWriter = fileWriter;
+								var timeParts = lastRecording.time.split(':');
+								uiHandler.recordTimeMillisOffset = (+timeParts[0] * (60000 * 60)) + (+timeParts[1] * 60000) + (+timeParts[2] * 1000);
+								removeVideoMessage(lastUrl,true);
+								uiHandler.saveData(data,false);
+							}, errorHandler);
+						},function(){
+							fs.root.getFile(LOOWID_FOLDER+'/'+getRoomFilePrefix($scope.global.roomId)+getNewItemId($scope.global.roomId)+'.webm', {create: true}, function(fileEntry) {
+								addNewRecording($scope.global.roomId,fileEntry.name,fileEntry.toURL());
+								fileEntry.createWriter(function(fileWriter) {
+										fileWriter.onwriteend = function(e) { };
+										fileWriter.onerror = function(e) { console.log('FileSystem Write Failed: ' + e.toString()); };
+										uiHandler.fileWriter = fileWriter;
+										uiHandler.saveData(data,true);
+								}, errorHandler);
+							}, errorHandler);
+						});
+					}, errorHandler);
+				};
+				uiHandler.saveData = function(bytes,newfile) {
+					if (!newfile) {
+						uiHandler.fileWriter.seek(uiHandler.fileWriter.length);
+					}
+					var recordData = [];
+					recordData.push(bytes);
+					var blob = new Blob(recordData, {type: 'video/webm;codecs=vp8'});
+					uiHandler.fileWriter.write(blob);
+				};
+				if (!uiHandler.fileWriter) {
+					requestFileSystem(window.TEMPORARY, LOOWID_FILESYSTEM_SIZE, initFileSystem, errorHandler);
+				} else {
+					uiHandler.saveData(data);
+				}
+			};
+
+			var removeVideoMessage = function(url,undo) {
+				uiHandler.messages.forEach(function(m,i){
+					if (m.class==='other' && m.id === $scope.global.bot && m.list.length === 1) {
+						var obj = m.list[0].list.find(function(item){ return (item.type==='blob' && item.url === url) || (item.type==='link' && item.undo && item.to === url); });
+						if (obj) {
+							if (obj.type==='blob') {
+								if (undo) {
+									uiHandler.messages.splice(i,1);
+								} else {
+									uiHandler.messages[i] = {'class':'other',
+										'id': $scope.global.bot,
+										'time': new Date(),
+										'istyping': false,
+										'list':[{list:[
+											{type:'link',
+											undo: true,
+											timeout: setTimeout(function(){ realRemoveRecording(url); },2000),
+											text:$scope.resourceBundle.undoDelete,
+											to: url}]}]};
+								}
+							} else {
+								clearTimeout(obj.timeout);
+								if (undo) {
+									var allRecordings = getAllRecordings($scope.global.roomId);
+									var myRecording = allRecordings.find(function(item){ return item.url === url; });
+									if (myRecording) { 
+										showRecordingOnChat(myRecording,true,i); 
+									} else {
+										uiHandler.messages.splice(i,1);
+									}
+								} else {
+									uiHandler.messages.splice(i,1);
+								}
+							}
+						}
+					}
+				});
+			};
+
+			var realRemoveRecording = function(url) {
+				resolveLocalFileSystemURL(url,function(fileEntry){
+					fileEntry.remove(function(){
+						removeVideoMessage(url);
+						purgeRecordings();
+					},errorHandler);
+				},function(){ 
+					console.log('File not found.');
+				});
+			};
+
+			$scope.undoRemoveRecording = function(url) {
+				removeVideoMessage(url,true);
+			};
+
+			$scope.removeRecording = function(url) {
+				removeVideoMessage(url);
+			};
+
+			$scope.startRecordingSession = function ($event) {
+
+				/* Hack with shift key: list or remove files from filesystem */
+				if ($event.shiftKey) {
+					handleFilesystem($event);
+					return;
+				}
+
 				var recordVideo = uiHandler.currentRecordStream === 0 || uiHandler.currentRecordStream === 1;
 				var recordAudio = uiHandler.currentRecordStream === 0 || uiHandler.currentRecordStream === 2;
 				
@@ -329,10 +614,13 @@ angular.module('mean.rooms').factory('MediaService',['Rooms','UIHandler','$resou
 					var onstop = function() {
 						uiHandler.isRecordingSession = false;
 						uiHandler.isPauseRecordingSession = false;
+						uiHandler.fileWriter = undefined;
+						saveRecordingTime($scope.global.roomId,uiHandler.recordTime);
 						window.clearInterval(uiHandler.recordTimeInterval);
 						if (uiHandler.screenStream) {
 							uiHandler.screenStream.getTracks()[0].stop();
 						}
+						showRecordingsOnChat(true);
 					};
 					
 					var mixedStream = new MediaStream();
@@ -390,7 +678,7 @@ angular.module('mean.rooms').factory('MediaService',['Rooms','UIHandler','$resou
 						img.onload = function(){ 
 							draw(); 
 							setTimeout(function(){
-								uiHandler.recordImageUrl = canvasWave.toDataURL('image/jpeg'); 
+								saveRecordingThumbnail($scope.global.roomId,canvasWave.toDataURL('image/jpeg')); 
 							},500);
 						};
 						img.src = '/img/hero.png';
@@ -409,24 +697,12 @@ angular.module('mean.rooms').factory('MediaService',['Rooms','UIHandler','$resou
 					};
 					uiHandler.mediaRecorder.ondataavailable = function(event){
 						if (event.data && event.data.size > 0) {
-							uiHandler.recordedBlobs.push(event.data);
+							if (requestFileSystem) {
+								uiHandler.autoSaveRecording(event.data,$event);
+							} else {
+								uiHandler.recordedBlobs.push(event.data);
+							}
 						}
-						/* AutoSave Every Minute
-						if (uiHandler.recordedBlobs.length>0 && uiHandler.recordedBlobs.length%60 === 0) {
-							var blob = new Blob(uiHandler.recordedBlobs, {type: 'video/webm;codecs=vp8'});
-							var url = window.URL.createObjectURL(blob);
-							var a = document.createElement('a');
-							a.style.display = 'none';
-							a.href = url;
-							a.download = 'record'+Math.round(uiHandler.recordedBlobs.length/10)+'.webm';
-							document.body.appendChild(a);
-							a.click();
-							setTimeout(function() {
-								document.body.removeChild(a);
-								window.URL.revokeObjectURL(url);
-							}, 100);
-						}
-						*/
 					};
 					uiHandler.mediaRecorder.start(100); // collect 100ms of data
 					uiHandler.isRecordingSession = true;
@@ -440,6 +716,7 @@ angular.module('mean.rooms').factory('MediaService',['Rooms','UIHandler','$resou
 							var minutes=Math.floor((diff/(1000*60))%60);
 							var hours=Math.floor((diff/(1000*60*60))%24);						
 							uiHandler.recordTime = (hours<10?'0':'') + hours + ':' + (hours<10?'0':'') + minutes + ':' + (seconds<10?'0':'') + seconds;
+							saveRecordingTime($scope.global.roomId,uiHandler.recordTime);
 						}
 					},1000);
 					
@@ -461,7 +738,7 @@ angular.module('mean.rooms').factory('MediaService',['Rooms','UIHandler','$resou
 						setTimeout(function(){
 							context.fillRect(0,0,w,h);
 						    context.drawImage(video,0,0,w,h);
-						    uiHandler.recordImageUrl = canvas.toDataURL('image/jpeg');
+						    saveRecordingThumbnail($scope.global.roomId,canvas.toDataURL('image/jpeg'));
 						},500);
 					}
 					
@@ -530,6 +807,94 @@ angular.module('mean.rooms').factory('MediaService',['Rooms','UIHandler','$resou
 				uiHandler.mediaRecorder.resume();
 			};
 
+			var showRecordingOnChat = function(myRecording,onindex,index) {
+				var recordUrl = myRecording.url;
+				var videoId = myRecording.id;
+				var recordImageUrl = myRecording.img;
+				var recordTime = myRecording.time;
+				var recordType = myRecording.type;
+				var recordYoutubeOEmbed = myRecording.youtubeOEmbed;
+				var recordYoutube = myRecording.youtube;
+				var recordBlobs = myRecording.blob;
+				var successText = {type:'text',text:$scope.resourceBundle._('readyRecord',recordTime)};
+				var oembedVideo = {type:'blob',
+					id: videoId,
+					url: recordUrl,
+					thumbnail: recordImageUrl,
+					youtubeOEmbed: recordYoutubeOEmbed,
+					youtube: recordYoutube,
+					title:$scope.resourceBundle._('recordStream'+recordType)};
+				var downloadLink = {type:'link',
+					to: recordUrl,
+					download: true,
+					filename: LOOWID_FOLDER+'-'+videoId,
+					text:$scope.resourceBundle.download};
+				var deleteLink = {type:'link',
+					to: recordUrl,
+					delete: true,
+					text:$scope.resourceBundle.deleteRecord};
+				var youtubeLink = {type:'link',
+					id: videoId,
+					youtube: true,
+			 		url: recordUrl,
+			 		blob: recordBlobs};
+				var msgList = [];
+				msgList.push(successText);
+				msgList.push(oembedVideo);
+				msgList.push(downloadLink);
+				if (!recordBlobs) { msgList.push(deleteLink); }
+				msgList.push(youtubeLink);
+				var obj = {'class':'other',
+                        'id': $scope.global.bot,
+                        'time': new Date(),
+                        'istyping': false,
+                        'list':[{list:msgList}]};
+			    if (onindex) {
+					uiHandler.messages[index] = obj;
+				} else {
+					uiHandler.messages.push(obj);
+				}
+								   
+			};
+
+			var showRecordingsOnChat = function(last) {
+				if (!uiHandler.messages) {
+					setTimeout(function(){
+						showRecordingsOnChat(last);
+					},500);
+				} else {
+					if (last) {
+						var myLastRecording;
+						if (!requestFileSystem) {
+							var recordBlobs = new Blob(uiHandler.recordedBlobs, {type: 'video/webm;codecs=vp8'});
+							var recordUrl = window.URL.createObjectURL(recordBlobs);
+							var videoId = recordUrl.substring(recordUrl.lastIndexOf('/')+1);
+							myLastRecording = {
+								id: videoId,
+								url: recordUrl,
+								blob: recordBlobs,
+								type: uiHandler.currentRecordStream,
+								time: uiHandler.recordTime,
+								img: uiHandler.recordImageUrl
+							};
+						} else {
+							myLastRecording = getLastRecording($scope.global.roomId);
+							if (!myLastRecording) {
+								setTimeout(function(){
+									showRecordingsOnChat(last);
+								},500);
+							}
+						}
+						showRecordingOnChat(myLastRecording);
+					} else {
+						var allRecordings = getAllRecordings($scope.global.roomId);
+						allRecordings.forEach(function(r){
+							showRecordingOnChat(r);
+						});
+					}
+				}
+			};
+
 			$scope.stopRecordingSession = function () {
 				if (uiHandler.mediaRecorder.state!=='inactive') {
 					uiHandler.mediaRecorder.stop();
@@ -538,34 +903,11 @@ angular.module('mean.rooms').factory('MediaService',['Rooms','UIHandler','$resou
 					cancelAnimationFrame(uiHandler.animationFrame);
 					uiHandler.animationFrame = undefined;
 				}
-				var recordBlobs = new Blob(uiHandler.recordedBlobs, {type: 'video/webm;codecs=vp8'});
-				var recordUrl = window.URL.createObjectURL(recordBlobs);
-				var videoId = recordUrl.substring(recordUrl.lastIndexOf('/')+1);
-				uiHandler.messages.push({'class':'other',
-                        'id': $scope.global.bot,
-                        'time': new Date(),
-                        'istyping': false,
-                        'list':[{list:[
-                                  {type:'text',text:$scope.resourceBundle._('readyRecord',uiHandler.recordTime)},
-                                  {type:'blob',
-                                   id: videoId,
-                        		   url: recordUrl,
-                        		   thumbnail: uiHandler.recordImageUrl,
-                        		   title:$scope.resourceBundle._('recordStream'+uiHandler.currentRecordStream)},
-                        		  {type:'link',
-                        		   to: recordUrl,
-                        		   download: true,
-                        		   filename: 'loowid-'+$scope.global.roomId+'-'+(new Date()).getTime()+'.webm',
-                        		   text:$scope.resourceBundle.download},
-                        		  {type:'link',
-                        		   id: videoId,
-                        		   youtube: true,
-                        		   blob: recordBlobs}]}]});
-				 room.changeRoomStatus($scope.global.roomId,uiHandler.status.substring(0,uiHandler.status.indexOf('-')),function(){
-					 //Refresh the view to restore the button state          
-					 uiHandler.status = uiHandler.status.substring(0,uiHandler.status.indexOf('-'));
-					 rtc.updateOwnerData ($scope.global.roomId,uiHandler.name,uiHandler.avatar,uiHandler.status,uiHandler.access);
-				 });
+				room.changeRoomStatus($scope.global.roomId,uiHandler.status.substring(0,uiHandler.status.indexOf('-')),function(){
+					//Refresh the view to restore the button state          
+					uiHandler.status = uiHandler.status.substring(0,uiHandler.status.indexOf('-'));
+					rtc.updateOwnerData ($scope.global.roomId,uiHandler.name,uiHandler.avatar,uiHandler.status,uiHandler.access);
+				});
 			};
 
 			$scope.openYoutubeForm = function() {
@@ -576,7 +918,19 @@ angular.module('mean.rooms').factory('MediaService',['Rooms','UIHandler','$resou
 				uiHandler.youtubeUploadClass = '';
 			};
 
-			$scope.youtubeUpload = function(id,blob) {
+			$scope.youtubeUpload = function(id,url) {
+				if (resolveLocalFileSystemURL) {
+					resolveLocalFileSystemURL(url, function(fileEntry) {
+						fileEntry.file(function(file) {
+							youtubeFileUpload(id,file);
+						}, errorHandler);
+					}, errorHandler);
+				} else {
+					youtubeFileUpload(id,url);
+				}
+			};
+				
+			var youtubeFileUpload = function(id,blob) {
 				uiHandler.youtubeVideoId = id;
 				if (!uiHandler.youtubeVideo) { uiHandler.youtubeVideo = {}; }
 				uiHandler.youtubeVideo[id] = {};

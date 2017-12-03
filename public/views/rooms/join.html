@@ -47,8 +47,8 @@
 					<p title="{{resourceBundle.titleUnmute}}"  ng-click="unmuteAudio()" ng-show="ui.isMuted"><i class="fa fa-volume-up"></i> <span class="title">{{resourceBundle.unmutemainbar}}</span></p>
 				</li>
 				<li id="recording" class="barbutton">
-					<div title="{{resourceBundle.startRecordingSession}}"  ng-click="startRecordingSession()" ng-hide="ui.isRecordingSession"><i class="fa fa-circle"></i> <span class="title">{{resourceBundle.startRecordingSession}}</span></div>
-					<div title="{{resourceBundle.pauseRecordingSession}}"  ng-click="pauseRecordingSession()" ng-show="ui.isRecordingSession && !ui.isPauseRecordingSession"><i class="recording fa fa-pause"></i> </div>
+					<div title="{{resourceBundle.startRecordingSession}}"  ng-click="startRecordingSession($event)" ng-hide="ui.isRecordingSession"><i class="fa fa-circle"></i> <span class="title">{{resourceBundle.startRecordingSession}}</span></div>
+					<div title="{{resourceBundle.pauseRecordingSession}}"  ng-click="pauseRecordingSession()" ng-show="ui.isRecordingSession && !ui.isPauseRecordingSession && ui.isPauseEnabled"><i class="recording fa fa-pause"></i> </div>
 					<div title="{{resourceBundle.resumeRecordingSession}}"  ng-click="resumeRecordingSession()" ng-show="ui.isPauseRecordingSession"><i class="recording fa fa-play"></i> </div>
 					<div title="{{resourceBundle.stopRecordingSession}}"  ng-click="stopRecordingSession()" ng-show="ui.isRecordingSession" ng-mouseenter="ui.showTime=true" ng-mouseleave="ui.showTime=false"><i class="recording fa fa-stop"></i> <span class="title">{{resourceBundle.stopRecordingSession}}</span> <span class="title" ng-show="ui.showTime">{{ui.recordTime}}</span></div>
 
@@ -397,8 +397,10 @@
 											<a ng-show="item.type==='link' && sitem.embed.length <=0 && !item.download" href="{{item.to}}" target="_blank">
 												<span> {{item.text}}</span>
 											</a>
-											<a ng-show="item.type==='link' && item.download" href="{{item.to}}" download="{{item.filename}}">{{item.text}}</a>
-											<a ng-show="item.type==='link' && item.youtube" ng-click="youtubeUpload(item.id,item.blob)" class="youtube" title="{{resourceBundle.youtubeuploadtitle}}"><i class="fa fa-youtube-square"></i></a>
+											<a ng-show="item.type==='link' && item.undo" href="" ng-click="undoRemoveRecording(item.to)">{{item.text}}</a>
+											<a ng-show="item.type==='link' && item.delete" href="" ng-click="removeRecording(item.to)">{{item.text}}</a>
+											<a ng-show="item.type==='link' && item.download" href="{{item.to}}" download="{{item.filename}}" class="download"><span>{{item.text}}</span></a>
+											<a ng-show="item.type==='link' && item.youtube" ng-click="youtubeUpload(item.id,item.blob?item.blob:item.url)" class="youtube" title="{{resourceBundle.youtubeuploadtitle}}"><i class="fa fa-youtube-square"></i></a>
 											<span ng-show="item.type==='text'">{{item.text}}</span>
 											<span ng-show="item.type==='emoji'"><i title="{{item.base}}" ng-class="item.twaclass" ng-click="item.base === ':sound:' && changeSound($event)"></i></span>
 											<span ng-show="item.type==='blob'" class="evideo">
@@ -418,6 +420,9 @@
 												</span>
 												<span ng-show="ui.youtubeVideo[item.id].isYoutubeTranscoded">
 													<a href="#" ng-click="openOEmbedFromService({url:ui.youtubeVideo[item.id].youtubeVideoUrl})">{{ui.youtubeVideo[item.id].youtubeVideoUrlText}}</a>
+												</span>
+												<span ng-show="item.youtube">
+													<a href="#" ng-click="openOEmbedFromService({url:item.youtubeOEmbed})">{{item.youtube}}</a>
 												</span>
 											</span>
 										</span>
