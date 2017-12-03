@@ -43,7 +43,7 @@ window.app.config(['$locationProvider',
 ]);
 
 window.app.config(['$compileProvider', function ($compileProvider) {
-    $compileProvider.aHrefSanitizationWhitelist(/^\s*(https?|ftp|mailto|filesystem):/);
+    $compileProvider.aHrefSanitizationWhitelist(/^\s*(https?|ftp|mailto|blob|filesystem):/);
 }]);
 
 window.app.value('ngI18nConfig', {

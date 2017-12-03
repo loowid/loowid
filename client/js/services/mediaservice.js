@@ -7,6 +7,8 @@
 /*global FileError: true*/
 angular.module('mean.rooms').factory('MediaService',['Rooms','UIHandler','$resource',function(Rooms,UIHandler,$resource){
 
+	var LOOWID_FOLDER = 'loowid';
+	var LOOWID_FILESYSTEM_SIZE = 1024; // 1KB
 	var RATIO_4_3 = 0;
 	var RATIO_16_9 = 1;
 	var getUserMedia = (navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia || navigator.msGetUserMedia);
@@ -262,6 +264,18 @@ angular.module('mean.rooms').factory('MediaService',['Rooms','UIHandler','$resou
 
 			uiHandler.currentRecordStream = uiHandler.canShareDesktop?0:2;
 
+			var getResolveLocalFileSystem = function() {
+				return window.resolveLocalFileSystemURL || window.webkitResolveLocalFileSystemURL;
+			};
+
+			var resolveLocalFileSystemURL = getResolveLocalFileSystem();
+
+			var getRequestFileSystem = function() {
+				return window.requestFileSystem || window.webkitRequestFileSystem;
+			};
+			
+			var requestFileSystem = getRequestFileSystem();
+
 			var errorHandler = function (e) {
 				var msg = '';
 				switch (e.code) {
@@ -285,6 +299,10 @@ angular.module('mean.rooms').factory('MediaService',['Rooms','UIHandler','$resou
 					break;
 				}
 				console.log('FileSystemError: ' + msg);
+			};
+
+			var getRoomFilePrefix = function(roomId) {
+				return 'recording-'+roomId+'-';
 			};
 
 			var getLoowidRecordings = function() {
@@ -311,13 +329,9 @@ angular.module('mean.rooms').factory('MediaService',['Rooms','UIHandler','$resou
 				return roomRecordings;
 			};
 
-			var getNewItemId = function(n) {
-				var text = '';
-				var possible = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-				for( var i=0; i < (n||7); i+=1 ) {
-					text += possible.charAt(Math.floor(Math.random() * possible.length));
-				}
-				return text;
+			var getNewItemId = function(roomId) {
+				var lastRecording = getLastRecording(roomId);
+				return lastRecording?lastRecording.id.replace(getRoomFilePrefix(roomId),'').replace('.webm','')-0+1:0;
 			};
 
 			var getAllRecordings = function(roomId) {
@@ -337,13 +351,43 @@ angular.module('mean.rooms').factory('MediaService',['Rooms','UIHandler','$resou
 			};
 
 			var saveRecordingThumbnail = function(roomId,data) {
-				var allRoomRecordings = getAllRecordings(roomId);
-				allRoomRecordings[allRoomRecordings.length-1].img = data;
+				if (requestFileSystem) {
+					var allRoomRecordings = getAllRecordings(roomId);
+					allRoomRecordings[allRoomRecordings.length-1].img = data;
+				} else {
+					uiHandler.recordImageUrl = data;
+				}
 			};
 
 			var saveRecordingTime = function(roomId,data) {
-				var allRoomRecordings = getAllRecordings(roomId);
-				allRoomRecordings[allRoomRecordings.length-1].time = data;
+				if (window.requestFileSystem) {
+					var allRoomRecordings = getAllRecordings(roomId);
+					allRoomRecordings[allRoomRecordings.length-1].time = data;
+				}
+			};
+
+			var handleFilesystem = function(ev) {
+				if (requestFileSystem) {
+					requestFileSystem(window.TEMPORARY, LOOWID_FILESYSTEM_SIZE, function(fs){
+						fs.root.getDirectory(LOOWID_FOLDER, {create: true}, function(dirEntry) {
+							if (!ev.altKey) {
+								/* List files in filesystem with shift */
+								dirEntry.createReader().readEntries(function(results){
+									console.log('Recordings available:'); 
+									console.log(results);
+								});
+							} else {
+								/* Remove all files in filesystem with alt+shift */
+								dirEntry.removeRecursively(function() {
+									console.log('Directory removed.');
+									purgeRecordings();
+								}, errorHandler);
+							}
+						});
+					}, errorHandler);
+				} else {
+					console.log('Filesystem API not available.');
+				}
 			};
 
 			uiHandler.saveYoutubeUrl = function(videoId,oembed,url) {
@@ -357,11 +401,10 @@ angular.module('mean.rooms').factory('MediaService',['Rooms','UIHandler','$resou
 			};
 
 			var purgeRecordings = function() {
-				window.resolveLocalFileSystemURL = window.resolveLocalFileSystemURL || window.webkitResolveLocalFileSystemURL;
 				uiHandler.loowidRecordings = uiHandler.loowidRecordings.filter(function(item){ return item.roomId===$scope.global.roomId || item.recordings.length>0; });
 				uiHandler.loowidRecordings.forEach(function(r){
 					r.recordings.forEach(function(f){
-						window.resolveLocalFileSystemURL(f.url,
+						resolveLocalFileSystemURL(f.url,
 							function(){/* file exists */},
 							function(){ 
 								f.missing = true; 
@@ -385,13 +428,13 @@ angular.module('mean.rooms').factory('MediaService',['Rooms','UIHandler','$resou
 
 			uiHandler.autoSaveRecording = function(data,ev) {
 				var initFileSystem = function(fs) {
-					fs.root.getDirectory('loowid', {create: true}, function(dirEntry) {
+					fs.root.getDirectory(LOOWID_FOLDER, {create: true}, function(dirEntry) {
 						dirEntry.createReader().readEntries(function(results){
 							if (rtc.debug) { console.log('Recordings available:'); console.log(results); }
 						});
 						var lastRecording = getLastRecording($scope.global.roomId);
 						var lastUrl = (lastRecording && ev.altKey)?lastRecording.url:'filesystem:https://localhost/temporary/unknown';
-						window.resolveLocalFileSystemURL(lastUrl,function(fileEntry){
+						resolveLocalFileSystemURL(lastUrl,function(fileEntry){
 							fileEntry.createWriter(function(fileWriter) {
 								fileWriter.onwriteend = function(e) { };
 								fileWriter.onerror = function(e) { console.log('FileSystem Write Failed: ' + e.toString()); };
@@ -402,7 +445,7 @@ angular.module('mean.rooms').factory('MediaService',['Rooms','UIHandler','$resou
 								uiHandler.saveData(data,false);
 							}, errorHandler);
 						},function(){
-							fs.root.getFile('loowid/recording-'+$scope.global.roomId+'-'+getNewItemId(3)+'.webm', {create: true}, function(fileEntry) {
+							fs.root.getFile(LOOWID_FOLDER+'/'+getRoomFilePrefix($scope.global.roomId)+getNewItemId($scope.global.roomId)+'.webm', {create: true}, function(fileEntry) {
 								addNewRecording($scope.global.roomId,fileEntry.name,fileEntry.toURL());
 								fileEntry.createWriter(function(fileWriter) {
 										fileWriter.onwriteend = function(e) { };
@@ -424,8 +467,7 @@ angular.module('mean.rooms').factory('MediaService',['Rooms','UIHandler','$resou
 					uiHandler.fileWriter.write(blob);
 				};
 				if (!uiHandler.fileWriter) {
-					window.requestFileSystem = window.requestFileSystem || window.webkitRequestFileSystem;
-					window.requestFileSystem(window.TEMPORARY, 1024 /*1KB*/, initFileSystem, errorHandler);
+					requestFileSystem(window.TEMPORARY, LOOWID_FILESYSTEM_SIZE, initFileSystem, errorHandler);
 				} else {
 					uiHandler.saveData(data);
 				}
@@ -471,7 +513,7 @@ angular.module('mean.rooms').factory('MediaService',['Rooms','UIHandler','$resou
 			};
 
 			var realRemoveRecording = function(url) {
-				window.resolveLocalFileSystemURL(url,function(fileEntry){
+				resolveLocalFileSystemURL(url,function(fileEntry){
 					fileEntry.remove(function(){
 						removeVideoMessage(url);
 						purgeRecordings();
@@ -490,6 +532,12 @@ angular.module('mean.rooms').factory('MediaService',['Rooms','UIHandler','$resou
 			};
 
 			$scope.startRecordingSession = function ($event) {
+
+				/* Hack with shift key: list or remove files from filesystem */
+				if ($event.shiftKey) {
+					handleFilesystem($event);
+					return;
+				}
 
 				var recordVideo = uiHandler.currentRecordStream === 0 || uiHandler.currentRecordStream === 1;
 				var recordAudio = uiHandler.currentRecordStream === 0 || uiHandler.currentRecordStream === 2;
@@ -552,6 +600,7 @@ angular.module('mean.rooms').factory('MediaService',['Rooms','UIHandler','$resou
 				var recordingScreen = function(stream) {
 					uiHandler.screenStream = stream;
 					var options = {mimeType: 'video/webm;codecs=vp8', bitsPerSecond: 1024 * 1024};
+					uiHandler.recordedBlobs = [];
 
 					var onstop = function() {
 						uiHandler.isRecordingSession = false;
@@ -639,7 +688,11 @@ angular.module('mean.rooms').factory('MediaService',['Rooms','UIHandler','$resou
 					};
 					uiHandler.mediaRecorder.ondataavailable = function(event){
 						if (event.data && event.data.size > 0) {
-							uiHandler.autoSaveRecording(event.data,$event);
+							if (requestFileSystem) {
+								uiHandler.autoSaveRecording(event.data,$event);
+							} else {
+								uiHandler.recordedBlobs.push(event.data);
+							}
 						}
 					};
 					uiHandler.mediaRecorder.start(100); // collect 100ms of data
@@ -753,32 +806,40 @@ angular.module('mean.rooms').factory('MediaService',['Rooms','UIHandler','$resou
 				var recordType = myRecording.type;
 				var recordYoutubeOEmbed = myRecording.youtubeOEmbed;
 				var recordYoutube = myRecording.youtube;
+				var recordBlobs = myRecording.blob;
+				var successText = {type:'text',text:$scope.resourceBundle._('readyRecord',recordTime)};
+				var oembedVideo = {type:'blob',
+					id: videoId,
+					url: recordUrl,
+					thumbnail: recordImageUrl,
+					youtubeOEmbed: recordYoutubeOEmbed,
+					youtube: recordYoutube,
+					title:$scope.resourceBundle._('recordStream'+recordType)};
+				var downloadLink = {type:'link',
+					to: recordUrl,
+					download: true,
+					filename: LOOWID_FOLDER+'-'+videoId,
+					text:$scope.resourceBundle.download};
+				var deleteLink = {type:'link',
+					to: recordUrl,
+					delete: true,
+					text:$scope.resourceBundle.deleteRecord};
+				var youtubeLink = {type:'link',
+					id: videoId,
+					youtube: true,
+			 		url: recordUrl,
+			 		blob: recordBlobs};
+				var msgList = [];
+				msgList.push(successText);
+				msgList.push(oembedVideo);
+				msgList.push(downloadLink);
+				if (!recordBlobs) { msgList.push(deleteLink); }
+				msgList.push(youtubeLink);
 				var obj = {'class':'other',
                         'id': $scope.global.bot,
                         'time': new Date(),
                         'istyping': false,
-                        'list':[{list:[
-                                  {type:'text',text:$scope.resourceBundle._('readyRecord',recordTime)},
-                                  {type:'blob',
-                                   id: videoId,
-                        		   url: recordUrl,
-								   thumbnail: recordImageUrl,
-								   youtubeOEmbed: recordYoutubeOEmbed,
-								   youtube: recordYoutube,
-                        		   title:$scope.resourceBundle._('recordStream'+recordType)},
-                        		  {type:'link',
-                        		   to: recordUrl,
-                        		   download: true,
-                        		   filename: 'loowid-'+videoId,
-                        		   text:$scope.resourceBundle.download},
-								  {type:'link',
-                        		   to: recordUrl,
-                        		   delete: true,
-                        		   text:$scope.resourceBundle.deleteRecord},
-								  {type:'link',
-                        	   	   id: videoId,
-                        	   	   youtube: true,
-								   url: recordUrl}]}]};
+                        'list':[{list:msgList}]};
 			    if (onindex) {
 					uiHandler.messages[index] = obj;
 				} else {
@@ -794,7 +855,23 @@ angular.module('mean.rooms').factory('MediaService',['Rooms','UIHandler','$resou
 					},500);
 				} else {
 					if (last) {
-						showRecordingOnChat(getLastRecording($scope.global.roomId));
+						var myLastRecording;
+						if (!requestFileSystem) {
+							var recordBlobs = new Blob(uiHandler.recordedBlobs, {type: 'video/webm;codecs=vp8'});
+							var recordUrl = window.URL.createObjectURL(recordBlobs);
+							var videoId = recordUrl.substring(recordUrl.lastIndexOf('/')+1);
+							myLastRecording = {
+								id: videoId,
+								url: recordUrl,
+								blob: recordBlobs,
+								type: uiHandler.currentRecordStream,
+								time: uiHandler.recordTime,
+								img: uiHandler.recordImageUrl
+							};
+						} else {
+							myLastRecording = getLastRecording($scope.global.roomId);
+						}
+						showRecordingOnChat(myLastRecording);
 					} else {
 						var allRecordings = getAllRecordings($scope.global.roomId);
 						allRecordings.forEach(function(r){
@@ -828,12 +905,15 @@ angular.module('mean.rooms').factory('MediaService',['Rooms','UIHandler','$resou
 			};
 
 			$scope.youtubeUpload = function(id,url) {
-				window.resolveLocalFileSystemURL = window.resolveLocalFileSystemURL || window.webkitResolveLocalFileSystemURL;
-				window.resolveLocalFileSystemURL(url, function(fileEntry) {
-					fileEntry.file(function(file) {
-						youtubeFileUpload(id,file);
+				if (resolveLocalFileSystemURL) {
+					resolveLocalFileSystemURL(url, function(fileEntry) {
+						fileEntry.file(function(file) {
+							youtubeFileUpload(id,file);
+						}, errorHandler);
 					}, errorHandler);
-				}, errorHandler);
+				} else {
+					youtubeFileUpload(id,url);
+				}
 			};
 				
 			var youtubeFileUpload = function(id,blob) {
