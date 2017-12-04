@@ -324,5 +324,7 @@
     "youtubetranscodingfailed": "Fout bij transcoderen van video.",
     "youtubeuploadtitle": "Verstuur uw opname naar YouTube.",
     "pauseRecordingSession": "Opname pauzeren",
-    "resumeRecordingSession": "Opname hervatten"
+    "resumeRecordingSession": "Opname hervatten",
+    "deleteRecord": "Opname verwijderen",
+    "undoDelete": "Verwijderen ongedaan maken"
 }
