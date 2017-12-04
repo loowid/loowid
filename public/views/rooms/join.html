@@ -46,13 +46,10 @@
 					<p title="{{resourceBundle.titleMute}}"  ng-click="muteAudio()" ng-hide="ui.isMuted"><i class="fa fa-times"></i> <span class="title">{{resourceBundle.mutemainbar}}</span></p>
 					<p title="{{resourceBundle.titleUnmute}}"  ng-click="unmuteAudio()" ng-show="ui.isMuted"><i class="fa fa-volume-up"></i> <span class="title">{{resourceBundle.unmutemainbar}}</span></p>
 				</li>
-				<li id="recording" class="barbutton">
-					<div title="{{resourceBundle.startRecordingSession}}"  ng-click="startRecordingSession($event)" ng-hide="ui.isRecordingSession"><i class="fa fa-circle"></i> <span class="title">{{resourceBundle.startRecordingSession}}</span></div>
-					<div title="{{resourceBundle.pauseRecordingSession}}"  ng-click="pauseRecordingSession()" ng-show="ui.isRecordingSession && !ui.isPauseRecordingSession && ui.isPauseEnabled"><i class="recording fa fa-pause"></i> </div>
-					<div title="{{resourceBundle.resumeRecordingSession}}"  ng-click="resumeRecordingSession()" ng-show="ui.isPauseRecordingSession"><i class="recording fa fa-play"></i> </div>
-					<div title="{{resourceBundle.stopRecordingSession}}"  ng-click="stopRecordingSession()" ng-show="ui.isRecordingSession" ng-mouseenter="ui.showTime=true" ng-mouseleave="ui.showTime=false"><i class="recording fa fa-stop"></i> <span class="title">{{resourceBundle.stopRecordingSession}}</span> <span class="title" ng-show="ui.showTime">{{ui.recordTime}}</span></div>
-
-					<div class="dropdown" ng-click="ui.showRecordMenu=!ui.showRecordMenu"	>
+				<li id="recording" class="barbutton" ng-hide="ui.isRecordingSession">
+					<div title="{{resourceBundle.startRecordingSession}}"  ng-click="startRecordingSession($event)" ><i class="fa fa-circle"></i> <span class="title">{{resourceBundle.startRecordingSession}}</span></div>
+                    
+                    <div class="dropdown" ng-click="ui.showRecordMenu=!ui.showRecordMenu"	>
 						<div title="{{resourceBundle.titleChangeStream}}" ng-hide="ui.isRecordingSession" class="down" ><i class="fa fa-sort-down"></i> <span class="title"></span></div>
 						<ul ng-show="!ui.isRecordingSession && ui.showRecordMenu" class="resolutionlist">
 							<li ng-show="ui.canShareDesktop"><p ng-click="changeToRecordStream(0)"><span>{{resourceBundle.recordStream0}}</span><i ng-show="ui.currentRecordStream==0" class ="fa fa-circle"></i></p></li>
@@ -60,6 +57,20 @@
 							<li><p ng-click="changeToRecordStream(2)"><span>{{resourceBundle.recordStream2}}</span><i ng-show="ui.currentRecordStream==2" class ="fa fa-circle"></i></p></li>
 						</ul>
 					</div>
+					
+                </li>
+                <li ng-show="ui.isRecordingSession" class="barsection right"> 
+                    <div><i ng-class="{'fa-blink' :  !ui.isPauseRecordingSession}" class ="recording fa fa-circle"></i> <span class="title">{{ui.recordTime}}</span></span>
+                </li>
+                <li ng-show="ui.isRecordingSession" class="barbutton mini right">
+                    <div title="{{resourceBundle.pauseRecordingSession}}"  ng-click="pauseRecordingSession()" ng-show="ui.isRecordingSession && !ui.isPauseRecordingSession && ui.isPauseEnabled"><i class="fa fa-pause"></i></div>
+					
+                    <div title="{{resourceBundle.resumeRecordingSession}}"  ng-click="resumeRecordingSession()" ng-show="ui.isPauseRecordingSession"><i class="recording fa-blink fa fa-pause"></i></div>
+				</li>
+                <li ng-show="ui.isRecordingSession" class="barbutton mini right">
+                    <div title="{{resourceBundle.stopRecordingSession}}"  ng-click="stopRecordingSession()" ng-show="ui.isRecordingSession" ng-mouseenter="ui.showTime=true" ng-mouseleave="ui.showTime=false"><i class="fa fa-stop"></i></div>
+                </li>
+					
 				</li>
 			</ul>
 		</nav>

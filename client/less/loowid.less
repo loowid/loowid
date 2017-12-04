@@ -667,10 +667,21 @@ header{
           div {
             display: inline-block;
           }
+            
+          &.mini {
+            padding-left: 7px;
+            padding-right: 7px;
+            margin: 0px;
+            &:hover {
+                border-top-color: darken(@secondarycolor, 5%);
+                margin: 0;  
+            }
+            
+          }
           &:hover {
             border-top-color: @titlecolor;
             margin: 0 0.2em;
-            background: darken(@secondarycolor, 5%);
+            background:  darken(@secondarycolor, 5%);
           }
 
           .dropdown {
@@ -679,11 +690,25 @@ header{
               color: @titlecolor;
             }
           }
-
+          &.right {
+                float: right;
+          }
 
         }
+        &.barsection {
+            &.right {
+                float: right;
+            }
+            display: inline-block;
+            padding-right: 3px; 
+          
+            div {
+             display: inline-block;
+            }
 
-
+        }
+          
+        
         p{
           margin: 0 0 0 0;
           padding: 0 0 0 0;
