@@ -333,7 +333,7 @@ angular.module('mean.rooms').factory('MediaService',['Rooms','UIHandler','$resou
 
 			var getNewItemId = function(roomId) {
 				var lastRecording = getLastRecording(roomId);
-				return lastRecording?lastRecording.id.replace(getRoomFilePrefix(roomId),'').replace('.webm','')-0+1:0;
+				return lastRecording?lastRecording.id.substring(getRoomFilePrefix(roomId).length).replace('.webm','')-0+1:0;
 			};
 
 			var getAllRecordings = function(roomId) {
@@ -389,7 +389,10 @@ angular.module('mean.rooms').factory('MediaService',['Rooms','UIHandler','$resou
 								/* Remove all files in filesystem with alt+shift */
 								dirEntry.removeRecursively(function() {
 									console.log('Directory removed.');
-									purgeRecordings();
+									uiHandler.loowidRecordings = [{
+										roomId: $scope.global.roomId,
+										recordings: []
+									}];
 								}, errorHandler);
 							}
 						});
@@ -434,6 +437,18 @@ angular.module('mean.rooms').factory('MediaService',['Rooms','UIHandler','$resou
 			
 			// Show Recordings Available
 			setTimeout(function(){ showRecordingsOnChat(); },3000);
+
+			// Check if the room change to update the roomId
+			$scope.$watch(function(){
+				return $scope.global.roomId;
+			},function(newValue,oldValue) {
+				if (oldValue && newValue && oldValue !== newValue)  {
+					var roomRecordings = getRoomRecordings(oldValue,true);
+					if (roomRecordings) {
+						roomRecordings.roomId = newValue;
+					}
+				}
+			});
 
 			uiHandler.autoSaveRecording = function(data,ev) {
 				var initFileSystem = function(fs) {
