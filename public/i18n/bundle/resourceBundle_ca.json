@@ -288,11 +288,11 @@
     "titleOpenEtherpadInWindow": "Obre aquest document etherpad en una finestra de LooWID",
     "startRecordingSession": "Inicia la gravació",
     "stopRecordingSession": "Atura la gravació",
-    "pauseRecordingSession": "Reprende la gravació",
+    "pauseRecordingSession": "Pausa la gravació",
     "undoDelete": "Desfer l'eliminació",
     "readyRecord": "La teva sessió es s'ha gravat correctament {0}",
     "readyRecordShow": "Veure la gravació",
-    "cantRecord": "El teu navegador no suporta gravació de mitjans, utilitza una versió més actual de <strong> Chrome </ strong> per a gravar la teva sessió.",
+    "cantRecord": "El teu navegador no suporta gravació de mitjans, utilitza una versió més actual de <strong>Chrome</strong> per a gravar la teva sessió.",
     "noRecordAudioAvailable": "No hi ha cap àudio disponible, comparteix algun micròfon abans de començar a gravar.",
     "noStreamRecordAvailable": "No hi ha cap vídeo disponible a gravar.",
     "recordStream0": "Vídeo i àudio",
@@ -300,7 +300,7 @@
     "recordStream2": "Només àudio",
     "titleChangeStream": "Canviar la mode de gravació de la sala.",
     "download": "Descarrega la gravació",
-    "deleteRecord": "Eliminar la gravació",
+    "deleteRecord": "Elimina la gravació",
     "statusrecording": "La sessió està sent gravada pel propietari de la sala.",
     "youtubeoauth": "Autentica't a Google amb el teu canal de YouTube per carregar la gravació.",
     "youtubeupload": "Carrega",
@@ -327,5 +327,5 @@
     "videohead": "Vídeo",
     "desktophead": "Captura d'escriptori",
     "titleOpenNewTab": "Obre en una nova pestanya",
-    "resumeRecordingSession": "Reprendre la gravació"
+    "resumeRecordingSession": "Reprèn la gravació"
 }
