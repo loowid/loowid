@@ -4,11 +4,11 @@
 /*global MediaStream: true */
 /*global getScreenId: true */
 /*global UploadVideo: true */
-/*global FileError: true*/
 angular.module('mean.rooms').factory('MediaService',['Rooms','UIHandler','$resource',function(Rooms,UIHandler,$resource){
 
 	var LOOWID_FOLDER = 'loowid';
 	var LOOWID_FILESYSTEM_SIZE = 1024; // 1KB
+	var LOOWID_RECORDING_DATABASE = LOOWID_FOLDER+'/loowid.db';
 	var RATIO_4_3 = 0;
 	var RATIO_16_9 = 1;
 	var getUserMedia = (navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia || navigator.msGetUserMedia);
@@ -279,45 +279,91 @@ angular.module('mean.rooms').factory('MediaService',['Rooms','UIHandler','$resou
 			uiHandler.isPauseEnabled = requestFileSystem !== undefined;
 
 			var errorHandler = function (e) {
-				var msg = '';
-				switch (e.code) {
-				  case FileError.QUOTA_EXCEEDED_ERR:
-					msg = 'QUOTA_EXCEEDED_ERR';
-					break;
-				  case FileError.NOT_FOUND_ERR:
-					msg = 'NOT_FOUND_ERR';
-					break;
-				  case FileError.SECURITY_ERR:
-					msg = 'SECURITY_ERR';
-					break;
-				  case FileError.INVALID_MODIFICATION_ERR:
-					msg = 'INVALID_MODIFICATION_ERR';
-					break;
-				  case FileError.INVALID_STATE_ERR:
-					msg = 'INVALID_STATE_ERR';
-					break;
-				  default:
-					msg = 'Unknown Error';
-					break;
-				}
-				console.log('FileSystemError: ' + msg);
+				console.log('FileSystemError: ' + e.toString());
 			};
 
 			var getRoomFilePrefix = function(roomId) {
-				return 'recording-'+roomId+'-';
+				return 'recording-'+(roomId?roomId+'-':'');
 			};
 
-			var getLoowidRecordings = function() {
-				var loowidRecordings = (typeof(Storage)!=='undefined')?localStorage.loowidRecordings:null;
-				if (loowidRecordings) { 
-					loowidRecordings = JSON.parse(loowidRecordings);
-				} else {
-					loowidRecordings = [];
+			var eventQueue = [];
+			$scope.updateDatabase = false;
+			$scope.$watch('updateDatabase',function(newValue,oldValue){
+				// Update database
+				if (newValue) {	saveLoowidRecordings();	}
+			});
+
+			var saveLoowidRecordings = function() {
+				if (requestFileSystem) {
+					var firstElement = eventQueue.shift();
+					if (firstElement) {
+						requestFileSystem(window.TEMPORARY, LOOWID_FILESYSTEM_SIZE, function(fs){
+							fs.root.getFile(LOOWID_RECORDING_DATABASE, {create: true}, function(fileEntryRemove) {
+								fileEntryRemove.remove(function(){
+									fs.root.getFile(LOOWID_RECORDING_DATABASE, {create: true}, function(fileEntry) {
+										fileEntry.createWriter(function(fileWriter){
+											fileWriter.onwriteend = function(e) {
+												saveLoowidRecordings();
+											};
+											fileWriter.onerror = function(e) { 
+												console.log('Database update failed: ' + e.toString()); 
+											};
+											var blob = new Blob([firstElement], {type:'application/json'});
+											fileWriter.write(blob);
+										}, errorHandler);
+									}, errorHandler);
+								}, errorHandler);
+							}, errorHandler);
+						}, errorHandler);
+					} else {
+						// End the update
+						$scope.updateDatabase = false;
+					}
 				}
-				return loowidRecordings;				
+			};
+
+			var loadLoowidRecordings = function() {
+				if (requestFileSystem) {
+					requestFileSystem(window.TEMPORARY, LOOWID_FILESYSTEM_SIZE, function(fs){
+						fs.root.getDirectory(LOOWID_FOLDER, {create: true}, function(dirEntry) {
+							fs.root.getFile(LOOWID_RECORDING_DATABASE, {create: true}, function(fileEntry) {
+								fileEntry.file(function(file){
+									var reader = new FileReader();
+									reader.onloadend = function(e) {
+										if (this.result) {
+											try {
+												uiHandler.loowidRecordings = JSON.parse(this.result);
+											} catch(e) {
+												console.log('Database corrupted: '+e.toString());
+												uiHandler.loowidRecordings = [];
+											}
+										} else {
+											uiHandler.loowidRecordings = [];
+										}
+										// Watch about changes in recordings
+										$scope.$watch(function(){
+											return JSON.stringify(uiHandler.loowidRecordings);
+										}, function(){
+											// Update database
+											eventQueue.push(JSON.stringify(uiHandler.loowidRecordings));
+											$scope.updateDatabase = true;
+										});
+										// Remove missing files from localstorage
+										purgeRecordings();
+										// Show Recordings Available
+										showRecordingsOnChat();
+									};
+									reader.readAsText(file);
+								}, errorHandler);
+							}, errorHandler);
+						}, errorHandler);
+					}, errorHandler);
+				} else {
+					uiHandler.loowidRecordings = [];
+				}
 			};
 			
-			uiHandler.loowidRecordings = getLoowidRecordings();
+			loadLoowidRecordings();
 
 			var getRoomRecordings = function(roomId,empty) {
 				var roomRecordings = uiHandler.loowidRecordings.find(function(item) { return item.roomId === roomId; });
@@ -331,9 +377,13 @@ angular.module('mean.rooms').factory('MediaService',['Rooms','UIHandler','$resou
 				return roomRecordings;
 			};
 
+			var getRecordIndex = function(id,roomId) {
+				return id.substring(getRoomFilePrefix(roomId).length).replace('.webm','')-0;
+			};
+
 			var getNewItemId = function(roomId) {
 				var lastRecording = getLastRecording(roomId);
-				return lastRecording?lastRecording.id.substring(getRoomFilePrefix(roomId).length).replace('.webm','')-0+1:0;
+				return lastRecording?getRecordIndex(lastRecording.id,roomId)+1:0;
 			};
 
 			var getAllRecordings = function(roomId) {
@@ -343,6 +393,13 @@ angular.module('mean.rooms').factory('MediaService',['Rooms','UIHandler','$resou
 
 			var getLastRecording = function(roomId) {
 				var allRecordings = getAllRecordings(roomId);
+				allRecordings.sort(function(a,b){
+					var aIndex = getRecordIndex(a.id,roomId);
+					var bIndex = getRecordIndex(b.id,roomId);
+					if (aIndex < bIndex) { return -1; }
+					if (aIndex > bIndex) { return 1; }
+					return 0;
+				});
 				return allRecordings[allRecordings.length-1];
 			};
 
@@ -366,11 +423,22 @@ angular.module('mean.rooms').factory('MediaService',['Rooms','UIHandler','$resou
 				}
 			};
 
-			var saveRecordingTime = function(roomId,data) {
-				if (window.requestFileSystem) {
+			var saveRecordingTime = function(roomId,data,isStop) {
+				if (requestFileSystem) {
 					var allRoomRecordings = getAllRecordings(roomId);
-					if (allRoomRecordings[allRoomRecordings.length-1]) {
-						allRoomRecordings[allRoomRecordings.length-1].time = data;
+					var lr = allRoomRecordings[allRoomRecordings.length-1];
+					// Save time evry 30 secs
+					if (lr) {
+						var timeParts = data.split(':');
+						var newMillis = (+timeParts[0] * (60000 * 60)) + (+timeParts[1] * 60000) + (+timeParts[2] * 1000);
+						var currentMillis = 0;
+						if (!isStop && lr.time) {
+							timeParts = lr.time.split(':');
+							currentMillis = (+timeParts[0] * (60000 * 60)) + (+timeParts[1] * 60000) + (+timeParts[2] * 1000);
+						}
+						if (isStop || !lr.time || (newMillis - currentMillis) > 10000) {
+							lr.time = data;
+						}
 					}
 				}
 			};
@@ -380,6 +448,8 @@ angular.module('mean.rooms').factory('MediaService',['Rooms','UIHandler','$resou
 					requestFileSystem(window.TEMPORARY, LOOWID_FILESYSTEM_SIZE, function(fs){
 						fs.root.getDirectory(LOOWID_FOLDER, {create: true}, function(dirEntry) {
 							if (!ev.altKey) {
+								console.log('Database content:');
+								console.log(uiHandler.loowidRecordings);
 								/* List files in filesystem with shift */
 								dirEntry.createReader().readEntries(function(results){
 									console.log('Recordings available:'); 
@@ -389,10 +459,8 @@ angular.module('mean.rooms').factory('MediaService',['Rooms','UIHandler','$resou
 								/* Remove all files in filesystem with alt+shift */
 								dirEntry.removeRecursively(function() {
 									console.log('Directory removed.');
-									uiHandler.loowidRecordings = [{
-										roomId: $scope.global.roomId,
-										recordings: []
-									}];
+									// Recreate database
+									loadLoowidRecordings();
 								}, errorHandler);
 							}
 						});
@@ -412,31 +480,68 @@ angular.module('mean.rooms').factory('MediaService',['Rooms','UIHandler','$resou
 				});
 			};
 
-			var purgeRecordings = function() {
-				uiHandler.loowidRecordings = uiHandler.loowidRecordings.filter(function(item){ return item.roomId===$scope.global.roomId || item.recordings.length>0; });
-				uiHandler.loowidRecordings.forEach(function(r){
-					r.recordings.forEach(function(f){
-						resolveLocalFileSystemURL(f.url,
-							function(){/* file exists */},
-							function(){ 
-								f.missing = true; 
-								r.recordings = r.recordings.filter(function(item){ return !item.missing; });
-							});
-					});
-				});
-				// Save in local storage every change
-				$scope.$watch(function(){
-					return JSON.stringify(uiHandler.loowidRecordings);
-				}, function(){
-					if (typeof(Storage)!=='undefined') { localStorage.loowidRecordings = JSON.stringify(uiHandler.loowidRecordings); }
-				});
+			var findRecording = function(fileName) {
+				var findRec = function(item){ return item.url.endsWith('/'+fileName); };
+				for (var i=0; i<uiHandler.loowidRecordings.length; i+=1) {
+					var rr = uiHandler.loowidRecordings[i];
+					var rc = rr.recordings.find(findRec);
+					if (rc) { return { id: rr.roomId, recs: rc }; }
+				}
+				return false;
 			};
 
-			// Remove missing files from localstorage
-			purgeRecordings();
-			
-			// Show Recordings Available
-			setTimeout(function(){ showRecordingsOnChat(); },3000);
+			var getRecordingFiles = function(results) {
+				var recordings = {};
+				for (var n=0; n<results.length; n+=1) {
+					var rId = results[n].name.replace(getRoomFilePrefix(),'');
+					rId = rId.substring(0,rId.indexOf('-'));
+					if (!recordings['r'+rId]) {
+						recordings['r'+rId] = [];
+					}
+					recordings['r'+rId].push(results[n].name);
+				}
+				return recordings;
+			};
+
+			var getRecordingOf = function(purgedLoowidRecordings,rid) {
+				return purgedLoowidRecordings.find(function(item){ return item.roomId === rid; });
+			};
+
+			var getPurgedRecordings = function(recordings) {
+				var purgedLoowidRecordings = [];
+				for (var k in recordings) {
+					if (recordings.hasOwnProperty(k)) {
+						for (var j=0; j<recordings[k].length; j+=1) {
+							var obj = findRecording(recordings[k][j]);
+							if (obj) {
+								var rec = getRecordingOf(purgedLoowidRecordings,obj.id);
+								if (!rec) {
+									rec = {
+										roomId: obj.id,
+										recordings: []
+									};
+									purgedLoowidRecordings.push(rec);			
+								}
+								rec.recordings.push(obj.recs);
+							}
+						}
+					}
+				}
+				return purgedLoowidRecordings;
+			};
+
+			var purgeRecordings = function() {
+				if (requestFileSystem) {
+					requestFileSystem(window.TEMPORARY, LOOWID_FILESYSTEM_SIZE, function(fs){
+						fs.root.getDirectory(LOOWID_FOLDER, {create: true}, function(dirEntry) {
+							/* List files in filesystem with shift */
+							dirEntry.createReader().readEntries(function(results){
+								uiHandler.loowidRecordings = getPurgedRecordings(getRecordingFiles(results));
+							});
+						});
+					}, errorHandler);
+				}
+			};
 
 			// Check if the room change to update the roomId
 			$scope.$watch(function(){
@@ -453,9 +558,6 @@ angular.module('mean.rooms').factory('MediaService',['Rooms','UIHandler','$resou
 			uiHandler.autoSaveRecording = function(data,ev) {
 				var initFileSystem = function(fs) {
 					fs.root.getDirectory(LOOWID_FOLDER, {create: true}, function(dirEntry) {
-						dirEntry.createReader().readEntries(function(results){
-							if (rtc.debug) { console.log('Recordings available:'); console.log(results); }
-						});
 						var lastRecording = getLastRecording($scope.global.roomId);
 						var lastUrl = (lastRecording && ev.altKey)?lastRecording.url:'filesystem:https://localhost/temporary/unknown';
 						resolveLocalFileSystemURL(lastUrl,function(fileEntry){
@@ -537,14 +639,16 @@ angular.module('mean.rooms').factory('MediaService',['Rooms','UIHandler','$resou
 			};
 
 			var realRemoveRecording = function(url) {
-				resolveLocalFileSystemURL(url,function(fileEntry){
-					fileEntry.remove(function(){
-						removeVideoMessage(url);
-						purgeRecordings();
-					},errorHandler);
-				},function(){ 
-					console.log('File not found.');
-				});
+				if (resolveLocalFileSystemURL) {
+					resolveLocalFileSystemURL(url,function(fileEntry){
+						fileEntry.remove(function(){
+							removeVideoMessage(url);
+							purgeRecordings();
+						},errorHandler);
+					},function(){ 
+						console.log('File not found.');
+					});
+				}
 			};
 
 			$scope.undoRemoveRecording = function(url) {
@@ -630,7 +734,7 @@ angular.module('mean.rooms').factory('MediaService',['Rooms','UIHandler','$resou
 						uiHandler.isRecordingSession = false;
 						uiHandler.isPauseRecordingSession = false;
 						uiHandler.fileWriter = undefined;
-						saveRecordingTime($scope.global.roomId,uiHandler.recordTime);
+						saveRecordingTime($scope.global.roomId,uiHandler.recordTime,true);
 						window.clearInterval(uiHandler.recordTimeInterval);
 						if (uiHandler.screenStream) {
 							uiHandler.screenStream.getTracks()[0].stop();
@@ -861,7 +965,7 @@ angular.module('mean.rooms').factory('MediaService',['Rooms','UIHandler','$resou
 				msgList.push(youtubeLink);
 				var obj = {'class':'other',
                         'id': $scope.global.bot,
-                        'time': new Date(),
+                        'time': new Date((new Date()).getTime() - 15100), // Hack 15s, ensure welcome message is not mixed with recording messages
                         'istyping': false,
                         'list':[{list:msgList}]};
 			    if (onindex) {
