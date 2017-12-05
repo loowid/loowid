@@ -69,7 +69,7 @@ RoomSchema.statics = {
     load: function(id, sid, cb) {
     	// Only show the last maxChat chat messages
     	var now = new Date();
-    	this.findOne({'$or':[{roomId:id},{'alias.id':id,'alias.timestamp':{'$gte':now}},{'alias.session':sid,'alias.timestamp':{'$gte':now}}]},{chat:{'$slice':maxChat}}).exec(cb);
+		this.findOne({'$or':[{roomId:id},{'alias.id':id,'alias.timestamp':{'$gte':now}},{'alias.id':id,'alias.session':sid,'alias.timestamp':{'$gte':now}}]},{chat:{'$slice':maxChat}}).exec(cb);
     },
     openByContext: function(id, sid, cb) {
     	// Only show the last maxChat chat messages
