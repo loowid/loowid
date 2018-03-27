@@ -315,7 +315,7 @@
     "deleteRecord": "Slett opptak",
     "readyRecord": "Økta di ble tatt opp {0}",
     "cantRecord": "Din nettleser støtter ikke opptak, bruk en nylig versjon av <strong>Chrome</strong> for å kunne ta opp økta.",
-    "noRecordAudioAvailable": "Ingen lyd tilgjengelig for opptak, del en mikrofon før opptaket startes",
+    "noRecordAudioAvailable": "Ingen lyd tilgjengelig for opptak, del en mikrofon før opptaket startes.",
     "noStreamRecordAvailable": "Det er ingen skjerm å ta opp.",
     "titleChangeStream": "Endre øktopptaksmodus.",
     "undoDelete": "Angre sletting",
