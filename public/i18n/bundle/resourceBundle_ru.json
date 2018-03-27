@@ -322,5 +322,9 @@
     "youtubemandatory": "Вы должны заполнить все поля.",
     "youtubeuploadedtranscoding": "Загрузка завершена, YouTube декодирует ваше видео ...",
     "youtubetranscodingfailed": "Ошибка декодирования видео.",
-    "youtubeuploadtitle": "Отправьте свою запись на YouTube."
+    "youtubeuploadtitle": "Отправьте свою запись на YouTube.",
+    "pauseRecordingSession": "Приостановить запись",
+    "resumeRecordingSession": "Продолжить запись",
+    "deleteRecord": "Удалить запись",
+    "undoDelete": "Отменить удаление"
 }
