@@ -320,7 +320,7 @@
     "youtubechannel": "Kanaal",
     "youtubeclientidmissing": "U moet de LooWID-server instellen met een geldige YouTube Client API-ID",
     "youtubemandatory": "U moet alle velden invullen.",
-    "youtubeuploadedtranscoding": "Uploaden voltooid; YouTube is bezig uw met het transcoderen van uw…",
+    "youtubeuploadedtranscoding": "Uploaden voltooid; YouTube is bezig met het transcoderen van uw video…",
     "youtubetranscodingfailed": "Fout bij transcoderen van video.",
     "youtubeuploadtitle": "Verstuur uw opname naar YouTube.",
     "pauseRecordingSession": "Opname pauzeren",
