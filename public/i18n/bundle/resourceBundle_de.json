@@ -200,5 +200,8 @@
     "youarefired": "Du bist aus dem Raum verwiesen worden",
     "youmustacceptterms": "Du must die Bedingungen akzeptieren",
     "yourbrowsernot": "Im Moment wird dein Browser leider nicht unterstützt. Folge @LooWIDCom, um zu erfahren, wann es soweit ist",
-    "embedVideo": "Vídeo - Klick öffnet"
+    "embedVideo": "Vídeo - Klick öffnet",
+    "maxmembersbyroom": "Max. Mitglieder pro Raum",
+    "textitemsrecord": "Nehmen Sie Ihre Raumsitzung direkt auf Ihren Computer auf oder teilen Sie sie auf YouTube.",
+    "textitemsetherpad": "Teilen Sie Notizen in einem Block, auf den jeder gleichzeitig Zugriff hat."
 }
