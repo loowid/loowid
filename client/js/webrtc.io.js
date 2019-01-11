@@ -963,7 +963,11 @@ function mergeConstraints(cons1, cons2) {
 			element.mozSrcObject = stream;
 			element.play();
 		} else {
-			element.src = wkURL.createObjectURL(stream);
+			try {
+				element.srcObject = stream;
+			  } catch (error) {
+				element.src = wkURL.createObjectURL(stream);
+			  }
 		}
 		element.play();
 	};
