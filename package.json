@@ -26,7 +26,7 @@
   },
   "dependencies": {
     "async": "0.2.9",
-    "connect-mongo": "0.8.2",
+    "connect-mongo": "git+https://github.com/loowid/connect-mongo.git#v0.8.2",
     "cookie-signature": "1.0.3",
     "express": "3.4.4",
     "grunt": "0.4.1",

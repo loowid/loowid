@@ -12,6 +12,8 @@ COPY package.json /opt/loowid/
 RUN cd /opt/loowid && npm install --production
 
 COPY . /opt/loowid
+RUN rm -rf /opt/loowid/node_modules/express/node_modules/debug
+RUN cp -R /opt/loowid/node_modules/connect-mongo/node_modules/debug /opt/loowid/node_modules/express/node_modules
 
 # Create self signed certificate
 RUN openssl genrsa -out /opt/loowid/private.pem 1024 && \
