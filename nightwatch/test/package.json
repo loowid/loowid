@@ -1,0 +1,9 @@
+{
+  "name": "loowid-nightwatch-test",
+  "private": true,
+  "version": "0.0.1",
+  "main": "globals.js",
+  "dependencies": {
+    "nightwatch-video-recorder": "1.1.0"
+  }
+}

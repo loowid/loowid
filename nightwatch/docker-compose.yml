@@ -1,0 +1,42 @@
+version: '2'
+services:
+  loowid:
+    image: loowid/loowid
+    ports:
+     - "443:443"
+    environment:
+       - MONGOHQ_URL=mongodb://mongodb:27017/loowid
+       - ADMIN_PASSWORD=password
+       - ADMIN_USERNAME=user
+       - CEXTID=ocegbggnlgopmchofgnbjhgpljlchlpl
+       - LOOWID_YOUTUBE_CLIENTID=xxxxxx
+       - LTI_KEY=key
+       - LTI_OWNER_ROLES=rol1,rol2,rol3
+       - LTI_SECRET=secret
+       - WS_PORT=443
+    depends_on:
+     - mongodb
+
+  mongodb:
+    image: mongo:2.6.11
+    expose:
+      - "27017"
+    command: ["mongod", "--noprealloc", "--smallfiles"]
+
+  chromedriver:
+    image: blueimp/chromedriver
+    environment:
+      - VNC_ENABLED=true
+      - EXPOSE_X11=true
+    ports:
+      - 5900:5900
+
+  nightwatch:
+    image: blueimp/nightwatch:latest
+    depends_on:
+      - chromedriver
+      - loowid
+    environment:
+      - WAIT_FOR_HOSTS=loowid:443 chromedriver:4444 chromedriver:6060
+    volumes:
+      - ./test:/home/node
