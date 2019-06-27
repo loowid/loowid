@@ -198,7 +198,7 @@
     "timeformat": "hh:mi",
     "p2p": "Maskin til maskin",
     "welcomedesc": "Godt å se at du bruker LooWID. Forestill deg hva du kan gjøre ved å helt enkelt dele skrivebordsskjermen din. Hjelp venner, vis dine ferdigheter, triks, kringkast spillingen din, og mer",
-    "easydesc": "Du kan opprette et rom når du ønsker. Alle som har samme lenke vil komme til ditt rom. Som forvalg er rommet privat, så bare dem som vet om romlenken vil kunne ta del i det.",
+    "easydesc": "Du kan opprette et rom når du ønsker. Alle som besøker det via samme romlenke som deg vil komme inn i det. Som forvalg er rommet privat, så bare de som vet om romlenken vil kunne ta del i det.",
     "p2pdesc": "LooWID bruker maskin til maskin-kommunikasjon, noe som betyr at videostrømmer sendes direkte mellom deg og dem du snakker med. Ingenting lagres på våre tjenere, og all kommunikasjon er kryptert med SSL",
     "searchdesc": "Ta del i offentlige rom for å se hva som skjer. Søk etter nøkkelord inndelt av komma",
     "feedbackdesc": "Fortell om din opplevelse, hva kan endres og forbedres, send en <a href='mailto:loowid@gmail.com'>e-post</a>. <br /> Din mening teller. Fyll inn et lite <a href='/views/survey_en.html' target='_blank'>spørreskjema</a>",
