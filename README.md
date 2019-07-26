@@ -2,8 +2,6 @@
 
 *LOOk What I'm Doing* is a web application that allows you to connect with other users and share audio, video, screen and files without any plugin using WebRTC technology.
 
-https://www.loowid.com
-
 Wiki Documentation | Vote us !! | Bitnami Contest
 :---:|:---:|:---:
 [![Wiki Documentation](https://raw.githubusercontent.com/loowid/loowid-doc/master/images/howtouse/6-user-buttons.png)](https://github.com/loowid/loowid/wiki)|[![LooWID Bitnami Contest](https://d33np9n32j53g7.cloudfront.net/assets/stacks/loowid/img/loowid-module-20caa0b9cc4fc99d7b5929ab83f8418f.png)](https://bitnami.com/stack/loowid)|[![Bitnami](https://pbs.twimg.com/profile_images/378800000732241585/9e00ada9691f6aab16668cfb9dfa2f1c_normal.png)](https://bitnami.com/contest?page=3&product=loowid&utm_campaign=Application%2BContest&utm_medium=badge&utm_source=bitnami&utm_term=loowid)
@@ -165,5 +163,3 @@ You can watch the **review** made by **Jay Weldy** to see what LooWID looks like
 
 ## Help us to maintain LooWID
 LooWID is an open source project and code developement and translations contributions would be very appreciated. We encourage you to join to start developing on project and create a pull request to the main repository. If you can't contribute development or translations and still want to contribute to the project, you could donate via  [![Flattr this git repo](http://api.flattr.com/button/flattr-badge-large.png)](https://flattr.com/submit/auto?user_id=LoowidCOM&url=https://www.loowid.com&title=LooWID&language=&tags=github&category=software)
-
-That will help us to maintain www.loowid.com service up and running.  
