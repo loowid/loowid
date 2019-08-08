@@ -143,5 +143,17 @@
     "disconnectedusers": "Rozłączony użytkownik",
     "titleConfigureroom": "Skonfiguruj ustawienia pokoju",
     "titleDisableeaudionoti": "Włącz powiadomienia dźwiękowe",
-    "titleLeaveroom": "Opuść ten pokój"
+    "titleLeaveroom": "Opuść ten pokój",
+    "gravataremail": "E-mail Gravatar",
+    "usertypeviewer": "Przeglądarka",
+    "roomviewer": "Przeglądarka",
+    "desktopsharingnotactive": "Udostępnianie pulpitu nie jest domyślnie aktywną opcją. Jeśli chcesz, żeby była aktywna",
+    "wantsyousharescreen": "<strong>{0}</strong> chce, abyś udostępnił swój pulpit. Chcesz go udostępnić?",
+    "unablepermissionaudio": "Przeglądarka nie może uzyskać dostępu do mikrofonu. Upewnij się, że mikrofon jest podłączony i że użytkownik udzielił przeglądarce żądanej zgody",
+    "shhh": "Ciii, jestem na misji!",
+    "yourbrowsernot": "W tej chwili Twoja przeglądarka nie jest obsługiwana. Śledź @LooWIDCom, aby wiedzieć, kiedy będzie",
+    "metakeys": "ekran, udostępnianie, serwis społecznościowy, WebRTC, screencast, łatwe",
+    "requestforaudio": "<strong>{0}</strong> chce udostępnić swoje audio",
+    "lockroom": "Pokój zamknięty",
+    "qwhatcanido": "Co jeszcze mogę zrobić?"
 }
