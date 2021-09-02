@@ -14,7 +14,9 @@
   },
   "scripts": {
     "start": "node node_modules/grunt-cli/bin/grunt prod",
-    "test": "node node_modules/grunt-cli/bin/grunt test --mongodb=off --nodes=1"
+    "test": "node node_modules/grunt-cli/bin/grunt test --mongodb=off --nodes=1",
+    "prepublish": "npm run snyk-protect",
+    "snyk-protect": "snyk-protect"
   },
   "devDependencies": {
     "coveralls": "^2.11.2",
@@ -50,6 +52,8 @@
     "socket.io": "0.9.6",
     "underscore": "1.5.2",
     "http-proxy": "^1.8.1",
-    "ws": "0.4.31"
-  }
+    "ws": "0.4.31",
+    "@snyk/protect": "latest"
+  },
+  "snyk": true
 }
